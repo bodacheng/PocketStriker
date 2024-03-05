@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Units
+  m_EditorClassIdentifier: 
+  m_GroupName: Units
+  m_Data:
+    m_SerializedData: []
+  m_GUID: f0dd6dc67cdb345bfa012551500cd672
+  m_SerializeEntries:
+  - m_GUID: 24087ecff243c4c4cb07db7cc128b2e2
+    m_Address: human/sybill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 2e8d7b503712441beac04cf9f89e22c7
+    m_Address: human/robot3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 6fc10c9acafe91c47b6414bcde9e68be
+    m_Address: human/mutant_b
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 4f4883883ac28404fa61878c09ac0b9b
+    m_Address: human/earth_golem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: f1732b694ef1b4ac9b896b55ce58d4fc
+    m_Address: human/maggie
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: d2ed3e4b366734b3a9375c08ada536fd
+    m_Address: human/haruka
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 33e6164656c424916beb474da8851e97
+    m_Address: human/et
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 6ca3efb6cefae4338ba0c93e213760a3
+    m_Address: human/adam
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 090a349b7348e4958b68a1b07d604f13
+    m_Address: human/yuta
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 1e1e05d63558f44b681b57faaf71bb49
+    m_Address: human/tetsuya
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: f17d85e625c6d314aa50d3d3de82bbcf
+    m_Address: human/NanoCyborg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: c6d41cd21953f4e55b15fe370a64f040
+    m_Address: human/adam_naked
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 5a52fa7e7b8e14ce685ddb57c94dece3
+    m_Address: human/HeavyBioMutant
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 3c73890c4af75411480c8f802eae4a91
+    m_Address: human/baruk
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 03f2228b049054295ac8a84dcde92a44
+    m_Address: human/fire_golem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  - m_GUID: 6ff42477e1f2d47dfb851c413fb563b8
+    m_Address: human/ice_golem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 815cafc3ee63d4386b4cd4391b50b151, type: 2}
+    - {fileID: 11400000, guid: 28d5363f76943416f92a27f68fc3e33d, type: 2}

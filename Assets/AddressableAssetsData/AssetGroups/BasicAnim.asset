@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BasicAnim
+  m_EditorClassIdentifier: 
+  m_GroupName: BasicAnim
+  m_Data:
+    m_SerializedData: []
+  m_GUID: b9dd2d761aca64481a7b825a015e8800
+  m_SerializeEntries:
+  - m_GUID: fe18baae7ba7848ff9b2e5eb922f4614
+    m_Address: human/BasicPack
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - anim
+    - basic_anim
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 676e333522bdd4bda8159b76cdb96960, type: 2}
+    - {fileID: 11400000, guid: 0b158931669eb44c89bbe2060c505917, type: 2}

@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Config
+  m_EditorClassIdentifier: 
+  m_GroupName: Config
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e937ec13c8ac84573b6ede0b131434e7
+  m_SerializeEntries:
+  - m_GUID: d7db40fb5b64b403480905c9cb8899d6
+    m_Address: Config/mst_unit
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: ba918278b8f5f41299cb4e7930b9b5b4
+    m_Address: Config/skill_name
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: a68841c2c08ac4fefafe74c4812cbcd1
+    m_Address: Config/skill_ai_attrs
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: fb73d0a5d0f8b483090a002c2d712a02
+    m_Address: Config/mst_skill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 0b7e9a68701b2457f8e322c57e0e682d
+    m_Address: Config/LanguageCode
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 2379f79c6262d40f6b36537dd2256428
+    m_Address: Config/unit_passive
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: f82352243f33a48c79e9de4316104397
+    m_Address: Config/stage_mode
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 51d4bf73a53b04fc0a3cf967d3ecd761
+    m_Address: Config/SkillStaticAnalysis
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 26bb3442a9a6b4908b2a162f148e49b0
+    m_Address: Config/fight_params
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 51715071703f44a39b79e07457b5c0e7
+    m_Address: Config/short_story
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: 3dcacaa4c9fea46fcb5a8fb806b94f08
+    m_Address: Config/gb_short_story
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  - m_GUID: cc8bc4431333a4b94b1f8148807004f0
+    m_Address: Config/commonSetting
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 4f3fbf609cb0745e1b39aa14279722db, type: 2}
+    - {fileID: 11400000, guid: fe6ac7a1ae94f4c5e83ab2cf90ee0b2a, type: 2}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BGM
+  m_EditorClassIdentifier: 
+  m_GroupName: BGM
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 0ff4ff40f3437894d8933054ed1cca63
+  m_SerializeEntries:
+  - m_GUID: 41572ba47fae64131813783fcff21408
+    m_Address: music/lobby
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - music
+  - m_GUID: 47a487b7ac156458fb3be6ba095ff1e0
+    m_Address: music/fight1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - music
+  - m_GUID: f1acd6908a0f945adaeb8b8cbf8d75e9
+    m_Address: music/fight2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - music
+  - m_GUID: 7901b554c073c41a3800c9a8aa962fa8
+    m_Address: music/start
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - music
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0e1875e6d934a924f973c48e259bdffc, type: 2}
+    - {fileID: 11400000, guid: 8d0ad128243be0d41a9532ef433a407f, type: 2}

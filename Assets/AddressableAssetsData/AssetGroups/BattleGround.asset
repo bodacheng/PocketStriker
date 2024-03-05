@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BattleGround
+  m_EditorClassIdentifier: 
+  m_GroupName: BattleGround
+  m_Data:
+    m_SerializedData: []
+  m_GUID: fd6831a11a135a5489045b0287f11aa6
+  m_SerializeEntries:
+  - m_GUID: 368f03a8a88c84f8dbc0af315a1aa87a
+    m_Address: battleGround/0
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_ground
+  - m_GUID: d640edb1e5b754d758335fc9cf47e7e6
+    m_Address: battleGround/1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_ground
+  - m_GUID: 20e84f904415347b49bb9f1dafd45019
+    m_Address: battleGround/2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - battle_ground
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: df31f4c3b8f4eb446b45f2231dc26841, type: 2}
+    - {fileID: 11400000, guid: e01690087279beb4e955cc162a96ceb9, type: 2}

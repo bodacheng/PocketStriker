@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: HurtObjects
+  m_EditorClassIdentifier: 
+  m_GroupName: HurtObjects
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 157b11f4138794e828a44fe1b11e91ce
+  m_SerializeEntries:
+  - m_GUID: a5f71a40524fc4afea0d7136365a0768
+    m_Address: bluemagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  - m_GUID: e2a7d7e67697d483fb476a8e81f0af38
+    m_Address: darkmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  - m_GUID: 2d823c1fb646349b894badaf146bce05
+    m_Address: defaultmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  - m_GUID: 64c0940bcfa204eabb7147436da27b90
+    m_Address: greenmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  - m_GUID: b41378ed82cac40789cfe56989ba88cc
+    m_Address: lightmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  - m_GUID: 1525bc5928d6f4b41a2b8386153079b4
+    m_Address: redmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - weapon
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9da47a4627a8648e1960535d31edee8e, type: 2}
+    - {fileID: 11400000, guid: 1069176e6811248109093f00716420d8, type: 2}

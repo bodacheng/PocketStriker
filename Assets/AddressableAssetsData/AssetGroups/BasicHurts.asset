@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BasicHurts
+  m_EditorClassIdentifier: 
+  m_GroupName: BasicHurts
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 419f5f2c878f14dda938f129ecc166dc
+  m_SerializeEntries:
+  - m_GUID: 816994435414445a6a750007d6f37276
+    m_Address: human/basic_hurts
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - hurt_anim
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 7a3ff95c6aaaf47e2a8a00b79fe2a0ad, type: 2}
+    - {fileID: 11400000, guid: 5bf588378f02946d9b881d4cd0ce4781, type: 2}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: SkillAnim
+  m_EditorClassIdentifier: 
+  m_GroupName: SkillAnim
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 0585100253e4349a6a5d57cdf17ea8e4
+  m_SerializeEntries:
+  - m_GUID: e56f84544fec544048d0cea7986efd29
+    m_Address: human/skill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_anim
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: e4b517c71adaf4f9ba014df2b8d66903, type: 2}
+    - {fileID: 11400000, guid: 27563071a99994da3ba2fec1e1f799ef, type: 2}

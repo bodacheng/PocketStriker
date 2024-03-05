@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Effects
+  m_EditorClassIdentifier: 
+  m_GroupName: Effects
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 64e13291244ba4a7081263bae4da9fd5
+  m_SerializeEntries:
+  - m_GUID: f086acfb6dc9946beac72e9cfc67ded9
+    m_Address: bluemagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  - m_GUID: d2cb06a3d8f5b4c2eb2214f46ebe885f
+    m_Address: darkmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  - m_GUID: ca7d60e6fecaa4cdebb6069c3ddc94ce
+    m_Address: defaultmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  - m_GUID: 14ca550a50cfd4b5991f49b5d73a60f4
+    m_Address: greenmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  - m_GUID: aff4e202137ba41ec82dab77a9e68085
+    m_Address: lightmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  - m_GUID: 8b322cffeb156444281ed22adc0a03e5
+    m_Address: redmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - effect
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 05a37f38fe289408e986f45f7420117c, type: 2}
+    - {fileID: 11400000, guid: ba950d4b344e048a0a5cd542f0458f9a, type: 2}

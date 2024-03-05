@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: BasicUnitComponent
+  m_EditorClassIdentifier: 
+  m_GroupName: BasicUnitComponent
+  m_Data:
+    m_SerializedData: []
+  m_GUID: d8adc24c185234e9dab436210d7d383b
+  m_SerializeEntries:
+  - m_GUID: a58ed11c0916c4478bcff07ef3449982
+    m_Address: BasicUnitComponent/B_enegryBlade.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - resource
+  - m_GUID: 0c72f172b96b74479b289100f736d733
+    m_Address: BasicUnitComponent/D_enegryBlade.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - resource
+  - m_GUID: 4234e994c97284b6db985e98403ef55e
+    m_Address: BasicUnitComponent/G_enegryBlade.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - resource
+  - m_GUID: e7fd8549653d8449d83ff56c9104979b
+    m_Address: BasicUnitComponent/R_enegryBlade.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - resource
+  - m_GUID: 2a4a033d7c0534bfdb5ec93b4fce6d9b
+    m_Address: BasicUnitComponent/W_enegryBlade.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - resource
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 834c889c0ca774f7384624ada90e2e66, type: 2}
+    - {fileID: 11400000, guid: 54bb07b9b3ead437090f5aca2e48b269, type: 2}

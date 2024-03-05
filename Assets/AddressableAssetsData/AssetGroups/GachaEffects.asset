@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: GachaEffects
+  m_EditorClassIdentifier: 
+  m_GroupName: GachaEffects
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 822f6f330b0de4d9386e6c621bab1a1a
+  m_SerializeEntries:
+  - m_GUID: fffd28e4ead204e7aa9991b98db9eabf
+    m_Address: gachastar0
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 4b4257c41358e4e718e6a64c15950ea0
+    m_Address: gachastar1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 117e2af522d7e476e9a653de3592d180
+    m_Address: gachastar2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 4cc2f8dc371a849adaa01c17e4ed14ed
+    m_Address: gachastar3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: b3cb710725b3c47f8adda571c07f763d
+    m_Address: screenStarExplostionTest0
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 961d8b82f21f54954a8fcfefe0fbb4ad
+    m_Address: screenStarExplostionTest1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: b411754e9a5974c41a82814c68f4f929
+    m_Address: screenStarExplostionTest2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: cf3c0218dce574049a094b56e4d72390
+    m_Address: screenStarExplostionTest3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: ba8db827643896b44bbda4cf5310a5de
+    m_Address: gachaResultEffect2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 4b10863adad46d24ab58d2595ef40b85
+    m_Address: gachaResultEffect3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 8da3759130e52a94897f0dc4f818c389
+    m_Address: gachaResultEffect1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  - m_GUID: 44744cb0e5ffab748b08ce782a3e3da4
+    m_Address: gachaResultEffect0
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - gacha_effect
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 61c2d2c1c580647b3a929114a973f692, type: 2}
+    - {fileID: 11400000, guid: 7a2afe485279c47b5b3d96f2adc30736, type: 2}

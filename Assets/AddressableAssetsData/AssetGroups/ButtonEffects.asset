@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ButtonEffects
+  m_EditorClassIdentifier: 
+  m_GroupName: ButtonEffects
+  m_Data:
+    m_SerializedData: []
+  m_GUID: feca3c036bef68b40a6c2011021de6e3
+  m_SerializeEntries:
+  - m_GUID: d40214c872fb74ce5bf86017e1a865c3
+    m_Address: ButtonEffects/bluemagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: 17fa5ea858cbe415584a9a8ac50d6097
+    m_Address: ButtonEffects/darkmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: 1aa7118b75e044eb8aa0aa338aa4d9b9
+    m_Address: ButtonEffects/defaultmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: 37c8b196c303e4ee9a169ab427ea3a0b
+    m_Address: ButtonEffects/greenmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: c6cea7af536274cddae52879a621fc88
+    m_Address: ButtonEffects/lightmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: d8ad3e6cc362c42a19b7c126b76cae50
+    m_Address: ButtonEffects/redmagic
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: d0b39e8dfd8694a66bbdde731c0a4905
+    m_Address: ButtonEffects/selectedTab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: e2a5a03cf6c1c48099c00e2166539e9c
+    m_Address: ButtonEffects/stonePoweredUp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  - m_GUID: 40ebbf3c585154bd0a23e3c4da73b20c
+    m_Address: ButtonEffects/ui_exbarburn
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - btn_effect
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 7b223a73941d6c246bfc2bf0a439b856, type: 2}
+    - {fileID: 11400000, guid: 31fbf7397e02ea04d80feda3f6665945, type: 2}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: SlotEffects
+  m_EditorClassIdentifier: 
+  m_GroupName: SlotEffects
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 4e4d2f51a03724d2782981921556d853
+  m_SerializeEntries:
+  - m_GUID: 5ac2ac0fac8b3754eb7617f47341594c
+    m_Address: SlotEffects/ex2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - slot_effect
+  - m_GUID: b865ba9c039810d4eaac76ecea00f777
+    m_Address: SlotEffects/normal
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - slot_effect
+  - m_GUID: 9474b6c41563310429b735a9c0cceb49
+    m_Address: SlotEffects/ex1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - slot_effect
+  - m_GUID: 10c46ec9beba6bf47bd84e51232744ae
+    m_Address: SlotEffects/ex3
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - slot_effect
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 71b5b3d21994d4290b615da003f839e9, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 52ed013fa7c06463fadd9f87167b4b22, type: 2}
+    - {fileID: 11400000, guid: 8ca11a1daa08d40b4ac5b85296a661e4, type: 2}
