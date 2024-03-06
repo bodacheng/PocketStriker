@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43766b8020d004e79a0be7e7abcca48c, type: 3}
+  m_Name: Data
+  m_EditorClassIdentifier: 
+  hasDefend: 0
+  skillStoneHasExp: 0
+  knockOffYAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 12.306488
+      outSlope: 12.306488
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.25669587
+    - serializedVersion: 3
+      time: 0.16701663
+      value: 2.1551974
+      inSlope: 5.989071
+      outSlope: 5.989071
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.90062773
+      outWeight: 0.3507107
+    - serializedVersion: 3
+      time: 0.6628503
+      value: -1.8411984
+      inSlope: -12.752612
+      outSlope: -12.752612
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.0025325217
+    - serializedVersion: 3
+      time: 60.630272
+      value: -692.26746
+      inSlope: -11.891722
+      outSlope: -11.891722
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.10435713
+      outWeight: 0.077702716
+    - serializedVersion: 3
+      time: 1078.9465
+      value: -9777.015
+      inSlope: -4.218889
+      outSlope: -4.218889
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07399521
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  knockOffZAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 24.919518
+      outSlope: 24.919518
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.026875
+    - serializedVersion: 3
+      time: 49.790714
+      value: 1016.41833
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hDamageYAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 23.706964
+      outSlope: 23.706964
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.07022149
+    - serializedVersion: 3
+      time: 0.7317031
+      value: -3.4004219
+      inSlope: -28.178617
+      outSlope: -28.178617
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.06518471
+      outWeight: 0.0025325217
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hDamageZAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 13.220373
+      outSlope: 13.220373
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.049019612
+    - serializedVersion: 3
+      time: 49.790714
+      value: 1016.41833
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fighterRigidMass: 1000
+  onTouchEnemyBodyRigidDrag: 1000
+  fighterMoveSpeed: 10
+  closeDis: 2
+  AT_coefficient: 1
+  HP_coefficient: 1
+  Team1Invincible: 0
+  NormalSkillExGet: 30
+  Sp1SkillExGet: 0
+  Sp2SkillExGet: 0
+  Sp3SkillExGet: 0
+  getHurtExGet: 10
+  slightHitLastingTime: 0.1
+  lightHitLastingTime: 0.3
+  heavyHitLastingTime: 0.3
+  superHitLastingTime: 0.4
+  highHitLastingTime: 0.4
+  hurtFreezeInDuration: 0.01
+  hurtFreezeOutDuration: 0.2
+  normalAttackPosFixingTime: 0.03
+  knockOffExtent: 15
+  MaxKnockoffLaidGroundTime: 1
+  CanGetUpAfterKnockoffToGround: 0.5
+  GetupTime: 0.5
+  SureToPushForwardDis: 5
+  defendHP: 0
+  lightBlockLastingTime: 0.3
+  heavyBlockLastingTime: 0.6
+  attackDrawingDistance: 1
+  resistanceMax: 10
+  toEnemyNearestDis: 0.5
+  eXMax: 90
+  dreamComboGaugeMax: 300
+  dreamComboSpeed: 1.7
+  dreamComboResistTime: 0.5
+  dreamComboResistUpCount: 5
+  player1DreamComboAIRateNumM: 20
+  arenaEnemyDreamComboAIRate: 30
+  energyResolveAfterExtendBoundary: 5
+  _physicMaterial: {fileID: 13400000, guid: 14a74fe52c92e416ea176cf990c64822, type: 2}

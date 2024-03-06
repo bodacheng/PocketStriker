@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a2fc58dd8a094ee2b1e75230d7aeca8, type: 3}
+  m_Name: commonSetting
+  m_EditorClassIdentifier: 
+  devMode: 0
+  maxStoneCount: 1000
+  gangbangModeMaxUnitPerTeam: 24
+  unitConfigFile: mst_unit
+  skillConfigFile: mst_skill
+  skillAIFile: skill_ai_attrs
+  skillNameFile: skill_name
+  passiveSKillFile: unit_passive
+  stageModeFile: stage_mode
+  skillStaticAnalysis: SkillStaticAnalysis
+  skillDynamicAnalysis: SkillDynamicAnalysis.csv
+  languageCodeFile: LanguageCode
+  shortStoryFile: short_story
+  gbShortStoryFile: gb_short_story
+  admob_interstitial_iosKey: ca-app-pub-9232931129246316/3313510110
+  admob_interstitial_androidKey: ca-app-pub-9232931129246316/3884942487
+  startThemeAddressKey: music/start
+  lobbyThemeAddressKey: music/lobby
+  fightThemeAddressKey1: music/fight1
+  fightThemeAddressKey2: music/fight2
+  hitGroundEffectCode: hitGround
+  wallCrackEffectCode: wallCrack
+  breakFreeEffectCode: breakFree
+  memberShiftEffectCode: membershift
+  btnTapSound: {fileID: 8300000, guid: a6473f5264a14804e992a7a4a29cd744, type: 3}
+  btnConfirmSound: {fileID: 8300000, guid: 468f662ba85278c419ef967f7c33907b, type: 3}
+  exTabSound: {fileID: 8300000, guid: bfc5803fa8fa8924bbeaa34f4f689bb1, type: 3}
+  characterAnimDuration: 0.15
+  shadowMaterial: {fileID: 2100000, guid: ea7a57501503cd74f87a10d974771222, type: 2}
+  resistColor: {r: 0, g: 0.5254902, b: 0.7921569, a: 0.49019608}
+  speedColor: {r: 0.18431373, g: 1, b: 0.9411765, a: 0.3764706}
+  dreamColor: {r: 1, g: 0.33333334, b: 0.47058824, a: 0.8352941}
+  downLoadLabels:
+  - quest
+  - quest_gangbang
+  - unit
+  - weapon
+  - effect
+  - skill_anim
+  - unit_icon
+  emptyBgColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  emptyFrameColor: {r: 1, g: 1, b: 1, a: 1}
+  lightBgColor: {r: 1, g: 0.69411767, b: 0, a: 1}
+  lightFrameColor: {r: 0.9843137, g: 1, b: 0, a: 1}
+  darkBgColor: {r: 0.5058824, g: 0, b: 1, a: 1}
+  darkFrameColor: {r: 0.9843137, g: 0.23137255, b: 1, a: 1}
+  redBgColor: {r: 0.7647059, g: 0, b: 0, a: 1}
+  redFrameColor: {r: 1, g: 0, b: 0.07450981, a: 1}
+  blueBgColor: {r: 0.101960786, g: 0.5058824, b: 0.7921569, a: 1}
+  blueFrameColor: {r: 0, g: 1, b: 0.9529412, a: 1}
+  greenBgColor: {r: 0.007843138, g: 0.50980395, b: 0, a: 1}
+  greenFrameColor: {r: 0, g: 1, b: 0.043137256, a: 1}
