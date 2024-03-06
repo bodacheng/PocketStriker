@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b2df92746254722a503aadf73dfd1f, type: 3}
+  m_Name: 13
+  m_EditorClassIdentifier: 
+  battleGroundID: 1
+  fightBGM: 0
+  unitsData:
+  - id: 0
+    r_id: 7
+    level: 1
+    set:
+      a1: 5
+      a2: 184
+      a3: 58
+      b1: 95
+      b2: 144
+      b3: 80
+      c1: 9
+      c2: 113
+      c3: 116
+  team1HpRate: 1
+  team2HpRate: 1
+  team1CGMode: 0
+  team2CGMode: 0
+  team1Mode: 2
+  team2Mode: 2
+  team1AIMode: 0
+  team2AIMode: 0
+  dumbAIDecisionDelay: 20
+  dreamComboAIRateNum: 20
+  stageRefLevel: 1.1
+  team2GroupSet:
+  - id: 0
+    Count: 24
+  - id: 1
+    Count: 10
+  - id: 2
+    Count: 10
