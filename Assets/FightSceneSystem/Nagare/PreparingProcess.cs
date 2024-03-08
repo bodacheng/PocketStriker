@@ -20,6 +20,8 @@ public class PreparingProcess : FSceneProcess
         RTFightManager.Target.team1.Clear();
         RTFightManager.Target.team2.Clear();
         
+        RTFightManager.Target._CameraManager.VisibilityControl.Clear();
+        
         if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang)
             &&
             !PlayerAccountInfo.Me.noAdsState)

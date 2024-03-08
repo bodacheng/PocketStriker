@@ -9,8 +9,11 @@ public class CameraManager : MonoBehaviour
     [SerializeField] Camera subCamera; // unit camera
     [SerializeField] Transform StartPosRef;
     [SerializeField] Transform topDownModeEndRef;
+    [SerializeField] VisibilityControl visibilityControl;
+    
     CameraMode CurrentMode;
     public Transform TopDownModeEndRef => topDownModeEndRef;
+    public VisibilityControl VisibilityControl => visibilityControl;
 
     readonly IDictionary<C_Mode, CameraMode> CModeDic = new Dictionary<C_Mode, CameraMode>()
     {
@@ -24,7 +27,7 @@ public class CameraManager : MonoBehaviour
         {C_Mode.TopDown, new GangV(32,23)},
         {C_Mode.ScreenSaver, new New2023(8.8f, 5f)}//new ScreenSaverC(8.8f, 8.8f)}
     };
-
+    
     public CameraMode GetMode(C_Mode mode)
     {
         CModeDic.TryGetValue(mode, out var c);

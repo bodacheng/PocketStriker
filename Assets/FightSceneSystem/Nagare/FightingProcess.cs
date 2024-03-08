@@ -67,6 +67,9 @@ namespace FightScene
                 RTFightManager.Target.team1.LocalUpdate();
                 RTFightManager.Target.team2.LocalUpdate();
             }
+            
+            if (FightLoad.Fight.EventType != FightEventType.Gangbang && FightLoad.Fight.team1Mode != TeamMode.MultiRaid)
+                RTFightManager.Target._CameraManager.VisibilityControl.LocalUpdate();
         }
     }
 }
