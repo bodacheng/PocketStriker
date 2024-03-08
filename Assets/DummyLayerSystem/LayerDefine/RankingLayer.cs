@@ -11,12 +11,12 @@ public class RankingLayer : UILayer
     [SerializeField] ArenaFightTeamDisplay myArenaFightTeamDisplay;
     [SerializeField] ArenaFightTeamDisplay arenaFightTeamDisplayPrefab;
     [SerializeField] DedicatedCameraConnector connector;
-    [SerializeField] float cameraConnectorBottomSpace = 1420;
     [SerializeField] NineForShow miniNineForShow;
     
     void OnClickUnitIcon(UnitInfo unitInfo)
     {
-        ResizeCameraConnectorRefTopAndSideWidth(connector.GetComponent<RectTransform>(), (Screen.height - Screen.safeArea.size.y), cameraConnectorBottomSpace);
+        var camRect = connector.GetComponent<RectTransform>();
+        ResizeCameraConnectorAsMaxSquare(camRect, camRect.rect.width, camRect.rect.height);
         
         var set = unitInfo.set;
         miniNineForShow.ShowStones(

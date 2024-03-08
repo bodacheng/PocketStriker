@@ -80,11 +80,11 @@ public class FrontLayer : UILayer
         }
     }
 
-    private bool view3D = false;
+    private bool view3D = true;
 
     void ViewSwitch()
     {
-        view3D = !view3D;
+        view3D = true; //!view3D;
         ShowMyModel(instanceID).Forget();
     }
     

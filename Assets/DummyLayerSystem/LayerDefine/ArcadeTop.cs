@@ -10,8 +10,6 @@ using mainMenu;
 public class ArcadeTop : UILayer
 {
     [SerializeField] DedicatedCameraConnector connector;
-    [SerializeField] float cameraConnectorBottomSpace = 1050;
-    
     [SerializeField] VerticalLayoutGroup container;
     [SerializeField] Button jumpToNewStage;
     [SerializeField] StageButton normalStagePrefab;
@@ -35,9 +33,8 @@ public class ArcadeTop : UILayer
         lastChapter.onClick.AddListener(ShowLastStages);
         jumpToNewStage.onClick.AddListener(ToNew);
         
-        ResizeCameraConnectorRefTopAndSideWidth(connector.GetComponent<RectTransform>(), 
-            ((Screen.height - Screen.safeArea.size.y) + 150), 
-            cameraConnectorBottomSpace);
+        var camRect = connector.GetComponent<RectTransform>();
+        ResizeCameraConnectorAsMaxSquare(camRect, camRect.rect.width, camRect.rect.height);
     }
     
     public void SetupArcade(int maxStageNum, LoadStageDelegate loadFightInfo, Action<int, bool> directToStage)
