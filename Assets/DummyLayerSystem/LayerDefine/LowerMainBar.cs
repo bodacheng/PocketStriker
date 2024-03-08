@@ -15,22 +15,22 @@ public class LowerMainBar : UILayer
         playTab.SetListener(() =>
         {
             ReturnLayer.ReturnMissionList.Clear();
-            pre.trySwitchToStep(MainSceneStep.FrontPage);
+            pre.trySwitchToStep(MainSceneStep.FrontPage, false);
         });
         fighterTab.SetListener(() =>
         {
             ReturnLayer.ReturnMissionList.Clear();
-            pre.trySwitchToStep(MainSceneStep.UnitList);
+            pre.trySwitchToStep(MainSceneStep.UnitList, false);
         });
         stoneTab.SetListener(() =>
         {
             ReturnLayer.ReturnMissionList.Clear();
-            pre.trySwitchToStep(MainSceneStep.SkillStoneList);
+            pre.trySwitchToStep(MainSceneStep.SkillStoneList, false);
         });
         gotchaTab.SetListener(() =>
         {
             ReturnLayer.ReturnMissionList.Clear();
-            pre.trySwitchToStep(MainSceneStep.GotchaFront);
+            pre.trySwitchToStep(MainSceneStep.GotchaFront, false);
         });
         
         hasStoneToBeUpdateBadge.SetActive(SSLevelUpManager.HasStoneToBeUpdate());
