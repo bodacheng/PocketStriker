@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
@@ -8,22 +9,25 @@ public class SizeAdjustBySpriteSize : MonoBehaviour
 {
     [SerializeField] Image image;
     [SerializeField] bool fixedHeight = true;
+    [SerializeField] bool adjustOnStart = false;
     
+    void Start()
+    {
+        if (adjustOnStart)
+            AdjustSize();
+    }
+
     public void AdjustSize()
     {
         var sprite = image.sprite;
         var rectTransform = transform.GetComponent<RectTransform>();
         if (fixedHeight)
         {
-            rectTransform.sizeDelta = new Vector2(
-                sprite.rect.width * rectTransform.rect.height / sprite.rect.height, 
-                rectTransform.rect.height);
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sprite.rect.width * rectTransform.rect.height / sprite.rect.height);
         }
         else
         {
-            rectTransform.sizeDelta = new Vector2(
-                rectTransform.rect.width, 
-                sprite.rect.height * rectTransform.rect.width / sprite.rect.width);
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sprite.rect.height * rectTransform.rect.width / sprite.rect.width);
         }
     }
 }

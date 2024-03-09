@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using DummyLayerSystem;
+using mainMenu;
 
 public partial class GotchaResultLayer : UILayer
 {
@@ -93,6 +94,6 @@ public partial class GotchaResultLayer : UILayer
         {
             returnLayer.gameObject.SetActive(true);
         }
-        LowerMainBar.Open();
+        LowerMainBar.Open(MainSceneStep.GotchaFront);
     }
 }

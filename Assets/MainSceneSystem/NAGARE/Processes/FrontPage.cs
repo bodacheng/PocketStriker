@@ -127,7 +127,7 @@ public class FrontPage : MSceneProcess
         
         SSLevelUpManager.CalUpdateAllForms();
         
-        LowerMainBar.Open();
+        LowerMainBar.Open(MainSceneStep.FrontPage);
         SetLoaded(true);
     }
     
