@@ -26,7 +26,6 @@ public class VisibilityControl : MonoBehaviour
         
         // 获取实际检测到的collider数量
         int numColliders = Physics.OverlapSphereNonAlloc(transform.position, radius, _hitColliders, layerMask);
-        Debug.Log(numColliders);
         List<Renderer> thisFrameDetected = new List<Renderer>();
         for (int i = 0; i < numColliders; i++)
         {

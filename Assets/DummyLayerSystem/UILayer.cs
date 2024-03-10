@@ -18,15 +18,37 @@ public class UILayer : MonoBehaviour
         var midAreaSizeHelper = middle.GetComponent<MidAreaSizeHelper>();
         if (midAreaSizeHelper != null)
             midAreaSizeHelper.Resize();
+
+        var offsetMinOffsetMax = CalculateOffsetForFullScreenAnchors(middle);
         
-        float topAreaHeight = PosCal.CanvasHeight - middle.offsetMin.y - middle.rect.height - PosCal.VTopSafeAreaHeight;
-        
+        float topAreaHeight = PosCal.CanvasHeight - offsetMinOffsetMax.Item1.y - middle.rect.height - PosCal.VTopSafeAreaHeight;
         top.anchoredPosition = new Vector2(0, - PosCal.VTopSafeAreaHeight);
         top.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, topAreaHeight);
 
-        float downArenaHeight = PosCal.CanvasHeight + middle.offsetMax.y - middle.rect.height - PosCal.VBottomSafeAreaHeight;
+        float downArenaHeight = PosCal.CanvasHeight + offsetMinOffsetMax.Item2.y - middle.rect.height - PosCal.VBottomSafeAreaHeight;
         bottom.anchoredPosition = new Vector2(0, PosCal.VBottomSafeAreaHeight);
         bottom.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, downArenaHeight);
+    }
+    
+    (Vector2, Vector2) CalculateOffsetForFullScreenAnchors(RectTransform rectTransform)
+    {
+        // 获取父元素的RectTransform
+        RectTransform parentRectTransform = rectTransform.parent as RectTransform;
+
+        // 当前锚点相对于父元素的位置
+        Vector2 anchorMin = rectTransform.anchorMin;
+        Vector2 anchorMax = rectTransform.anchorMax;
+
+        // 当前RectTransform的尺寸
+        Vector2 sizeDelta = rectTransform.sizeDelta;
+
+        // 计算当前锚点对应的偏移量
+        Vector2 parentSize = parentRectTransform.rect.size;
+        Vector2 offsetMin = rectTransform.offsetMin + new Vector2(anchorMin.x * parentSize.x, anchorMin.y * parentSize.y);
+        Vector2 offsetMax = rectTransform.offsetMax - new Vector2((1 - anchorMax.x) * parentSize.x, (1 - anchorMax.y) * parentSize.y);
+
+        // 这里返回的就是在Anchors为(0, 0)和(1, 1)情况下对应的offsetMin和offsetMax
+        return (offsetMin, offsetMax);
     }
     
     public string Index { get; set; }
