@@ -16,7 +16,7 @@ class MCamera : CameraMode
     float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
-    float zoomSpeedExtra = 6;
+    float zoomSpeedExtra = 8;
     float _transitionSpeedPara = 10f;
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;

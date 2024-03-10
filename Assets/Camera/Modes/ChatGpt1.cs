@@ -15,7 +15,7 @@ class ChatGptFix : CameraMode
     float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
-    private float speedUpRate = 3;
+    private float speedUpRate = 5;
     float _transitionSpeedPara = 10f;
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
