@@ -18,7 +18,7 @@ public partial class ArenaFightOver : UILayer
     [SerializeField] private Image winImage;
     [SerializeField] private Image loseImage;
     [SerializeField] private RectTransform powerUpTip;
-    [SerializeField] private Button returnBtn;
+    [SerializeField] private BOButton returnBtn;
     [SerializeField] private RectTransform awardParent;
     [SerializeField] private RectTransform dmParent;
     [SerializeField] private Text currentDmCurrency;
@@ -99,7 +99,16 @@ public partial class ArenaFightOver : UILayer
         }
         get => arena;
     }
-    
+
+    void Awake()
+    {
+        powerUpTip.gameObject.SetActive(false);
+        arenaRankParent.gameObject.SetActive(false);
+        dmParent.gameObject.SetActive(false);
+        gdParent.gameObject.SetActive(false);
+        awardParent.gameObject.SetActive(false);
+    }
+
     void NextFight(TeamMode mode, FightInfo fight)
     {
         switch (mode)
@@ -188,7 +197,7 @@ public partial class ArenaFightOver : UILayer
             }
         );
         
-        returnBtn.onClick.AddListener(()=>
+        returnBtn.SetListener(()=>
         {
             OnDestroy();
             FightScene.FightScene.target.ReturnToFront();
@@ -316,6 +325,7 @@ public partial class ArenaFightOver : UILayer
     
     public void ShowArenaPoint(int oldPoint, int currentPoint)
     {
+        awardParent.gameObject.SetActive(currentPoint > oldPoint);
         arenaRankParent.gameObject.SetActive(true);
         arenaRankIcon.Set(oldPoint);
         arenaPointValue = oldPoint;

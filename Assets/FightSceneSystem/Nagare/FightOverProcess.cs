@@ -34,8 +34,8 @@ namespace FightScene
                                 var a = UILayerLoader.Load<ArenaFightOver>();
                                 a.Setup();
                                 a.Step2Anim();
-                                a.ShowArenaPoint(x,y);
                                 a.ShowAward(z,0, 0);
+                                a.ShowArenaPoint(x,y);
                             }
                         );
                     }

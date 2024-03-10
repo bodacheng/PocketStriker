@@ -17,15 +17,11 @@ public class NextOrAgainBtn : MonoBehaviour
     public void SetUp(int fightMode, string title)
     {
         stageTitle.text = title;
-        
         var showAgainFor1v1Btn = fightMode is 0 or 2;
         var showAgainForMultiBtn = fightMode is 0 or 1;
-        
         againFor1v1Btn.gameObject.SetActive(showAgainFor1v1Btn);
         againForMultiBtn.gameObject.SetActive(showAgainForMultiBtn);
-        
         modeRoot.gameObject.SetActive(showAgainFor1v1Btn || showAgainForMultiBtn);
-        
         wholeRect.sizeDelta = new Vector2(
             (showAgainFor1v1Btn || showAgainForMultiBtn)? longerAgainBtnWidth : normalAgainBtnWidth,
             wholeRect.sizeDelta.y);
