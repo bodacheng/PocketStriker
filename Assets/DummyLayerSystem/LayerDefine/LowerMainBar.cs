@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using DummyLayerSystem;
 using UnityEngine;
 using mainMenu;
+using UniRx;
 
 public class LowerMainBar : UILayer
 {
@@ -28,15 +28,26 @@ public class LowerMainBar : UILayer
         switch (step)
         {
             case MainSceneStep.FrontPage:
+            case MainSceneStep.Arena:
+            case MainSceneStep.Ranking:
+            case MainSceneStep.ArenaAward:
+            case MainSceneStep.ArcadeFront:
+            case MainSceneStep.QuestInfo:
+            case MainSceneStep.GangBangFront:
+            case MainSceneStep.SelfFightFront:
                 targetBtn = playTab;
                 break;
             case MainSceneStep.UnitList:
+            case MainSceneStep.UnitSkillEdit:
                 targetBtn = fighterTab;
                 break;
             case MainSceneStep.SkillStoneList:
+            case MainSceneStep.SkillStones_Sell:
                 targetBtn = stoneTab;
                 break;
             case MainSceneStep.GotchaFront:
+            case MainSceneStep.GotchaResult:
+            case MainSceneStep.DropTableInfo:
                 targetBtn = gotchaTab;
                 break;
         }
@@ -49,9 +60,10 @@ public class LowerMainBar : UILayer
     
     void Initialise(PreScene pre)
     {
+        ProcessesRunner.Main.CurrentStep.Subscribe(SelectUI).AddTo(this.gameObject);
+        
         void Go(MainSceneStep step)
         {
-            SelectUI(step);
             UILayerLoader.Remove<ReturnLayer>();
             ReturnLayer.ReturnMissionList.Clear();
             pre.trySwitchToStep(step, false);
@@ -77,11 +89,10 @@ public class LowerMainBar : UILayer
         hasStoneToBeUpdateBadge.SetActive(SSLevelUpManager.HasStoneToBeUpdate());
     }
 
-    public static void Open(MainSceneStep step)
+    public static void Open()
     {
         var lowerMainBar = UILayerLoader.Load<LowerMainBar>();
         lowerMainBar.Initialise(PreScene.target);
         lowerMainBar.transform.SetAsLastSibling();
-        lowerMainBar.SelectUI(step);
     }
 }

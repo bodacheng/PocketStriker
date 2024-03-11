@@ -1,42 +1,46 @@
 ﻿using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 namespace mainMenu
 {
     public class ProcessesRunner
     {
-        static ProcessesRunner instance_main;
+        static ProcessesRunner _instanceMain;
         public static ProcessesRunner Main
         {
             get
             {
-                if (instance_main == null)
+                if (_instanceMain == null)
                 {
-                    instance_main = new ProcessesRunner();
+                    _instanceMain = new ProcessesRunner();
                 }
-                return instance_main;
+                return _instanceMain;
             }
         }
         
         public MSceneProcess lastProcess;
         public MSceneProcess currentProcess;
-        readonly IDictionary<MainSceneStep, MSceneProcess> Dic = new Dictionary<MainSceneStep, MSceneProcess>();
+
+        public readonly ReactiveProperty<MainSceneStep> _currentStep = new ReactiveProperty<MainSceneStep>();
+        public ReactiveProperty<MainSceneStep> CurrentStep => _currentStep;
+        readonly IDictionary<MainSceneStep, MSceneProcess> _dic = new Dictionary<MainSceneStep, MSceneProcess>();
 
         public MSceneProcess GetProcess(MainSceneStep step)
         {
-            return Dic[step];
+            return _dic[step];
         }
 
         public void Clear()
         {
             lastProcess = null;
             currentProcess = null;
-            Dic.Clear();
+            _dic.Clear();
         }
 
         public void Add(MainSceneStep step, MSceneProcess _process)
         {
-            DicAdd<MainSceneStep, MSceneProcess>.Add(Dic, step, _process);
+            DicAdd<MainSceneStep, MSceneProcess>.Add(_dic, step, _process);
         }
 
         public void ProcessNagare()
@@ -68,19 +72,21 @@ namespace mainMenu
             }
             
             lastProcess = currentProcess;
-            Dic.TryGetValue(sceneStep, out currentProcess);
+            _dic.TryGetValue(sceneStep, out currentProcess);
             if (currentProcess != null)
             {
+                _currentStep.Value = sceneStep;
+                
                 if (t != null)
                     currentProcess.ProcessEnter(t);
                 else
                     currentProcess.ProcessEnter();
-                var Log_new = new MainSceneLog()
+                var logNew = new MainSceneLog()
                 {
                     step = currentProcess.Step,
                     description = "start"
                 };
-                MainSceneLogger.Logs.Add(Log_new);
+                MainSceneLogger.Logs.Add(logNew);
             }
             else
             {

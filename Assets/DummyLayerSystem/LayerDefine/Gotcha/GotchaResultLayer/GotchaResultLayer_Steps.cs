@@ -94,6 +94,6 @@ public partial class GotchaResultLayer : UILayer
         {
             returnLayer.gameObject.SetActive(true);
         }
-        LowerMainBar.Open(MainSceneStep.GotchaFront);
+        LowerMainBar.Open();
     }
 }
