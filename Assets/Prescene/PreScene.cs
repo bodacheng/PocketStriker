@@ -144,6 +144,7 @@ namespace mainMenu
             
             BasicPhase();
             ToInitialPhase();
+            TutorialRunner.Main.TutorialCheck();
         }
 
         async UniTask PrepareModelOftenUse()
@@ -247,9 +248,13 @@ namespace mainMenu
         void Update()
         {
             ProcessesRunner.Main.ProcessNagare();
+        }
+
+        void LateUpdate()
+        {
             TutorialRunner.Main.Process();
         }
-        
+
         public void BeginSkillTest_Rotation()
         {
             var stage = FightInfo.RandomSkillTestStage(TeamMode.Rotation);

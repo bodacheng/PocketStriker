@@ -1,7 +1,6 @@
 ﻿using mainMenu;
 using dataAccess;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using UnityEngine;
@@ -62,8 +61,6 @@ public class FrontPage : MSceneProcess
     
     void _EnterProcess()
     {
-        TutorialRunner.Main.TutorialCheck();
-        
         _frontLayer = UILayerLoader.Load<FrontLayer>();
         _frontLayer.Initialise(PreScene.target);
         
@@ -122,7 +119,7 @@ public class FrontPage : MSceneProcess
         
         if (PlayerAccountInfo.Me.tutorialProgress == "Finished" && Stones.TooManyStones())
         {
-            _frontLayer.PlsClickBtn("stones");
+            _frontLayer.PlsClickBtn(MainSceneStep.SkillStoneList);
         }
         
         SSLevelUpManager.CalUpdateAllForms();

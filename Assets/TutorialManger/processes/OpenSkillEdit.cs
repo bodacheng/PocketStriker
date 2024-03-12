@@ -50,9 +50,8 @@ public class OpenSkillEdit : TutorialProcess
         if (_unitListPage.GetLoaded() && _unitOptionLayer != null)
         {
             _unitOptionLayer.PlsClickSkillEdit();
-            HighLightLayer.HighLightRect(_unitOptionLayer._NineForShow.GetComponent<RectTransform>());
         }
-
+        
         if (_unitsLayer == null)
         {
             _unitsLayer = UILayerLoader.Get<UnitsLayer>();

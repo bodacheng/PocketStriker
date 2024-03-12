@@ -12,9 +12,9 @@ using UniRx;
 
 public class FrontLayer : UILayer
 {
-    [SerializeField] BOButton ArcadeBtn;
-    [SerializeField] BOButton GangbangBtn;
-    [SerializeField] BOButton ArenaBtn;
+    [SerializeField] LowerBarIcon ArcadeBtn;
+    [SerializeField] LowerBarIcon GangbangBtn;
+    [SerializeField] LowerBarIcon ArenaBtn;
     [SerializeField] BOButton TrainBtn;
     [SerializeField] Button SkillTestRBtn;
     [SerializeField] Button SkillTestMBtn;
@@ -32,20 +32,20 @@ public class FrontLayer : UILayer
         // CameraConnectorCal(view2D.GetComponent<RectTransform>(), cameraConnectorRightSpace, cameraConnectorVerticalSpace);
         // view2D.GetComponent<RectTransform>().anchoredPosition = camConnector.GetComponent<RectTransform>().anchoredPosition + new Vector2(camConnector.GetComponent<RectTransform>().sizeDelta.x / 2,0);
         
-        ArcadeBtn.onClick.AddListener(
+        ArcadeBtn.BOButton.onClick.AddListener(
         ()=>
             {
                 PlayerAccountInfo.Me.ArcadeModeManager.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, true);
             });
         
-        GangbangBtn.onClick.AddListener(
+        GangbangBtn.BOButton.onClick.AddListener(
             ()=>
             {
                 PlayerAccountInfo.Me.GangbangModeManager.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
             });
         GangbangBtn.gameObject.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
         
-        ArenaBtn.onClick.AddListener(() =>
+        ArenaBtn.BOButton.onClick.AddListener(() =>
         {
             if (PlayerAccountInfo.Me.arcadeProcess >= 5)
                 pre.trySwitchToStep(MainSceneStep.Arena);
@@ -140,43 +140,31 @@ public class FrontLayer : UILayer
     }
 
     #region 教程
-    [SerializeField] private GameObject indicator;
-
-    public void PlsClickBtn(string btnCode)
+    public void PlsClickBtn(MainSceneStep btnCode)
     {
-        ArcadeBtn.interactable = btnCode == "arcade";
-        ArenaBtn.interactable = btnCode == "arena";
-        //MemberBtn.interactable = btnCode == "unit";
-        TrainBtn.interactable = btnCode == "train";
-        //StonesBtn.interactable = btnCode == "stones";
-        //GotchaBtn.interactable = btnCode == "gotcha";
-
-        Transform localPos = null;
+        ArcadeBtn.BOButton.interactable = btnCode == MainSceneStep.QuestInfo;
+        ArenaBtn.BOButton.interactable = btnCode == MainSceneStep.Arena;
+        GangbangBtn.BOButton.interactable = btnCode == MainSceneStep.GotchaFront;
+        TrainBtn.interactable = btnCode == MainSceneStep.SelfFightFront;
+        
+        ArcadeBtn.Indicator.SetActive(false);
+        ArenaBtn.Indicator.SetActive(false);
+        GangbangBtn.Indicator.SetActive(false);
+        
+        Debug.Log("MainSceneStep:"+ btnCode);
+        
         switch (btnCode)
         {
-            case "arcade":
-                localPos = ArcadeBtn.transform;
+            case MainSceneStep.QuestInfo:
+                ArcadeBtn.Indicator.SetActive(true);
                 break;
-            case "arena":
-                localPos = ArenaBtn.transform;
+            case MainSceneStep.Arena:
+                ArenaBtn.Indicator.SetActive(true);
                 break;
-            case "unit":
-                //localPos = MemberBtn.transform;
-                break;
-            case "train":
-                localPos = TrainBtn.transform;
-                break;
-            case "stones":
-                //localPos = StonesBtn.transform;
-                break;
-            case "gotcha":
-                //localPos = GotchaBtn.transform;
+            case MainSceneStep.SelfFightFront:
+                GangbangBtn.Indicator.SetActive(true);
                 break;
         }
-
-        indicator.transform.SetParent(localPos);
-        indicator.transform.localPosition = Vector3.zero;
-        indicator.SetActive(true);
     }
     #endregion
 }

@@ -5,15 +5,30 @@ public class GoTo : TutorialProcess
 {
     private FrontLayer _frontLayer;
     private UpperInfoBar _upperInfoBar;
+    private LowerMainBar _lowerMainBar;
 
-    private readonly string _goto;
-    public GoTo(string step)
+    private readonly MainSceneStep _goto;
+    public GoTo(MainSceneStep step)
     {
         _goto = step;
     }
     
+    public override void ProcessEnd()
+    {
+        _lowerMainBar?.CloseIndicators();
+    }
+
     public override void LocalUpdate()
     {
+        if (_lowerMainBar == null)
+        {
+            _lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+            if (_lowerMainBar != null)
+            {
+                _lowerMainBar.PlsClickBtn(_goto);
+            }
+        }
+        
         if (_frontLayer == null)
         {
             _frontLayer = UILayerLoader.Get<FrontLayer>();
@@ -35,22 +50,10 @@ public class GoTo : TutorialProcess
     
     public override bool CanEnterOtherProcess()
     {
-        switch (_goto)
+        if (ProcessesRunner.Main.currentProcess == null)
         {
-            case "arcade":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.QuestInfo;
-            case "arena":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.Arena;
-            case "unit":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.UnitList;
-            case "train":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.SelfFightFront;
-            case "stones":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.SkillStoneList;
-            case "gotcha":
-                return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.GotchaFront;
+            return false;
         }
-
-        return true;
+        return ProcessesRunner.Main.currentProcess.Step == _goto;
     }
 }

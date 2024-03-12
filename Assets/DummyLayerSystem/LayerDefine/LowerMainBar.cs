@@ -95,4 +95,42 @@ public class LowerMainBar : UILayer
         lowerMainBar.Initialise(PreScene.target);
         lowerMainBar.transform.SetAsLastSibling();
     }
+
+    #region 教程
+    public void PlsClickBtn(MainSceneStep step)
+    {
+        playTab.BOButton.interactable = step == MainSceneStep.FrontPage;
+        fighterTab.BOButton.interactable = step == MainSceneStep.UnitList;
+        stoneTab.BOButton.interactable = step == MainSceneStep.SkillStoneList;
+        gotchaTab.BOButton.interactable = step == MainSceneStep.GotchaFront;
+        
+        CloseIndicators();
+        
+        switch (step)
+        {
+            case MainSceneStep.FrontPage:
+            case MainSceneStep.Arena:
+            case MainSceneStep.SelfFightFront:
+                playTab.Indicator.SetActive(true);
+                break;
+            case MainSceneStep.UnitList:
+                fighterTab.Indicator.SetActive(true);
+                break;
+            case MainSceneStep.SkillStoneList:
+                stoneTab.Indicator.SetActive(true);
+                break;
+            case MainSceneStep.GotchaFront:
+                gotchaTab.Indicator.SetActive(true);
+                break;
+        }
+    }
+
+    public void CloseIndicators()
+    {
+        playTab.Indicator.SetActive(false);
+        fighterTab.Indicator.SetActive(false);
+        stoneTab.Indicator.SetActive(false);
+        gotchaTab.Indicator.SetActive(false);
+    }
+    #endregion
 }

@@ -27,4 +27,9 @@ public class ExplainCombo : TutorialProcess
         await UniTask.Delay(TimeSpan.FromSeconds(1));
         comboFinished = true;
     }
+
+    public override void ProcessEnd()
+    {
+        
+    }
 }
