@@ -41,9 +41,4 @@ public class AutoSwitch : MonoBehaviour
         startState = this._currentState();
         Switch(this._currentState());
     }
-
-    public void AddExtraProcessOnClick(Action action)
-    {
-        btn.onClick.AddListener(() => { action();});
-    }
 }

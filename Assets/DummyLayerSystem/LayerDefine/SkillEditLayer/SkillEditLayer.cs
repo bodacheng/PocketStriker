@@ -41,13 +41,18 @@ public partial class SkillEditLayer : UILayer
     // For Transition Effects
     private readonly List<Tween> _tweens = new List<Tween>();
     private readonly List<GameObject> _transitionEffects = new List<GameObject>();
-    
-    public async UniTask ShowCombo(bool dreamCombo)
+
+    public void TurnDuringComboHideObjects(bool on)
     {
         foreach (var t in duringComboHide)
         {
-            t.gameObject.SetActive(false);
+            t.gameObject.SetActive(on);
         }
+    }
+    
+    public async UniTask ShowCombo(bool dreamCombo)
+    {
+        TurnDuringComboHideObjects(false);
         
         stonesBox._tabEffects.TurnShowingTagEffects(false);
         
@@ -81,11 +86,6 @@ public partial class SkillEditLayer : UILayer
         nineSlot.comboShowBtn.gameObject.SetActive(true);
         nineSlot.dreamComboShowBtn.gameObject.SetActive(true);
         nineSlot.comboCloseBtn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");
-        
-        foreach (var t in duringComboHide)
-        {
-            t.gameObject.SetActive(true);
-        }
     }
     
     void CloseComboShow()
@@ -94,6 +94,7 @@ public partial class SkillEditLayer : UILayer
         stoneBoxRect.gameObject.SetActive(true);
         nineSlot.comboCloseBtn.gameObject.SetActive(false);
         stonesBox._tabEffects.TurnShowingTagEffects(true);
+        TurnDuringComboHideObjects(true);
     }
     
     async UniTask RunSkillAndShowTransition_Combo(SKStoneItem stone, SKStoneItem endStone)

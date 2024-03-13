@@ -9,6 +9,8 @@ public class ClickNextTutorial : MonoBehaviour
     [SerializeField] private GameObject[] TutorialLayers;
     [SerializeField] private float clickDelay = 1f;
 
+    public Button Button => Btn;
+    
     private int pageIndex = 0;
     void Awake()
     {

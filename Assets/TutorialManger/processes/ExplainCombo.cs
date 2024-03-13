@@ -6,6 +6,7 @@ public class ExplainCombo : TutorialProcess
 {
     private bool comboFinished = false;
     private SkillEditLayer _skillEditLayer;
+    private ReturnLayer _returnLayer;
     public override bool CanEnterOtherProcess()
     {
         return comboFinished;
@@ -14,6 +15,15 @@ public class ExplainCombo : TutorialProcess
     public override void ProcessEnter()
     {
         Process();
+    }
+
+    public override void LocalUpdate()
+    {
+        if (_returnLayer == null)
+        {
+            _returnLayer = UILayerLoader.Get<ReturnLayer>();
+            _returnLayer.gameObject.SetActive(false);
+        }
     }
 
     async void Process()

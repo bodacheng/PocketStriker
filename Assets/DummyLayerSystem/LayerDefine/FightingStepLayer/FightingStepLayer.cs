@@ -136,13 +136,12 @@ public class FightingStepLayer : UILayer
     public void ForceClickAutoBtn()
     {
         forceClickAutoBtnBlackMask.SetActive(true);
-        team1UI.AutoSwitch.transform.SetAsLastSibling();
-        team1UI.AutoSwitch.AddExtraProcessOnClick(
-            () =>
+        clickNextTutorial.Button.onClick.AddListener(
+            ()=>
             {
-                clickNextTutorial.gameObject.SetActive(false);
-            }
-        );
+                team1UI.AutoSwitch.ChangeAutoState(true);
+                forceClickAutoBtnBlackMask.SetActive(false);
+            });
     }
     
     public void ForceClickDreamComboBtn(Action afterClick)
