@@ -68,10 +68,12 @@ public class TutorialRunner
         var goTo = new GoTo(MainSceneStep.UnitList);
         var openSkillEdit = new OpenSkillEdit("1");
         var skillEditTry = new SkillEditTry("openInstruction2");
+        var goTo1 = new GoTo(MainSceneStep.FrontPage);
         _tutorialProcesses.Clear();
         _tutorialProcesses.Add(goTo);
         _tutorialProcesses.Add(openSkillEdit);
         _tutorialProcesses.Add(skillEditTry);
+        _tutorialProcesses.Add(goTo1);
     }
     
     void GenerateStep5Tutorial()

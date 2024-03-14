@@ -6,6 +6,7 @@ public class SkillEditTry : TutorialProcess
 {
     private ReturnLayer _returnLayer;
     private SkillEditLayer _skillEditLayer;
+    private UpperInfoBar _upperInfoBar;
     private bool _skillEditFinished = false;
     private readonly string _tutorialFlag;
 
@@ -24,10 +25,19 @@ public class SkillEditTry : TutorialProcess
         if (_returnLayer == null)
         {
             _returnLayer = UILayerLoader.Get<ReturnLayer>();
+            if (_returnLayer != null)
+            {
+                _returnLayer.gameObject.SetActive(false);
+            }
         }
-        if (_returnLayer != null)
+        
+        if (_upperInfoBar == null)
         {
-            _returnLayer.gameObject.SetActive(false);
+            _upperInfoBar = UILayerLoader.Get<UpperInfoBar>();
+            if (_upperInfoBar != null)
+            {
+                _upperInfoBar.gameObject.SetActive(false);
+            }
         }
         
         if (!_skillEditFinished)

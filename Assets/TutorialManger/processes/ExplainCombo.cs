@@ -22,7 +22,10 @@ public class ExplainCombo : TutorialProcess
         if (_returnLayer == null)
         {
             _returnLayer = UILayerLoader.Get<ReturnLayer>();
-            _returnLayer.gameObject.SetActive(false);
+            if (_returnLayer != null)
+            {
+                _returnLayer.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -31,6 +34,8 @@ public class ExplainCombo : TutorialProcess
         if (_skillEditLayer == null)
         {
             _skillEditLayer = UILayerLoader.Get<SkillEditLayer>();
+            var returnLayer = UILayerLoader.Get<ReturnLayer>();
+            returnLayer?.gameObject.SetActive(false);
             await _skillEditLayer.ShowCombo(true);
         }
         

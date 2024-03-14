@@ -62,8 +62,6 @@ public partial class SkillEditLayer : UILayer
         
         stoneBoxRect.gameObject.SetActive(false);
         nineSlot.IntroAboutCombo(true, dreamCombo);
-        var returnLayer = UILayerLoader.Get<ReturnLayer>();
-        returnLayer?.gameObject.SetActive(false);
         mask.gameObject.SetActive(true);
         EffectsManager.GenerateEffect("super_combo_explosion", FightGlobalSetting.EffectPathDefine(), 
             camConnector.FocusingC.WholeT.position, camConnector.FocusingC.WholeT.rotation, camConnector.FocusingC.WholeT).Forget();
@@ -81,7 +79,6 @@ public partial class SkillEditLayer : UILayer
         camConnector.FocusingC.AnimationManger.RemoveSpeedBuff("dreamCombo");
         
         mask.gameObject.SetActive(false);
-        returnLayer?.gameObject.SetActive(true);
         
         nineSlot.comboShowBtn.gameObject.SetActive(true);
         nineSlot.dreamComboShowBtn.gameObject.SetActive(true);
@@ -197,8 +194,22 @@ public partial class SkillEditLayer : UILayer
         ResizeCameraConnectorAsMaxSquare(camRect, camRect.rect.width, camRect.rect.height);
         
         
-        nineSlot.comboShowBtn.SetListener(()=> ShowCombo(false).Forget());
-        nineSlot.dreamComboShowBtn.SetListener(()=> ShowCombo(true).Forget());
+        nineSlot.comboShowBtn.SetListener(
+            async ()=>
+        {
+            var returnLayer = UILayerLoader.Get<ReturnLayer>();
+            returnLayer?.gameObject.SetActive(false);
+            await ShowCombo(false);
+            returnLayer?.gameObject.SetActive(true);
+        });
+        nineSlot.dreamComboShowBtn.SetListener(
+            async ()=>
+        {
+            var returnLayer = UILayerLoader.Get<ReturnLayer>();
+            returnLayer?.gameObject.SetActive(false);
+            await ShowCombo(true);
+            returnLayer?.gameObject.SetActive(true);
+        });
         nineSlot.comboCloseBtn.SetListener(CloseComboShow);
         
         Initialized = true;

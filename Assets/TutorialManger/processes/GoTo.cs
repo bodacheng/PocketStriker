@@ -6,6 +6,7 @@ public class GoTo : TutorialProcess
     private FrontLayer _frontLayer;
     private UpperInfoBar _upperInfoBar;
     private LowerMainBar _lowerMainBar;
+    private ReturnLayer _returnLayer;
 
     private readonly MainSceneStep _goto;
     public GoTo(MainSceneStep step)
@@ -45,6 +46,13 @@ public class GoTo : TutorialProcess
             {
                 _upperInfoBar.Interactable(false);
             }
+        }
+        
+        if (_returnLayer == null)
+        {
+            _returnLayer = UILayerLoader.Get<ReturnLayer>();
+            if (_returnLayer != null)
+                _returnLayer.gameObject.SetActive(false);
         }
     }
     
