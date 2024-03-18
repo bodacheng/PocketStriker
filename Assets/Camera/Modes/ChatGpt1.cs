@@ -39,7 +39,7 @@ class ChatGptFix : CameraMode
     private float XZDistance
     {
         get => XZDis;
-        set => XZDis = Mathf.Clamp(value, _minXZ , _minXZ + 30f);
+        set => XZDis = Mathf.Clamp(value, _minXZ , _minXZ + 26f);
     }
 
     public override void Enter(Camera _camera)

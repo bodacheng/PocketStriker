@@ -29,18 +29,18 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1628531889527204011}
   - {fileID: 513613474608345166}
   - {fileID: 1826216363144518567}
   - {fileID: 5590099496524875236}
   - {fileID: 9182938502659796295}
-  - {fileID: 6494483237623169672}
-  - {fileID: 1566584131598615751}
   - {fileID: 7744561065297730184}
   - {fileID: 2526969603362148994}
-  - {fileID: 4042061516646652469}
-  - {fileID: 4243084833122337948}
+  - {fileID: 1566584131598615751}
+  - {fileID: 6494483237623169672}
   - {fileID: 7722772943223974098}
+  - {fileID: 4042061516646652469}
+  - {fileID: 1628531889527204011}
+  - {fileID: 4243084833122337948}
   m_Father: {fileID: 7823801273078968998}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1148573079251246662
@@ -459,7 +459,6 @@ GameObject:
   - component: {fileID: 1924167815193677195}
   - component: {fileID: 2933897280278088841}
   - component: {fileID: 1465968260361558728}
-  - component: {fileID: 3466880658499786393}
   m_Layer: 0
   m_Name: SeaFloor
   m_TagString: Untagged
@@ -532,28 +531,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3466880658499786393
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3435666149391393094}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &4495914427540338505
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,7 +599,6 @@ GameObject:
   - component: {fileID: 6435957447423340830}
   - component: {fileID: 8273538366920595987}
   - component: {fileID: 1348599244027315927}
-  - component: {fileID: 8804245835590366500}
   m_Layer: 0
   m_Name: OceanPlane
   m_TagString: Untagged
@@ -695,28 +671,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8804245835590366500
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7337093967755329855}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &7657774820688580311
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,6 +950,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -1224,6 +1183,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1247,6 +1211,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -1326,6 +1295,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -1782,6 +1756,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_03 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_RootOrder
@@ -1790,7 +1769,7 @@ PrefabInstance:
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0704
+      value: 1.0703996
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
@@ -1800,32 +1779,32 @@ PrefabInstance:
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.654017
+      value: 14.654016
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.62439966
+      value: -0.6243996
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.7230368
+      value: 2.7230365
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.8477578
+      value: -0.8477579
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.046412077
+      value: -0.04641207
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.02653323
+      value: 0.026533242
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
@@ -1855,7 +1834,11 @@ PrefabInstance:
     - {fileID: 908124524, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7784845619463454560}
   m_SourcePrefab: {fileID: 100100000, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
 --- !u!4 &1566584131598615751 stripped
 Transform:
@@ -1863,6 +1846,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 599567226662130760}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2231057918340587133 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+    type: 3}
+  m_PrefabInstance: {fileID: 599567226662130760}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &7784845619463454560
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2231057918340587133}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8.625936, y: 7.488001, z: 4.894983}
+  m_Center: {x: -3.5609605, y: 2.7125666, z: -0.407719}
 --- !u!1001 &672455064172106542
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2511,6 +2521,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -2683,6 +2698,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (19)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -3420,6 +3440,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (21)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -4597,6 +4622,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Ruin_05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3676644831096148524, guid: 2c000cc8c3dbffe4fbf27fc6217cceb0,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4057110298160744598, guid: 2c000cc8c3dbffe4fbf27fc6217cceb0,
         type: 3}
@@ -6216,6 +6246,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6522,6 +6557,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -6600,6 +6640,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (20)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -7480,6 +7525,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (17)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -8645,6 +8695,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -8817,6 +8872,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (18)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -9134,6 +9194,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9520,6 +9585,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (22)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -9763,6 +9833,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_04 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1535694898, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
     - {fileID: 1535694899, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
@@ -9771,7 +9846,11 @@ PrefabInstance:
     - {fileID: 1535694895, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5751162513737643822}
   m_SourcePrefab: {fileID: 100100000, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
 --- !u!4 &2526969603362148994 stripped
 Transform:
@@ -9779,6 +9858,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3974896580164776472}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2907717717122091064 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+    type: 3}
+  m_PrefabInstance: {fileID: 3974896580164776472}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5751162513737643822
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2907717717122091064}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.56967, y: 13.719625, z: 6.463442}
+  m_Center: {x: 0.5788469, y: 5.963988, z: 0.0048246346}
 --- !u!1001 &3983043599758545093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9930,6 +10036,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10425,6 +10536,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Ruin_04
       objectReference: {fileID: 0}
+    - target: {fileID: 2726005608016841216, guid: a25ba7a3c7af62548874aa00a2c65d1e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3359517117327167674, guid: a25ba7a3c7af62548874aa00a2c65d1e,
         type: 3}
       propertyPath: m_RootOrder
@@ -10503,6 +10619,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
@@ -11122,6 +11243,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -11200,6 +11326,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -11742,6 +11873,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12882,6 +13018,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_03 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_RootOrder
@@ -12955,8 +13096,39 @@ PrefabInstance:
     - {fileID: 908124524, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2098510632211089991}
   m_SourcePrefab: {fileID: 100100000, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
+--- !u!1 &5866741935274874930 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+    type: 3}
+  m_PrefabInstance: {fileID: 5174216888617046535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &2098510632211089991
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5866741935274874930}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8.625935, y: 7.487999, z: 4.894984}
+  m_Center: {x: -3.5609596, y: 2.7125669, z: -0.40771908}
 --- !u!4 &6494483237623169672 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
@@ -12975,6 +13147,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -13203,6 +13380,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14262,6 +14444,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -14529,6 +14716,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_03
       objectReference: {fileID: 0}
+    - target: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
       propertyPath: m_RootOrder
@@ -14597,8 +14789,39 @@ PrefabInstance:
     - {fileID: 908124524, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3436358269541723508}
   m_SourcePrefab: {fileID: 100100000, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
+--- !u!1 &5107035193563471710 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+    type: 3}
+  m_PrefabInstance: {fileID: 5799384110055953771}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &3436358269541723508
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5107035193563471710}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8.625936, y: 7.488, z: 4.894984}
+  m_Center: {x: -3.560961, y: 2.7125673, z: -0.40771997}
 --- !u!4 &5590099496524875236 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
@@ -15088,6 +15311,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_02 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7276090184807176047, guid: 3039ac338f0bce74cb61ca91efcf8817,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8048510695120244181, guid: 3039ac338f0bce74cb61ca91efcf8817,
         type: 3}
       propertyPath: m_RootOrder
@@ -15543,6 +15771,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -15797,6 +16030,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Ruin_04 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2726005608016841216, guid: a25ba7a3c7af62548874aa00a2c65d1e,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3359517117327167674, guid: a25ba7a3c7af62548874aa00a2c65d1e,
         type: 3}
       propertyPath: m_RootOrder
@@ -15930,6 +16168,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16892,6 +17135,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -17214,6 +17462,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17237,6 +17490,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_03 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
         type: 3}
@@ -17306,8 +17564,39 @@ PrefabInstance:
     - {fileID: 908124524, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5875639264369885632}
   m_SourcePrefab: {fileID: 100100000, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71, type: 3}
+--- !u!1 &8375438868718761981 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1631526187575200309, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
+    type: 3}
+  m_PrefabInstance: {fileID: 7106628718752300488}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5875639264369885632
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8375438868718761981}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8.625936, y: 7.488, z: 4.894984}
+  m_Center: {x: -3.5609581, y: 2.7125673, z: -0.4077202}
 --- !u!4 &9182938502659796295 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2157093109020397711, guid: 5cb458dcaaf8d6d4d9b026ad394f0e71,
@@ -17599,6 +17888,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -17677,6 +17971,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -17850,6 +18149,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -18207,6 +18511,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Gates_Cemetary_01
       objectReference: {fileID: 0}
+    - target: {fileID: 1244616513678327753, guid: 260b025fb66440a46b7d4c9a60fb1950,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1877460855332922739, guid: 260b025fb66440a46b7d4c9a60fb1950,
         type: 3}
       propertyPath: m_RootOrder
@@ -18285,6 +18594,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -18365,6 +18679,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_02
       objectReference: {fileID: 0}
+    - target: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7849377050755362001, guid: d46388ce1f854b24db247ac7b23e7d41,
         type: 3}
       propertyPath: m_RootOrder
@@ -18428,7 +18747,11 @@ PrefabInstance:
     - {fileID: 1202350098, guid: d46388ce1f854b24db247ac7b23e7d41, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 189916600729516376}
   m_SourcePrefab: {fileID: 100100000, guid: d46388ce1f854b24db247ac7b23e7d41, type: 3}
 --- !u!4 &513613474608345166 stripped
 Transform:
@@ -18436,6 +18759,33 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7768197452468984991}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &894923401025694452 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+    type: 3}
+  m_PrefabInstance: {fileID: 7768197452468984991}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &189916600729516376
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894923401025694452}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.3871226, y: 7.8712783, z: 3.0192325}
+  m_Center: {x: -0.03514921, y: 3.7018688, z: -0.19959925}
 --- !u!1001 &7776524056537062378
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19139,6 +19489,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -19406,6 +19761,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -19568,6 +19928,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -19881,6 +20246,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Pillar_Cemetary_01
       objectReference: {fileID: 0}
+    - target: {fileID: 4547341904957719829, guid: ed3fa8df7e37ad04f8a8a0d222ae2754,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19998,6 +20368,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -20172,6 +20547,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_02 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7849377050755362001, guid: d46388ce1f854b24db247ac7b23e7d41,
         type: 3}
       propertyPath: m_RootOrder
@@ -20235,8 +20615,39 @@ PrefabInstance:
     - {fileID: 1202350098, guid: d46388ce1f854b24db247ac7b23e7d41, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5063687273795852567}
   m_SourcePrefab: {fileID: 100100000, guid: d46388ce1f854b24db247ac7b23e7d41, type: 3}
+--- !u!1 &1302620802239971613 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7468453053722539627, guid: d46388ce1f854b24db247ac7b23e7d41,
+    type: 3}
+  m_PrefabInstance: {fileID: 8482126155294209910}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5063687273795852567
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302620802239971613}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.3871226, y: 7.8712783, z: 3.0192325}
+  m_Center: {x: -0.035149205, y: 3.7018688, z: -0.19959971}
 --- !u!4 &1826216363144518567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7849377050755362001, guid: d46388ce1f854b24db247ac7b23e7d41,
@@ -20349,6 +20760,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -20898,6 +21314,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
@@ -21532,6 +21953,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Bld_Fence_Cemetary_01 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2874609165872275067, guid: 32defebcf751e0e478a8d613aa4d5b80,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3219925723851932865, guid: 32defebcf751e0e478a8d613aa4d5b80,
         type: 3}
       propertyPath: m_RootOrder
@@ -21859,6 +22285,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Env_Tree_Dead_04
       objectReference: {fileID: 0}
+    - target: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1535694898, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
     - {fileID: 1535694899, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
@@ -21867,8 +22298,39 @@ PrefabInstance:
     - {fileID: 1535694895, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7037781228395577585}
   m_SourcePrefab: {fileID: 100100000, guid: 2eda3b6db64ebbf4aaa1513c37212954, type: 3}
+--- !u!1 &6931574108590440498 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2266404328464906784, guid: 2eda3b6db64ebbf4aaa1513c37212954,
+    type: 3}
+  m_PrefabInstance: {fileID: 9169899864465275410}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &7037781228395577585
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6931574108590440498}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.5696692, y: 13.719625, z: 6.4634404}
+  m_Center: {x: 0.57884383, y: 5.963988, z: 0.004825126}
 --- !u!4 &7744561065297730184 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1456969549680124058, guid: 2eda3b6db64ebbf4aaa1513c37212954,
