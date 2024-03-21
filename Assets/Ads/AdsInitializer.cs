@@ -3,8 +3,6 @@ using GoogleMobileAds.Api;
 
 public class AdsInitializer : MonoBehaviour
 {
-    private string _gameId;
-
     void Awake()
     {
         InitializeAds();

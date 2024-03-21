@@ -1,6 +1,7 @@
 using System;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class AdsBtnRender : MonoBehaviour
@@ -8,7 +9,7 @@ public class AdsBtnRender : MonoBehaviour
     [SerializeField] private Text remainCount;
     [SerializeField] private Text ticketChargeCountDown;
     [SerializeField] private RectTransform ticketChargeCountDownT;
-    [SerializeField] private InterstitialAdsButton interstitialAdsButton;
+    [FormerlySerializedAs("interstitialAdsButton")] [SerializeField] private AdmobAdsButton admobAdsButton;
 
     //[Header("google ads")]
     //[SerializeField] private GoogleMobileAdsManager googleMobileAdsManager;
@@ -18,8 +19,8 @@ public class AdsBtnRender : MonoBehaviour
     public void SetupForMainScene()
     {
         // unity
-        interstitialAdsButton.LoadInterstitialAd();
-        interstitialAdsButton.SetWatchedAdExtraProcess(
+        admobAdsButton.LoadAd();
+        admobAdsButton.SetWatchedAdExtraProcess(
             () =>
             {
                 // Grant a reward.
@@ -61,7 +62,7 @@ public class AdsBtnRender : MonoBehaviour
                         }
                     }).AddTo(gameObject);
                 }
-                interstitialAdsButton.HasTicket = x > 0;
+                admobAdsButton.HasTicket = x > 0;
                 //googleMobileAdsManager.Enable(x > 0);
             }
         ).AddTo(gameObject);

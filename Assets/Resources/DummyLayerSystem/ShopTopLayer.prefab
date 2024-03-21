@@ -59,6 +59,7 @@ MonoBehaviour:
   - {fileID: 7484773855068082255}
   - {fileID: 5215598267638685177}
   noAdsCell: {fileID: 8135144357352643768}
+  cellHeight: 450
   timeLimitedBundleCell: {fileID: 4881852321842979717}
 --- !u!1 &2904046931105250747
 GameObject:
@@ -384,6 +385,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 80135160145429034, guid: fc2bc79c251664e34a88adb27efbb5bf,
         type: 3}
+      propertyPath: admobAdsButton
+      value: 
+      objectReference: {fileID: 604187507812803441}
+    - target: {fileID: 80135160145429034, guid: fc2bc79c251664e34a88adb27efbb5bf,
+        type: 3}
       propertyPath: rewardedAdsButton
       value: 
       objectReference: {fileID: 604187507812803441}
@@ -401,6 +407,11 @@ PrefabInstance:
         type: 3}
       propertyPath: text
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1523163117158937322, guid: fc2bc79c251664e34a88adb27efbb5bf,
+        type: 3}
+      propertyPath: adType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1523163117158937322, guid: fc2bc79c251664e34a88adb27efbb5bf,
         type: 3}

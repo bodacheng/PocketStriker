@@ -3,14 +3,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using GoogleMobileAds.Api;
 
-public class InterstitialAdsButton : MonoBehaviour
+public class AdmobAdsButton : MonoBehaviour
 {
+    [SerializeField] AdType adType;
     [SerializeField] Button _showAdButton;
     [SerializeField] bool reloadAfterWatched;
     [SerializeField] Text text;
     string _adUnitId = null; // This will remain null for unsupported platforms
 
     private InterstitialAd _interstitialAd;
+    private RewardedAd _rewardedAd;
     private Action watchedAdExtraProcess;
 
     [SerializeField] Image[] colorImages;
@@ -69,22 +71,59 @@ public class InterstitialAdsButton : MonoBehaviour
     {
         // Get the Ad Unit ID for the current platform:
 #if UNITY_IOS
-        _adUnitId = CommonSetting.Admob_interstitial_iosKey;
+        switch (adType)
+        {
+            case AdType.Interstitial:
+                _adUnitId = CommonSetting.Admob_interstitial_iosKey;
+                break;
+            case AdType.Reward:
+                _adUnitId = CommonSetting.Admob_rewarded_iosKey;
+                break;
+        }
 #elif UNITY_ANDROID
-        _adUnitId = CommonSetting.Admob_interstitial_androidKey;
+        switch (adType)
+        {
+            case AdType.Interstitial:
+                _adUnitId = CommonSetting.Admob_interstitial_androidKey;
+                break;
+            case AdType.Reward:
+                _adUnitId = CommonSetting.rewarded_androidKey;
+                break;
+        }
 #endif
     }
     
     // Implement a method to execute when the user clicks the button:
     public void ShowAd()
     {
-        if (_interstitialAd != null && _interstitialAd.CanShowAd())
+        switch (adType)
         {
-            _interstitialAd.Show();
-        } 
-        else
-        {
-            Debug.LogError("Interstitial ad is not ready yet.");
+            case AdType.Interstitial:
+                if (_interstitialAd != null && _interstitialAd.CanShowAd())
+                {
+                    _interstitialAd.Show();
+                } 
+                else
+                {
+                    Debug.LogError("Interstitial ad is not ready yet.");
+                }
+                break;
+            case AdType.Reward:
+                if (_rewardedAd != null && _rewardedAd.CanShowAd())
+                {
+                    _rewardedAd.Show((x) =>
+                    {
+                        watchedAdExtraProcess.Invoke();
+                        if (reloadAfterWatched)
+                            LoadRewardAd();
+                        AppSetting.Value.UnMute();
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Rewarded ad is not ready yet.");
+                }
+                break;
         }
     }
     
@@ -132,12 +171,62 @@ public class InterstitialAdsButton : MonoBehaviour
         };
     }
     
-    // These ad units are configured to always serve test ads.
+    private void RegisterEventHandlers(RewardedAd rewardedAd)
+    {
+        // Raised when the ad is estimated to have earned money.
+        rewardedAd.OnAdPaid += (AdValue adValue) =>
+        {
+            Debug.Log(String.Format("Rewarded ad paid {0} {1}.", adValue.Value, adValue.CurrencyCode));
+        };
+        // Raised when an impression is recorded for an ad.
+        rewardedAd.OnAdImpressionRecorded += () =>
+        {
+            Debug.Log("Rewarded ad recorded an impression.");
+        };
+        // Raised when a click is recorded for an ad.
+        rewardedAd.OnAdClicked += () =>
+        {
+            Debug.Log("Rewarded ad was clicked.");
+        };
+        
+        // Raised when an ad opened full screen content.
+        rewardedAd.OnAdFullScreenContentOpened += () =>
+        {
+            Debug.Log("Rewarded ad full screen content opened.");
+            AdIsReady = false;
+            AppSetting.Value.Mute();
+        };
+        // Raised when the ad closed full screen content.
+        rewardedAd.OnAdFullScreenContentClosed += () =>
+        {
+            // 相关处理放到_rewardedAd.Show那边？
+            AppSetting.Value.UnMute();
+        };
+        // Raised when the ad failed to open full screen content.
+        rewardedAd.OnAdFullScreenContentFailed += (AdError error) =>
+        {
+            Debug.LogError("Rewarded ad failed to open " +
+                           "full screen content with error : " + error);
+        };
+    }
+
+    public void LoadAd()
+    {
+        switch (adType)
+        {
+            case AdType.Interstitial:
+                LoadInterstitialAd();
+                break;
+            case AdType.Reward:
+                LoadRewardAd();
+                break;
+        }
+    }
     
     /// <summary>
     /// Loads the rewarded interstitial ad.
     /// </summary>
-    public void LoadInterstitialAd()
+    void LoadInterstitialAd()
     {
         // Clean up the old ad before loading a new one.
         if (_interstitialAd != null)
@@ -169,5 +258,45 @@ public class InterstitialAdsButton : MonoBehaviour
                 AdIsReady = true;
                 RegisterEventHandlers(_interstitialAd);
             });
+    }
+    
+    void LoadRewardAd()
+    {
+        // Clean up the old ad before loading a new one.
+        if (_rewardedAd != null)
+        {
+            _rewardedAd.Destroy();
+            _rewardedAd = null;
+        }
+
+        Debug.Log("Loading the reward ad.");
+        
+        // create our request used to load the ad.
+        var adRequest = new AdRequest();
+        //adRequest.Keywords.Add("unity-admob-sample");
+
+        // send the request to load the ad.
+        RewardedAd.Load(_adUnitId, adRequest,
+            (RewardedAd ad, LoadAdError error) =>
+            {
+                // if error is not null, the load request failed.
+                if (error != null || ad == null)
+                {
+                    Debug.LogError("Rewarded ad failed to load an ad with error : " + error);
+                    return;
+                }
+                
+                Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
+                
+                _rewardedAd = ad;
+                AdIsReady = true;
+                RegisterEventHandlers(_rewardedAd);
+            });
+    }
+    
+    enum AdType
+    {
+        Interstitial = 0,
+        Reward = 1
     }
 }
