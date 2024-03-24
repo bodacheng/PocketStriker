@@ -181,6 +181,7 @@ namespace mainMenu
             var teamEditFront = new TeamEditPage();
             var skillStones = new StonesPage();
             var stoneSell = new StoneSell();
+            var stoneUpdatesConfirmPage = new StoneUpdatesConfirmPage();
             var selfFightFront = new SelfFightPage();
             var questInfo = new QuestInfoPage();
             var unitListPage = new UnitListPage();
@@ -209,6 +210,7 @@ namespace mainMenu
             ProcessesRunner.Main.Add(MainSceneStep.SkillStoneList, skillStones);
             ProcessesRunner.Main.Add(MainSceneStep.SkillStones_Sell, stoneSell);
             ProcessesRunner.Main.Add(MainSceneStep.SelfFightFront, selfFightFront);
+            ProcessesRunner.Main.Add(MainSceneStep.StoneUpdateConfirm, stoneUpdatesConfirmPage);
             ProcessesRunner.Main.Add(MainSceneStep.QuestInfo, questInfo);
             ProcessesRunner.Main.Add(MainSceneStep.UnitList, unitListPage);
             ProcessesRunner.Main.Add(MainSceneStep.UnitSkillEdit, memberDetailEdit);

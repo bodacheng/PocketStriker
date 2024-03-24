@@ -17,6 +17,7 @@ namespace mainMenu
         [SerializeField] GridLayoutGroup grid;
         [SerializeField] ScrollRect scrollRect;
         public GridLayoutGroup Grid=> grid;
+        public ScrollRect ScrollRect => scrollRect;
         public static GameObject Selected;
         readonly IDictionary<int, StoneCell> _cellsDic = new Dictionary<int, StoneCell>();
 

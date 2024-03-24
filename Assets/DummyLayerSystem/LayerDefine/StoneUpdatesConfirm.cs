@@ -11,18 +11,16 @@ namespace mainMenu
     public class StoneUpdatesConfirm : UILayer
     {
         [SerializeField] private BOButton confirmBtn;
-        [SerializeField] private BOButton cancelBtn;
         [SerializeField] private Text needGold;
         
         [SerializeField] VerticalLayoutGroup resultT;
         [SerializeField] StoneLevelUpInfoItem itemPrefab;
         
-        public void ShowInfo(Action confirm, Action cancel, int needGD,
+        public void ShowInfo(Action confirm, int needGD,
             List<SkillStoneLevelUpForm> updateAllStoneForms)
         {
             needGold.text = needGD.ToString();
             confirmBtn.SetListener(confirm);
-            cancelBtn.SetListener(cancel);
             
             float rectHeight = 0;
             for (var i = 0; i < updateAllStoneForms.Count; i++)
@@ -35,8 +33,7 @@ namespace mainMenu
                 rectHeight += (item.transform.GetComponent<RectTransform>().rect.height + resultT.spacing);
             }
             
-            resultT.GetComponent<RectTransform>().sizeDelta = 
-                new Vector2(resultT.GetComponent<RectTransform>().sizeDelta.x, rectHeight);
+            resultT.GetComponent<RectTransform>().sizeDelta = new Vector2(resultT.GetComponent<RectTransform>().sizeDelta.x, rectHeight);
         }
     }
 }

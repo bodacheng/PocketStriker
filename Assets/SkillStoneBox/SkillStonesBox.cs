@@ -24,7 +24,6 @@ namespace mainMenu
         [SerializeField] Toggle closeCheckBox;
         [SerializeField] Toggle nearCheckBox;
         [SerializeField] Toggle farCheckBox;
-
         
         void Awake()
         {

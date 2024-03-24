@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using dataAccess;
 using mainMenu;
 using UnityEngine;
@@ -49,7 +50,7 @@ public partial class SSLevelUpManager : MonoBehaviour
         levelUpAllStonesBtn.SetListener(
             () =>
             {
-                ConfirmUpdateAll(s => { });
+                PreScene.target.trySwitchToStep(MainSceneStep.StoneUpdateConfirm);
             });
     }
     
@@ -137,12 +138,12 @@ public partial class SSLevelUpManager : MonoBehaviour
         PopupLayer.ArrangeConfirmWindow(
             ()=>
             {
-                LevelUpStone(instanceId, mInstanceIds,
+                StoneLevelUpProccessor.LevelUpStone(instanceId, mInstanceIds,
                     x =>
                     {
-                        CalUpdateAllForms();
-                        LevelUpAllStonesBtn.interactable = HasStoneToBeUpdate();
-                        LevelUpAllStonesBtnAnimator.SetBool("on", HasStoneToBeUpdate());
+                        StoneLevelUpProccessor.CalUpdateAllForms();
+                        LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
+                        LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
                         // 具体待定。但不应该是RefreshSkillLevelUpModule，这个在CloseLevelUpPage会跑一次才对
                     });
             }, 

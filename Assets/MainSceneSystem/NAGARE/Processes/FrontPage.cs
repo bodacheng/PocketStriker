@@ -122,7 +122,7 @@ public class FrontPage : MSceneProcess
             _frontLayer.PlsClickBtn(MainSceneStep.SkillStoneList);
         }
         
-        SSLevelUpManager.CalUpdateAllForms();
+        StoneLevelUpProccessor.CalUpdateAllForms();
         
         LowerMainBar.Open();
         SetLoaded(true);

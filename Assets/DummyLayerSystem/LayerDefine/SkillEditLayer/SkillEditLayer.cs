@@ -181,7 +181,7 @@ public partial class SkillEditLayer : UILayer
         }
         
         await stonesBox._tabEffects.SwitchElement(unitConfig != null? unitConfig.element : Element.lightMagic, cts.Token);
-        await stonesBox.IniExTabsEffects(PreScene.target.postProcessCamera);
+        await stonesBox.IniExTabsEffects(PreScene.target.postProcessCamera, stonesBox.gameObject.GetCancellationTokenOnDestroy());
         stonesBox.FilterFeatureRefresh(true);
         skillStoneDetail.Clear();
         SkillEditButtonFeature(PreScene.target.Focusing);

@@ -18,7 +18,7 @@ public partial class SSLevelUpManager : MonoBehaviour
         gameObject.SetActive(true);
     }
     
-    void CloseLevelUpPage()
+    public void CloseLevelUpPage()
     {
         if (!gameObject.activeSelf)
             return;
@@ -33,7 +33,7 @@ public partial class SSLevelUpManager : MonoBehaviour
         renderModel._using = false;
         SKStoneItem.SelectedRender(renderModel, SkillStonesBox.Selected);
         _stoneListLayer.TargetStoneID = renderModel.instanceId;
-        
+        _stoneListLayer.SkillStoneDetail.SkillIntro.gameObject.SetActive(true);
         foreach (var t in _materialSlots)
         {
             if (t.GetItem() != null)

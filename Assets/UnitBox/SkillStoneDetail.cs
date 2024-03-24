@@ -43,6 +43,8 @@ namespace mainMenu
         [Header("tempT")]
         [SerializeField] Transform tempT;
         
+        public Text SkillIntro => skillIntro;
+        
         // 额外生成一个技能石图像
         async void IconForShow(string skillID)
         {

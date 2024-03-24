@@ -50,7 +50,12 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         }
         item.transform.SetParent(transform, false);
         item.transform.SetAsLastSibling();
-        item.transform.localScale = Vector3.one * 1.2f;
+        item.transform.localScale = Vector3.one;
+        var childRectTransform = item.transform.GetComponent<RectTransform>();
+        childRectTransform.anchorMin = Vector2.zero; // 设置锚点为左下角
+        childRectTransform.anchorMax = Vector2.one; // 设置锚点为右上角
+        childRectTransform.offsetMin = Vector2.zero; // 设置左边和下边的边缘
+        childRectTransform.offsetMax = Vector2.zero;
         item.transform.localPosition = Vector3.zero;
         item.MakeRaycast(true);
     }

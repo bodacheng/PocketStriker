@@ -85,8 +85,15 @@ public class LowerMainBar : UILayer
         {
             Go(MainSceneStep.GotchaFront);
         });
-        
-        hasStoneToBeUpdateBadge.SetActive(SSLevelUpManager.HasStoneToBeUpdate());
+
+        RefreshBadge();
+    }
+
+    public static void RefreshBadge()
+    {
+        StoneLevelUpProccessor.CalUpdateAllForms();
+        var lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+        lowerMainBar?.hasStoneToBeUpdateBadge.SetActive(StoneLevelUpProccessor.HasStoneToBeUpdate());
     }
 
     public static void Open()

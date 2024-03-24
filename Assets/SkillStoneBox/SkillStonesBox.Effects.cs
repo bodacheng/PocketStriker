@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,8 +35,10 @@ namespace mainMenu
             Temp(EX3Tab,3);
         }
         
-        public async UniTask IniExTabsEffects(Camera fxCamera)
+        public async UniTask IniExTabsEffects(Camera fxCamera, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
+            
             void IniExTab(Button btn, int exLevel)
             {
                 var worldPos = PosCal.GetWorldPos(fxCamera, btn.GetComponent<RectTransform>(), 5f);

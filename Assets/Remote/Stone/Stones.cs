@@ -52,7 +52,7 @@ namespace dataAccess
             if (stoneInfo == null)
                 return false;
 
-            var form = SSLevelUpManager.DecideForm(stoneInfo.SkillId, stoneInfo.InstanceId);
+            var form = StoneLevelUpProccessor.DecideForm(stoneInfo.SkillId, stoneInfo.InstanceId);
             return form != null;
         }
         

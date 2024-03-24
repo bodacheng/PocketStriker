@@ -33,6 +33,7 @@ public class GotchaResult : MSceneProcess
     {
         StarsFall.target.gameObject.SetActive(false);
         GotchaResultLayer.Close();
+        StoneLevelUpProccessor.CalUpdateAllForms();
     }
     
     private bool processingGotcha = false;

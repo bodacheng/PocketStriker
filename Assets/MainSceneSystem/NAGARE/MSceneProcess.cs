@@ -33,6 +33,7 @@
         UnitList = 5,
         UnitSkillEdit = 16,
         SkillStoneList = 15,
+        StoneUpdateConfirm = 14,
         SkillStones_Sell = 100,
         GotchaFront = 6,
         GotchaResult = 24,

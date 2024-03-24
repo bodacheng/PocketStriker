@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using dataAccess;
-using DummyLayerSystem;
 using mainMenu;
+using UnityEngine;
 
-public partial class SSLevelUpManager : MonoBehaviour
+public static class StoneLevelUpProccessor
 {
-    private static readonly List<SkillStoneLevelUpForm> UpdateAllStoneForms = new List<SkillStoneLevelUpForm>();
-    private static int needGoldWhole;
-
+    public static readonly List<SkillStoneLevelUpForm> UpdateAllStoneForms = new List<SkillStoneLevelUpForm>();
+    public static int needGoldWhole;
+    
     public static bool HasStoneToBeUpdate()
     {
         return UpdateAllStoneForms.Count > 0;
@@ -98,57 +97,75 @@ public partial class SSLevelUpManager : MonoBehaviour
         }
     }
     
-    void ConfirmUpdateAll(Action<string> refreshStoneData)
+    public static void LevelUpStone(string InstanceId, List<string> mInstanceIds, Action<string> refreshStoneData)
     {
-        _stoneListLayer.box._tabEffects.TurnShowingTagEffects(false);
-        var stoneUpdatesConfirm = UILayerLoader.Load<StoneUpdatesConfirm>();
-        stoneUpdatesConfirm.ShowInfo(
-            ()=>
-            {
-                UILayerLoader.Remove<StoneUpdatesConfirm>();
-                ExecuteUpdateAll(refreshStoneData);
-                _stoneListLayer.box._tabEffects.TurnShowingTagEffects(true);
-            },
-            ()=>
-            {
-                _stoneListLayer.box._tabEffects.TurnShowingTagEffects(true);
-                UILayerLoader.Remove<StoneUpdatesConfirm>();
-            },
-            needGoldWhole,
-            UpdateAllStoneForms
-        );
-    }
-
-    async void ExecuteUpdateAll(Action<string> refreshStoneData)
-    {
-        if (Currencies.CoinCount.Value < needGoldWhole)
+        var target = Stones.Get(InstanceId);
+        if (target.Born == "true")
         {
-            PopupLayer.ArrangeWarnWindow(Translate.Get("NoEnoughGD"));
+            Debug.Log("原生技能石不需升级");
             return;
         }
         
-        var _returnLayer = UILayerLoader.Get<ReturnLayer>();
-        if (_returnLayer != null)
-            _returnLayer.gameObject.SetActive(false);
-        bool canNext = true;
-        void Next(string x)
+        var materialInstanceIds = new List<string>();
+        var form = new SkillStoneLevelUpForm
         {
-            refreshStoneData(x);
-            canNext = true;
-        }
-        foreach (var updateAllStoneForm in UpdateAllStoneForms)
+            targetStoneID = InstanceId
+        };
+        
+        foreach (var instanceId in mInstanceIds)
         {
-            await UniTask.WaitUntil(()=> canNext);
-            canNext = false;
-            LevelUpStone(updateAllStoneForm.targetStoneID, updateAllStoneForm.stoneInstances, Next);
+            form.stoneInstances.Add(instanceId);
+            materialInstanceIds.Add(instanceId);
         }
         
-        PopupLayer.ArrangeWarnWindow(Translate.Get("AutoMergeFinished"));
-        if (_returnLayer != null)
-            _returnLayer.gameObject.SetActive(true);
-
-        CalUpdateAllForms();
-        LevelUpAllStonesBtn.interactable = HasStoneToBeUpdate();
-        LevelUpAllStonesBtnAnimator.SetBool("on", false);
+        // 以下是远程那边计算技能石升到等级的逻辑：
+        var materialLevels = new List<int>();
+        var addLevel = 0; // 增加的等级
+        void Temp(string instanceID)
+        {
+            var ssInfo = Stones.Get(instanceID);
+            if (ssInfo.Born == "true")
+            {
+                Debug.Log("操作终止。被动技能正在被用作材料："+ssInfo.InstanceId);
+                return;
+            }
+            
+            materialLevels.Add(ssInfo.Level);
+            addLevel += (ssInfo.Level - 1);
+            if (materialLevels.Count == 4)
+                addLevel += 1;
+        }
+        
+        foreach (var instanceId in materialInstanceIds)
+        {
+            Temp(instanceId);
+        }
+        
+        if (materialLevels.Count < 4)
+        {
+            Debug.Log("逻辑错误，material count :"+ materialLevels.Count);
+            return;
+        }
+        
+        form.addLevel = addLevel.ToString();
+        form.needGD = 10 * (materialInstanceIds.Count / 4);
+        
+        CloudScript.UpdateStone(
+            form,
+            async (targetInstanceId,x) =>
+            {
+                foreach (var instanceId in x)
+                {
+                    await Stones.RemoveStoneLocal(instanceId);
+                }
+                
+                Currencies.CoinCount.Value -= form.needGD;
+                // RemoveStoneLocal会销毁作为材料的技能石模型，
+                // 而CloseLevelUpPage内部有对材料的操作，
+                // 他们在同一帧执行的话会有一定错误
+                await UniTask.DelayFrame(1);
+                refreshStoneData.Invoke(targetInstanceId);
+            }
+        );
     }
 }
