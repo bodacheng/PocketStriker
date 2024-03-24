@@ -140,14 +140,9 @@ public class MobileInputsManager : MonoBehaviour {
                         if (percent == 1)
                         {
                             var _layer = UILayerLoader.Get<FightingStepLayer>();
-                            var preTeam1AIState = _layer.Team1UI.AutoSwitch.CurrentState();
+                            _layer.ForceClickDreamComboBtn();
                             _layer.Team1UI.AutoSwitch.ChangeAutoState(false);
                             _layer.Team2UI.AutoSwitch.ChangeAutoState(false);
-                            _layer.ForceClickDreamComboBtn(() =>
-                            {
-                                _layer.Team1UI.AutoSwitch.ChangeAutoState(preTeam1AIState);
-                                _layer.Team2UI.AutoSwitch.ChangeAutoState(true);
-                            });
                             dreamComboIntro?.Dispose();
                         }
                     }

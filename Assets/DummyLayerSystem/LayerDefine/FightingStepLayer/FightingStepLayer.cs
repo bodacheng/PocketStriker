@@ -143,21 +143,20 @@ public class FightingStepLayer : UILayer
                 forceClickAutoBtnBlackMask.SetActive(false);
             });
     }
-    
-    public void ForceClickDreamComboBtn(Action afterClick)
+
+    bool preTeam1AIState;
+    public void TutorialModeForceOnClickDreamCombo()
     {
+        clickTriggerDreamCombo.SetActive(false);
+        inputsManager.DreamComboDown();
+        Team1UI.AutoSwitch.ChangeAutoState(preTeam1AIState);
+        Team2UI.AutoSwitch.ChangeAutoState(true);
+    }
+    
+    public void ForceClickDreamComboBtn()
+    {
+        preTeam1AIState = Team1UI.AutoSwitch.CurrentState();
         clickTriggerDreamCombo.SetActive(true);
-        void Call()
-        {
-            clickTriggerDreamCombo.SetActive(false);
-        }
-        inputsManager.DreamComboBtn.onClick.AddListener(Call);
-        inputsManager.DreamComboBtn.onClick.AddListener(() =>
-        {
-            inputsManager.DreamComboBtn.onClick.RemoveListener(Call);
-            afterClick.Invoke();
-        });
-        inputsManager.DreamComboBtn.transform.SetAsLastSibling();
     }
 
     private void OnDisable()
