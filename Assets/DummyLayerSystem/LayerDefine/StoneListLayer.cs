@@ -46,7 +46,7 @@ public class StoneListLayer : UILayer
         box.IniExTabs();
         box.GenerateCells();
         await box._tabEffects.SwitchElement(Element.blueMagic, cts.Token);
-        await box.IniExTabsEffects(PreScene.target.postProcessCamera, box.gameObject.GetCancellationTokenOnDestroy());
+        await box.IniExTabsEffects(PreScene.target.postProcessCamera, cts.Token);
         box.AddFeatureToCells(CellFeature_StoneShow);
         box.FilterFeatureRefresh(true);
         box.RestFilter();

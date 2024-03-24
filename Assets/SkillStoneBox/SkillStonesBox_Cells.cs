@@ -63,12 +63,13 @@ namespace mainMenu
             }
             
             hang = cellCount / grid.constraintCount + 1;
+            
+            var viewPortHeight = PosCal.AdjustedViewPortHeight(scrollRect.GetComponent<RectTransform>().rect.height, grid.cellSize.y, grid.spacing.y);
+            viewPortHeight += 20;// 因为有的格子有角色使用图标，所以留出一些空间。这是个主观数值，和那个角色图标的尺寸有关
+            scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, viewPortHeight);
+            
             var gridRect = grid.GetComponent<RectTransform>();
             gridRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (grid.cellSize.y + grid.spacing.y) * hang);
-
-            var viewPortHeight = PosCal.AdjustedViewPortHeight(scrollRect.GetComponent<RectTransform>().rect.height, grid.cellSize.y, grid.spacing.y);
-            viewPortHeight += grid.spacing.y;// 因为有的格子有角色使用图标，所以留出一些空间
-            scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, viewPortHeight);
         }
         
         public void AddFeatureToCells(Action<StoneCell> action)

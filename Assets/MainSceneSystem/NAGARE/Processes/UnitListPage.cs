@@ -13,6 +13,7 @@ public class UnitListPage : MSceneProcess
     
     public override void ProcessEnter()
     {
+        UILayerLoader.Remove<UpperInfoBar>();
         unitOptionLayer = UILayerLoader.Load<UnitOptionLayer>();
         layer = UILayerLoader.Load<UnitsLayer>();
         ReturnLayer.MoveFront();
