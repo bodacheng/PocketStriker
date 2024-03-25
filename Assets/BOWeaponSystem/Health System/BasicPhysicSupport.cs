@@ -175,9 +175,9 @@ public class BasicPhysicSupport : MonoBehaviour
         if (disFromCenter > BoundaryControlByGod._BattleRingRadius)
         {
             var sa = maxLimbDisFromCenter - maxLimbDisFromCenter.normalized * BoundaryControlByGod._BattleRingRadius;
-            pos = pos - sa;
+            pos -= sa;
             pos.y = originY;
-            _DATA_CENTER.WholeT.position = Vector3.Lerp(_DATA_CENTER.WholeT.position, pos, pushIntoRingSpeed * Time.deltaTime);
+            _DATA_CENTER.WholeT.position = pos;//Vector3.Lerp(_DATA_CENTER.WholeT.position, pos, pushIntoRingSpeed * Time.deltaTime);
             AtRing = true;
         }
         else

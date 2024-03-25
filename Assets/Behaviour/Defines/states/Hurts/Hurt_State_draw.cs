@@ -16,9 +16,15 @@ namespace Soul
             Vector3 destination()
             {
                 var vector3 = newValue.from_weapon_marker.transform.position;
+                vector3.y = 0;
+                if (vector3.magnitude > BoundaryControlByGod._BattleRingRadius)
+                {
+                    vector3 = vector3.normalized * BoundaryControlByGod._BattleRingRadius;
+                }
                 vector3.y = gameObject.transform.position.y;
                 return vector3;
             }
+            
             _Rigidbody.MovePosition(destination());
         }
     }
