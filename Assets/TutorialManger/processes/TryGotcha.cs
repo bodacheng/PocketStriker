@@ -46,22 +46,6 @@ public class TryGotcha : TutorialProcess
         {
             returnLayer.gameObject.SetActive(ProcessesRunner.Main.currentProcess.Step == MainSceneStep.DropTableInfo);
         }
-        
-        if (gotchaResultLayer == null)
-        {
-            gotchaResultLayer = UILayerLoader.Get<GotchaResultLayer>();
-            if (gotchaResultLayer != null)
-            {
-                async void DelayBack()
-                {
-                    returnLayer.gameObject.SetActive(false);
-                    await UniTask.Delay(TimeSpan.FromSeconds(3));
-                    returnLayer.gameObject.SetActive(true);
-                    returnLayer.ForceBackMode(true);
-                }
-                DelayBack();
-            }
-        }
     }
 
     public override bool CanEnterOtherProcess()
