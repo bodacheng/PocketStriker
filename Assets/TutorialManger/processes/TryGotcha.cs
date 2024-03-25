@@ -1,14 +1,14 @@
-using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using mainMenu;
 using PlayFab.ClientModels;
+using UnityEngine;
 
 public class TryGotcha : TutorialProcess
 {
     private GotchaLayer gotchaLayer;
     private GotchaResultLayer gotchaResultLayer;
+    private LowerMainBar _lowerMainBar;
     private ReturnLayer returnLayer;
     
     public override void LocalUpdate()
@@ -46,6 +46,21 @@ public class TryGotcha : TutorialProcess
         {
             returnLayer.gameObject.SetActive(ProcessesRunner.Main.currentProcess.Step == MainSceneStep.DropTableInfo);
         }
+        
+        if (_lowerMainBar == null)
+        {
+            _lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+            if (_lowerMainBar != null)
+            {
+                _lowerMainBar.PlsClickBtn(MainSceneStep.None);
+            }
+        }
+        
+        if (gotchaResultLayer == null)
+        {
+            gotchaResultLayer = UILayerLoader.Get<GotchaResultLayer>();
+        }
+
     }
 
     public override bool CanEnterOtherProcess()
@@ -55,7 +70,5 @@ public class TryGotcha : TutorialProcess
     
     public override void ProcessEnd()
     {
-        var gotchaFront  = (GotchaFront)ProcessesRunner.Main.GetProcess(MainSceneStep.GotchaFront);
-        gotchaFront.SetExtraSuccessAction(null);
     }
 }
