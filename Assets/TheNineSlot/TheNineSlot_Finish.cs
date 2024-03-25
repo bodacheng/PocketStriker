@@ -1,13 +1,15 @@
-﻿using dataAccess;
+﻿using System.Collections.Generic;
+using dataAccess;
 using UnityEngine;
 using mainMenu;
+using Skill;
 
 public partial class SkillSet
 {
     // 根据账户内拥有的技能石来补完当前九宫格
     public static SkillSet FixSkillSet(string type, SkillSet originSkillSet, bool baseOnAcc)
     {
-        var skillSet = SkillSetRandomFix(type, originSkillSet, 1, baseOnAcc);
+        var skillSet = SkillSetRandomFix(type, originSkillSet, 9, baseOnAcc);
         if (skillSet == null)
         {
             return null;
@@ -19,7 +21,7 @@ public partial class SkillSet
 
     static SkillSet SkillSetRandomFix(string type, SkillSet _skillSet, int targetSlot, bool baseOnAcc)
     {
-        if (targetSlot == 10)
+        if (targetSlot == 0)
         {
             return _skillSet;
         }
@@ -58,35 +60,51 @@ public partial class SkillSet
         
         // 已经有技能石的格子不做修改
         if (SkillConfigTable.GetSkillConfigByRecordId(skillId) != null)
-            return SkillSetRandomFix(type, _skillSet, targetSlot + 1, baseOnAcc);
+            return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc);
 
         skillId = null;
         
         SkillStonesBox.StoneFilterForm filterForm;
-        
-        if (targetSlot == 7)
+
+        bool CheckLastFirstColumnSkill()
         {
-            // 第一列技能必须有普通技能
+            List<SkillConfig> list = new List<SkillConfig>();
             var a1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.a1);
             var b1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.b1);
-            if (a1SkillConfig.SP_LEVEL != 0 && b1SkillConfig.SP_LEVEL != 0)
-            {
-                filterForm = new SkillStonesBox.StoneFilterForm
-                {
-                    Type = type,
-                    ExType = new int[1] { 0 },
-                    Close = false,
-                    Near = false,
-                    Far = false
-                };
-                goto A;
-            }
+            var c1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.c1);
+            if (a1SkillConfig != null)
+                list.Add(a1SkillConfig);
+            if (b1SkillConfig != null)
+                list.Add(b1SkillConfig);
+            if (c1SkillConfig != null)
+                list.Add(c1SkillConfig);
+            
+            return list.Count == 2 && list.TrueForAll(x=> x.SP_LEVEL != 0);
         }
-
+        
+        if (CheckLastFirstColumnSkill() &&  targetSlot is 1 or 4 or 7)
+        {
+            filterForm = new SkillStonesBox.StoneFilterForm
+            {
+                Type = type,
+                ExType = new int[1] { 0 },
+                Close = false,
+                Near = false,
+                Far = false
+            };
+            goto A;
+        }
+        
+        var remainSpLevelList = RemainSlotSPLevelCal(_skillSet);
+        if (remainSpLevelList.Count > 1 && remainSpLevelList.Contains(0))
+        {
+            remainSpLevelList.Remove(0); // 必杀技优先
+        }
+        
         filterForm = new SkillStonesBox.StoneFilterForm
         {
             Type = type,
-            ExType = RemainSlotSPLevelCal(_skillSet).ToArray(),
+            ExType = remainSpLevelList.ToArray(),
             Close = false,
             Near = false,
             Far = false
@@ -153,7 +171,7 @@ public partial class SkillSet
                 break;
         }
         
-        if (targetSlot == 9)
+        if (targetSlot == 0)
         {
             var valR = CheckEdit(
                 _skillSet.a1, _skillSet.a2, _skillSet.a3,
@@ -162,6 +180,6 @@ public partial class SkillSet
             
             return valR == SkillEditError.Perfect ? _skillSet : null;
         }
-        return SkillSetRandomFix(type, _skillSet, targetSlot + 1, baseOnAcc);
+        return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc);
     }
 }
