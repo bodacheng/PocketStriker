@@ -39,6 +39,7 @@ public class SettingPage : MSceneProcess
 
     public override void ProcessEnd()
     {
+        UILayerLoader.Remove<NickNameLayer>();
         SettingLayer.Close();
     }
 
