@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Skill;
 using System.Linq;
+using NoSuchStudio.Common;
 
 // 配置文件属于资源信息，不是账户信息，应该分离开处理。
 namespace dataAccess
@@ -92,7 +93,7 @@ namespace dataAccess
             }
             return returnValue;
         }
-
+        
         // 从账户随机抽取符合要求的技能石
         // exceptSkIDs : 除了这些技能ID。切记是技能ID
         public static StoneOfPlayerInfo SearchStoneForRandomSetFromAccount(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIds)
@@ -111,8 +112,7 @@ namespace dataAccess
             var stoneAccIDs = TargetStonesFromAccount_except(focusingUnitInstanceId, filterForm, exceptStones, null, true);
             if (stoneAccIDs.Count == 0)
                 return null;
-            var ranDom = Random.Range(0, stoneAccIDs.Count);
-            var stoneAccID = stoneAccIDs[ranDom];
+            var stoneAccID = stoneAccIDs.Random();
             var infoModel = Get(stoneAccID);
             return infoModel;
         }

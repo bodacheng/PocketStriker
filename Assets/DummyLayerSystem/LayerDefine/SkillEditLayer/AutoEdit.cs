@@ -10,7 +10,7 @@ public partial class SkillEditLayer : UILayer
         var info = PreScene.target.Focusing;
         var unitConfig = Units.GetUnitConfig(info.r_id);
         var now = nineSlot.GetCurrentNineAndTwo();
-        var targetSkillSet = SkillSet.FixSkillSet(unitConfig.TYPE, now,  true);
+        var targetSkillSet = SkillSet.FixSkillSet(unitConfig.TYPE, now, true, info.id);
         
         if (targetSkillSet == null)
         {

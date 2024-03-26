@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using dataAccess;
 using Skill;
 
 public partial class SkillSet
@@ -35,6 +36,17 @@ public partial class SkillSet
             ids.Add(c3);
         
         return ids;
+    }
+
+    public List<string> GetAllInstanceIdsThatRelatesToCurrentSet()
+    {
+        List<string> instanceIds = new List<string>();
+        foreach (var skillId in SkillIDList())
+        {
+            instanceIds.AddRange(Stones.GetMyStonesBySkillID(skillId));
+        }
+
+        return instanceIds;
     }
     
     // 获取平均技能等级

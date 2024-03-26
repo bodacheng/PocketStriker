@@ -7,9 +7,9 @@ using Skill;
 public partial class SkillSet
 {
     // 根据账户内拥有的技能石来补完当前九宫格
-    public static SkillSet FixSkillSet(string type, SkillSet originSkillSet, bool baseOnAcc)
+    public static SkillSet FixSkillSet(string type, SkillSet originSkillSet, bool baseOnAcc, string focusingUnitInstanceId)
     {
-        var skillSet = SkillSetRandomFix(type, originSkillSet, 9, baseOnAcc);
+        var skillSet = SkillSetRandomFix(type, originSkillSet, 9, baseOnAcc, focusingUnitInstanceId);
         if (skillSet == null)
         {
             return null;
@@ -19,7 +19,7 @@ public partial class SkillSet
         return skillSet;
     }
 
-    static SkillSet SkillSetRandomFix(string type, SkillSet _skillSet, int targetSlot, bool baseOnAcc)
+    static SkillSet SkillSetRandomFix(string type, SkillSet _skillSet, int targetSlot, bool baseOnAcc, string focusingUnitInstanceId)
     {
         if (targetSlot == 0)
         {
@@ -60,7 +60,7 @@ public partial class SkillSet
         
         // 已经有技能石的格子不做修改
         if (SkillConfigTable.GetSkillConfigByRecordId(skillId) != null)
-            return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc);
+            return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc, focusingUnitInstanceId);
 
         skillId = null;
         
@@ -95,7 +95,9 @@ public partial class SkillSet
             goto A;
         }
         
-        var remainSpLevelList = RemainSlotSPLevelCal(_skillSet);
+        
+        
+        var remainSpLevelList = RemainSlotSPLevelCal(_skillSet, focusingUnitInstanceId, _skillSet.GetAllInstanceIdsThatRelatesToCurrentSet());
         if (remainSpLevelList.Count > 1 && remainSpLevelList.Contains(0))
         {
             remainSpLevelList.Remove(0); // 必杀技优先
@@ -180,6 +182,6 @@ public partial class SkillSet
             
             return valR == SkillEditError.Perfect ? _skillSet : null;
         }
-        return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc);
+        return SkillSetRandomFix(type, _skillSet, targetSlot - 1, baseOnAcc, focusingUnitInstanceId);
     }
 }
