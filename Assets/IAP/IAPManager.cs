@@ -18,7 +18,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     // Items list, configurable via inspector
     private static List<CatalogItem> _productCatalog;
     private static List<CatalogItem> _stoneProductCatalog;
-    private string noAdsServiceName = "vip";
+    private string noAdsServiceName = "vip_v";
     private string productClassName = "Product";
     private string ProductCatalogVersion = "Product";
     private string StoneProductCatalogVersion = "stone";
@@ -235,12 +235,12 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
         {
             switch (e.purchasedProduct.definition.id)
             {
-                case "vip":
+                case "vip_v":
                     PopupLayer.ArrangeWarnWindow(Translate.Get("PurchaseVIPSuccess"));
                     break;
-                case "beginnerbundle1":
-                case "beginnerbundle2":
-                case "beginnerbundle3":
+                case "beginnerbundle1_v":
+                case "beginnerbundle2_v":
+                case "beginnerbundle3_v":
                     PopupLayer.ArrangeWarnWindow(Translate.Get("PurchaseStoneBundleSuccess"));
                     break;
                 default:
