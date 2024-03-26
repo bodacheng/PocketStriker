@@ -48,7 +48,7 @@ namespace dataAccess
                     continue;
                 }
 
-                if (pair.Value.unitInstanceId != null && skillEditFocusing != null && pair.Value.unitInstanceId != skillEditFocusing)
+                if (Units.Get(pair.Value.unitInstanceId) != null && skillEditFocusing != null && pair.Value.unitInstanceId != skillEditFocusing)
                 {
                     continue;
                 }
@@ -80,7 +80,7 @@ namespace dataAccess
                 var infoModel = Get(filteredList[i]);
                 if (notUsing)
                 {
-                    if (Units.Get(infoModel.unitInstanceId) != null)
+                    if (Units.Get(infoModel.unitInstanceId) != null && infoModel.unitInstanceId != skillEditFocusing)
                     {
                         continue;
                     }

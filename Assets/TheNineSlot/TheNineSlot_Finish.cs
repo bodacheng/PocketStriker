@@ -95,8 +95,6 @@ public partial class SkillSet
             goto A;
         }
         
-        
-        
         var remainSpLevelList = RemainSlotSPLevelCal(_skillSet, focusingUnitInstanceId, _skillSet.GetAllInstanceIdsThatRelatesToCurrentSet());
         if (remainSpLevelList.Count > 1 && remainSpLevelList.Contains(0))
         {
