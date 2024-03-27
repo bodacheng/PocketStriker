@@ -29,6 +29,7 @@ public class StonesPage : MSceneProcess
     //EnterProcess()内绝不能出现triggerMainProcess
     async void EnterProcess(bool updateStone = false)
     {
+        BackGroundPS.target.Void();
         UILayerLoader.Remove<UpperInfoBar>();
         ProgressLayer.Loading(string.Empty);
         await Stones.RenderAll();
