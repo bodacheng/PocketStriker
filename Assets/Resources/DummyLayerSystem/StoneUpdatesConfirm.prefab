@@ -479,7 +479,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 8021008956027076141}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999758
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -517,7 +517,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000093642775}
+  m_AnchoredPosition: {x: 0, y: 0.00016745635}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &8197763065034732463
@@ -1085,18 +1085,23 @@ PrefabInstance:
     - target: {fileID: 6075133239518147408, guid: 16c2ac0421d9e46a18703c11102acb16,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.39607844
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6075133239518147408, guid: 16c2ac0421d9e46a18703c11102acb16,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.39607844
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6075133239518147408, guid: 16c2ac0421d9e46a18703c11102acb16,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.39607844
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6075133239518147408, guid: 16c2ac0421d9e46a18703c11102acb16,
+        type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: ac31607d78a8a4677b2dd1a525c3e5da, type: 3}
     - target: {fileID: 6075133239518147408, guid: 16c2ac0421d9e46a18703c11102acb16,
         type: 3}
       propertyPath: m_RaycastTarget
