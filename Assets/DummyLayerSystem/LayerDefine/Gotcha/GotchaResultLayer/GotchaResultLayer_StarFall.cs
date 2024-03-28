@@ -24,20 +24,23 @@ public partial class GotchaResultLayer : UILayer
     
     void StarFall(StoneOfPlayerInfo stone)
     {
-        var targetPos = StarsFall.target.GetRandomStarPos();
+        var starExplosionInTheSkyPos = StarsFall.target.GetRandomStarPos();
         var effectSet = _effectDic[stone];
         var star = effectSet.StoneFigure;
         star.ParticleSystem.Play();
         star.PlaySoundOnce();
-        star.transform.position =  StarsFall.target.GetEffectCenter();
-        StarsFall.target.Camera.transform.DOLookAt(targetPos, 1f);
-        var sequence = DOTween.Sequence().Append(star.transform.DOMove(targetPos, 1).OnComplete(() =>
+        star.transform.position = StarsFall.target.GetRandomStarPos(true);
+        
+        var cameraTargetPos = StarsFall.target.GetRandomStarPosCameraLookPos(starExplosionInTheSkyPos);
+        StarsFall.target.Camera.transform.DOMove(cameraTargetPos, 1);
+        
+        var sequence = DOTween.Sequence().Append(star.transform.DOMove(starExplosionInTheSkyPos, 1).OnComplete(() =>
         {
             var flash = effectSet.StoneFlashFigure;
-            flash.transform.position = targetPos;
+            flash.transform.position = starExplosionInTheSkyPos;
             flash.ParticleSystem.Play();
             flash.PlaySoundOnce();
-        })).Append(star.transform.DOMoveY(-600, 30f));
+        })).Append(star.transform.DOMove(cameraTargetPos + StarsFall.target.Camera.transform.forward * 5f, 1f));
         effectSet.RunSequence(sequence);
     }
     

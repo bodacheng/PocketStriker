@@ -63,7 +63,7 @@ public class GotchaFront : MSceneProcess
      
     public override void ProcessEnter()
     {
-        StarsFall.target.gameObject.SetActive(true);
+        StarsFall.target.Turn(true);
         if (Stones.TooManyStones())
         {
             ReturnLayer.ReturnMissionList.Clear();
@@ -93,7 +93,7 @@ public class GotchaFront : MSceneProcess
     public override void ProcessEnd()
     {
         UILayerLoader.Remove<GotchaLayer>();
-        StarsFall.target.gameObject.SetActive(false);
+        StarsFall.target.Turn(false);
     }
     
     void DropTableInfo(string dropTableId)

@@ -5,6 +5,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5796086602460285, guid: fffd28e4ead204e7aa9991b98db9eabf, type: 3}
@@ -106,6 +107,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: gachastar3
       objectReference: {fileID: 0}
+    - target: {fileID: 4876135476239839223, guid: fffd28e4ead204e7aa9991b98db9eabf,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8cb3458e2f63df54dafcc544ba5527ab, type: 2}
     - target: {fileID: 4876327682804421837, guid: fffd28e4ead204e7aa9991b98db9eabf,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -129,12 +135,12 @@ PrefabInstance:
     - target: {fileID: 4876361624976324975, guid: fffd28e4ead204e7aa9991b98db9eabf,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4876361624976324975, guid: fffd28e4ead204e7aa9991b98db9eabf,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.7312288
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4876545936742795139, guid: fffd28e4ead204e7aa9991b98db9eabf,
         type: 3}
@@ -162,4 +168,7 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fffd28e4ead204e7aa9991b98db9eabf, type: 3}
