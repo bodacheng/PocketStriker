@@ -67,9 +67,9 @@ public class BannerAds : MonoBehaviour
         var screenHeight = Screen.height * posRef.rect.height / PosCal.CanvasHeight ;
         var screenWidth = Screen.width * posRef.rect.width / PosCal.CanvasWidth;
         var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
-//Debug.Log("pos :"+ pos);
-            //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
-        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), pos);
+        Debug.Log("pos :"+ pos);
+        Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
+        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
     }
     
     /// <summary>
