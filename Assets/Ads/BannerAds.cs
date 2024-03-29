@@ -7,11 +7,28 @@ using System;
 
 public class BannerAds : MonoBehaviour
 {
+    [SerializeField] private RectTransform posRef;
+    
+    public static BannerAds target;
     private string _adUnitId;
 
     void Awake()
     {
+        target = this;
         IniUnitId();
+    }
+
+    void Start()
+    {
+        if (AdsInitializer.target.Initialized && _bannerView == null)
+        {
+            LoadAd();
+        }
+    }
+
+    void OnDestroy()
+    {
+        DestroyBannerView();
     }
 
     void IniUnitId()
@@ -25,7 +42,8 @@ public class BannerAds : MonoBehaviour
     }
     
     BannerView _bannerView;
-
+    public BannerView BannerView;
+    
     /// <summary>
     /// Creates a 320x50 banner view at top of the screen.
     /// </summary>
@@ -39,9 +57,20 @@ public class BannerAds : MonoBehaviour
         
         Debug.Log("Creating banner view");
 // Use the AdSize argument to set a custom size for the ad.
-        AdSize adSize = new AdSize(700, 150);
-        _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);
+
+        var rect = CalSize();
+        AdSize adSize = new AdSize((int)rect.Item1.x, (int)rect.Item1.y);
+        _bannerView = new BannerView(_adUnitId, adSize, (int)rect.Item2.x, (int)rect.Item2.y);
         ListenToAdEvents();
+    }
+
+    Tuple<Vector2, Vector2> CalSize()
+    {
+        var screenHeight = UnityEngine.Device.Screen.height * posRef.rect.height / PosCal.CanvasHeight ;
+        var screenWidth = UnityEngine.Device.Screen.width * posRef.rect.width / PosCal.CanvasWidth;
+        var pos = new Vector2(0, Screen.safeArea.position.y - screenHeight);
+
+        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), pos);
     }
     
     /// <summary>

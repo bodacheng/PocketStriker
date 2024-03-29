@@ -18,7 +18,6 @@ public class UpperInfoBar : UILayer
     [SerializeField] Text accountIntelliCoin;
     [SerializeField] GameObject vipFlg;
     [SerializeField] float currencyTextChangeDuration = 2f;
-
     private string gold;
     private string GoldText
     {

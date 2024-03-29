@@ -1714,7 +1714,6 @@ MonoBehaviour:
   viewSwitchBtn: {fileID: 939203393787663049}
   viewText: {fileID: 317053639056879389}
   skillShowInterval: 5
-  indicator: {fileID: 8151383610826493773}
 --- !u!95 &3648622557364505496
 Animator:
   serializedVersion: 5
@@ -2795,7 +2794,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 400}
+  m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &481752861139382388
 CanvasRenderer:

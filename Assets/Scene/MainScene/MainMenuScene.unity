@@ -2806,7 +2806,7 @@ PrefabInstance:
         type: 3}
       propertyPath: bannerAds
       value: 
-      objectReference: {fileID: 2127319106}
+      objectReference: {fileID: 0}
     - target: {fileID: 3366064175794714547, guid: 8102a4a1ea88d4f8bbb5bc6b0071a20f,
         type: 3}
       propertyPath: m_Name
@@ -2815,30 +2815,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3366064175794714547, guid: 8102a4a1ea88d4f8bbb5bc6b0071a20f,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2127319106}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8102a4a1ea88d4f8bbb5bc6b0071a20f, type: 3}
---- !u!1 &2127319105 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3366064175794714547, guid: 8102a4a1ea88d4f8bbb5bc6b0071a20f,
-    type: 3}
-  m_PrefabInstance: {fileID: 2127319104}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2127319106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2127319105}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf7ea9a11244547c0ad6679d15e35ba5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &299263300624455892
 GameObject:
   m_ObjectHideFlags: 0
