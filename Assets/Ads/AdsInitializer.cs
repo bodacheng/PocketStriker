@@ -14,8 +14,8 @@ public class AdsInitializer : MonoBehaviour
         // Google admob
         MobileAds.Initialize(initStatus =>
         {
-            Debug.Log("谷歌广告插件初始化状态："+initStatus);
-            bannerAds.LoadAd();
+            Debug.Log("谷歌广告插件初始化状态："+initStatus.getAdapterStatusMap());
+            bannerAds?.LoadAd();
         });
     }
 }
