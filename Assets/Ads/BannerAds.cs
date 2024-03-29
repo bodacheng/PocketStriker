@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using GoogleMobileAds;
 using GoogleMobileAds.Api;
 using System;
+using UnityEngine.UI;
 
 public class BannerAds : MonoBehaviour
 {
@@ -66,10 +64,11 @@ public class BannerAds : MonoBehaviour
 
     Tuple<Vector2, Vector2> CalSize()
     {
-        var screenHeight = UnityEngine.Device.Screen.height * posRef.rect.height / PosCal.CanvasHeight ;
-        var screenWidth = UnityEngine.Device.Screen.width * posRef.rect.width / PosCal.CanvasWidth;
-        var pos = new Vector2(0, Screen.safeArea.position.y - screenHeight);
-
+        var screenHeight = Screen.height * posRef.rect.height / PosCal.CanvasHeight ;
+        var screenWidth = Screen.width * posRef.rect.width / PosCal.CanvasWidth;
+        var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
+//Debug.Log("pos :"+ pos);
+            //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
         return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), pos);
     }
     
@@ -150,4 +149,15 @@ public class BannerAds : MonoBehaviour
             _bannerView = null;
         }
     }
+    
+    // void OnGUI()
+    // {
+    //     var rect = CalSize();
+    //     if (GUI.Button(new Rect(rect.Item2.x, rect.Item2.y,rect.Item1.x, rect.Item1.y), "I am a button"))
+    //     {
+    //         Debug.Log(rect.Item2.x + " : " + rect.Item2.y);
+    //         Debug.Log(rect.Item1.x + " : " + rect.Item1.y);
+    //         print("You clicked the button!");
+    //     }
+    // }
 }
