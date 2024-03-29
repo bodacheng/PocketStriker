@@ -44,6 +44,11 @@ public class CommonSetting : ScriptableObject
     [Tooltip("admob rewarded android Key")] 
     [SerializeField] string admob_rewarded_androidKey;
     
+    [Tooltip("admob banner ios Key")] 
+    [SerializeField] string admob_banner_iosKey;
+    [Tooltip("admob banner android Key")] 
+    [SerializeField] string admob_banner_androidKey;
+    
     [Tooltip("audio source key")]
     [SerializeField] string startThemeAddressKey = "music/start";
     [SerializeField] string lobbyThemeAddressKey = "music/lobby";
@@ -115,6 +120,9 @@ public class CommonSetting : ScriptableObject
     
     public static string Admob_rewarded_iosKey;
     public static string Admob_rewarded_androidKey;
+    
+    public static string Admob_banner_iosKey;
+    public static string Admob_banner_androidKey;
 
     public static string StartThemeAddressKey;
     public static string LobbyThemeAddressKey;
@@ -171,6 +179,9 @@ public class CommonSetting : ScriptableObject
         
         Admob_rewarded_iosKey = admob_rewarded_iosKey;
         Admob_rewarded_androidKey = admob_rewarded_androidKey;
+
+        Admob_banner_iosKey = admob_banner_iosKey;
+        Admob_banner_androidKey = admob_banner_androidKey;
         
         LobbyThemeAddressKey = lobbyThemeAddressKey;
         StartThemeAddressKey = startThemeAddressKey;
