@@ -1,12 +1,9 @@
 using UnityEngine;
 using GoogleMobileAds.Api;
 using System;
-using UnityEngine.UI;
 
 public class BannerAds : MonoBehaviour
 {
-    [SerializeField] private RectTransform posRef;
-    
     public static BannerAds target;
     private string _adUnitId;
 
@@ -140,15 +137,15 @@ public class BannerAds : MonoBehaviour
         }
     }
     
-    Tuple<Vector2, Vector2> CalSize()
-    {
-        var screenHeight = Screen.height * (posRef.rect.height / PosCal.CanvasHeight);
-        var screenWidth = Screen.width * (posRef.rect.width / PosCal.CanvasWidth);
-        var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
-        //Debug.Log("pos :"+ pos);
-        //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
-        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
-    }
+    // Tuple<Vector2, Vector2> CalSize()
+    // {
+    //     var screenHeight = Screen.height * (posRef.rect.height / PosCal.CanvasHeight);
+    //     var screenWidth = Screen.width * (posRef.rect.width / PosCal.CanvasWidth);
+    //     var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
+    //     //Debug.Log("pos :"+ pos);
+    //     //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
+    //     return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
+    // }
     
     // void OnGUI()
     // {

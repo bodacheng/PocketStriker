@@ -38,6 +38,7 @@ namespace FightScene
                 watchBtn.SetWatchedAdExtraProcess(
                     () =>
                     {
+                        watchBtn.gameObject.SetActive(false);
                         CloudScript.RequestAdReward(
                             "DM",
                             extraAdReward, 
@@ -46,6 +47,10 @@ namespace FightScene
                         );
                     }
                 );
+                if (watchBtn.AdIsReady && finishedStage >= 3)
+                {
+                    watchBtn.ShowAd();
+                }
                 watchBtn.gameObject.SetActive(true);
             }
         }
