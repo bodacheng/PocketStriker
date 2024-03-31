@@ -29,6 +29,12 @@ public class StonesPage : MSceneProcess
     //EnterProcess()内绝不能出现triggerMainProcess
     async void EnterProcess(bool updateStone = false)
     {
+        var lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+        if (updateStone)
+        {
+            lowerMainBar?.gameObject.SetActive(false);
+        }
+        
         BackGroundPS.target.Void();
         UILayerLoader.Remove<UpperInfoBar>();
         ProgressLayer.Loading(string.Empty);
@@ -39,7 +45,7 @@ public class StonesPage : MSceneProcess
         ReturnLayer.MoveFront();
         layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
         layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
-        var lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+        
         lowerMainBar.transform.SetAsLastSibling();
 
         if (!updateStone)
@@ -97,6 +103,12 @@ public class StonesPage : MSceneProcess
         layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", false);
         LowerMainBar.RefreshBadge();
         PopupLayer.ArrangeWarnWindow(Translate.Get("AutoMergeFinished"));
+        
+        if (updateStone)
+        {
+            lowerMainBar?.gameObject.SetActive(true);
+        }
+        
         SetLoaded(true);
     }
     

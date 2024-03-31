@@ -125,4 +125,10 @@ public class ReturnLayer : UILayer
             layer.transform.SetAsLastSibling();
         }
     }
+
+    public static void Clear()
+    {
+        ReturnMissionList.Clear();
+        UILayerLoader.Remove<ReturnLayer>();
+    }
 }

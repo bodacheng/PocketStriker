@@ -34,5 +34,6 @@ public class StoneUpdatesConfirmPage : MSceneProcess
             return;
         }
         PreScene.target.trySwitchToStep(MainSceneStep.SkillStoneList, true, false);
+        ReturnLayer.Clear();
     }
 }

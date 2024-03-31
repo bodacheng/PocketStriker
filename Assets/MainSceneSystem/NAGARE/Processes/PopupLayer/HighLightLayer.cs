@@ -1,14 +1,9 @@
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using DummyLayerSystem;
 using UnityEngine;
 using NoSuchStudio.UI.Highlight;
 using UniRx;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class HighLightLayer : UILayer
 {
