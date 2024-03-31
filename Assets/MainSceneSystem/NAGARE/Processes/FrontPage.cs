@@ -47,13 +47,13 @@ public class FrontPage : MSceneProcess
 
     void EnterProcess()
     {
-        if (PlayerAccountInfo.Me.tutorialProgress == "Started")
-        {
-            var titleBgLayer = UILayerLoader.Load<TitleBgLayer>();
-            titleBgLayer.Setup(1);
-            titleBgLayer.Rotate(true, _EnterProcess);
-        }
-        else
+        // if (PlayerAccountInfo.Me.tutorialProgress == "Started")
+        // {
+        //     var titleBgLayer = UILayerLoader.Load<TitleBgLayer>();
+        //     titleBgLayer.Setup(1);
+        //     titleBgLayer.Rotate(true, _EnterProcess);
+        // }
+        // else
         {
             _EnterProcess();
         }
