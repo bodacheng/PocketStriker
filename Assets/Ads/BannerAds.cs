@@ -56,20 +56,10 @@ public class BannerAds : MonoBehaviour
         Debug.Log("Creating banner view");
         // Use the AdSize argument to set a custom size for the ad.
 
-        // var adSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        var adSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(200);
         // Debug.Log(adSize.Width + ":"+ adSize.Height);
-        _bannerView = new BannerView(_adUnitId, AdSize.Banner, AdPosition.TopLeft);
+        _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);
         ListenToAdEvents();
-    }
-
-    Tuple<Vector2, Vector2> CalSize()
-    {
-        var screenHeight = Screen.height * (posRef.rect.height / PosCal.CanvasHeight);
-        var screenWidth = Screen.width * (posRef.rect.width / PosCal.CanvasWidth);
-        var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
-        //Debug.Log("pos :"+ pos);
-        //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
-        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
     }
     
     /// <summary>
@@ -148,6 +138,16 @@ public class BannerAds : MonoBehaviour
             _bannerView.Destroy();
             _bannerView = null;
         }
+    }
+    
+    Tuple<Vector2, Vector2> CalSize()
+    {
+        var screenHeight = Screen.height * (posRef.rect.height / PosCal.CanvasHeight);
+        var screenWidth = Screen.width * (posRef.rect.width / PosCal.CanvasWidth);
+        var pos = new Vector2(0, Screen.safeArea.size.y + Screen.safeArea.position.y - screenHeight);
+        //Debug.Log("pos :"+ pos);
+        //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
+        return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
     }
     
     // void OnGUI()
