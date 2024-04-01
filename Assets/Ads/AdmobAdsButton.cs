@@ -17,6 +17,8 @@ public class AdmobAdsButton : MonoBehaviour
 
     [SerializeField] Image[] colorImages;
 
+    public Button ShowAdButton=>_showAdButton;
+    
     public String Text
     {
         set => text.text = value;
