@@ -114,6 +114,22 @@ public class UILayer : MonoBehaviour
         grid.cellSize = new Vector2(cellWidth, cellWidth);
     }
     
+    protected float SetGridGroupSizeForUnitBox(GridLayoutGroup grid, int unitsCount)
+    {
+        // 获取父对象的宽度
+        RectTransform rect = grid.transform.GetComponent<RectTransform>();
+        float parentWidth = rect.rect.width;
+        float parentHeight = rect.rect.height;
+        int row = Mathf.CeilToInt((float)unitsCount / grid.constraintCount);
+        float cellHeight = (parentHeight / row) - grid.spacing.y;
+     
+        // 根据父对象的宽度，左右padding和格子间距来计算每个格子的大小
+        float cellWidth =  (parentWidth - grid.spacing.x * (grid.constraintCount - 1)) / grid.constraintCount;
+        float smaller = Mathf.Min(cellWidth, cellHeight);
+        grid.cellSize = new Vector2(smaller, smaller);
+        return smaller;
+    }
+    
     /// <summary>
     /// 
     /// </summary>

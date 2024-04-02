@@ -74,7 +74,8 @@ namespace mainMenu
                 targetingIcon.transform.localPosition = Vector3.zero;
             }
 
-            SetGridGroupSize(grid, grid.transform.GetComponent<RectTransform>().offsetMin.x);
+            var cellSize = SetGridGroupSizeForUnitBox(grid, icons.Count);
+            selectedFrame.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize+ 50,cellSize+50);
             displayUnitIconsAfterAction?.Invoke();
         }
 
