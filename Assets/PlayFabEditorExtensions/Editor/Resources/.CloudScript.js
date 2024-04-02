@@ -830,7 +830,7 @@ function AddTeamInfoItem(Leaderboard, mePosition, mePoint) {
             "PlayerLeaderboardEntry": Leaderboard,
             "Team": JSON.parse(playerTeamData.Data["DefendTeam"].Value),
             "OneWord": playerTeamData.Data["OneWord"] != null ? playerTeamData.Data["OneWord"].Value : "",
-            "plusPoint": arenaPlusPoint(mePosition, Leaderboard.Position, mePoint, Leaderboard.StatValue)
+            "plusPoint": arenaPlusPoint(mePosition, Leaderboard.Position, mePoint, Leaderboard.StatValue).toString()
         };
         return item;
     }
