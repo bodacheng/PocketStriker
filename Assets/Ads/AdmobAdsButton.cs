@@ -89,7 +89,7 @@ public class AdmobAdsButton : MonoBehaviour
                 _adUnitId = CommonSetting.Admob_interstitial_androidKey;
                 break;
             case AdType.Reward:
-                _adUnitId = CommonSetting.rewarded_androidKey;
+                _adUnitId = CommonSetting.Admob_rewarded_androidKey;
                 break;
         }
 #endif
