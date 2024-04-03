@@ -16,9 +16,11 @@ namespace mainMenu
                 return;
             var zt = new ElementStoneTagsGroup();
             await zt.IniForSkillStoneBox(element, transform);
-            ct.ThrowIfCancellationRequested();
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
             _btnEffects.Add(element, zt);
-            ct.ThrowIfCancellationRequested();
         }
 
         public void TurnShowingTagEffects(bool on)
@@ -49,7 +51,11 @@ namespace mainMenu
         {
             ProgressLayer.Loading(string.Empty);
             await StartUp(element, ct);
-            ct.ThrowIfCancellationRequested();
+            if (ct.IsCancellationRequested)
+            {
+                ProgressLayer.Close();
+                return;
+            }
             _focusingEffectsGroup?.CloseTagEffects();
             if (_btnEffects.ContainsKey(element))
             {

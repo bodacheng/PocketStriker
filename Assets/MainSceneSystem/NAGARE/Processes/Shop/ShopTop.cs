@@ -13,6 +13,7 @@ public partial class ShopTop : MSceneProcess
     
     public override void ProcessEnter()
     {
+        BackGroundPS.target.ChangeBGByElement(Element.Null);
         var upperInfoBar = UILayerLoader.Load<UpperInfoBar>();
         upperInfoBar.Setup(null,
             null, 

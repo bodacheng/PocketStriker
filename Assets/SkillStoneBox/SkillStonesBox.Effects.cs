@@ -37,7 +37,10 @@ namespace mainMenu
         
         public async UniTask IniExTabsEffects(Camera fxCamera, CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
             
             void IniExTab(Button btn, int exLevel)
             {
@@ -51,7 +54,10 @@ namespace mainMenu
             }
             
             await Observable.TimerFrame(5);
-            
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
             IniExTab(NormalTab,0);
             IniExTab(EX1Tab,1);
             IniExTab(EX2Tab,2);

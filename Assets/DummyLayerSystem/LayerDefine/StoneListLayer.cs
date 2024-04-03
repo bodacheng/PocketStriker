@@ -1,4 +1,5 @@
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using mainMenu;
 using UnityEngine;
 using dataAccess;
@@ -44,8 +45,17 @@ public class StoneListLayer : UILayer
         
         box.IniExTabs();
         box.GenerateCells();
-        await box._tabEffects.SwitchElement(Element.blueMagic, cts.Token);
-        await box.IniExTabsEffects(PreScene.target.postProcessCamera, cts.Token);
+
+        var cancellationTokenOnDestroy = gameObject.GetCancellationTokenOnDestroy();
+        
+        await box._tabEffects.SwitchElement(Element.blueMagic, cancellationTokenOnDestroy);
+        await box.IniExTabsEffects(PreScene.target.postProcessCamera, cancellationTokenOnDestroy);
+        
+        if (cancellationTokenOnDestroy.IsCancellationRequested)
+        {
+            return;
+        }
+        
         box.AddFeatureToCells(CellFeature_StoneShow);
         box.FilterFeatureRefresh(true);
         box.RestFilter();
