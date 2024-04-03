@@ -16,7 +16,8 @@ class MCamera : CameraMode
     float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
-    float zoomSpeedExtra = 8;
+    float zoomOutSpeedExtra = 8;
+    float zoomInSpeedExtra = 8;
     float _transitionSpeedPara = 10f;
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
@@ -30,13 +31,15 @@ class MCamera : CameraMode
     }
 
     private float disToH; // 相机距离中心点的横轴距离与高的比值
-    public MCamera(float XZDis, float YDis, float fieldOfView)
+    public MCamera(float XZDis, float YDis, float fieldOfView, float zoomOutSpeedExtra, float zoomInSpeedExtra)
     {
         _minXZ = XZDis;
         this.XZDis = XZDis;
         this.YDis = YDis;
         this.disToH = (float) ((decimal)this.YDis/ (decimal)this.XZDis);
         this.fieldOfView = fieldOfView;
+        this.zoomOutSpeedExtra = zoomOutSpeedExtra;
+        this.zoomInSpeedExtra = zoomInSpeedExtra;
     }
 
     private float XZDistance
@@ -187,11 +190,11 @@ class MCamera : CameraMode
             
             if (shouldZoomIn)
             {
-                XZDistance -= _changeSpeed * zoomSpeedExtra;
+                XZDistance -= _changeSpeed * zoomInSpeedExtra;
             }
             else if (shouldZoomOut)
             {
-                XZDistance += _changeSpeed * zoomSpeedExtra;
+                XZDistance += _changeSpeed * zoomOutSpeedExtra;
             }
         }
         

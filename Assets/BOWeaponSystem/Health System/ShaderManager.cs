@@ -17,6 +17,7 @@ public class ShaderManager : MonoBehaviour
         foreach (var mesh in meshes)
         {
             mesh.gameObject.layer = 3;
+            mesh.EmissionColor = Color.clear;
             var shadowMesh = Instantiate(mesh, mesh.transform, true);
             var transform1 = shadowMesh.transform;
             transform1.localPosition = Vector3.zero;

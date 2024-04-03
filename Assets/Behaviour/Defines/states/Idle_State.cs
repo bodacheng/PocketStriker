@@ -26,7 +26,7 @@ namespace Soul
             showVictoryMotion = hasVictoryAnimUnit.Contains(r_id);
             motionReset = false;
             this._Animator.SetFloat("speed", 0f);
-            if (showVictoryMotion)
+            // if (showVictoryMotion)
                 AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
             this._Rigidbody.velocity = Vector3.zero;
             this._Rigidbody.drag = FightGlobalSetting.OnTouchEnemyBodyRigidDrag;

@@ -1168,6 +1168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshes:
   - {fileID: 931680218909767682}
+  - {fileID: 2956815487606188965}
 --- !u!114 &7157776457622043225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2750,6 +2751,7 @@ GameObject:
   - component: {fileID: 1640733777804282086}
   - component: {fileID: 6066147358094696824}
   - component: {fileID: 6694156635926711804}
+  - component: {fileID: 2956815487606188965}
   m_Layer: 3
   m_Name: SM_Chr_Attach_DarkLord_Mask_01
   m_TagString: Untagged
@@ -2822,6 +2824,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2956815487606188965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3341377640557797902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4796095434084d59939621d426405db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3444843494256948463
 GameObject:
   m_ObjectHideFlags: 0

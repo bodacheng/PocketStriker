@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using PlayFab.ClientModels;
-using UnityEngine;
 
 namespace FightScene
 {
