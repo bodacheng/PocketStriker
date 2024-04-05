@@ -45,7 +45,7 @@ public partial class PlayFabReadClient
 #endif
     }
 
-    static void UnLinkDevice(string unlinkDeviceId, Action success)
+    static void UnLinkDevice(string unlinkDeviceId, Action success = null)
     {
 #if UNITY_IOS
         PlayFabClientAPI.UnlinkIOSDeviceID(
@@ -57,7 +57,7 @@ public partial class PlayFabReadClient
             {
                 Debug.Log(x);
                 PlayerAccountInfo.Me.currentLinkedDeviceId = null;
-                success.Invoke();
+                success?.Invoke();
             },
             ErrorReport
         );
@@ -78,5 +78,24 @@ public partial class PlayFabReadClient
             ErrorReport
         );
 #endif
+    }
+
+    static void DeletePlayer()
+    {
+        CloudScript.ExecuteCloudScriptMainSceneCommon(
+            new ExecuteCloudScriptRequest()
+            {
+                FunctionName = "DeletePlayer",
+                GeneratePlayStreamEvent = false, // Optional - Shows this event in PlayStream
+            },
+            (x) =>
+            {
+                Debug.Log(x.FunctionResult);
+            },
+            (x) =>
+            {
+                Debug.Log(x.Error);
+            }
+        );
     }
 }

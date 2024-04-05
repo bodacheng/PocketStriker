@@ -10,28 +10,38 @@ public partial class PlayFabReadClient
                 LinkDevice(
                     () =>
                     {
-                        PopupLayer.ArrangeWarnWindow(" 已经关联账户 ");
+                        PopupLayer.ArrangeWarnWindow(Translate.Get("AccountLinked"));
                         success.Invoke();
                     }
                 );
             },
-            "当前设备没和这个账户进行绑定，绑定一下？绑定了的话。。");
+            Translate.Get("HowAboutLinkDevice"));
     }
     
-    public static void UnLinkAccountPopup(Action success)
+    public static void DeleteAccountPopup(Action success)
     {
         PopupLayer.ArrangeConfirmWindow(
             () =>
             {
-                UnLinkDevice(
-                    PlayerAccountInfo.Me.currentLinkedDeviceId,
+                // 再确认
+                PopupLayer.ArrangeConfirmWindow(
                     () =>
                     {
-                        PopupLayer.ArrangeWarnWindow(" 已经与当前设备断开链接 ");
                         success.Invoke();
-                    }
-                );
+                        // 底下这个操作就是放飞自我
+                        UnLinkDevice(
+                            PlayerAccountInfo.Me.currentLinkedDeviceId,
+                            DeletePlayer
+                        );
+                    },
+                    () =>
+                    {
+                    },
+                    Translate.Get("DeleteAccountConfirm2"));
             },
-            "要把当前设备和当前账户断开链接？");
+            () =>
+            {
+            },
+            Translate.Get("DeleteAccountConfirm1"));
     }
 }

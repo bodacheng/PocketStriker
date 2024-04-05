@@ -33,6 +33,20 @@
 //log.debug(playstreamEvent.Entity);
 //var currentPlayerId = playstreamEvent.Entity.Id;
 
+handlers.DeletePlayer = function(args, context) {
+    
+    // 执行账户删除操作，需要服务器权限
+    // 注意：这个示例中没有直接的API调用删除账户，因为PlayFab没有提供直接删除账户的API。
+    // 你可能需要标记账户为删除状态，或者通过PlayFab支持团队了解更合适的方法。
+
+    var updateUserDataResult = server.DeletePlayer({
+        PlayFabId: currentPlayerId
+    });
+    
+    // 返回操作结果
+    return { updateUserDataResult };
+};
+
 handlers.BundleBought = function (args, context) {
 
     const key = args.bundleProductId;

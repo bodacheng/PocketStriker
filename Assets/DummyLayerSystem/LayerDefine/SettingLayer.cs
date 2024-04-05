@@ -1,5 +1,6 @@
 ﻿using DummyLayerSystem;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SettingLayer : UILayer
@@ -40,6 +41,7 @@ public class SettingLayer : UILayer
     [SerializeField] InputField EmailInput;
     [SerializeField] BOButton EmailConfirmBtn;
     [SerializeField] BOButton SendPwResetBtn;
+    [SerializeField] BOButton deleteAccountBtn;
     #endregion
 
     #region linkDevice
@@ -255,6 +257,20 @@ public class SettingLayer : UILayer
             Application.OpenURL("https://mugencombat.webnode.jp/o-weni-hewase/");
         });
         accountBtn.onClick.Invoke();
+        
+        deleteAccountBtn.SetListener(() =>
+        {
+            PlayFabReadClient.DeleteAccountPopup(() =>
+            {
+                PopupLayer.ArrangeWarnWindow(
+                    () =>
+                    {
+                        SceneManager.LoadScene(0);
+                    },
+                    Translate.Get("AccountDeleted")
+                );
+            });
+        });
     }
 
     public void RefreshLinkDeviceBtn()
