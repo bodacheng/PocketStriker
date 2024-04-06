@@ -266,7 +266,7 @@ public class FightInfo : ScriptableObject
     {
         var stage = CreateInstance<FightInfo>();
         stage.FightMembers = FightMembers.ScreenSaver(teamMode);
-        stage.battleGroundID = 1;
+        stage.battleGroundID = 0;
         stage.fightBGM = 0;
         stage.Team1Auto = true;
         stage.Team2Auto = true;
