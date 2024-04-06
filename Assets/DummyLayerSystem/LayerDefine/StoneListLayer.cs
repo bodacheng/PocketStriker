@@ -38,7 +38,7 @@ public class StoneListLayer : UILayer
         }
     }
     
-    public async void Setup()
+    public async UniTask Setup()
     {
         var cts = new CancellationTokenSource();
         ReturnLayer.AddUniTaskCancel(cts);

@@ -1,4 +1,5 @@
-﻿using DummyLayerSystem;
+﻿using Cysharp.Threading.Tasks;
+using DummyLayerSystem;
 using mainMenu;
 
 public class StoneSell : MSceneProcess
@@ -19,7 +20,7 @@ public class StoneSell : MSceneProcess
     public override void ProcessEnter()
     {
         StoneListLayer = UILayerLoader.Load<StoneListLayer>();
-        StoneListLayer.Setup();
+        StoneListLayer.Setup().Forget();
         EnterProcess();
     }
     

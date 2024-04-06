@@ -41,7 +41,7 @@ public class StonesPage : MSceneProcess
         await Stones.RenderAll();
         ProgressLayer.Close();
         layer = UILayerLoader.Load<StoneListLayer>();
-        layer.Setup();
+        await layer.Setup();
         ReturnLayer.MoveFront();
         layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
         layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
@@ -114,6 +114,7 @@ public class StonesPage : MSceneProcess
     
     public override void ProcessEnd()
     {
+        Stones.TempRemoveAllStoneModel();
         UILayerLoader.Remove<StoneListLayer>();
     }
 }

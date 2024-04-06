@@ -45,6 +45,7 @@ public class SkillEditPage : MSceneProcess
     {
         HurtObjectManager.Clear();
         EffectsManager.Clear();
+        Stones.TempRemoveAllStoneModel();
         UILayerLoader.Remove<SkillEditLayer>();
     }
 }

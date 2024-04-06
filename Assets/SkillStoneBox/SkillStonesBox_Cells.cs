@@ -118,7 +118,7 @@ namespace mainMenu
             item._using = false;
             item.gameObject.transform.SetParent(PreScene.target.stonesTempContainer);
         }
-
+        
         static int BoxLength()
         {
             var returnValue = 0;

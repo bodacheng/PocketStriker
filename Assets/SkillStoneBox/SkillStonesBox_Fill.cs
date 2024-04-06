@@ -19,7 +19,7 @@ namespace mainMenu
                 Near = nearCheckBox.isOn,
                 Far = farCheckBox.isOn
             };
-
+            
             _form = filterForm;
             PutSkillStonesToBox();
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
+using mainMenu;
 
 namespace dataAccess
 {
@@ -26,6 +27,15 @@ namespace dataAccess
                 GameObject.Destroy(kv.Value);
             }
             RenderModelDic.Clear();
+        }
+        
+        public static void TempRemoveAllStoneModel()
+        {
+            foreach (var kv in RenderModelDic)
+            {
+                kv.Value._using = false;
+                kv.Value.gameObject.transform.SetParent(PreScene.target.stonesTempContainer);
+            }
         }
         
         public static StoneOfPlayerInfo Get(string id)
