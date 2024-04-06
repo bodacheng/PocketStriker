@@ -73,7 +73,7 @@ public partial class PlayFabReadClient
             {
                 Debug.Log(x);
                 PlayerAccountInfo.Me.currentLinkedDeviceId = null;
-                success.Invoke();
+                success?.Invoke();
             },
             ErrorReport
         );
