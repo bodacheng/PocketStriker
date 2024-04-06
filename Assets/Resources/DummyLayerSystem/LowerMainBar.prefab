@@ -354,7 +354,6 @@ MonoBehaviour:
   stoneTab: {fileID: 8215039572522964212}
   gotchaTab: {fileID: 892569856239200321}
   hasStoneToBeUpdateBadge: {fileID: 3695508650448633893}
-  indicator: {fileID: 8151383610826493773}
 --- !u!1 &3029729696832101437
 GameObject:
   m_ObjectHideFlags: 0
@@ -1334,7 +1333,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Stone
+  m_Text: SkillGem
 --- !u!114 &150948019867619251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1362,7 +1361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f69ade8f94e534fe988a129c38348848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  languageCode: Stone
+  languageCode: SkillGem
   target: {fileID: 9133742219144603584}
 --- !u!1 &5806729084372145545
 GameObject:
