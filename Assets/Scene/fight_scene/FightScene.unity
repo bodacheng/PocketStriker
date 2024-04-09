@@ -9174,11 +9174,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71ba3c14843ee43ea98c8a7b33654db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 25
+  radius: 5
+  detectDis: 30
   layerMask:
     serializedVersion: 2
-    m_Bits: 64
-  detectInterval: 20
+    m_Bits: 1600
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 1536
+  wallLayer: 6
+  detectInterval: 10
+  rayCastMax: 20
 --- !u!1 &3000649885559932594
 GameObject:
   m_ObjectHideFlags: 0
