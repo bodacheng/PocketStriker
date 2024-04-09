@@ -18,7 +18,10 @@ public class VisibilityControl : MonoBehaviour
     // 预先分配一个足够大的数组，以存储可能检测到的所有collider
     // 数组的大小取决于你预计场景中可能同时存在的最大collider数量
     private RaycastHit[] _hitColliders;
-
+    private readonly List<Renderer> thisFrameDetected = new List<Renderer>();
+    private List<RaycastHit> hitList = new List<RaycastHit>();
+    private readonly List<RaycastHit> unitTargets = new List<RaycastHit>();
+    private readonly List<RaycastHit> wallTargets = new List<RaycastHit>();
     void Start()
     {
         _hitColliders = new RaycastHit[rayCastMax];
@@ -37,13 +40,17 @@ public class VisibilityControl : MonoBehaviour
         
         // 获取实际检测到的collider数量
         int numColliders = Physics.SphereCastNonAlloc(ray, radius, _hitColliders, detectDis, layerMask);
-        List<Renderer> thisFrameDetected = new List<Renderer>();
-        
         if (numColliders > 0)
         {
-            var hitList = _hitColliders.ToList().FindAll(x=> x.collider);
-            var unitTargets = hitList.FindAll(x=> ((unitLayer & (1 << x.collider.gameObject.layer)) != 0));
-            var wallTargets = hitList.FindAll(x=> x.collider.gameObject.layer == wallLayer);
+            hitList = new List<RaycastHit>(_hitColliders.Take(numColliders)); // 直接使用数组的切片
+            foreach (var hit in hitList)
+            {
+                if ((unitLayer & (1 << hit.collider.gameObject.layer)) != 0)
+                    unitTargets.Add(hit);
+                if (hit.collider.gameObject.layer == wallLayer)
+                    wallTargets.Add(hit);
+            }
+            
             if (unitTargets.Count > 0 && wallTargets.Count > 0)
             {
                 var minDis = unitTargets.Min(x=> Vector3.Distance(x.transform.position, transform.position));
@@ -51,7 +58,7 @@ public class VisibilityControl : MonoBehaviour
                 {
                     if (Vector3.Distance(wall.transform.position, transform.position) < minDis)
                     {
-                        Renderer renderer = wall.transform.GetComponent<Renderer>();
+                        var renderer = wall.transform.GetComponent<Renderer>();
                         if (renderer != null)
                         {
                             renderer.enabled = false; // 禁用Renderer组件
@@ -69,7 +76,10 @@ public class VisibilityControl : MonoBehaviour
                 renderer.enabled = true; // 启用Renderer组件
         }
         
-        _hiddenObjects = thisFrameDetected;
+        _hiddenObjects = new List<Renderer>(thisFrameDetected);
+        thisFrameDetected.Clear();
+        unitTargets.Clear();
+        wallTargets.Clear();
     }
 
     public void Clear()
