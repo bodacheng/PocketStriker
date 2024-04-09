@@ -103,7 +103,7 @@ public class FrontPage : MSceneProcess
                     PlayFabReadClient.LinkDevice(
                         () =>
                         {
-                            PopupLayer.ArrangeWarnWindow("Account linked to device.");
+                            PopupLayer.ArrangeWarnWindow(Translate.Get("AccountLinked"));
                             PlayerAccountInfo.Me.currentLinkedDeviceId = PlayFabReadClient.CustomId;
                         }
                     );
