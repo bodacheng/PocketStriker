@@ -45,15 +45,15 @@ MonoBehaviour:
     r_id: 15
     level: 1
     set:
-      a1: 68
+      a1: 58
       a2: 182
-      a3: 10
-      b1: 58
-      b2: 80
-      b3: 5
-      c1: 27
-      c2: 113
-      c3: 95
+      a3: 173
+      b1: 37
+      b2: 159
+      b3: 9
+      c1: 127
+      c2: 89
+      c3: 17
   team1HpRate: 1
   team2HpRate: 0.7
   team1CGMode: 0
@@ -63,4 +63,5 @@ MonoBehaviour:
   team1AIMode: 0
   team2AIMode: 0
   dumbAIDecisionDelay: 20
+  dreamComboAIRateNum: 5
   stageRefLevel: 1
