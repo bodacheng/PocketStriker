@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
@@ -11,7 +12,6 @@ public class TitleBgLayer : UILayer
     [SerializeField] Button touchScreenBtn;
     [SerializeField] BOButton skipBtn;
     [SerializeField] LanguageConverter languageConverter;
-    [SerializeField] Sprite targetSprite;
     [SerializeField] RectTransform content;
     [SerializeField] Scrollbar vScrollbar;
     [SerializeField] List<string> subtitleCodes;
@@ -19,10 +19,12 @@ public class TitleBgLayer : UILayer
     [SerializeField] float scrollDelayInMilliSecond = 0.001f;
     [SerializeField] float ScrollbarMinValue = 0;
     [SerializeField] float ScrollbarMaxValue = 1;
-    float milliSecondCounter = 0;
+    float _milliSecondCounter = 0;
     IDisposable _disposable;
-    public void Setup(float scrollValue) // false: titleMode
+    
+    public async UniTask Setup(float scrollValue) // false: titleMode
     {
+        var targetSprite = await AddressablesLogic.LoadT<Sprite>("TitleBg", this.gameObject);
         var parentRect = transform.GetComponent<RectTransform>();
         content.sizeDelta = new Vector2(parentRect.rect.width ,  targetSprite.rect.height * parentRect.rect.width / targetSprite.rect.width);
         content.anchoredPosition = Vector2.zero;
@@ -56,14 +58,14 @@ public class TitleBgLayer : UILayer
         _disposable = Observable.Timer(TimeSpan.FromSeconds(storyMode? scrollDelayFromSeconds : 0), TimeSpan.FromMilliseconds(0.1)).Subscribe(
             (_) =>
             {
-                milliSecondCounter += scrollDelayInMilliSecond;
+                _milliSecondCounter += scrollDelayInMilliSecond;
                 vScrollbar.value = Mathf.Clamp(vScrollbar.value - scrollDelayInMilliSecond, ScrollbarMinValue, ScrollbarMaxValue);
                 if (storyMode)
                 {
                     languageConverter.gameObject.SetActive(storyMode);
                     var indexOfSubtitleCodes = (int)((1 - vScrollbar.value) / (1f / subtitleCodes.Count));
                     ChangeSubtitle(indexOfSubtitleCodes);
-                    if (milliSecondCounter >= 1.2)
+                    if (_milliSecondCounter >= 1.2)
                     {
                         languageConverter.gameObject.SetActive(false);
                         touchScreenBtn.gameObject.SetActive(true);
