@@ -1,73 +1,87 @@
 using UnityEngine;
 using UnityEditor;
 
-public class RemoveCollidersFromPrefab : EditorWindow
+public class RemoveCollidersWithProgress : EditorWindow
 {
-    GameObject prefabObject;
-    LayerMask layerMask;
-    Collider[] collidersToProcess;
-    int colliderCount = 0;
+    private GameObject prefabObject;
+    private LayerMask layerMask;
+    private Collider[] collidersToProcess;
+    private int currentIndex = 0;
+    private bool isProcessing = false;
 
-    [MenuItem("Tools/Remove Colliders With Efficiency")]
-    public static void ShowWindow()
+    [MenuItem("Tools/Remove Colliders Asynchronously")]
+    static void ShowWindow()
     {
-        GetWindow<RemoveCollidersFromPrefab>("Remove Colliders Efficiently");
+        GetWindow<RemoveCollidersWithProgress>("Remove Colliders Async");
     }
 
     void OnGUI()
     {
-        GUILayout.Label("Select a prefab to modify colliders", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Select a prefab to remove colliders:", EditorStyles.boldLabel);
         prefabObject = (GameObject)EditorGUILayout.ObjectField("Prefab Object", prefabObject, typeof(GameObject), false);
         layerMask = EditorGUILayout.LayerField("Layers to Keep", layerMask);
 
-        if (GUILayout.Button("Count and Cache Colliders"))
+        if (GUILayout.Button("Prepare Colliders"))
         {
-            if (prefabObject != null)
-            {
-                collidersToProcess = prefabObject.GetComponentsInChildren<Collider>(true);
-                colliderCount = collidersToProcess.Length;
-                Debug.Log("Total colliders in prefab: " + colliderCount);
-            }
-            else
-            {
-                Debug.LogError("No prefab selected. Please select a prefab first.");
-            }
+            PrepareColliders();
         }
 
-        if (GUILayout.Button("Remove Colliders"))
+        if (GUILayout.Button("Start Removing"))
         {
-            if (prefabObject != null && collidersToProcess != null)
-            {
-                RemoveCollidersWithProgress(collidersToProcess, layerMask);
-                Debug.Log("Colliders have been removed efficiently from the prefab.");
-            }
-            else
-            {
-                Debug.LogError("No prefab or collider cache found. Please cache colliders first.");
-            }
+            StartRemovingColliders();
         }
 
-        GUILayout.Space(20);
-        GUILayout.Label("Total Colliders: " + colliderCount);
+        if (isProcessing)
+        {
+            EditorGUILayout.LabelField("Processing... " + currentIndex + "/" + collidersToProcess.Length);
+        }
     }
 
-    private void RemoveCollidersWithProgress(Collider[] colliders, LayerMask layersToKeep)
+    private void PrepareColliders()
     {
-        int updateStep = Mathf.Max(1, colliders.Length / 10); // Update progress every 10% of the way
-        Undo.RecordObjects(colliders, "Remove Colliders");
-
-        for (int i = 0; i < colliders.Length; i++)
+        if (prefabObject != null)
         {
-            if (((1 << colliders[i].gameObject.layer) & layersToKeep.value) == 0)
-            {
-                Undo.DestroyObjectImmediate(colliders[i]);
-            }
-
-            if (i % updateStep == 0)
-            {
-                EditorUtility.DisplayProgressBar("Removing Colliders", "Progress: " + (i + 1) + " / " + colliders.Length, i / (float)colliders.Length);
-            }
+            collidersToProcess = prefabObject.GetComponentsInChildren<Collider>(true);
+            Debug.Log("Prepared " + collidersToProcess.Length + " colliders for processing.");
         }
-        EditorUtility.ClearProgressBar();
+        else
+        {
+            Debug.LogError("No prefab selected. Please select a prefab first.");
+        }
+    }
+
+    private void StartRemovingColliders()
+    {
+        if (collidersToProcess != null)
+        {
+            currentIndex = 0;
+            isProcessing = true;
+            EditorApplication.update += ProcessStep;
+        }
+        else
+        {
+            Debug.LogError("No colliders prepared. Please prepare colliders first.");
+        }
+    }
+
+    private void ProcessStep()
+    {
+        if (currentIndex < collidersToProcess.Length)
+        {
+            Collider collider = collidersToProcess[currentIndex];
+            if (collider != null && ((1 << collider.gameObject.layer) & layerMask.value) == 0)
+            {
+                Undo.DestroyObjectImmediate(collider);
+            }
+            currentIndex++;
+        }
+        else
+        {
+            EditorApplication.update -= ProcessStep;
+            isProcessing = false;
+            Debug.Log("All colliders have been removed.");
+            EditorUtility.ClearProgressBar();
+        }
+        EditorUtility.DisplayProgressBar("Removing Colliders", "Progress: " + currentIndex + " / " + collidersToProcess.Length, currentIndex / (float)collidersToProcess.Length);
     }
 }
