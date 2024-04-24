@@ -9,10 +9,10 @@ public class RemoveCollidersWithProgress : EditorWindow
     private int currentIndex = 0;
     private bool isProcessing = false;
 
-    [MenuItem("Tools/Remove Colliders Asynchronously")]
+    [MenuItem("Tools/Remove Colliders Efficiently")]
     static void ShowWindow()
     {
-        GetWindow<RemoveCollidersWithProgress>("Remove Colliders Async");
+        GetWindow<RemoveCollidersWithProgress>("Remove Colliders Efficiently");
     }
 
     void OnGUI()
@@ -56,6 +56,7 @@ public class RemoveCollidersWithProgress : EditorWindow
         {
             currentIndex = 0;
             isProcessing = true;
+            AssetDatabase.StartAssetEditing(); // Suspend automatic asset importing
             EditorApplication.update += ProcessStep;
         }
         else
@@ -78,6 +79,8 @@ public class RemoveCollidersWithProgress : EditorWindow
         else
         {
             EditorApplication.update -= ProcessStep;
+            AssetDatabase.StopAssetEditing(); // Resume automatic asset importing and reimport all changed assets once
+            AssetDatabase.Refresh();
             isProcessing = false;
             Debug.Log("All colliders have been removed.");
             EditorUtility.ClearProgressBar();
