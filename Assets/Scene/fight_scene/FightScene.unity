@@ -1676,12 +1676,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &1013157160
 GameObject:
   m_ObjectHideFlags: 0
@@ -1830,12 +1830,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!20 &1050871294
 Camera:
   m_ObjectHideFlags: 0
@@ -9051,12 +9051,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!82 &3000649885118306805
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9174,7 +9174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71ba3c14843ee43ea98c8a7b33654db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 5
+  radius: 30
   detectDis: 50
   layerMask:
     serializedVersion: 2
@@ -9183,8 +9183,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1536
   wallLayer: 6
-  detectInterval: 10
-  rayCastMax: 20
+  detectInterval: 100
+  rayCastMax: 1000
 --- !u!1 &3000649885559932594
 GameObject:
   m_ObjectHideFlags: 0
