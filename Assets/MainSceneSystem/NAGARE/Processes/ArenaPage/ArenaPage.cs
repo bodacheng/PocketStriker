@@ -80,6 +80,8 @@ public partial class ArenaPage : MSceneProcess
                 arenaLayer.SetSeasonCountDown(timeUntilSettlement);
                 arenaLayer.ShowMyTeamByLeaderInfo(_myLeaderboardInfo);
                 arenaLayer.DisplayOpponents(opponents, _myLeaderboardInfo);
+                
+                LowerMainBar.Open();
                 ReturnLayer.MoveBack();
             },
             ()=>
