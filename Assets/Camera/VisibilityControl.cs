@@ -40,14 +40,13 @@ public class VisibilityControl : MonoBehaviour
         
         // 获取实际检测到的collider数量
         int numColliders = Physics.SphereCastNonAlloc(ray, radius, _hitColliders, detectDis, layerMask);
-        Debug.Log(numColliders);
-
+        // 雅典城场景1对1模式下加上角色大概能检测到不到30个对象
+        
         if (numColliders > 0)
         {
             hitList = new List<RaycastHit>(_hitColliders.Take(numColliders)); // 直接使用数组的切片
             foreach (var hit in hitList)
             {
-                Debug.Log("这里："+ hit.collider.gameObject.name);
                 if ((unitLayer & (1 << hit.collider.gameObject.layer)) != 0)
                     unitTargets.Add(hit);
                 if (hit.collider.gameObject.layer == wallLayer)
