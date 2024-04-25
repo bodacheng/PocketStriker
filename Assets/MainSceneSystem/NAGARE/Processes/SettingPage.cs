@@ -1,8 +1,6 @@
 using System;
 using DummyLayerSystem;
 using mainMenu;
-using PlayFab;
-using UnityEngine;
 
 public class SettingPage : MSceneProcess
 {
@@ -32,6 +30,7 @@ public class SettingPage : MSceneProcess
                     }
                     _layer.RefreshLinkDeviceBtn();
                 }
+                _layer.AccountBtn.onClick.Invoke();
             }
         );
         SetLoaded(true);

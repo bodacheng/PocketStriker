@@ -14,6 +14,8 @@ public class SettingLayer : UILayer
     [SerializeField] BOButton supportBtn;
     [SerializeField] BOButton languageBtn;
     [SerializeField] BOButton nickNameBtn;
+    
+    public BOButton AccountBtn=>accountBtn;
     #endregion
     
     #region Panels
@@ -256,7 +258,6 @@ public class SettingLayer : UILayer
         {
             Application.OpenURL("https://mugencombat.webnode.jp/o-weni-hewase/");
         });
-        accountBtn.onClick.Invoke();
         
         deleteAccountBtn.SetListener(() =>
         {
