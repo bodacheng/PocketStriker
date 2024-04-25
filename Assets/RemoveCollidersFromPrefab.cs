@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 
@@ -88,3 +90,5 @@ public class RemoveCollidersWithProgress : EditorWindow
         EditorUtility.DisplayProgressBar("Removing Colliders", "Progress: " + currentIndex + " / " + collidersToProcess.Length, currentIndex / (float)collidersToProcess.Length);
     }
 }
+
+#endif
