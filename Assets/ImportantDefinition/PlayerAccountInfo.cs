@@ -19,6 +19,8 @@ public class PlayerAccountInfo
     
     private readonly ArcadeModeManager _arcadeModeManager = new ArcadeModeManager();
     private readonly GangbangModeManager _gangbangModeManager = new GangbangModeManager();
+    private readonly EventModeManager _eventModeManager = new EventModeManager();
     public ArcadeModeManager ArcadeModeManager => _arcadeModeManager;
     public GangbangModeManager GangbangModeManager => _gangbangModeManager;
+    public EventModeManager EventModeManager => _eventModeManager;
 }

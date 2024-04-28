@@ -84,6 +84,23 @@ public partial class FightPrepareLayer : UILayer
         );
     }
     
+    public void SetEventFeature(string arcadeStageNo)
+    {
+        arcadeStageNoText.gameObject.SetActive(true);
+        arcadeStageNoText.text = "Stage " + arcadeStageNo;
+        toArcadeFrontBtn.gameObject.SetActive(false);
+        rewardUI.gameObject.SetActive(false);
+        // rewardUI.ShowRewards(award.d,award.g);
+        // rewardUI.AwardRender(cleared);
+        nineForShow.AddOnClickToSlots(
+            (RECORD_ID) =>
+            {
+                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
+                connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
+            }
+        );
+    }
+    
     public void StageMembersInfoShow(FightInfo stage)
     {
         MemberInfosShow(stage.FightMembers.HeroSets.GetValues(), 

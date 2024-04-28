@@ -42,6 +42,11 @@ public class QuestInfoPage : MSceneProcess
                     FightLoad.Fight.ID
                 );
                 break;
+            case FightEventType.Event:
+                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
+                _layer.SetTeamEditFeature(GoToTeamEditArcade);
+                _layer.SetEventFeature(FightLoad.Fight.ID);
+                break;
             case FightEventType.Gangbang:
                 _controllingGangbangInfo = GangbangInfo.Copy((GangbangInfo)stage);
                 _controllingGangbangInfo.FightMembers.HeroSets = TeamSet.GetTargetSet("gangbang").LoadTeamDic(); // 为了队员显示
@@ -94,6 +99,7 @@ public class QuestInfoPage : MSceneProcess
                 switch (FightLoad.Fight.EventType)
                 {
                     case FightEventType.Quest:
+                    case FightEventType.Event:
                         return FightLoad.Fight.ArcadeFightMode;
                     default:
                         return 0;
@@ -148,6 +154,7 @@ public class QuestInfoPage : MSceneProcess
                 }
                 break;
             case FightEventType.Quest:
+            case FightEventType.Event:
                 if (PlayerAccountInfo.Me.tutorialProgress == "SkillEditFinished2")
                 {
                     if (fight.FightMembers.HeroSets.GetValues().Count < 2)

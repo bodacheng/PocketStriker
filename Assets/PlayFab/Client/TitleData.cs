@@ -14,6 +14,9 @@ public partial class PlayFabReadClient
     private static IDictionary<string, Award> _arenaAward;
     public static IDictionary<string, Award> ArenaAwards => _arenaAward;
 
+    private static IDictionary<string, Award> _eventAwards;
+    public static IDictionary<string, Award> EventAwards => _eventAwards;
+
     public static TimeLimitedBuyData TimeLimitedBuyData;
     
     public static void GetAllTitleData(Action<bool> finished)
@@ -21,7 +24,7 @@ public partial class PlayFabReadClient
         PlayFabClientAPI.GetTitleData(
             new GetTitleDataRequest
             {
-                Keys = new List<string>() {"stage_awards", "gangbang_awards","arena_awards", PlayFabSetting._timeLimitBuyCode}
+                Keys = new List<string>() {"stage_awards", "gangbang_awards","arena_awards", "event_awards",PlayFabSetting._timeLimitBuyCode}
             },
             result =>
             {
@@ -65,6 +68,19 @@ public partial class PlayFabReadClient
                     if (!_arenaAward.ContainsKey(kv.stageKey))
                     {
                         _arenaAward.Add(kv.stageKey, kv.award);
+                    }
+                }
+                #endregion
+                
+                #region event
+                var eventAwardObject = result.Data["event_awards"];
+                var eventAwards = JsonConvert.DeserializeObject<List<StageAward>>(eventAwardObject);
+                _eventAwards = new Dictionary<string, Award>();
+                foreach (var kv in eventAwards)
+                {
+                    if (!_eventAwards.ContainsKey(kv.stageKey))
+                    {
+                        _eventAwards.Add(kv.stageKey, kv.award);
                     }
                 }
                 #endregion

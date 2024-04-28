@@ -35,6 +35,29 @@
 
 handlers.DeletePlayer = function(args, context) {
     
+    // 调用 GetAccountInfo 来获取用户的账户信息
+    var accountInfoResult = server.GetUserAccountInfo({
+        PlayFabId: currentPlayerId
+    });
+
+    if (accountInfoResult.UserInfo) {
+        // 检查并解除 iOS 设备绑定
+        if (accountInfoResult.UserInfo.IosDeviceInfo) {
+            server.UnlinkIOSDeviceID({
+                PlayFabId: currentPlayerId,
+                DeviceId: accountInfoResult.UserInfo.IosDeviceInfo.IosDeviceId
+            });
+        }
+        
+        // 检查并解除 Android 设备绑定
+        if (accountInfoResult.UserInfo.AndroidDeviceInfo) {
+            server.UnlinkAndroidDeviceID({
+                PlayFabId: currentPlayerId,
+                AndroidDeviceId: accountInfoResult.UserInfo.AndroidDeviceInfo.AndroidDeviceId
+            });
+        }
+    }
+
     // 执行账户删除操作，需要服务器权限
     // 注意：这个示例中没有直接的API调用删除账户，因为PlayFab没有提供直接删除账户的API。
     // 你可能需要标记账户为删除状态，或者通过PlayFab支持团队了解更合适的方法。
@@ -585,6 +608,112 @@ handlers.claimQuestReward = function (args, context) {
         diamond: d
     };
 };
+
+handlers.claimEventReward = function (args, context) {
+    
+    var stageAwardsKey = "event_awards";
+    var titleDataRequest = { "Keys": stageAwardsKey };
+    var titleDataResponse = server.GetTitleData(titleDataRequest);
+
+    var whole = titleDataResponse.Data[stageAwardsKey];
+    var objData = JSON.parse(whole);
+    var award;
+    let g = 0;
+    var d = 0;
+
+    for (var i = 0; i < objData.length; i++) {
+
+        if (objData[i].stageKey == args.level){
+            if(objData[i].hasOwnProperty("award")){
+                award = objData[i].award;
+                break;
+            }
+        }
+    }
+    
+    if (award === undefined) {
+        return {
+            has_reward: false
+        };
+    }
+
+    if (award.hasOwnProperty("g")) {
+        g = Number(award.g);
+    }
+
+    if (award.hasOwnProperty("d")) {
+        d = Number(award.d);
+    }
+    
+    if (g > 0) {
+        server.AddUserVirtualCurrency({
+            PlayFabID: currentPlayerId,
+            VirtualCurrency: "GD",
+            Amount: g
+        });
+    }
+
+    if (d > 0) {
+        server.AddUserVirtualCurrency({
+            PlayFabID: currentPlayerId,
+            VirtualCurrency: "DM",
+            Amount: d
+        });
+    }
+
+    return {
+        has_reward: true,
+        gold: g,
+        diamond: d
+    };
+};
+
+handlers.getCompletedEventBattle = function(args, context) {
+    var progressKey = "eventbattleprogress";
+
+    // 从PlayFab获取当前玩家的内部数据
+    var playerData = server.GetUserReadOnlyData({
+        PlayFabId: currentPlayerId,
+        Keys: [progressKey]
+    });
+
+    // 检查是否已经有关卡进度数据
+    var progress = playerData.Data[progressKey] ? playerData.Data[progressKey].Value : "";
+    var levelsCompleted = progress ? JSON.parse(progress) : [];
+    return { completedEventBattles : levelsCompleted };
+};
+
+handlers.checkAndUpdateEventBattleProgress = function (args, context) {
+    var levelId = args.eventBattleId;
+    var progressKey = "eventbattleprogress"; // 玩家内部数据中用于追踪关卡进度的键
+
+    // 从PlayFab获取当前玩家的内部数据
+    var playerData = server.GetUserReadOnlyData({
+        PlayFabId: currentPlayerId,
+        Keys: [progressKey]
+    });
+
+    // 检查是否已经有关卡进度数据
+    var progress = playerData.Data[progressKey] ? playerData.Data[progressKey].Value : "";
+    var levelsCompleted = progress ? JSON.parse(progress) : [];
+
+    // 检查玩家是否已经完成了该关卡
+    if (levelsCompleted.indexOf(levelId) === -1) {
+        // 如果没有完成，添加关卡ID到进度数组
+        levelsCompleted.push(levelId);
+
+        // 更新PlayFab内部数据
+        server.UpdateUserReadOnlyData({
+            PlayFabId: currentPlayerId,
+            Data: { [progressKey]: JSON.stringify(levelsCompleted) }
+        });
+        
+        return { message: "Level added to progress.", levelId: levelId };
+    } else {
+        return { message: "Level already completed.", levelId: levelId };
+    }
+};
+
 
 // 技能石背包只能10个10个的往上买。但是必须应该有一个最大值。这个数字是多少要看这游戏是个什么感觉
 handlers.expandBox10 = function (args, context) {

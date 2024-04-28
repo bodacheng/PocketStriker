@@ -15,6 +15,7 @@ public class FrontLayer : UILayer
     [SerializeField] LowerBarIcon ArcadeBtn;
     [SerializeField] LowerBarIcon GangbangBtn;
     [SerializeField] LowerBarIcon ArenaBtn;
+    [SerializeField] BOButton EventFightBtn;
     [SerializeField] BOButton TrainBtn;
     [SerializeField] Button SkillTestRBtn;
     [SerializeField] Button SkillTestMBtn;
@@ -54,6 +55,8 @@ public class FrontLayer : UILayer
                 PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));
             }
         });
+        
+        EventFightBtn.SetListener(() => { pre.trySwitchToStep(MainSceneStep.EventFight);});
         TrainBtn.onClick.AddListener(() => pre.trySwitchToStep(MainSceneStep.SelfFightFront));
 
         SkillTestRBtn.onClick.AddListener(pre.BeginSkillTest_Rotation);

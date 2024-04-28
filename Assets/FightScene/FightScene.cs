@@ -91,6 +91,7 @@ namespace FightScene
                 case FightEventType.Arena:
                 case FightEventType.Quest:
                 case FightEventType.Gangbang:
+                case FightEventType.Event:
                     FSceneProcessesRunner.Main.AddNewProcess(SceneStep.Preparing, preparingProcess);
                     FSceneProcessesRunner.Main.AddNewProcess(SceneStep.CountDown, countDownProcess);
                     FSceneProcessesRunner.Main.AddNewProcess(SceneStep.Fighting, fightingProcess);

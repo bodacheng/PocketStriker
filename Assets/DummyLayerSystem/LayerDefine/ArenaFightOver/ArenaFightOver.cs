@@ -286,7 +286,7 @@ public partial class ArenaFightOver : UILayer
         }
     }
     
-    public void ShowAward(int awardDm, int awardGd, int extraAdReward, int finishedStage = -1)
+    public void ShowAward(int awardDm, int awardGd)
     {
         awardParent.gameObject.SetActive(awardDm > 0 || awardGd > 0);
         if (awardDm > 0)
@@ -304,6 +304,12 @@ public partial class ArenaFightOver : UILayer
             awardGdCurrency.text = "+" + awardGd;
             _tweenTextScaleManager.AddNew(awardGdCurrency.transform, Vector3.one * 1.2f, Vector3.one, rewardTextChangeHalfDuration);
         }
+        vipSymbol.gameObject.SetActive(PlayerAccountInfo.Me.noAdsState);
+    }
+    
+    public void ShowAward(int awardDm, int awardGd, int extraAdReward, int finishedStage = -1)
+    {
+        ShowAward(awardDm, awardGd);
 
         if (PlayerAccountInfo.Me.tutorialProgress == "Finished"
             &&
@@ -320,7 +326,6 @@ public partial class ArenaFightOver : UILayer
                 finishedStage
             );
         }
-        vipSymbol.gameObject.SetActive(PlayerAccountInfo.Me.noAdsState);
     }
     
     public void ShowArenaPoint(int oldPoint, int currentPoint)

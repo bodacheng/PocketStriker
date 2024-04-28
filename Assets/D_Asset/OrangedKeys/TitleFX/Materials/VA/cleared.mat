@@ -7,12 +7,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TitleFX_V2
-  m_Shader: {fileID: 4800000, guid: d0cbdbb2bf3fcf749a99a6d2ff9c82a0, type: 3}
+  m_Name: cleared
+  m_Shader: {fileID: 4800000, guid: 5aeb7503c199c794b8e8a713c03678d7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _UPDOWNDIRECTION_ON
+  m_ValidKeywords: []
   m_InvalidKeywords:
   - _AUTOMANUALANIMATION_ON
   m_LightmapFlags: 4
@@ -30,15 +29,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailsMASK:
-        m_Texture: {fileID: 2800000, guid: 3fe2e7186ee6f82428cfc815f1b96796, type: 3}
+        m_Texture: {fileID: 2800000, guid: 38ce4bc45c06eb148a95f8e60caaf3f3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Main:
-        m_Texture: {fileID: 2800000, guid: 753bd8fb755ae48e5a7901cef4c1baf7, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4ef5a4df19a0d4045ab6b51f8efa0c69, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainMASK:
-        m_Texture: {fileID: 2800000, guid: 3a3a1483cc479a34f8a018b14cda1694, type: 3}
+        m_Texture: {fileID: 2800000, guid: 38ce4bc45c06eb148a95f8e60caaf3f3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -50,7 +49,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Outline:
-        m_Texture: {fileID: 2800000, guid: 753bd8fb755ae48e5a7901cef4c1baf7, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4ef5a4df19a0d4045ab6b51f8efa0c69, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture0:
@@ -113,16 +112,16 @@ Material:
     - _StencilWriteMask: 255
     - _TransitionFactor: 1
     - _TransitionSpeed: 5
-    - _UpDownDirection: 1
+    - _UpDownDirection: 0
     - _UseUIAlphaClip: 0
-    - _VignetteMaskFallof: 0.25
-    - _VignetteMaskSize: 0.577
-    - _XTiling: 3
+    - _VignetteMaskFallof: 0.5
+    - _VignetteMaskSize: 0.439
+    - _XTiling: 1
     - _YTiling: 1
     - __dirty: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color0: {r: 1, g: 0.235066, b: 0, a: 0}
-    - _MainColor: {r: 0.87933326, g: 1, b: 0, a: 1}
-    - _OutlineColor: {r: 0, g: 120.937675, b: 78.84732, a: 1}
+    - _MainColor: {r: 1.3875303, g: 1.3144317, b: 0, a: 1}
+    - _OutlineColor: {r: 66.81093, g: 58.06604, b: 0, a: 1}
   m_BuildTextureStacks: []

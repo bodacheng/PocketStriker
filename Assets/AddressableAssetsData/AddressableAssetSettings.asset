@@ -63,6 +63,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 68d02a7a477e04d458f6a52441d5b1f2, type: 2}
   - {fileID: 11400000, guid: 421c454ff09414180983855911567f66, type: 2}
   - {fileID: 11400000, guid: 52ac939f0ebd544bbaf6a42c5c7c5cec, type: 2}
+  - {fileID: 11400000, guid: 8afa3109321d24b63b8de145afae21cc, type: 2}
   - {fileID: 11400000, guid: c4227ddaf9fe444baac86a56bf502883, type: 2}
   - {fileID: 11400000, guid: 45193fcd1036945ed98f00aaa568b836, type: 2}
   - {fileID: 11400000, guid: 2a9b861e50fe34cf7bb1db0731797657, type: 2}
@@ -163,6 +164,7 @@ MonoBehaviour:
     - Locale-zh-Hans
     - Locale-ja
     - quest_gangbang
+    - event_stage
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 7ed3c4f91e15949209e5cda4294e805b, type: 2}
@@ -193,7 +195,7 @@ MonoBehaviour:
           m_Key: HostingServiceUploadSpeed
         - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
           m_ClassName: System.String
-          m_Data: Library/com.unity.addressables/aa/Android/Android;ServerData/Android
+          m_Data: Library/com.unity.addressables/aa/iOS/iOS;ServerData/iOS
           m_Key: ContentRoot
         - m_AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
           m_ClassName: System.Boolean

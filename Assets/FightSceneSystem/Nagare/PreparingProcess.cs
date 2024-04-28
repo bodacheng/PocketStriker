@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using UniRx;
+using UnityEngine;
+using Random = System.Random;
 
 public class PreparingProcess : FSceneProcess
 {
@@ -22,7 +24,7 @@ public class PreparingProcess : FSceneProcess
         
         RTFightManager.Target._CameraManager.VisibilityControl.Clear();
         
-        if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang)
+        if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang || FightLoad.Fight.EventType == FightEventType.Event)
             &&
             !PlayerAccountInfo.Me.noAdsState)
         {

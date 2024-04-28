@@ -181,6 +181,49 @@ namespace FightScene
                 case FightEventType.SkillTest:
                     SkillTestReload();
                     break;
+                case FightEventType.Event:
+                    if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
+                    {
+                        var battleID = FightLoad.Fight.ID;
+                        if (!PlayerAccountInfo.Me.EventModeManager.CompletedLevels.Contains(battleID))
+                        {
+                            CloudScript.EventBattleProgress(
+                                battleID,
+                                result =>
+                                {
+                                    PlayerAccountInfo.Me.EventModeManager.CompletedLevels.Add(battleID);
+                                    var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
+                                    var hasReward = jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
+                                    var hasRewardBool = (bool)hasReward;
+                                    var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
+                                    arenaFightOver.Setup();
+                                    arenaFightOver.Step2Anim();
+                                    if (hasRewardBool)
+                                    {
+                                        var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
+                                        var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
+                                        var rewardGdInt = Convert.ToInt32(rewardGd);
+                                        var rewardDmInt = Convert.ToInt32(rewardDm);
+                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt);
+                                    }
+                                }
+                            );
+                        }
+                        else
+                        {
+                            var a = UILayerLoader.Load<ArenaFightOver>();
+                            a.Setup();
+                            a.Step2Anim();
+                        }
+                    }
+                    else
+                    {
+                        var a = UILayerLoader.Load<ArenaFightOver>();
+                        a.Setup();
+                        a.Step2Anim();
+                        a.AgainBtn.gameObject.SetActive(true);
+                    }
+                    break;
             }
             
             SingleAssignmentDisposableCleaner.Clear();
