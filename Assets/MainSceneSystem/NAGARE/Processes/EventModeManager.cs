@@ -118,7 +118,7 @@ public class EventModeManager
             layer.EasyModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, easyMode, true);
-            }, PlayFabReadClient.EventAwards["easy"],  CompletedLevels.Contains(easyModePath.PrimaryKey));
+            }, PlayFabReadClient.EventAwards["easy"],  CompletedLevels.Contains(easyModePath.PrimaryKey), easyMode.team2CGMode);
         }
         
         if (normalModePath != null)
@@ -126,7 +126,8 @@ public class EventModeManager
             layer.NormalModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, normalMode, true);
-            }, PlayFabReadClient.EventAwards["normal"],CompletedLevels.Contains(normalModePath.PrimaryKey));
+            }, PlayFabReadClient.EventAwards["normal"],CompletedLevels.Contains(normalModePath.PrimaryKey), normalMode.team2CGMode);
+            
         }
         
         if (hardModePath != null)
@@ -134,7 +135,7 @@ public class EventModeManager
             layer.HardModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, hardMode, true);
-            }, PlayFabReadClient.EventAwards["hard"],CompletedLevels.Contains(hardModePath.PrimaryKey));
+            }, PlayFabReadClient.EventAwards["hard"],CompletedLevels.Contains(hardModePath.PrimaryKey), hardMode.team2CGMode);
         }
     }
 }
