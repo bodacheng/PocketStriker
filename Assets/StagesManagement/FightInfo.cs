@@ -312,7 +312,8 @@ public enum FightEventType
     Gangbang = 3,
     Arena = 2,
     Self = 4,
-    SkillTest = 5
+    SkillTest = 5,
+    Event = 6
 }
 
 public enum TeamMode
