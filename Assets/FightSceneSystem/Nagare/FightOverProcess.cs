@@ -205,6 +205,8 @@ namespace FightScene
                                         var rewardGdInt = Convert.ToInt32(rewardGd);
                                         var rewardDmInt = Convert.ToInt32(rewardDm);
                                         arenaFightOver.ShowAward(rewardDmInt, rewardGdInt);
+                                        if (!PlayerAccountInfo.Me.noAdsState)
+                                            FightScene.target.JustShowAds();
                                     }
                                 }
                             );

@@ -158,7 +158,7 @@ public class AdmobAdsButton : MonoBehaviour
         interstitialAd.OnAdFullScreenContentClosed += () =>
         {
             Debug.Log("Rewarded interstitial ad full screen content closed.");
-            watchedAdExtraProcess.Invoke();
+            watchedAdExtraProcess?.Invoke();
             // Load another ad: 需要检查在实机上这里跑的是否有问题。在editor上产生一个造成广告再次观看时连续跑了两次的错误
             if (reloadAfterWatched)
                 LoadInterstitialAd();

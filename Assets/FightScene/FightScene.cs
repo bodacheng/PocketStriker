@@ -55,6 +55,17 @@ namespace FightScene
             }
         }
 
+        public void JustShowAds()
+        {
+            if (watchBtn != null)
+            {
+                if (watchBtn.AdIsReady)
+                {
+                    watchBtn.ShowAd();
+                }
+            }
+        }
+
         void Awake()
         {
             target = this;
