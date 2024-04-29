@@ -99,6 +99,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         targetIcon.transform.SetAsLastSibling();
         targetIcon.gameObject.SetActive(true);
         targetIcon.ChangeIcon(unitInfo);
+        targetIcon.iconButton.interactable = false;
     }
     
     /// <summary>
