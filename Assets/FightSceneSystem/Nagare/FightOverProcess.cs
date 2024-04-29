@@ -193,15 +193,15 @@ namespace FightScene
                                 {
                                     PlayerAccountInfo.Me.EventModeManager.CompletedLevels.Add(battleID);
                                     var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
-                                    var hasReward = jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
+                                    var hasReward = jsonResult.TryGetValue("has_reward", out var value) ? value : false;
                                     var hasRewardBool = (bool)hasReward;
                                     var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
                                     arenaFightOver.Setup();
                                     arenaFightOver.Step2Anim();
                                     if (hasRewardBool)
                                     {
-                                        var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
-                                        var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
+                                        var rewardGd = jsonResult.TryGetValue("gold", out var value1) ? value1 : 0;
+                                        var rewardDm = jsonResult.TryGetValue("diamond", out var value2) ? value2 : 0;
                                         var rewardGdInt = Convert.ToInt32(rewardGd);
                                         var rewardDmInt = Convert.ToInt32(rewardDm);
                                         arenaFightOver.ShowAward(rewardDmInt, rewardGdInt);

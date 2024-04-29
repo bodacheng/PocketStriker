@@ -33,6 +33,7 @@ public class EventFightPage : MSceneProcess
             (x) =>
             {
                 eventModeManager.OnCloudScriptSuccess(x, layer);
+                LowerMainBar.Open();
                 SetLoaded(true);
             }
         );

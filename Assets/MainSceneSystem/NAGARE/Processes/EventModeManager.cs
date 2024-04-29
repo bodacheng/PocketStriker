@@ -97,8 +97,7 @@ public class EventModeManager
         
         Debug.Log("Cloud Script Success: " + result.FunctionResult);
         JsonObject jsonResult = (JsonObject)result.FunctionResult;
-        object completedBattlesObject;
-        if (jsonResult.TryGetValue("completedEventBattles", out completedBattlesObject))
+        if (jsonResult.TryGetValue("completedEventBattles", out var completedBattlesObject))
         {
             var objects = (List<object>)completedBattlesObject;
             CompletedLevels.Clear();
@@ -118,7 +117,7 @@ public class EventModeManager
             layer.EasyModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, easyMode, true);
-            }, PlayFabReadClient.EventAwards["easy"],  CompletedLevels.Contains(easyModePath.PrimaryKey), easyMode.team2CGMode);
+            }, PlayFabReadClient.EventAwards["easy"],  CompletedLevels.Contains(easyMode.ID), easyMode.team2CGMode);
         }
         
         if (normalModePath != null)
@@ -126,8 +125,7 @@ public class EventModeManager
             layer.NormalModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, normalMode, true);
-            }, PlayFabReadClient.EventAwards["normal"],CompletedLevels.Contains(normalModePath.PrimaryKey), normalMode.team2CGMode);
-            
+            }, PlayFabReadClient.EventAwards["normal"],CompletedLevels.Contains(normalMode.ID), normalMode.team2CGMode);
         }
         
         if (hardModePath != null)
@@ -135,7 +133,7 @@ public class EventModeManager
             layer.HardModeBtn.Setup(() =>
             {
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, hardMode, true);
-            }, PlayFabReadClient.EventAwards["hard"],CompletedLevels.Contains(hardModePath.PrimaryKey), hardMode.team2CGMode);
+            }, PlayFabReadClient.EventAwards["hard"],CompletedLevels.Contains(hardMode.ID), hardMode.team2CGMode);
         }
     }
 }

@@ -26,6 +26,7 @@ public class ArcadeFrontPage : MSceneProcess
         _arcadeTop.SetupArcade(arcadeModeManager.MaxStageNum, arcadeModeManager.LoadStage, arcadeModeManager.DirectToArcadeStage);
         var stages = _arcadeTop.NewStages(PlayerAccountInfo.Me.arcadeProcess);
         await _arcadeTop.ShowStages(stages);
+        LowerMainBar.Open();
         SetLoaded(true);
     }
     
