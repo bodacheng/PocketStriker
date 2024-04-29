@@ -44,7 +44,7 @@ public class FrontLayer : UILayer
             {
                 PlayerAccountInfo.Me.GangbangModeManager.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
             });
-        GangbangBtn.gameObject.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
+        GangbangBtn.BOButton.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
         
         ArenaBtn.BOButton.onClick.AddListener(() =>
         {
@@ -57,6 +57,7 @@ public class FrontLayer : UILayer
         });
         
         EventFightBtn.SetListener(() => { pre.trySwitchToStep(MainSceneStep.EventFight);});
+        EventFightBtn.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
         TrainBtn.onClick.AddListener(() => pre.trySwitchToStep(MainSceneStep.SelfFightFront));
 
         SkillTestRBtn.onClick.AddListener(pre.BeginSkillTest_Rotation);
