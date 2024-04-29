@@ -16,18 +16,18 @@ MonoBehaviour:
   fightBGM: 0
   unitsData:
   - id: 0
-    r_id: 11
-    level: 1
+    r_id: 8
+    level: 11
     set:
       a1: 171
-      a2: 171
+      a2: 166
       a3: 169
-      b1: 116
+      b1: 113
       b2: 171
-      b3: 166
+      b3: 170
       c1: 115
       c2: 102
-      c3: 171
+      c3: 99
   team1HpRate: 1
   team2HpRate: 1
   team1CGMode: 0
@@ -37,5 +37,5 @@ MonoBehaviour:
   team1AIMode: 0
   team2AIMode: 0
   dumbAIDecisionDelay: 20
-  dreamComboAIRateNum: 100
-  stageRefLevel: 11
+  dreamComboAIRateNum: 80
+  stageRefLevel: 2
