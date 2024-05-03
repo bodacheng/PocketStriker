@@ -166,28 +166,10 @@ public partial class Data_Center : MonoBehaviour
         
         _MyBehaviorRunner.SuperComboCondition = ()=> this.FightDataRef.HasPlentyDreamGauge() && !FightDataRef.IsDead.Value;
         
-        var tasks = new List<UniTask>
-        {
-            EffectsManager.IniEffectsPool("short_effect", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("normal_effect", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("long_effect", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("Sparks", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("light_hit", FightGlobalSetting.EffectPathDefine(element), preloadCount),
-            EffectsManager.IniEffectsPool("heavy_hit", FightGlobalSetting.EffectPathDefine(element), preloadCount),
-            EffectsManager.IniEffectsPool("super_hit", FightGlobalSetting.EffectPathDefine(element), preloadCount),
-            EffectsManager.IniEffectsPool("resistanceUp", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("on_enable_effect", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("FlashStart", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("FlashEnd", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("super_combo_explosion", FightGlobalSetting.EffectPathDefine(element), 1),
-            EffectsManager.IniEffectsPool("dream_buff", FightGlobalSetting.EffectPathDefine(element), 1)
-        };
-        
         //这个环节之后我应该有一份列表来展示到底我一个角色一场战斗都能用上什么招
         // 上面这个环节结束后，有这样几个重要情况1. state_Transition_Dictionary的内容就正确了 2.AIStateRunner内的States_Dictionary实例内将有一份正确的skill类key的列表
         var toLoadSkillAnimsNames = _MyBehaviorRunner.PassSkillTypeKeys();
-        tasks.Add(AnimationManger.PreloadPersonalAnimsResourceMode(type, toLoadSkillAnimsNames, element, preloadCount));
-        await UniTask.WhenAll(tasks);
+        await AnimationManger.PreloadPersonalAnimsResourceMode(type, toLoadSkillAnimsNames, element, preloadCount);
     }
 
     /// <summary>

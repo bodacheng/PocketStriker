@@ -59,16 +59,23 @@ public static class EffectsManager
         return processingEffectObj;
     }
     
-    static DecompositionPool ConstructEffectPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
+    private static readonly IDictionary<string, int> PreloadCountIncrementLog = new Dictionary<string, int>();
+    static async UniTask<DecompositionPool> ConstructEffectPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
     {
-        var poolToConstruct = new DecompositionPool(prefab);
-        poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});//Debug.Log("已经为对象池:"+key+"预留"+ini_count+"个物件")
         if (EffectPoolsDic.ContainsKey(key))
-            EffectPoolsDic[key] = poolToConstruct;
+        {
+            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, PreloadCountIncrementLog[key]+1);
+            await EffectPoolsDic[key].PreloadAsync(PreloadCountIncrementLog[key], 1);
+            return EffectPoolsDic[key];
+        }
         else
+        {
+            var poolToConstruct = new DecompositionPool(prefab);
+            poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});
             EffectPoolsDic.Add(new KeyValuePair<string, DecompositionPool>(key, poolToConstruct));
-        
-        return poolToConstruct;
+            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
+            return poolToConstruct;
+        }
     }
     
     public static async UniTask<DecompositionPool> IniEffectsPool(string resourceName, string effectPath, int objectCount)
@@ -80,13 +87,15 @@ public static class EffectsManager
             {
                 EffectPoolsDic.TryGetValue(effectPath + "/" + resourceName, out effectPool);
                 if (effectPool != null)
+                {
                     return effectPool;
+                }
             }
             
             var effectPrefab = await TryLoadEffectPrefab(effectPath + "/" + resourceName + ".prefab");
             if (effectPrefab != null)
             {
-                effectPool = ConstructEffectPoolWithPrefabAndKey(effectPrefab, effectPath + "/" + resourceName, objectCount);
+                effectPool = await ConstructEffectPoolWithPrefabAndKey(effectPrefab, effectPath + "/" + resourceName, objectCount);
                 return effectPool;
             }
             if (effectPath == FightGlobalSetting.EffectPathDefine())

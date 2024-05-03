@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UniRx;
@@ -48,7 +49,7 @@ public static class HurtObjectManager
         }
         
         _defaultHitBoxPool = new DecompositionPool(resultObject);
-        _defaultHitBoxPool.PreloadAsync(10, 1);
+        await _defaultHitBoxPool.PreloadAsync(10, 1);
     }
     
     public static async UniTask ConstructHurtObjectPool(string resourceName, Element element, int preloadCount)
@@ -62,13 +63,15 @@ public static class HurtObjectManager
         {
             HurtPoolDic.TryGetValue(basicMagicForwardPath + "/" + resourceName, out poolToConstruct);
             if (poolToConstruct != null)
+            {
                 return;
+            }
         }
         
         weaponPrefab = await TryLoadWeaponPrefab(basicMagicForwardPath + "/" + resourceName + ".prefab");
         if (weaponPrefab != null)
         {
-            poolToConstruct = ConstructHitBoxPoolWithPrefabAndKey(weaponPrefab, basicMagicForwardPath + "/" + resourceName, preloadCount);
+            poolToConstruct = await ConstructHitBoxPoolWithPrefabAndKey(weaponPrefab, basicMagicForwardPath + "/" + resourceName, preloadCount);
             
             var decomposition = weaponPrefab.GetComponent<Decomposition>();
             if (decomposition != null)
@@ -102,7 +105,7 @@ public static class HurtObjectManager
             weaponPrefab = await TryLoadWeaponPrefab(basicMagicForwardPath + "/" + resourceName + ".prefab");
             if (weaponPrefab != null)
             {
-                poolToConstruct = ConstructHitBoxPoolWithPrefabAndKey(weaponPrefab, basicMagicForwardPath + "/" + resourceName, preloadCount);
+                poolToConstruct = await ConstructHitBoxPoolWithPrefabAndKey(weaponPrefab, basicMagicForwardPath + "/" + resourceName, preloadCount);
                 
                 var d = weaponPrefab.GetComponent<Decomposition>();
                 if (d != null)
@@ -151,15 +154,26 @@ public static class HurtObjectManager
         }
         return null;
     }
-    
-    static DecompositionPool ConstructHitBoxPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
+
+    private static readonly IDictionary<string, int> PreloadCountIncrementLog = new Dictionary<string, int>();
+    static async UniTask<DecompositionPool> ConstructHitBoxPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
     {
-        if (prefab != null)
+        if (HurtPoolDic.ContainsKey(key))
         {
-            var poolToConstruct = new DecompositionPool(prefab);
-            poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});
-            DicAdd<string, DecompositionPool>.Add(HurtPoolDic, key, poolToConstruct);
-            return poolToConstruct;
+            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, PreloadCountIncrementLog[key]+1);
+            await HurtPoolDic[key].PreloadAsync(PreloadCountIncrementLog[key],1);
+            return HurtPoolDic[key];
+        }
+        else
+        {
+            if (prefab != null)
+            {
+                var poolToConstruct = new DecompositionPool(prefab);
+                poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});
+                HurtPoolDic.Add(key, poolToConstruct);
+                DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
+                return poolToConstruct;
+            }
         }
         return null;
     }

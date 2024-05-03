@@ -197,83 +197,108 @@ public partial class AnimationManger
         Animator.runtimeAnimatorController = animatorOverride;
     }
     
+    // 这里面隐藏着一个同一个技能动画每次执行load都把对应特效物体的对象池扩充一次的逻辑。
     public async UniTask PreloadPersonalAnimResourceMode(string animPath, string key, Element element, int preloadCount)
     {
-        if (toLoadAnims.ContainsKey(key))
+        if (!toLoadAnims.ContainsKey(key))
         {
-            return;
+            await AnimationResourceLoader.LoadAnim(animPath, key);
         }
         
-        await AnimationResourceLoader.LoadAnim(animPath, key);
         var clip = AnimationResourceLoader.Instance.GetAnimationClip(animPath + "/skill/" + key);
         if (clip != null)
         {
             if (!toLoadAnims.ContainsKey(key))
             {
                 toLoadAnims.Add(new KeyValuePair<string, AnimationClip>(key, clip));
-                var tasks = new List<UniTask>();
-                
-                foreach (AnimationEvent e in clip.events)
+            }
+            
+            var tasks = new List<UniTask>();
+            foreach (AnimationEvent e in clip.events)
+            {
+                if (e.functionName == "MagicForward")
                 {
-                    if (e.functionName == "MagicForward")
+                    tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
+                }
+                if (e.functionName == "MagicForwardOnBody")
+                {
+                    tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
+                }
+                if (e.functionName == "MagicToEnemy")
+                {
+                    tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
+                }
+                if (e.functionName == "PrepareOneMagic")
+                {
+                    tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
+                }
+                if (e.functionName == "Bullet_shoot_from_body_part")
+                {
+                    switch (e.intParameter)
                     {
-                        tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
-                    }
-                    if (e.functionName == "MagicForwardOnBody")
-                    {
-                        tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
-                    }
-                    if (e.functionName == "MagicToEnemy")
-                    {
-                        tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
-                    }
-                    if (e.functionName == "PrepareOneMagic")
-                    {
-                        tasks.Add(HurtObjectManager.ConstructHurtObjectPool(e.stringParameter, element, preloadCount));
-                    }
-                    if (e.functionName == "Bullet_shoot_from_body_part")
-                    {
-                        switch (e.intParameter)
-                        {
-                            case 1:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("bullet", element, preloadCount));
-                                break;
-                            case 2:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("big_bullet", element, preloadCount));
-                                break;
-                            case 3:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("super_bullet", element, preloadCount));
-                                break;
-                            default:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("bullet", element, preloadCount));
-                                break;
-                        }
-                    }
-                    if (e.functionName == "BlastAttack")
-                    {
-                        switch (e.intParameter)
-                        {
-                            case 0:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, 1));
-                                break;
-                            case 1:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, 1));
-                                break;
-                            case 2:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("big_blast", element, 1));
-                                break;
-                            default:
-                                tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, 1));
-                                break;
-                        }
-                    }
-                    if (e.functionName == "PlaySoundOnce")
-                    {
-                        AudioResourceLoading.Instance.LoadAudioClipFromResourceAndPutItIntoDic("effects", e.stringParameter);
+                        case 1:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("bullet", element, preloadCount));
+                            break;
+                        case 2:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("big_bullet", element, preloadCount));
+                            break;
+                        case 3:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("super_bullet", element, preloadCount));
+                            break;
+                        default:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("bullet", element, preloadCount));
+                            break;
                     }
                 }
-                await UniTask.WhenAll(tasks);
+                if (e.functionName == "BlastAttack")
+                {
+                    switch (e.intParameter)
+                    {
+                        case 0:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, preloadCount));
+                            break;
+                        case 1:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, preloadCount));
+                            break;
+                        case 2:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("big_blast", element, preloadCount));
+                            break;
+                        default:
+                            tasks.Add(HurtObjectManager.ConstructHurtObjectPool("blast", element, preloadCount));
+                            break;
+                    }
+                }
+                if (e.functionName == "PlaySoundOnce")
+                {
+                    AudioResourceLoading.Instance.LoadAudioClipFromResourceAndPutItIntoDic("effects", e.stringParameter);
+                }
+                
+                // effects loading
+                if (e.functionName == "EffectOnBodyPart")
+                {
+                    tasks.Add(EffectsManager.IniEffectsPool("normal_effect",
+                        FightGlobalSetting.EffectPathDefine(element), preloadCount));
+                }
+                
+                if (e.functionName == "Flash")
+                {
+                    tasks.Add(EffectsManager.IniEffectsPool("FlashStart",
+                        FightGlobalSetting.EffectPathDefine(element), preloadCount));
+                    tasks.Add(EffectsManager.IniEffectsPool("FlashEnd",
+                        FightGlobalSetting.EffectPathDefine(element), preloadCount));
+                }
+                
+                if (e.functionName == "ResistanceUp")
+                {
+                    if (e.stringParameter == "resistup")
+                        tasks.Add(EffectsManager.IniEffectsPool(CommonSetting.BreakFreeEffectCode,
+                            FightGlobalSetting.EffectPathDefine(), preloadCount));
+                    if (e.stringParameter == "speedup")
+                        tasks.Add(EffectsManager.IniEffectsPool("speedupbuff",
+                            FightGlobalSetting.EffectPathDefine(element), preloadCount));
+                }
             }
+            await UniTask.WhenAll(tasks);
         }
     }
     
