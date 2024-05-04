@@ -42,9 +42,13 @@ public class FrontLayer : UILayer
         GangbangBtn.BOButton.onClick.AddListener(
             ()=>
             {
-                PlayerAccountInfo.Me.GangbangModeManager.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
+                if (PlayerAccountInfo.Me.arcadeProcess >= 5)
+                    PlayerAccountInfo.Me.GangbangModeManager.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
+                else
+                {
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));
+                }
             });
-        GangbangBtn.BOButton.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
         
         ArenaBtn.BOButton.onClick.AddListener(() =>
         {
@@ -56,8 +60,15 @@ public class FrontLayer : UILayer
             }
         });
         
-        EventFightBtn.SetListener(() => { pre.trySwitchToStep(MainSceneStep.EventFight);});
-        EventFightBtn.SetActive(PlayerAccountInfo.Me.arcadeProcess >= 5);
+        EventFightBtn.SetListener(() =>
+        {
+            if (PlayerAccountInfo.Me.arcadeProcess >= 5)
+                pre.trySwitchToStep(MainSceneStep.EventFight);
+            else
+            {
+                PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));
+            }
+        });
         TrainBtn.onClick.AddListener(() => pre.trySwitchToStep(MainSceneStep.SelfFightFront));
 
         SkillTestRBtn.onClick.AddListener(pre.BeginSkillTest_Rotation);
@@ -150,6 +161,7 @@ public class FrontLayer : UILayer
         ArenaBtn.BOButton.interactable = btnCode == MainSceneStep.Arena;
         GangbangBtn.BOButton.interactable = btnCode == MainSceneStep.GotchaFront;
         TrainBtn.interactable = btnCode == MainSceneStep.SelfFightFront;
+        EventFightBtn.interactable = btnCode == MainSceneStep.EventFight;
         
         ArcadeBtn.Indicator.SetActive(false);
         ArenaBtn.Indicator.SetActive(false);

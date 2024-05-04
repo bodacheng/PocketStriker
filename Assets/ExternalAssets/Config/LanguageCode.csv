@@ -252,8 +252,14 @@ TeamModeR,1V1,1V1,对决
 ,,,
 normalLoginBonusDM,Login gift,ログインギフト,登陆礼物
 sevenDaysLoginBonusDM,7-day consecutive login bonus,7日連続ログイン特典,7日连续登陆特典
-normalLoginBonusDMIntro,This is your $streak 's day logging into the game! Log in for another $extraRemain days and you will receive extra rewards!,これはゲームにログインする第$streak日です！さらに$extraRemain日間ログインすると、追加の報酬がもらえます！,这是你第$streak天登陆游戏！再登陆$extraRemain天你将获得额外奖励！
-sevenDaysLoginBonusDMIntro,Thank you for logging in for seven consecutive days! Wishing you happiness and joy every day.,連続7日間ログインしていただきありがとうございます！毎日幸せで楽しい日々をお過ごしください。,感谢你连续七天登陆！祝你开心快乐每一天！
+normalLoginBonusDMIntro,"This is your $streak 's day logging into the game! 
+Log in for another $extraRemain days and you will receive extra rewards!","これはゲームにログインする第$streak日です！
+さらに$extraRemain日間ログインすると、追加の報酬がもらえます！","这是你第$streak天登陆游戏！
+再登陆$extraRemain天你将获得额外奖励！"
+sevenDaysLoginBonusDMIntro,"Thank you for logging in for seven consecutive days! 
+Wishing you happiness and joy every day.","連続7日間ログインしていただきありがとうございます！
+毎日幸せで楽しい日々をお過ごしください。","感谢你连续七天登陆！
+祝你开心快乐每一天！"
 ThankYouGiftBonusDM50,Thank you !,ありがとうございます！,感谢!
 ThankYouGiftBonusGD50,Thank you !,ありがとうございます！,感谢!
 NewWarrior,A new warrior has joined your team!,新しい戦士があなたのチームに参加しました！,一名新的战士参与到你的队伍！
@@ -321,9 +327,6 @@ GameTip3,"・Each skill has its optimal release distance from the enemy.
 In automatic mode , the AI will autonomously choose which skill to release based on the distance from the enemy.","・各スキルには敵との最適な発動距離があります。
 自動モードでは、AIは敵との距離に基づいてスキルを自動的に選択して発動します。","・每个技能都有所对应的最佳距敌释放距离。
 自动模式下，AI会根据与敌人的距离自主选择技能释放。"
-GameTip4,"・In war mode, swiping the center of the screen with one finger rotates the camera, 
-while using two fingers allows you to zoom out or zoom in the camera.","・戦争モード下で、画面の中央を一本の指でスワイプするとカメラが回転し、
-二本の指で操作するとカメラをズームアウトまたはズームインできます。","・战争模式下，单指划动屏幕中央可旋转相机，
-双指操作可拉远，拉近相机"
+GameTip4,"・In war mode, swiping the center of the screen with one finger rotates the camera",・戦争モード下で、画面の中央を一本の指でスワイプするとカメラが回転できます。,・战争模式下，单指划动屏幕中央可旋转相机
 GameTip5,・It is recommended to place defensive skills in the first vertical column of the skill slot.,・防御系のスキルは、スキルスロットの第1縦列に配置することを推奨します。,・防御类技能建议配置在技能槽第一竖列
 GameTip6,"・When activated by different characters, certain skills may exhibit different effects.",・一部のスキルは異なるキャラクターが発動すると、異なる効果を示します。,・部分技能被不同角色发动时会呈现出不同的效果
