@@ -36,7 +36,7 @@ public partial class AnimationManger
             {
                 foreach (var path in loadPath.Result)
                 {
-                    if (path.PrimaryKey.Contains(type + "/BasicPack/" + basicPackName))
+                    if (path.PrimaryKey.Contains(type + "/" + basicPackName))
                     {
                         Object value = await AddressablesLogic.LoadT<AnimationClip>(path.PrimaryKey);
                         if (value != null)
