@@ -116,7 +116,6 @@ namespace Soul
             _Rigidbody.velocity = Vector3.zero;
             _rushTimeCounter = 0f;
             _Animator.applyRootMotion = true;
-            Sensor.DetectionStart(2, true);
             Sensor.GetEnemiesByDistance(true);
             if (Sensor.GetEnemiesByDistance(false).Count == 0)
             {
@@ -228,7 +227,6 @@ namespace Soul
                         AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
                         _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
                         _Rigidbody.velocity = Vector3.zero;
-                        Sensor.DetectionStart(5, false);
                         _BuffsRunner.EndSubCoroutineOfState(_rushCoroutine);
                     }
                     break;

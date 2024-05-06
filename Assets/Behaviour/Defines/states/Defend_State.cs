@@ -94,7 +94,6 @@ namespace Soul
             freezed = false;
             FightParamsRef.Resistance.Value = DefendHP > 0 ? 10 : 0;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            Sensor.DetectionStart(-1, true);
             _Animator.SetFloat("speed", 0f);
             AnimationManger.AnimationTrigger(defend_clip_name, false, CommonSetting.CharacterAnimDuration);
             _Rigidbody.velocity = Vector3.zero;
@@ -110,7 +109,6 @@ namespace Soul
             freezed = false;
             FightParamsRef.Resistance.Value = DefendHP > 0 ? 10 : 0;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            Sensor.DetectionStart(-1, true);
             _Animator.SetFloat("speed", 0f);
             _SkillCancelFlag.turn_off_flag();
             //this.AI_DATA_CENTER.turnShield(true);

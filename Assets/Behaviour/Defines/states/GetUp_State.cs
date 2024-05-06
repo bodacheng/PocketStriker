@@ -22,7 +22,6 @@ namespace Soul
             _SkillCancelFlag.turn_on_flag();
             counter = 0f;
             _Animator.SetFloat("speed", 0f);
-            Sensor.DetectionStart(5, false);
             _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
             AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
         }

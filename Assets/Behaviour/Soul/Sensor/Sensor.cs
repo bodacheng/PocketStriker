@@ -3,32 +3,8 @@ using UnityEngine;
 
 public partial class Sensor
 {
-    LayerMask _layers;
     LayerMask _meAndEnemyLayerMask;
-    readonly Collider[] _hits = new Collider[30] ; //What was hit in this frame?
-    readonly RaycastHit[] _spherecastHits= new RaycastHit[30] ;
     TeamConfig _teamConfig = TeamConfig.DefaultSet;
-    
-    int _detectionInterval = -1; // -1 会保持检测器停止
-    int _detectionResultKeepFrames;
-    bool _continuousDetection;
-
-    int DetectionInterval
-    {
-        get => _detectionInterval;
-        set
-        {
-            _detectionInterval = value;
-            SensorDetectionResultClearProcess();
-            if (_detectionInterval != -1)
-            {
-                SensorDetectProcess();//检测
-                SensorDetectionResultSortProcess();//整理
-                SphereCastSortProcess();
-            }
-        }
-    }
-    
     static readonly IDictionary<Team, List<Data_Center>> SharedUnitDic = new Dictionary<Team, List<Data_Center>>();
     static readonly IDictionary<Team, List<Data_Center>> SharedDeadUnitDic = new Dictionary<Team, List<Data_Center>>();
     readonly List<Collider> _detectedEnemies = new List<Collider>();
@@ -52,26 +28,8 @@ public partial class Sensor
     public void SetDetectLayer(TeamConfig teamConfig, Data_Center self)
     {
         _teamConfig = teamConfig;
-        _layers = teamConfig.mySensorAndWeaponTargetLayerMask;
         _meAndEnemyLayerMask = teamConfig.myTeamAndMyEnemy;
         _selfDataCenter = self;
-    }
-    
-    public void SensorFixedUpdate()
-    {
-        if (DetectionInterval != -1)
-        {
-            if (DetectionInterval > _detectionResultKeepFrames)
-            {
-                DetectionInterval = 0;
-                if (!_continuousDetection)
-                {
-                    DetectionInterval = -1;
-                }
-                return;//否则下面的DetectionInterval++会导致其值立刻从0变到1，无法进入上面的if (DetectionInterval == 0)部分。
-            }
-            _detectionInterval++;
-        }
     }
     
     public static void ClearFightingMember()
@@ -124,13 +82,7 @@ public partial class Sensor
         SharedDeadUnitDic[team] = fightingUnits;
     }
     
-    public void Stop()
-    {
-        DetectionInterval = -1;
-        _continuousDetection = false;
-    }
-    
-    void SensorDetectionResultClearProcess()
+    public void SensorDetectionResultClearProcess()
     {
         _detectedEnemies.Clear();
         _damagingWeaponAround.Clear();
@@ -173,77 +125,43 @@ public partial class Sensor
         }
         return targetList;
     }
-
-    void SphereCastSortProcess()
+    
+    public void SensorDetectionResultSortProcess(Collider[] hits) //这个函数的调用必须要确保每次都在update函数之后
     {
-        float mateToMe = SensorRadius, enemyToMe = SensorRadius;
-        foreach (var raycastHit in _spherecastHits)
+        foreach (Collider hit in hits)
         {
-            if (raycastHit.collider != null)
+            if (hit == null || Vector3.Distance(hit.transform.position, Center.position) > SensorRadius)
             {
-                if (_teamConfig.myTeamLayerMask == (_teamConfig.myTeamLayerMask | (1 << raycastHit.collider.gameObject.layer)))
-                {
-                    if (!_selfDataCenter.FightDataRef.IfMyBody(raycastHit.collider))
-                    {
-                        var toMe = Vector3.Distance(Center.position, raycastHit.collider.transform.position);
-                        if (toMe < mateToMe)
-                        {
-                            _jiaMateAmMate = raycastHit.collider;
-                            mateToMe = toMe;
-                        }
-                    }
-                }
-                if (_teamConfig.enemyLayerMask == (_teamConfig.enemyLayerMask | (1 << raycastHit.collider.gameObject.layer)))
-                {
-                    var toMe = Vector3.Distance(Center.position, raycastHit.collider.transform.position);
-                    if (toMe < enemyToMe)
-                    {
-                        _nearestEnemy = raycastHit.collider;
-                        enemyToMe = toMe;
-                    }
-                }
+                continue;
             }
-        }
-
-        if (_jiaMateAmMate != null && _nearestEnemy != null)
-        {
-            if (Vector3.Distance(Center.position, _jiaMateAmMate.transform.position) < Vector3.Distance(Center.position, _nearestEnemy.transform.position))
-                return;//意思就是说让jiamateammate和nearestenemy不为空
-        }
-        _jiaMateAmMate = null;
-        _nearestEnemy = null;
-    }
-
-    void SensorDetectionResultSortProcess() //这个函数的调用必须要确保每次都在update函数之后
-    {
-        foreach (Collider hit in _hits)
-        {
-            if (hit != null)
+            
+            if (_teamConfig.enemyLayerMask == (_teamConfig.enemyLayerMask | (1 << hit.gameObject.layer)) || _teamConfig.enemyShieldLayerMask == (_teamConfig.enemyShieldLayerMask | (1 << hit.gameObject.layer)))
             {
-                if (_teamConfig.enemyLayerMask == (_teamConfig.enemyLayerMask | (1 << hit.gameObject.layer)) || _teamConfig.enemyShieldLayerMask == (_teamConfig.enemyShieldLayerMask | (1 << hit.gameObject.layer)))
-                {
-                    _detectedEnemies.Add(hit);
-                }
-                if (_teamConfig.enemyWeaponLayerMask == (_teamConfig.enemyWeaponLayerMask | (1 << hit.gameObject.layer)))
-                {
-                    _damagingWeaponAround.Add(hit);
-                }
+                _detectedEnemies.Add(hit);
+            }
+            if (_teamConfig.enemyWeaponLayerMask == (_teamConfig.enemyWeaponLayerMask | (1 << hit.gameObject.layer)))
+            {
+                _damagingWeaponAround.Add(hit);
             }
         }
         _nearestEnemyCollider = FindNearestCollider(_detectedEnemies);
         _nearestDamagingWeapon = FindNearestCollider(_damagingWeaponAround);
     }
-
+    
     float _p1ToMe, _p2ToMe;
     int HorizontalDistanceCompare(Vector3 p1, Vector3 p2)
     {
-        var position = Center.position;
-        p1.y = position.y;
-        _p1ToMe = (p1 - position).sqrMagnitude;
-        p2.y = position.y;
-        _p2ToMe = (p2 - position).sqrMagnitude;
-        
-        return _p1ToMe > _p2ToMe ? 1 : _p1ToMe < _p2ToMe ? -1 : 0;
+        Vector3 center = Center.position;  // 只获取一次中心位置，提高效率
+        p1.y = p2.y = center.y;  // 同时设置 p1 和 p2 的 y 坐标，简化代码
+
+        // 直接计算平方距离，避免创建不必要的中间变量
+        float p1ToCenter = (p1 - center).sqrMagnitude;
+        float p2ToCenter = (p2 - center).sqrMagnitude;
+
+        // 简化比较逻辑，直接返回结果
+        if (p1ToCenter > p2ToCenter) return 1;
+        if (p1ToCenter < p2ToCenter) return -1;
+        return 0;
     }
     
     //void OnDrawGizmosSelected()
@@ -253,76 +171,3 @@ public partial class Sensor
     //    //Gizmos.DrawRay(transform.position,selfDataCenter.WholeT.forward * sensor_radius);
     //}
 }
-
-//public List<Collider> getInnerRangeWallColliders() //这个函数的调用必须要确保每次都在update函数之后
-//{
-//    wallTs.Clear();
-//    if (_hits == null)
-//    {
-//        return wallTs;
-//    }
-//    foreach (Collider hit in this._hits)
-//    {
-//        if (hit != null)
-//        {
-//            if (hit.gameObject.layer == 13)
-//            {
-
-//                //_ClosestPointOnBounds = hit.ClosestPointOnBounds(transform.position);
-//                if ((hit.transform.position - transform.position).magnitude < innerSensorRadius)
-//                {
-//                    wallTs.Add(hit);
-//                    break;
-//                }
-
-//            }
-//        }
-//    }
-//    return wallTs;
-//}
-
-//public List<Collider> getMyTeammatesNearby()
-//{
-//    return teammatesC;
-//}
-
-//public void MyteamDetectionResultSortProcess()
-//{
-//    teammatesC = teamMatesHIts.ToList();
-//    if (teammatesC.Count > 1)
-//    {
-//        //OutterDamagingWeapon.Sort((a, b) => horizontalDistanceCompare(a.transform.position, b.transform.position));
-//        tempCForNearest = FindNearestCollider(teammatesC);
-//        if (tempCForNearest != null)
-//        {
-//            teammatesC.Remove(tempCForNearest);
-//            teammatesC.Insert(0, tempCForNearest);
-//        }
-//    }
-//}
-
-// What kinds of info we need from all the hits we get ?
-// 1.Other characters
-// 2.Weapons on damaging mode
-// 3.Working shield
-
-// 在这个函数中我们使用了大量getComponent函数，但实际上在新的分层机制下，这些东西可以回避掉。
-// 我们整个AI系统，策略上的一些判定靠的是DATAcente里那些，而这个地方的判定更多的来说是针对敌人近身情况下的一些应急性动作。
-// 也就是说，其实对getNearbyEnemyHealthBody这个函数的利用基本只局限于和近身敌人的距离判定一类。。。
-// 既然层的目的本来就是针对打击判定系统自身，那如果角色层上的collider的确不用来做伤害hitbox，何不直接在这种情况下把角色给设置成other层？
-//List<Collider> FocousingNearbyEnemyColliders;
-//public List<Collider> getNearbyEnemyColliders()
-//{
-//    FocousingNearbyEnemyColliders = new List<Collider>();
-//    foreach (Collider hit in this._hits)
-//    {
-//        if (hit != null)
-//        {
-//            if (enemyMeatLayers == (enemyMeatLayers | (1 << hit.gameObject.layer)))
-//            {
-//                FocousingNearbyEnemyColliders.Add(hit);
-//            }
-//        }
-//    }
-//    return FocousingNearbyEnemyColliders;
-//}

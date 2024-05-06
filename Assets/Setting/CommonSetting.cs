@@ -66,6 +66,9 @@ public class CommonSetting : ScriptableObject
     [SerializeField] AudioClip btnConfirmSound;
     [SerializeField] AudioClip exTabSound;
 
+    [Tooltip("AI检测帧数间隔")] 
+    [SerializeField] private int aiDetectInterval = 1;
+
     [Tooltip("角色动画平滑区间")] 
     [SerializeField] private float characterAnimDuration = 0.25f;
     
@@ -134,6 +137,8 @@ public class CommonSetting : ScriptableObject
     public static string BreakFreeEffectCode;
     public static string MemberShiftEffectCode;
     
+    public static int AIDetectInterval = 1;
+    
     public static float CharacterAnimDuration;
     public static Material ShadowMaterial;
     public static AudioClip BtnTapSound;
@@ -192,7 +197,8 @@ public class CommonSetting : ScriptableObject
         WallCrackEffectCode = wallCrackEffectCode;
         BreakFreeEffectCode = breakFreeEffectCode;
         MemberShiftEffectCode = memberShiftEffectCode;
-        
+
+        AIDetectInterval = aiDetectInterval;
         CharacterAnimDuration = characterAnimDuration;
         ShadowMaterial = shadowMaterial;
         BtnTapSound = btnTapSound;

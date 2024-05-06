@@ -34,7 +34,7 @@ namespace FightScene
             SceneProcessDictionary.Clear();
         }
             
-        public void ProcessNagare()
+        public void ProcessUpdate()
         {
             if (currentProcess != null)
             {
@@ -44,6 +44,11 @@ namespace FightScene
                     ChangeProcess(currentProcess.nextProcessStep);
                 }
             }
+        }
+
+        public void ProcessFixedUpdate()
+        {
+            currentProcess?.LocalFixedUpdate();
         }
     
         public void AddNewProcess(SceneStep step, FSceneProcess _process)

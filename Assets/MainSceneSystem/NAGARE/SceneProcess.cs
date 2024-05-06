@@ -22,5 +22,9 @@
         public virtual void LocalUpdate()
         {
         }
+        
+        public virtual void LocalFixedUpdate()
+        {
+        }
     }
 }

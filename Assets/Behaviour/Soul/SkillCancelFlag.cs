@@ -45,7 +45,6 @@ public class SkillCancelFlag : MonoBehaviour {
     
     public void turn_on_flag()
     {
-        _C.Sensor.DetectionStart(1, true);
         Cancel_Flag = true;
     }
 

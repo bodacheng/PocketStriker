@@ -37,6 +37,8 @@ namespace FightScene
             if (FightLoad.Fight.RunTutorial)
                 _layer.OpenTutorial();
             RTFightManager.Target.ModeStart();
+            
+            BoundaryControlByGod.target.SensorUnity.DetectionStart(CommonSetting.AIDetectInterval, true);
         }
         
         public override void ProcessEnd()
@@ -58,6 +60,8 @@ namespace FightScene
             RTFightManager.Target.RefreshTimeDic.Clear();
             RTFightManager.Target.ClearUnitData();
             FightLogger.value.WatchMissionsAbandon();
+            
+            BoundaryControlByGod.target.SensorUnity.Stop();
         }
 
         public override void LocalUpdate()
@@ -70,6 +74,11 @@ namespace FightScene
             
             if (FightLoad.Fight.EventType != FightEventType.Gangbang && FightLoad.Fight.team1Mode != TeamMode.MultiRaid)
                 RTFightManager.Target._CameraManager.VisibilityControl.LocalUpdate();
+        }
+
+        public override void LocalFixedUpdate()
+        {
+            BoundaryControlByGod.target.SensorUnity.SensorFixedUpdate();
         }
     }
 }

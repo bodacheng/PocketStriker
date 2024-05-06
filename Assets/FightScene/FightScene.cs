@@ -136,10 +136,15 @@ namespace FightScene
         
         void Update()
         {
-            FSceneProcessesRunner.Main.ProcessNagare();
+            FSceneProcessesRunner.Main.ProcessUpdate();
             TutorialRunner.Main.Process();
         }
-        
+
+        void FixedUpdate()
+        {
+            FSceneProcessesRunner.Main.ProcessFixedUpdate();
+        }
+
         public void ReturnToFront(MainSceneStep mainSceneStep = MainSceneStep.FrontPage)
         {
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.None);

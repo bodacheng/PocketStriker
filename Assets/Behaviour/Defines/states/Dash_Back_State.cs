@@ -36,7 +36,6 @@ namespace Soul
             base.AI_State_enter();
             _Animator.applyRootMotion = true;
             _Animator.SetFloat("speed", 0f);
-            Sensor.DetectionStart(2, true);
             _SkillCancelFlag.turn_off_flag();
             pEvents.CloseAllPersonalityEffects();
             Vector3 threatsComingPosition = Vector3.zero;

@@ -144,7 +144,6 @@ namespace Soul
         // Process when exit the state 
         public virtual void AI_State_exit()
         {
-            Sensor.DetectionStart(-1, false);
             pEvents.CloseAllPersonalityEffects();
         }
         
