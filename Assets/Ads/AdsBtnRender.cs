@@ -26,7 +26,12 @@ public class AdsBtnRender : MonoBehaviour
                 // Grant a reward.
                 CloudScript.SubtractVirtualCurrency(
                     "AD",1,
-                    ()=> CloudScript.RequestAdReward("GD", PlayFabSetting._adTicketRewardGD)
+                    ()=> CloudScript.RequestAdReward("GD", PlayFabSetting._adTicketRewardGD,
+                        () =>
+                        {
+                            PopupLayer.ArrangeWarnWindow(Translate.Get("GotAdWatchedReward"));
+                        }
+                    )
                 );
             }
         );
