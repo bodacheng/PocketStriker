@@ -7,6 +7,20 @@ public static class PosCal
     static CanvasScaler CanvasScaler => Canvas.GetComponent<CanvasScaler>();
     public static float CanvasWidth => Canvas.GetComponent<RectTransform>().rect.width;
     public static float CanvasHeight => Canvas.GetComponent<RectTransform>().rect.height;
+
+    public static void TestIni()
+    {
+        // 画面サイズに合わせてUIも拡大する
+        CanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        // キャンバスのサイズが基準の解像度よりも大きくなるようにする
+        CanvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+
+        // 基準の解像度がセーフエリア内に収まるようにCanvasScalerの解像度を調整
+        Vector2 resolution = CanvasScaler.referenceResolution;
+        resolution.x = (int)(resolution.x * (Screen.width / (float)Screen.safeArea.width));
+        resolution.y = (int)(resolution.y * (Screen.height / (float)Screen.safeArea.height));
+        CanvasScaler.referenceResolution = resolution;
+    }
     
     /// <summary>
     /// 九宫格的slot特效在比1920x1080更长的设备上并不会出现尺寸变不匹配问题

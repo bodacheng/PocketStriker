@@ -39,6 +39,7 @@ public class StartUpPresentation : MonoBehaviour
     void Start()
     {
         PosCal.Canvas = this.canvas;
+        PosCal.TestIni();
         UILayerLoader.SetHanger(t);
         AppSetting.Load();
         AppSetting.BGMSource = audioSource;
@@ -92,7 +93,7 @@ public class StartUpPresentation : MonoBehaviour
                 #endif
                 
                 #if UNITY_IOS
-                Application.OpenURL("https://apps.apple.com/app/%E9%AD%94%E6%99%B6%E9%97%98%E5%A3%AB/id1640836926");
+                Application.OpenURL("https://apps.apple.com/app/pocket-striker/id6478905824");
                 #endif
             }, text);
             return;

@@ -70,6 +70,7 @@ namespace FightScene
         {
             target = this;
             PosCal.Canvas = this.canvas;
+            PosCal.TestIni();
         }
         
         void Start()

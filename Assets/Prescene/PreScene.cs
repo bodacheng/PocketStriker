@@ -55,6 +55,7 @@ namespace mainMenu
         {
             target = this;
             PosCal.Canvas = this.Canvas;
+            PosCal.TestIni();
             SetBgRenderTexture();
         }
         

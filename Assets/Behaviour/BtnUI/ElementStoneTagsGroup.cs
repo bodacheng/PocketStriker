@@ -186,16 +186,16 @@ public class ElementStoneTagsGroup
                 break;
         }
         var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, releaseTarget.gameObject);
-        
-        slotEffect.transform.localScale = 
-            new Vector3(slotEffect.transform.localScale.x * PosCal.TempRate(),
-                slotEffect.transform.localScale.y * PosCal.TempRate(),
-                slotEffect.transform.localScale.z);
+
+        var slotT = slotEffect.transform;
+
+        var oldScale = slotT.localScale;
+        slotT.localScale = new Vector3(oldScale.x * PosCal.TempRate(), oldScale.y * PosCal.TempRate(), oldScale.z);
         
         //slotEffect.transform.SetParent(parent);
         DicAdd<int, ParticleSystem>.Add(_slotEffects, slotNum, slotEffect);
         slotEffect.gameObject.name = "slotEffect"+ slotNum;
-        slotEffect.gameObject.transform.position = pos;
+        slotT.position = pos;
         slotEffect.Play(true);
     }
     
