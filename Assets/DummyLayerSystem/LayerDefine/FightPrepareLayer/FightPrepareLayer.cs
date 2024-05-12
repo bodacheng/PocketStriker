@@ -87,7 +87,20 @@ public partial class FightPrepareLayer : UILayer
     public void SetEventFeature(string arcadeStageNo)
     {
         arcadeStageNoText.gameObject.SetActive(true);
-        arcadeStageNoText.text = "Stage " + arcadeStageNo;
+        var hardTxt = string.Empty;
+        if (arcadeStageNo.Contains("easy"))
+        {
+            hardTxt = "easy";
+        }
+        if (arcadeStageNo.Contains("normal"))
+        {
+            hardTxt = "normal";
+        }
+        if (arcadeStageNo.Contains("hard"))
+        {
+            hardTxt = "hard";
+        }
+        arcadeStageNoText.text = Translate.Get("EventFightTitle")+ " " + hardTxt;
         toArcadeFrontBtn.gameObject.SetActive(false);
         rewardUI.gameObject.SetActive(false);
         // rewardUI.ShowRewards(award.d,award.g);
