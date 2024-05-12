@@ -12,7 +12,7 @@ public class StonesPage : MSceneProcess
         Step = MainSceneStep.SkillStoneList;
     }
     
-    private StoneListLayer layer;
+    private StoneListLayer _layer;
     
     public override void ProcessEnter()
     {
@@ -25,7 +25,7 @@ public class StonesPage : MSceneProcess
     }
 
 
-    private Tweener autoScroll;
+    private Tweener _autoScroll;
     //EnterProcess()内绝不能出现triggerMainProcess
     async void EnterProcess(bool updateStone = false)
     {
@@ -39,15 +39,14 @@ public class StonesPage : MSceneProcess
         UILayerLoader.Remove<UpperInfoBar>();
         ProgressLayer.Loading(string.Empty);
         await Stones.RenderAll();
-        ProgressLayer.Close();
-        layer = UILayerLoader.Load<StoneListLayer>();
-        await layer.Setup();
+        _layer = UILayerLoader.Load<StoneListLayer>();
+        await _layer.Setup();
         ReturnLayer.MoveFront();
-        layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
-        layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
+        _layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
+        _layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
         
-        lowerMainBar.transform.SetAsLastSibling();
-
+        lowerMainBar?.transform.SetAsLastSibling();
+        ProgressLayer.Close();
         if (!updateStone)
         {
             SetLoaded(true);
@@ -60,33 +59,33 @@ public class StonesPage : MSceneProcess
             canNext = true;
             var info = Stones.Get(x);
             var config = SkillConfigTable.GetSkillConfigByRecordId(info.SkillId);
-            layer.box.PressTab(config.SP_LEVEL);
-            layer.box.RestFilter();
+            _layer.box.PressTab(config.SP_LEVEL);
+            _layer.box.RestFilter();
 
             #region 滚动scroll
             // 下面这些就是自动滚动，完全是gpt代码没仔细想过
             var targetStoneModel = Stones.GetRenderModel(x);
             // 计算目标元素在内容中的局部位置
-            Vector3 elementLocalPosition = layer.box.ScrollRect.content.InverseTransformPoint(
+            Vector3 elementLocalPosition = _layer.box.ScrollRect.content.InverseTransformPoint(
                 targetStoneModel.GetComponent<RectTransform>().position + new Vector3(0,targetStoneModel.GetComponent<RectTransform>().rect.height / 2 ));
-            Vector3 viewportLocalPosition = layer.box.ScrollRect.content.InverseTransformPoint(layer.box.ScrollRect.viewport.position);
+            Vector3 viewportLocalPosition = _layer.box.ScrollRect.content.InverseTransformPoint(_layer.box.ScrollRect.viewport.position);
             
             // 计算目标位置和视口的差异
             float diff = viewportLocalPosition.y - elementLocalPosition.y;
 
             // 计算新的内容区域的位置
-            Vector2 newAnchoredPosition = layer.box.ScrollRect.content.anchoredPosition + new Vector2(0, diff);
+            Vector2 newAnchoredPosition = _layer.box.ScrollRect.content.anchoredPosition + new Vector2(0, diff);
             
-            autoScroll?.Kill();
-            autoScroll = layer.box.ScrollRect.content.DOAnchorPosY(newAnchoredPosition.y, 0.5f).SetEase(Ease.InOutQuad).OnComplete(
+            _autoScroll?.Kill();
+            _autoScroll = _layer.box.ScrollRect.content.DOAnchorPosY(newAnchoredPosition.y, 0.5f).SetEase(Ease.InOutQuad).OnComplete(
                 () =>
                 {
                     targetStoneModel.Shine(PreScene.target.postProcessCamera);
                 });
             #endregion
             
-            layer.levelManager.CloseLevelUpPage();
-            layer.TargetStoneID = x;
+            _layer.levelManager.CloseLevelUpPage();
+            _layer.TargetStoneID = x;
         }
         
         foreach (var updateAllStoneForm in StoneLevelUpProccessor.UpdateAllStoneForms)
@@ -99,8 +98,8 @@ public class StonesPage : MSceneProcess
         await UniTask.WaitUntil(()=> canNext);
         
         StoneLevelUpProccessor.CalUpdateAllForms();
-        layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
-        layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", false);
+        _layer.levelManager.LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
+        _layer.levelManager.LevelUpAllStonesBtnAnimator.SetBool("on", false);
         LowerMainBar.RefreshBadge();
         PopupLayer.ArrangeWarnWindow(Translate.Get("AutoMergeFinished"));
         

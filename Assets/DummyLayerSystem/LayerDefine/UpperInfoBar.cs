@@ -53,21 +53,22 @@ public class UpperInfoBar : UILayer
     private TweenerCore<int, int, NoOptions> _gdTween;
     private TweenerCore<int, int, NoOptions> _dmTween;
     
-    public void Interactable(bool on)
+    public void SetInteractive(bool on)
     {
         settingBtn.interactable = on;
         mailBtn.interactable = on;
         diamondPlus.interactable = on;
     }
     
-    public void Setup(string titleDisplayName, Action openSetting, Action openMail, Action openDmShop, bool isVip)
+    public void Setup(string text, Action openSetting, Action openMail, Action openDmShop, bool isVip)
     {
-        this.titleDisplayName.text = titleDisplayName;
+        this.titleDisplayName.text = text;
         DiamondText = Currencies.DiamondCount.Value.ToString();
         Currencies.DiamondCount.Subscribe(x =>
         {
             int.TryParse(DiamondText, out int currentValue);
             int targetValue = currentValue;
+            _dmTween?.Kill();
             _dmTween = DOTween.To(
                 () => targetValue,
                 setterValue => targetValue = setterValue,
@@ -85,6 +86,7 @@ public class UpperInfoBar : UILayer
             int.TryParse(GoldText, out int currentValue);
             int targetValue = currentValue;
             
+            _gdTween?.Kill();
             _gdTween = DOTween.To(
                 () => targetValue,
                 setterValue => targetValue = setterValue,

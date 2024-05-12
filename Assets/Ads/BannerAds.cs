@@ -37,7 +37,7 @@ public class BannerAds : MonoBehaviour
     }
     
     BannerView _bannerView;
-    public BannerView BannerView;
+    public BannerView BannerView => _bannerView;
     
     /// <summary>
     /// Creates a 320x50 banner view at top of the screen.
@@ -50,9 +50,8 @@ public class BannerAds : MonoBehaviour
             DestroyBannerView();
         }
         
-        Debug.Log("Creating banner view");
         // Use the AdSize argument to set a custom size for the ad.
-
+        
         var adSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(200);
         // Debug.Log(adSize.Width + ":"+ adSize.Height);
         _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);

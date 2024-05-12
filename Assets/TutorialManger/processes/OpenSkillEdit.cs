@@ -59,7 +59,7 @@ public class OpenSkillEdit : TutorialProcess
             _upperInfoBar = UILayerLoader.Get<UpperInfoBar>();
             if (_upperInfoBar != null)
             {
-                _upperInfoBar.Interactable(false);
+                _upperInfoBar.SetInteractive(false);
             }
         }
         
