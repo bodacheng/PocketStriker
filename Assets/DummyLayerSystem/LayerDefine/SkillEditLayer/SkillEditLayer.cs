@@ -308,6 +308,7 @@ public partial class SkillEditLayer : UILayer
             if (stone != null && stone._SkillConfig != null)
             {
                 skillStoneDetail.RefreshInfo(stone.instanceId);
+                RunSkillAndShowTransition(stone).Forget();
             }else{
                 skillStoneDetail.Clear();
             }
@@ -337,7 +338,7 @@ public partial class SkillEditLayer : UILayer
         cell.btn.ActivateHold = true;
         cell.btn.ActivateDoubleClick = true;
         
-        cell.btn.onHold.AddListener(PressGoToLevelUpPage);
+        //cell.btn.onHold.AddListener(PressGoToLevelUpPage);
         cell.btn.onDoubleClick.AddListener(DoubleClick);
         cell.SetOnDropAction(StoneCell.Install);
     }

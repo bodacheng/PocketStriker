@@ -143,6 +143,9 @@ namespace mainMenu
 
         public void ShowTransition(SkillStoneSlot slot, Action<SkillStoneSlot, SkillStoneSlot> effectTrigger)
         {
+            if (slot == null)
+                return;
+                
             SkillStoneSlot endSlot1 = null, endSlot2 = null, endSlot3 = null;
             if (slot == _a1Slot || slot == _b1Slot ||slot == _c1Slot)
             {
