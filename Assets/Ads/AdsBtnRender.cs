@@ -72,4 +72,9 @@ public class AdsBtnRender : MonoBehaviour
             }
         ).AddTo(gameObject);
     }
+
+    void OnDestroy()
+    {
+        _disposeCountDown?.Dispose();
+    }
 }

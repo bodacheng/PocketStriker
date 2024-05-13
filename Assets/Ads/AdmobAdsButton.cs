@@ -13,7 +13,7 @@ public class AdmobAdsButton : MonoBehaviour
 
     private InterstitialAd _interstitialAd;
     private RewardedAd _rewardedAd;
-    private Action watchedAdExtraProcess;
+    private Action _watchedAdExtraProcess;
 
     [SerializeField] Image[] colorImages;
 
@@ -26,7 +26,7 @@ public class AdmobAdsButton : MonoBehaviour
     
     public void SetWatchedAdExtraProcess(Action watchedAdProcess)
     {
-        this.watchedAdExtraProcess = watchedAdProcess;
+        this._watchedAdExtraProcess = watchedAdProcess;
     }
 
     private bool adIsReady;
@@ -115,7 +115,7 @@ public class AdmobAdsButton : MonoBehaviour
                 {
                     _rewardedAd.Show((x) =>
                     {
-                        watchedAdExtraProcess.Invoke();
+                        _watchedAdExtraProcess.Invoke();
                         if (reloadAfterWatched)
                             LoadRewardAd();
                         AppSetting.Value.UnMute();
@@ -158,7 +158,7 @@ public class AdmobAdsButton : MonoBehaviour
         interstitialAd.OnAdFullScreenContentClosed += () =>
         {
             Debug.Log("Rewarded interstitial ad full screen content closed.");
-            watchedAdExtraProcess?.Invoke();
+            _watchedAdExtraProcess?.Invoke();
             // Load another ad: 需要检查在实机上这里跑的是否有问题。在editor上产生一个造成广告再次观看时连续跑了两次的错误
             if (reloadAfterWatched)
                 LoadInterstitialAd();
@@ -247,6 +247,9 @@ public class AdmobAdsButton : MonoBehaviour
         InterstitialAd.Load(_adUnitId, adRequest,
             (InterstitialAd ad, LoadAdError error) =>
             {
+                if (gameObject == null)
+                    return;
+                
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
                 {
@@ -270,7 +273,7 @@ public class AdmobAdsButton : MonoBehaviour
             _rewardedAd.Destroy();
             _rewardedAd = null;
         }
-
+        
         Debug.Log("Loading the reward ad.");
         
         // create our request used to load the ad.
@@ -281,6 +284,9 @@ public class AdmobAdsButton : MonoBehaviour
         RewardedAd.Load(_adUnitId, adRequest,
             (RewardedAd ad, LoadAdError error) =>
             {
+                if (gameObject == null)
+                    return;
+                
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
                 {
