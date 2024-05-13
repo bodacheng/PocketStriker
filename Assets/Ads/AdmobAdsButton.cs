@@ -230,8 +230,6 @@ public class AdmobAdsButton : MonoBehaviour
     /// </summary>
     void LoadInterstitialAd()
     {
-        ProgressLayer.Loading(string.Empty);
-        
         // Clean up the old ad before loading a new one.
         if (_interstitialAd != null)
         {
@@ -249,8 +247,6 @@ public class AdmobAdsButton : MonoBehaviour
         InterstitialAd.Load(_adUnitId, adRequest,
             (InterstitialAd ad, LoadAdError error) =>
             {
-                ProgressLayer.Close();
-                
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
                 {
