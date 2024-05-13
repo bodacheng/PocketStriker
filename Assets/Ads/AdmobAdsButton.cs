@@ -230,6 +230,8 @@ public class AdmobAdsButton : MonoBehaviour
     /// </summary>
     void LoadInterstitialAd()
     {
+        ProgressLayer.Loading(string.Empty);
+        
         // Clean up the old ad before loading a new one.
         if (_interstitialAd != null)
         {
@@ -247,8 +249,7 @@ public class AdmobAdsButton : MonoBehaviour
         InterstitialAd.Load(_adUnitId, adRequest,
             (InterstitialAd ad, LoadAdError error) =>
             {
-                if (gameObject == null)
-                    return;
+                ProgressLayer.Close();
                 
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
@@ -267,6 +268,8 @@ public class AdmobAdsButton : MonoBehaviour
     
     void LoadRewardAd()
     {
+        ProgressLayer.Loading(string.Empty);
+        
         // Clean up the old ad before loading a new one.
         if (_rewardedAd != null)
         {
@@ -284,8 +287,7 @@ public class AdmobAdsButton : MonoBehaviour
         RewardedAd.Load(_adUnitId, adRequest,
             (RewardedAd ad, LoadAdError error) =>
             {
-                if (gameObject == null)
-                    return;
+                ProgressLayer.Close();
                 
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
