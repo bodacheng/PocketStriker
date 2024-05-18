@@ -128,9 +128,10 @@ public partial class Sensor
     
     public void SensorDetectionResultSortProcess(Collider[] hits) //这个函数的调用必须要确保每次都在update函数之后
     {
+        float sensorRadiusSqr = SensorRadius * SensorRadius;  // 预计算半径的平方
         foreach (Collider hit in hits)
         {
-            if (hit == null || Vector3.Distance(hit.transform.position, Center.position) > SensorRadius)
+            if (hit == null || (hit.transform.position - Center.position).sqrMagnitude > sensorRadiusSqr)
             {
                 continue;
             }
@@ -152,15 +153,13 @@ public partial class Sensor
     int HorizontalDistanceCompare(Vector3 p1, Vector3 p2)
     {
         Vector3 center = Center.position;  // 只获取一次中心位置，提高效率
-        p1.y = p2.y = center.y;  // 同时设置 p1 和 p2 的 y 坐标，简化代码
-
-        // 直接计算平方距离，避免创建不必要的中间变量
-        float p1ToCenter = (p1 - center).sqrMagnitude;
-        float p2ToCenter = (p2 - center).sqrMagnitude;
+        // 计算平方距离，避免使用开方
+        float p1ToCenterSqr = (p1.x - center.x) * (p1.x - center.x) + (p1.z - center.z) * (p1.z - center.z);
+        float p2ToCenterSqr = (p2.x - center.x) * (p2.x - center.x) + (p2.z - center.z) * (p2.z - center.z);
 
         // 简化比较逻辑，直接返回结果
-        if (p1ToCenter > p2ToCenter) return 1;
-        if (p1ToCenter < p2ToCenter) return -1;
+        if (p1ToCenterSqr > p2ToCenterSqr) return 1;
+        if (p1ToCenterSqr < p2ToCenterSqr) return -1;
         return 0;
     }
     

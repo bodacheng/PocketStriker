@@ -88,16 +88,10 @@ public partial class Sensor
     
     Collider FindNearestCollider(List<Collider> list)
     {
-        if (list.Count == 0)
+        if (list.Count == 0 || list[0] == null)
         {
             return null;
         }
-        if (list[0] == null)
-        {
-            return null;
-        }
-        if (list.Count == 1)
-            return list[0];
         
         Collider target = list[0];
         for (var i = 1; i < list.Count; i++)
