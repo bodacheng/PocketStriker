@@ -14,6 +14,27 @@ namespace Soul
         SingleAssignmentDisposable _physicMissionDisposable;
         private float hurtAnimDuration = 0.05f;
         Tween _tween;
+
+        private Data_Center nearAttacker;
+        private Vector3 mvDirection;
+        void lockAttacker(V_Damage newValue)
+        {
+            var temp = this._DATA_CENTER.geometryCenter.position - newValue.attacker.Center.geometryCenter.position;
+            temp.y = 0;
+            if (nearAttacker != newValue.attacker.Center)
+            {
+                if (temp.magnitude < FightGlobalSetting.HurtAutoFixPosDis)
+                {
+                    mvDirection = temp;
+                    mvDirection.Normalize();
+                    nearAttacker = newValue.attacker.Center;
+                }
+                else
+                {
+                    nearAttacker = null;
+                }
+            }
+        }
         
         void PlayHurtAnim(V_Damage newValue)
         {
@@ -110,7 +131,7 @@ namespace Soul
                     NormalStart(target);
                     break;
                 case DamageType.pull_slight:
-                    PushToMidStart(target, 0.01f, true, false);
+                    PushToMidStart(target, 0.002f, true, false);
                     break;
                 case DamageType.stable_damage:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
@@ -118,15 +139,15 @@ namespace Soul
                     break;
                 case DamageType.stable_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     break;
                 case DamageType.heavy_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     break;
                 case DamageType.supper_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.SuperHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element), newValue.DamageEffectPoint, newValue.CutRotation, _DATA_CENTER.geometryCenter).Forget();
                     break;
                 case DamageType.draw:
