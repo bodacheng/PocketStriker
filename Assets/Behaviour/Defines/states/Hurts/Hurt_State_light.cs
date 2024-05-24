@@ -8,7 +8,7 @@ namespace Soul
     {
         void NormalStart(V_Damage newValue)
         {
-            lockAttacker(newValue);
+            LockAttacker(newValue);
             
             // 计算当前连线方向，仅保留水平分量
             Vector3 currentDirection = this._DATA_CENTER.geometryCenter.position -

@@ -17,13 +17,13 @@ namespace Soul
 
         private Data_Center nearAttacker;
         private Vector3 mvDirection;
-        void lockAttacker(V_Damage newValue)
+        void LockAttacker(V_Damage newValue)
         {
             var temp = this._DATA_CENTER.geometryCenter.position - newValue.attacker.Center.geometryCenter.position;
             temp.y = 0;
             if (nearAttacker != newValue.attacker.Center)
             {
-                if (temp.magnitude < FightGlobalSetting.HurtAutoFixPosDis)
+                if (newValue.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon && temp.magnitude < FightGlobalSetting.HurtAutoFixPosDis)
                 {
                     mvDirection = temp;
                     mvDirection.Normalize();

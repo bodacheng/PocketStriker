@@ -8,7 +8,7 @@ namespace Soul
     {
         void HeavyStart(V_Damage newValue)
         {
-            lockAttacker(newValue);
+            LockAttacker(newValue);
             
             //gameObject.transform.DOMove(fixDesPos, 0.1f);
             _Rigidbody.velocity = CalFixPushVector(newValue.impactComingPoint, newValue.attacker.Center.WholeT.position, gameObject.transform.position, 
