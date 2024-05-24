@@ -70,6 +70,7 @@ public class PreparingProcess : FSceneProcess
                             EffectsManager.IniEffectsPool("light_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
                             EffectsManager.IniEffectsPool("heavy_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
                             EffectsManager.IniEffectsPool("super_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
+                            EffectsManager.IniEffectsPool("electric_s_e", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
                             EffectsManager.IniEffectsPool("super_combo_explosion", null, effectPreloadCount),
                             EffectsManager.IniEffectsPool("dream_buff", null, effectPreloadCount)
                         }

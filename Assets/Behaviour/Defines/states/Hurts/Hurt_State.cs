@@ -110,7 +110,8 @@ namespace Soul
                     NormalStart(target);
                     break;
                 case DamageType.pull_slight:
-                    PushToMidStart(target, 0.01f, true, false);
+                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                    PushToMidStart(target, 1f, true);
                     break;
                 case DamageType.stable_damage:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
@@ -137,12 +138,15 @@ namespace Soul
                     ExplosionDamageStart(target);
                     break;
                 case DamageType.push_to_mid:
+                    _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
                     PushToMidStart(target, 10f, true);
                     break;
                 case DamageType.push_to_mid_slight:
+                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
                     PushToMidStart(target, 4f, true);
                     break;
                 case DamageType.same_height_to_mid:
+                    _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
                     PushToMidStart(target, 4f, false);
                     break;
                 case DamageType.sekka:

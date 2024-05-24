@@ -7,12 +7,11 @@ namespace Soul
 {
     public partial class Hurt_State : Behavior
     {
-        void PushToMidStart(V_Damage newValue, float dis, bool Grounded, bool push = true)
+        void PushToMidStart(V_Damage newValue, float dis, bool grounded)
         {
-            _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
             Vector3 midDistanceFromMe = newValue.attacker.Center.geometryCenter.transform.position + 
-                                        (push ? 1f : -0.5f) * newValue.attacker.Center.WholeT.transform.forward * dis;
-            if (Grounded)
+                                        newValue.attacker.Center.WholeT.transform.forward * dis;
+            if (grounded)
             {
                 PlayHurtAnim(newValue);
                 midDistanceFromMe.y = 0;
@@ -21,7 +20,11 @@ namespace Soul
             {
                 AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.1f);
             }
-            _tween = gameObject.transform.DOMove(midDistanceFromMe, 0.3f);
+            _tween = gameObject.transform.DOMove(midDistanceFromMe, 0.3f).OnComplete(
+                () =>
+                {
+                    _Rigidbody.velocity = Vector3.zero;
+                });
             _physicMissionDisposable = new SingleAssignmentDisposable();
             _physicMissionDisposable.Disposable = Observable.EveryUpdate().Subscribe(_ =>
                 {
@@ -33,6 +36,7 @@ namespace Soul
                     
                     if (Vector3.Distance(midDistanceFromMe, gameObject.transform.position) < 0.3f || _BasicPhysicSupport.AtRing)
                     {
+                        _Rigidbody.velocity = Vector3.zero;
                         _tween.Kill(false);
                         _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
                         _physicMissionDisposable.Dispose();
