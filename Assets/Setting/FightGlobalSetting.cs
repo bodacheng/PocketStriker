@@ -46,6 +46,13 @@ public class FightGlobalSetting : ScriptableObject
     [SerializeField] int energyResolveAfterExtendBoundary = 5;
     [SerializeField] PhysicMaterial _physicMaterial;
 
+    [SerializeField] float hurtAutoFixPosDis = 2f;
+    public static float HurtAutoFixPosDis;
+    [SerializeField] private float hurtAutoFixPosCrossLimit = 0.2f;
+    public static float HurtAutoFixPosCrossLimit;
+    [SerializeField] private float hurtAutoFixPosDuration = 0.1f;
+    public static float HurtAutoFixPosDuration;
+    
     static string fightParamKey = "Config/fight_params";
     public static int SceneStep;//0 :mainmenu 1: fightscene
     public static bool HasDefend;
@@ -92,6 +99,10 @@ public class FightGlobalSetting : ScriptableObject
     
     public void Initialise()
     {
+        HurtAutoFixPosDis = hurtAutoFixPosDis;
+        HurtAutoFixPosCrossLimit = hurtAutoFixPosCrossLimit;
+        HurtAutoFixPosDuration = hurtAutoFixPosDuration;
+            
         HasDefend = hasDefend;
         SkillStoneHasExp = skillStoneHasExp;
 

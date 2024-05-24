@@ -129,6 +129,45 @@ public class BasicPhysicSupport : MonoBehaviour
             _BasicPhysicSupport.Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             _BasicPhysicSupport.Rigidbody.velocity = Vector3.zero;
         }
+        
+        private bool IsNearParallel(Vector3 dir1, Vector3 dir2)
+        {
+            // 检查两个向量的叉积是否为零（零向量）来判断是否平行
+            return Vector3.Cross(dir1, dir2).sqrMagnitude < FightGlobalSetting.HurtAutoFixPosCrossLimit;
+        }
+        
+        // 此函数计算从点B到通过点A且方向为向量a的直线的最近点
+        public Vector3 FindClosestPoint(Vector3 A, Vector3 B, Vector3 a)
+        {
+            // 计算向量AB
+            Vector3 AB = B - A;
+
+            // 计算向量a的单位向量
+            Vector3 aNormalized = a.normalized;
+
+            // 投影向量AB到向量a
+            float projectionLength = Vector3.Dot(AB, aNormalized);
+
+            // 找到最近的点C
+            Vector3 closestPoint = A + aNormalized * projectionLength;
+
+            return closestPoint;
+        }
+
+        Tween _tween;
+        // mvDirection 攻击者到敌人的向量
+        public void AutoFixPosWhenAttackNearEnemy(Vector3 enemyPos, Vector3 mvDirection)
+        {
+            var mePos = this._BasicPhysicSupport._DATA_CENTER.geometryCenter.position;
+            mePos.y = 0;
+            if (IsNearParallel(mvDirection, enemyPos - mePos))
+            {
+                var targetPos = FindClosestPoint(enemyPos, mePos,mvDirection);
+                targetPos.y = this._BasicPhysicSupport._DATA_CENTER.WholeT.position.y;
+                _tween?.Kill();
+                _tween = this._BasicPhysicSupport._DATA_CENTER.WholeT.DOMove(targetPos, FightGlobalSetting.HurtAutoFixPosDuration);
+            }
+        }
     }
     
     void Awake()
@@ -195,8 +234,7 @@ public class BasicPhysicSupport : MonoBehaviour
     private Tweener rotateTween;
     public void RotateToTarget_Tween(Vector3 target, float duration)
     {
-        if (rotateTween != null)
-            rotateTween.Kill();
+        rotateTween?.Kill();
         rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
     }
 

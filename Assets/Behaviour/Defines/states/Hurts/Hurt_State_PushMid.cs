@@ -11,7 +11,7 @@ namespace Soul
         {
             _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
             Vector3 midDistanceFromMe = newValue.attacker.Center.geometryCenter.transform.position + 
-                                        (push ? 1f : -0.5f) * newValue.attacker.Center.WholeT.transform.forward * dis;
+                                        (push ? 1f : -1f) * newValue.attacker.Center.WholeT.transform.forward * dis;
             if (Grounded)
             {
                 PlayHurtAnim(newValue);
