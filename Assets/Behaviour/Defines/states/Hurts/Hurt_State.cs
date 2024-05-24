@@ -15,23 +15,24 @@ namespace Soul
         private float hurtAnimDuration = 0.05f;
         Tween _tween;
 
-        private Data_Center nearAttacker;
-        private Vector3 mvDirection;
+        private Data_Center _nearAttacker;
+        private Vector3 _mvDirection;
         void LockAttacker(V_Damage newValue)
         {
             var temp = this._DATA_CENTER.geometryCenter.position - newValue.attacker.Center.geometryCenter.position;
             temp.y = 0;
-            if (nearAttacker != newValue.attacker.Center)
+            if (_nearAttacker != newValue.attacker.Center)
             {
-                if (newValue.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon && temp.magnitude < FightGlobalSetting.HurtAutoFixPosDis)
+                if (newValue.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon 
+                    && temp.sqrMagnitude < FightGlobalSetting.HurtAutoFixPosDis * FightGlobalSetting.HurtAutoFixPosDis)
                 {
-                    mvDirection = temp;
-                    mvDirection.Normalize();
-                    nearAttacker = newValue.attacker.Center;
+                    _mvDirection = temp;
+                    _mvDirection.Normalize();
+                    _nearAttacker = newValue.attacker.Center;
                 }
                 else
                 {
-                    nearAttacker = null;
+                    _nearAttacker = null;
                 }
             }
         }
@@ -131,7 +132,7 @@ namespace Soul
                     NormalStart(target);
                     break;
                 case DamageType.pull_slight:
-                    PushToMidStart(target, 0.002f, true, false);
+                    PushToMidStart(target, 0.001f, true, false);
                     break;
                 case DamageType.stable_damage:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
