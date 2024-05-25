@@ -126,7 +126,7 @@ class ChatGptFix : CameraMode
         }
         else
         {
-            if (hasTargets && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
+            if (hasTargets && meCenter != null && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
             {
                 float angleToHorizontal = 0;
                 float CheckNeedForAutoRotate()
