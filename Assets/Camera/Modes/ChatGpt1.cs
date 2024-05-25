@@ -12,7 +12,7 @@ class ChatGptFix : CameraMode
     Vector3 lookPoint;
     Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 30f;
+    float autoChangeAngleLimit = 20f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
     private float speedUpRate = 5;
@@ -20,19 +20,27 @@ class ChatGptFix : CameraMode
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
     float fieldOfView;
-    private float screenDifferForRotate = 150;
+    private float screenDifferForRotate = 50;
     
     float TransitionSpeedPara
     {
         get => _transitionSpeedPara;
         set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 5f);
     }
+
+    private readonly float _originHeight;
+    private float CameraHeight
+    {
+        get => this.YDis;
+        set => YDis = Mathf.Clamp(value, _originHeight, _originHeight + 5);
+    }
     
-    public ChatGptFix(float XZDis, float YDis, float fieldOfView)
+    public ChatGptFix(float XZDis, float originHeight, float fieldOfView)
     {
         _minXZ = XZDis;
         this.XZDis = XZDis;
-        this.YDis = YDis;
+        this._originHeight = originHeight;
+        CameraHeight = this._originHeight;
         this.fieldOfView = fieldOfView;
     }
 
@@ -98,6 +106,10 @@ class ChatGptFix : CameraMode
             }
             enemiesCenter /= targets.Count;
         }
+        else
+        {
+            enemiesCenter = mePos + meCenter.forward * 10f;
+        }
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
         meScreenPos = camera.WorldToScreenPoint(mePos);
@@ -114,7 +126,7 @@ class ChatGptFix : CameraMode
         }
         else
         {
-            if (Vector2.Distance(meScreenPos, enemyScreenPos) > screenDifferForRotate)
+            if ((meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
             {
                 float angleToHorizontal = 0;
                 float CheckNeedForAutoRotate()
@@ -162,6 +174,7 @@ class ChatGptFix : CameraMode
             mPosY >= 0.3 && mPosY <= 0.7)
         {
             XZDistance -= _changeSpeed;
+            CameraHeight -= _changeSpeed/2;
         }
         else if (ePosX <= 0.2 || ePosX >= 0.8 || 
                  mPosX <= 0.2 || mPosX >= 0.8 || 
@@ -169,6 +182,7 @@ class ChatGptFix : CameraMode
                  mPosY <= 0.2 || mPosY >= 0.8)
         {
             XZDistance += _changeSpeed;
+            CameraHeight += _changeSpeed / 2;
         }
         
         // 判断我与敌人哪个更接近相机位置
@@ -185,7 +199,7 @@ class ChatGptFix : CameraMode
         
         lookPoint = (backWPos - frontWPos) * 0.5f + frontWPos;
         cameraTargetPos = lookPoint + xzOff.normalized * XZDistance;
-        cameraTargetPos.y = YDis;
+        cameraTargetPos.y = CameraHeight;
         lookPoint.y = _lookPointHeight;
         
         if (hasTargets || h != 0)
