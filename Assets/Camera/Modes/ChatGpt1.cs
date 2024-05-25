@@ -20,7 +20,7 @@ class ChatGptFix : CameraMode
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
     float fieldOfView;
-    private float screenDifferForRotate = 50;
+    private float screenDifferForRotate = 20;
     
     float TransitionSpeedPara
     {
@@ -126,7 +126,7 @@ class ChatGptFix : CameraMode
         }
         else
         {
-            if ((meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
+            if (hasTargets && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
             {
                 float angleToHorizontal = 0;
                 float CheckNeedForAutoRotate()
