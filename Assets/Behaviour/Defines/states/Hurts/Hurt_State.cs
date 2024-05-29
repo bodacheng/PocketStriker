@@ -38,7 +38,7 @@ namespace Soul
                 hurtAnimKey = newValue.DamageEffectPoint.y > _DATA_CENTER.geometryCenter.position.y ? "high" : "low";
             }
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim(hurtAnimKey), true, hurtAnimDuration);
-            AnimationManger.TriggerExpression(Facial.hit);
+            //AnimationManger.TriggerExpression(Facial.hit);
             RotateToTargetTween(rotateToTarget, 0.1f);
         }
 
