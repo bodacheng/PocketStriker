@@ -39,7 +39,7 @@ public partial class SkillSet
         }
         
         var wholePoint = SkillBalancePoint(a1, a2, a3, b1, b2, b3, c1, c2, c3);
-        if (wholePoint < 0)
+        if (wholePoint > CommonSetting.SkillSetCostLimit)
         {
             return SkillEditError.UnBalanced;
         }
@@ -57,10 +57,10 @@ public partial class SkillSet
             return SkillEditError.NoNormalStart;
         }
         
-        if (!CheckRepeat(a1, a2, a3, b1, b2, b3, c1, c2, c3))
-        {
-            return SkillEditError.RepeatedSkill;
-        }
+        // if (!CheckRepeat(a1, a2, a3, b1, b2, b3, c1, c2, c3))
+        // {
+        //     return SkillEditError.RepeatedSkill;
+        // }
 
         if (atLeastTwoExSkill && !CheckAtLeastTwoEx(a1, a2, a3, b1, b2, b3, c1, c2, c3))
         {
@@ -110,16 +110,16 @@ public partial class SkillSet
             switch (t.SP_LEVEL)
             {
                 case 0:
-                    balancePoint += 10;
+                    balancePoint += CommonSetting.Sp0Cost;
                     break;
                 case 1:
-                    balancePoint -= 10;
+                    balancePoint += CommonSetting.Sp1Cost;
                     break;
                 case 2:
-                    balancePoint -= 20;
+                    balancePoint += CommonSetting.Sp2Cost;
                     break;
                 case 3:
-                    balancePoint -= 30;
+                    balancePoint += CommonSetting.Sp3Cost;
                     break;
                 case -1:
                     break;

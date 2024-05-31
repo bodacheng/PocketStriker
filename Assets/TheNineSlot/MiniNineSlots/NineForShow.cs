@@ -84,7 +84,9 @@ public partial class NineForShow : MonoBehaviour
             b1SkillId, b2SkillId, b3SkillId,
             c1SkillId, c2SkillId, c3SkillId);
         
-        if (valR == SkillSet.SkillEditError.UnBalanced || valR == SkillSet.SkillEditError.RepeatedSkill || valR == SkillSet.SkillEditError.NoNormalStart)
+        if (valR == SkillSet.SkillEditError.UnBalanced || 
+            //valR == SkillSet.SkillEditError.RepeatedSkill || 
+            valR == SkillSet.SkillEditError.NoNormalStart)
         {
             await UniTask.DelayFrame(5);
             await AddEffect(bossMode? abnormalSkillSetEffectKey : notQualifiedEffectKey, fxCamera);
@@ -100,7 +102,7 @@ public partial class NineForShow : MonoBehaviour
             editSkillIndicator.SetActive(showEditSkillIndicator &&
                                          (PreScene.target.Focusing != null && PreScene.target.Focusing.id != null) &&
                                          (valR == SkillSet.SkillEditError.UnBalanced 
-                                          || valR == SkillSet.SkillEditError.RepeatedSkill 
+                                          //|| valR == SkillSet.SkillEditError.RepeatedSkill 
                                           || valR == SkillSet.SkillEditError.NoNormalStart
                                           || valR == SkillSet.SkillEditError.NotFull
                                           || valR == SkillSet.SkillEditError.Empty));

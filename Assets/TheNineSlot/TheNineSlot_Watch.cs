@@ -116,37 +116,8 @@ namespace mainMenu
         
         void ShowNineSlotExSurplus(int wholePoint)
         {
-            int pointRemain = wholePoint / 10;
-            var i = 0;
-            for (i = 0; i < remainCharges.Count; i++)
-            {
-                if (i + 1 <= pointRemain)
-                {
-                    remainCharges[i].SetActive(true);
-                }
-                else
-                {
-                    remainCharges[i].SetActive(false);
-                }
-            }
-            
-            var tempCount = 0;
-            for (i = 0; i < burdenCharges.Count; i++)
-            {
-                if (-i - 1 >= pointRemain)
-                {
-                    burdenCharges[i].SetActive(true);
-                    tempCount++;
-                }
-                else
-                {
-                    burdenCharges[i].SetActive(false);
-                }
-            }
-            
-            float temp = tempCount / (float)burdenCharges.Count;
-            //overHeatBar.gameObject.SetActive(tempCount > 0);
-            overHeatBar.value = temp;
+            currentCostText.text = wholePoint + "  /  " + CommonSetting.SkillSetCostLimit;
+            overHeatBar.value = (float)wholePoint / CommonSetting.SkillSetCostLimit;
         }
 
         void RefreshCurrentHpBasedOnNineSlots()

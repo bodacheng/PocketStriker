@@ -262,9 +262,9 @@ public partial class SkillEditLayer : UILayer
                         case SkillSet.SkillEditError.UnBalanced:
                             PopupLayer.ArrangeWarnWindow(Translate.Get("UnBalanced"));
                             break;
-                        case SkillSet.SkillEditError.RepeatedSkill:
-                            PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
-                            break;
+                        // case SkillSet.SkillEditError.RepeatedSkill:
+                        //     PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
+                        //     break;
                         case SkillSet.SkillEditError.NoNormalStart:
                             PopupLayer.ArrangeWarnWindow(Translate.Get("AColumnNeedNormal"));
                             break;

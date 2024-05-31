@@ -8,6 +8,18 @@ public class CommonSetting : ScriptableObject
     [SerializeField] bool devMode;
     [SerializeField] int maxStoneCount = 30;
     [SerializeField] int gangbangModeMaxUnitPerTeam = 30;
+
+    [Tooltip("技能组初始权重上限")] 
+    [SerializeField] int skillSetCostLimit = 15;
+    [Tooltip("sp0 cost")] 
+    [SerializeField] int sp0Cost = 1;
+    [Tooltip("sp1 cost")] 
+    [SerializeField] int sp1Cost = 2;
+    [Tooltip("sp2 cost")] 
+    [SerializeField] int sp2Cost = 3;
+    [Tooltip("sp3 cost")] 
+    [SerializeField] int sp3Cost = 4;
+    
     [Tooltip("unit定义文件")]
     [SerializeField] string unitConfigFile = "mst_unit";
     [Tooltip("skill定义文件")]
@@ -106,6 +118,12 @@ public class CommonSetting : ScriptableObject
     public static bool DevMode;
     public static int GangbangModeMaxUnitPerTeam;
     public static int MaxStoneCount;
+    public static int SkillSetCostLimit = 15;
+    public static int Sp0Cost = 1;
+    public static int Sp1Cost = 2;
+    public static int Sp2Cost = 3;
+    public static int Sp3Cost = 4;
+    
     public static string UnitConfigFile;
     public static string SkillConfigFile;
     public static string SkillAIFile;
@@ -166,6 +184,12 @@ public class CommonSetting : ScriptableObject
     {
         DevMode = devMode;
         MaxStoneCount = maxStoneCount;
+        SkillSetCostLimit = skillSetCostLimit;
+        Sp0Cost = sp0Cost;
+        Sp1Cost = sp1Cost;
+        Sp2Cost = sp2Cost;
+        Sp3Cost = sp3Cost;
+        
         GangbangModeMaxUnitPerTeam = gangbangModeMaxUnitPerTeam;
         SkillStaticAnalysis = skillStaticAnalysis;
         SkillDynamicAnalysis = skillDynamicAnalysis;

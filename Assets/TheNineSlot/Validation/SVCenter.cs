@@ -66,13 +66,13 @@ public static class SVCenter
 
             var layer = UILayerLoader.Get<SkillEditLayer>();
             
-            var currentSkillIds = layer.nineSlot.GetCurrentNineSlotAllSkillIds();
-            if (currentSkillIds.Contains(item._SkillConfig.RECORD_ID))
-            {
-                // 不可出现相同技能
-                PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
-                return;
-            }
+            // var currentSkillIds = layer.nineSlot.GetCurrentNineSlotAllSkillIds();
+            // if (currentSkillIds.Contains(item._SkillConfig.RECORD_ID))
+            // {
+            //     // 不可出现相同技能
+            //     PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
+            //     return;
+            // }
             layer.stonesBox._tabEffects.SkillButtonExplosion(item._SkillConfig.SP_LEVEL, 
                 PosCal.GetWorldPos(PreScene.target.postProcessCamera, to.GetComponent<RectTransform>(), 3), 
                 layer.stonesBox._tabEffects.transform);
@@ -113,19 +113,19 @@ public static class SVCenter
             }
             
             var skillEditLayer = UILayerLoader.Get<SkillEditLayer>();
-            var currentSkillIds = skillEditLayer.nineSlot.GetCurrentNineSlotAllSkillIds();
+            //var currentSkillIds = skillEditLayer.nineSlot.GetCurrentNineSlotAllSkillIds();
             
             if (toItem != null)
             {
-                if (toItem._SkillConfig.RECORD_ID != fromItem._SkillConfig.RECORD_ID)
-                {
-                    if (currentSkillIds.Contains(fromItem._SkillConfig.RECORD_ID))
-                    {
-                        // 不可出现相同技能
-                        PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
-                        return;
-                    }
-                }
+                // if (toItem._SkillConfig.RECORD_ID != fromItem._SkillConfig.RECORD_ID)
+                // {
+                //     if (currentSkillIds.Contains(fromItem._SkillConfig.RECORD_ID))
+                //     {
+                //         // 不可出现相同技能
+                //         PopupLayer.ArrangeWarnWindow(Translate.Get("CantEquipSameSkill"));
+                //         return;
+                //     }
+                // }
 
                 if (toItem.Inherent)
                 {

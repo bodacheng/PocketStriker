@@ -24,9 +24,9 @@ namespace mainMenu
             overHeatIndicator.gameObject.SetActive(skillEditError == SkillSet.SkillEditError.UnBalanced);
             switch(skillEditError)
             {
-                case SkillSet.SkillEditError.RepeatedSkill:
-                    validationWarn.text = Translate.Get("CantEquipSameSkill");
-                break;
+                // case SkillSet.SkillEditError.RepeatedSkill:
+                //     validationWarn.text = Translate.Get("CantEquipSameSkill");
+                // break;
                 case SkillSet.SkillEditError.UnBalanced:
                     validationWarn.text = Translate.Get("UnBalanced");
                     break;

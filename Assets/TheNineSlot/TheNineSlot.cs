@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using NoSuchStudio.Common;
 using UnityEngine;
 using UnityEngine.UI;
-using Button = UnityEngine.UI.Button;
 using Slider = UnityEngine.UI.Slider;
 
 namespace mainMenu
@@ -42,11 +41,9 @@ namespace mainMenu
         
         [Header("技能石编辑确认")]
         public BOButton ResetButton;
+
+        [SerializeField] private Text currentCostText;
         
-        [Header("EXPoint+")]
-        [SerializeField] List<GameObject> remainCharges;//固定是9个长度
-        [Header("EXPoint-")]
-        [SerializeField] List<GameObject> burdenCharges;//固定是9个长度
         [Header("over heat bar")] 
         [SerializeField] Slider overHeatBar;
         
