@@ -1,11 +1,12 @@
 using System;
-using Cysharp.Threading.Tasks;
 using FightScene;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InBattleEvolution : UILayer
 {
     [SerializeField] private NineForShow nineForShow;
+    [SerializeField] private Text indicatorText;
     [SerializeField] private EvolutionSkill[] skillOptions;
     [SerializeField] private GameObject selectedFrame;
 

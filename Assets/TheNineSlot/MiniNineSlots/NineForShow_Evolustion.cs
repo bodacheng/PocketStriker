@@ -4,6 +4,8 @@ using UnityEngine;
 
 public partial class NineForShow : MonoBehaviour
 {
+    private Color gray = new Color(0.5f, 0.5f, 0.5f);
+    
     public void ClickTargetSlot(int slot)
     {
         BOButton target = null;
@@ -111,14 +113,20 @@ public partial class NineForShow : MonoBehaviour
             if (skillConfigA1 is { SP_LEVEL: 0 })
             {
                 A1T.interactable = false;
+                var item = A1T.transform.GetComponentInChildren<SKStoneItem>();
+                item.image.color = gray;
             }
             if (skillConfigB1 is { SP_LEVEL: 0 })
             {
                 B1T.interactable = false;
+                var item = B1T.transform.GetComponentInChildren<SKStoneItem>();
+                item.image.color = gray;
             }
             if (skillConfigC1 is { SP_LEVEL: 0 })
             {
                 C1T.interactable = false;
+                var item = C1T.transform.GetComponentInChildren<SKStoneItem>();
+                item.image.color = gray;
             }
         }
     }

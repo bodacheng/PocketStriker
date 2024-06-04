@@ -13,6 +13,12 @@ namespace mainMenu
         [Header("CurrentHp")]
         [SerializeField] Text _HP;
         
+        [Header("over heat bar")] 
+        [SerializeField] Slider overHeatBar;
+        
+        [Header("OverHeat Indicator")]  
+        [SerializeField] GameObject overHeatIndicator;
+        
         [Header("Validation Warning")]
         [SerializeField] Text validationWarn;
         [SerializeField] Text validationWarnSide;
@@ -33,19 +39,13 @@ namespace mainMenu
         public BOButton ConfirmSkillChangeButton;
         [SerializeField] ConfirmBtnColorSwapper confirmBtnColorSwapper;
         
-        [Header("OverHeat Indicator")]  
-        [SerializeField] GameObject overHeatIndicator;
-        
         [Header("Confirm Indicator")] 
         public GameObject confirmBtnIndicator;
         
         [Header("技能石编辑确认")]
         public BOButton ResetButton;
 
-        [SerializeField] private Text currentCostText;
-        
-        [Header("over heat bar")] 
-        [SerializeField] Slider overHeatBar;
+        [SerializeField] Text currentCostText;
         
         [Header("选中框")]
         [SerializeField] GameObject selectedFrame;
