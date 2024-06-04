@@ -181,7 +181,9 @@ public partial class Data_Center : MonoBehaviour
     /// <param name="aiDelayFrame"></param>
     /// <param name="teamHpRate"></param>
     /// <param name="lv"> 两种模式，如果带入-1，将按照角色等级来初始化，用于玩家账户队伍。带入其他值则按其他值来，用于关卡队伍 </param>
-    public void Step3Initialize(TeamConfig teamConfig, CriticalGaugeMode criticalGaugeMode, AIMode aiMode, int aiDelayFrame, Func<bool> AITriggerDreamComboRateCondition,
+    private float teamHpRate;
+    public void Step3Initialize(TeamConfig teamConfig, CriticalGaugeMode criticalGaugeMode, 
+        AIMode aiMode, int aiDelayFrame, Func<bool> AITriggerDreamComboRateCondition,
         float teamHpRate, UnitInfo unitInfo)
     {
         this.unitInfo = unitInfo;
@@ -193,12 +195,7 @@ public partial class Data_Center : MonoBehaviour
         FightDataRef.EnableAllLimbs(true);
         FightDataRef._comboHitCount.HitCount.Value = 0;
         FightDataRef.CriticalGaugeMode = criticalGaugeMode;
-        var hp = SkillSet.INI_Hp(unitInfo.set.SkillIDList(), unitInfo.level) * teamHpRate;
-        FightDataRef.CurrentHp.Value = hp;
-        FightDataRef.CurrentHp.Subscribe(x =>
-        {
-            FightDataRef.CurrentHp.Value = Mathf.Clamp(x, 0, hp);
-        }).AddTo(gameObject);
+
         
         FightDataRef.Resistance.Subscribe(x =>
         {
@@ -206,7 +203,8 @@ public partial class Data_Center : MonoBehaviour
         }).AddTo(gameObject);
         
         FightDataRef.CriticalGauge.Value = FightGlobalSetting._EXMax;
-        _MyBehaviorRunner.SetAt(unitInfo.level);
+        this.teamHpRate = teamHpRate;
+        SetAT();
         _MyBehaviorRunner.AIMode = aiMode;
         _MyBehaviorRunner.Controller.DecisionDelay = aiDelayFrame;
         _MyBehaviorRunner.AITriggerDreamComboRateCondition = () =>
@@ -230,6 +228,17 @@ public partial class Data_Center : MonoBehaviour
             {
                 this.Sensor.SensorDetectionResultSortProcess(x);
             });
+    }
+
+    public void SetAT()
+    {
+        _MyBehaviorRunner.SetAt(unitInfo.level);
+        var hp = SkillSet.INI_Hp(unitInfo.set.SkillIDList(), unitInfo.level) * teamHpRate;
+        FightDataRef.CurrentHp.Value = hp;
+        FightDataRef.CurrentHp.Subscribe(x =>
+        {
+            FightDataRef.CurrentHp.Value = Mathf.Clamp(x, 0, hp);
+        }).AddTo(gameObject);
     }
     
     // for tutorial

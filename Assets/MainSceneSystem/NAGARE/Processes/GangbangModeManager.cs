@@ -38,7 +38,7 @@ public class GangbangModeManager
         var fightInfo = await AddressablesLogic.LoadT<GangbangInfo>(location);
         fightInfo.EventType = FightEventType.Gangbang;
         fightInfo.ArcadeFightMode = 1;
-        fightInfo.FightMembers.SetEnemyLevel(fightInfo.stageRefLevel);
+        fightInfo.FightMembers.SetEnemyLevel(fightInfo.StageRefLevel);
         return fightInfo;
     }
 

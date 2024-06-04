@@ -129,6 +129,8 @@ public class PreparingProcess : FSceneProcess
                     FightLoad.Fight.team1AIMode, FightLoad.Fight.dumbAIDecisionDelay,
                     CreateRandomBoolFunc(0)
                 );
+                // temp for evolution dev
+                FightLoad.Fight.EvolutionMode = true;
                 break;
         }
         

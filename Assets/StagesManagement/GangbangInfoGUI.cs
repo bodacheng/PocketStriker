@@ -25,6 +25,8 @@ public class GangbangInfoGUI : Editor
             _stageEditor = new StageEditor();
             _initialized = true;
         }
+        
+        gangbangInfo.StageRefLevel = EditorGUILayout.FloatField("Stage Ref Level:", gangbangInfo.StageRefLevel);
         _stageEditor.OnGUIView(gangbangInfo.FightMembers, gangbangInfo.GetTeam2GroupSet);
         
         if (GUILayout.Button("Save"))

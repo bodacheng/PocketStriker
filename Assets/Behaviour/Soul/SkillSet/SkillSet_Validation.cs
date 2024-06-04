@@ -193,7 +193,7 @@ public partial class SkillSet
     static SkillEditError CheckStartSKills(string a1Skill, string a2Skill, string a3Skill)
     {
         // 第一列技能必须有普通技能
-        var normalSkillsOfAList = new List<string>();            
+        var normalSkillsOfAList = new List<string>();
         var skillConfigA1 = SkillConfigTable.GetSkillConfigByRecordId(a1Skill);
         var skillConfigB1 = SkillConfigTable.GetSkillConfigByRecordId(a2Skill);
         var skillConfigC1 = SkillConfigTable.GetSkillConfigByRecordId(a3Skill);

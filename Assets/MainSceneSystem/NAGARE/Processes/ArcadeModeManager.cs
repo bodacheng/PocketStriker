@@ -40,7 +40,7 @@ public class ArcadeModeManager
         var fightInfo = await AddressablesLogic.LoadT<FightInfo>(location);
         fightInfo.EventType = FightEventType.Quest;
         fightInfo.ArcadeFightMode = _stageModeTable.GetModeById(fightInfo.ID);
-        fightInfo.FightMembers.SetEnemyLevel(fightInfo.stageRefLevel);
+        fightInfo.FightMembers.SetEnemyLevel(fightInfo.StageRefLevel);
         return fightInfo;
     }
 
@@ -51,7 +51,14 @@ public class ArcadeModeManager
         {
             stage = await LoadStage(stageNo - 1);
         }
-        stage.EventType = FightEventType.Quest;
-        PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, stage, forward);
+        if (stage != null)
+        {
+            stage.EventType = FightEventType.Quest;
+            PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, stage, forward);
+        }
+        else
+        {
+            PreScene.target.trySwitchToStep(MainSceneStep.ArcadeFront, forward);
+        }
     }
 }

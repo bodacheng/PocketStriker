@@ -96,9 +96,10 @@ namespace dataAccess
         
         // 从账户随机抽取符合要求的技能石
         // exceptSkIDs : 除了这些技能ID。切记是技能ID
-        public static StoneOfPlayerInfo SearchStoneForRandomSetFromAccount(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIds)
+        public static StoneOfPlayerInfo SearchStoneForRandomSetFromAccount(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIds = null)
         {
             var exceptStones = new List<string>();
+            if (exceptSkIds != null)
             for (var i = 0; i < exceptSkIds.Count; i++)
             {
                 var exceptAccIds = GetMyStonesBySkillID(exceptSkIds[i]);

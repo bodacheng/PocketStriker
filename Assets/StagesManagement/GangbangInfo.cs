@@ -155,7 +155,7 @@ public class GangbangInfo : FightInfo
         stage.ArcadeFightMode = source.ArcadeFightMode;
         stage.FightMembers = source.FightMembers;
         stage.battleGroundID = source.battleGroundID;
-        stage.stageRefLevel = source.stageRefLevel;
+        stage.StageRefLevel = source.StageRefLevel;
         stage.fightBGM = source.fightBGM;
         stage.team1Mode = TeamMode.MultiRaid;
         stage.team2Mode = TeamMode.MultiRaid;

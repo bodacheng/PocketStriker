@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
+using DummyLayerSystem;
 
 namespace FightScene
 {
@@ -28,10 +29,10 @@ namespace FightScene
             ChangeFightingUnit(unit, true, TeamStandPoints[0]);
         }
         
-        void ToNewUnit()
+        void ToNewUnit(int delayInSeconds)
         {
             var disposable = new SerialDisposable();
-            disposable.Disposable = Observable.Timer(TimeSpan.FromSeconds(2)).Subscribe((_) =>
+            disposable.Disposable = Observable.Timer(TimeSpan.FromSeconds(delayInSeconds)).Subscribe((_) =>
                 {
                     RandomToAliveUnit();
                     disposable.Dispose();
@@ -46,12 +47,31 @@ namespace FightScene
                 RTFightManager.Target.RefreshTimeDic.Add(center, new ReactiveProperty<float>(0));
                 center.Step3Initialize(teamConfig, teamCGMode, aiMode, aiDelayFrame, AITriggerDreamComboRateCondition, teamHpRate, RTFightManager.Target.UnitInfoRef[center]);
                 center.FightDataRef.IsDead.Subscribe(x => {
-                    if (x) 
+                    if (x)
                     {
                         Sensor.AddOrRemoveSharedDeadUnitInfo(center, teamConfig.myTeam, true);
                         Sensor.AddOrRemoveSharedUnitInfo(center, teamConfig.myTeam, false);
                         if (FightLogger.value.GetWinnerTeam() == Team.none)
-                            ToNewUnit();
+                        {
+                            if (teamConfig.myTeam == Team.player2 && FightLoad.Fight.EvolutionMode)
+                            {
+                                var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
+                                var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
+                                fightingLayer.gameObject.SetActive(false);
+                                RTFightManager.Target.team1.InputsManager.FocusUnit(null);
+                                inBattleEvolution.Setup(RTFightManager.Target.team1.RMode_Unit.Value, () =>
+                                {
+                                    UILayerLoader.Remove<InBattleEvolution>();
+                                    ToNewUnit(0);
+                                    fightingLayer.gameObject.SetActive(true);
+                                    RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1.RMode_Unit.Value);
+                                });
+                            }
+                            else
+                            {
+                                ToNewUnit(2);
+                            }
+                        }
                         
                         var disposable = new SerialDisposable();
                         disposable.Disposable = Observable.Timer(TimeSpan.FromSeconds(1)).Subscribe(

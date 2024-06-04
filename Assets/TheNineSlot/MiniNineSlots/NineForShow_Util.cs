@@ -7,6 +7,9 @@ using UnityEngine.UI;
 // 抽卡技能石细节显示
 public partial class NineForShow : MonoBehaviour
 {
+    private int _clickedSlot = 1;
+    public int ClickedSlot => _clickedSlot;
+    
     public async UniTask SkillSetInfoOfUnitOnArcadePage(SkillSet set)
     {
         await UniTask.WhenAll(
@@ -24,7 +27,7 @@ public partial class NineForShow : MonoBehaviour
             )
         );
     }
-
+    
     public void AddOnClickToSlots(Action<string> onClickStone)
     {
         A1T.SetListener(() => { AddOnClickToBtn(A1T, onClickStone);});

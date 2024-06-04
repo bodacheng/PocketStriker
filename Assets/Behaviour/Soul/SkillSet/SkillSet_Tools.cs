@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using dataAccess;
 using Skill;
 
@@ -191,5 +192,40 @@ public partial class SkillSet
     public SkillEntity GetM_STS()
     {
         return M;
+    }
+    
+    public int GetLowestSpLevel()
+    {
+        var sp = new List<int>()
+        {
+            GetA1Config() != null ? GetA1Config().SP_LEVEL : 0, 
+            GetA2Config() != null ? GetA2Config().SP_LEVEL : 0,
+            GetA3Config() != null ? GetA3Config().SP_LEVEL : 0,
+            
+            GetB1Config() != null ? GetB1Config().SP_LEVEL : 0, 
+            GetB2Config() != null ? GetB2Config().SP_LEVEL : 0,
+            GetB3Config() != null ? GetB3Config().SP_LEVEL : 0,
+            
+            GetC1Config() != null ? GetC1Config().SP_LEVEL : 0, 
+            GetC2Config() != null ? GetC2Config().SP_LEVEL : 0,
+            GetC3Config() != null ? GetC3Config().SP_LEVEL : 0,
+        };
+        
+        return sp.Min();
+    }
+
+    // 这个的运行是建立在九宫格满的前提上
+    public int RecommendedTargetReplaceSlot(bool mugen)
+    {
+        var list = SkillIDList();
+        for (int i = 0; i <= list.Count; i++)
+        {
+            var config = SkillConfigTable.GetSkillConfigByRecordId(list[i]);
+            if (config.SP_LEVEL == 0 && (mugen || (i != 0 && i != 3 && i != 6)))
+            {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 }

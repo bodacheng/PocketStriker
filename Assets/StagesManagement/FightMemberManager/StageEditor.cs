@@ -31,8 +31,7 @@ public partial class StageEditor
         }
     }
     
-    public void OnGUIView(FightMembers target,
-        Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
+    public void OnGUIView(FightMembers target, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
     {
         if (!Initialized)
         {

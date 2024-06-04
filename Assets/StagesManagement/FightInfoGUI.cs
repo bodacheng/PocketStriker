@@ -27,6 +27,9 @@ public class FightInfoGUI : Editor
             _initialized = true;
         }
         
+        fightInfo.StageRefLevel = EditorGUILayout.FloatField("Stage Ref Level:", fightInfo.StageRefLevel);
+        fightInfo.EvolutionMode = EditorGUILayout.Toggle("进化模式", fightInfo.EvolutionMode);
+        
         _stageEditor.OnGUIView(fightInfo.FightMembers);
         
         if (GUILayout.Button("Save"))

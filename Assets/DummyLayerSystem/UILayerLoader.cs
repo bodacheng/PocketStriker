@@ -28,6 +28,7 @@ namespace DummyLayerSystem
             {"FightResultAnimLayer", "DummyLayerSystem/FightResultAnimLayer"},
             {"CountDownLayer", "DummyLayerSystem/CountDownLayer"},
             {"FightingStepLayer", "DummyLayerSystem/FightingStepLayer"},
+            {"InBattleEvolution", "DummyLayerSystem/InBattleEvolution"},
             {"SettingLayer", "DummyLayerSystem/SettingLayer"},
             {"AskIfLinkDeviceLayer", "DummyLayerSystem/AskIfLinkDeviceLayer"},
             {"UnitsLayer", "DummyLayerSystem/UnitsLayer"},

@@ -7,7 +7,7 @@ using dataAccess;
 public partial class SkillSet
 {
     // exceptSkIDs : 除了这些技能ID。切记是技能ID
-    static string RandomSkillIDOfStone(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIDs)
+    public static string RandomSkillIDOfStone(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIDs = null)
     {
         var skillIDsAndNames = SkillConfigTable.GetSkillIDAndNameDic(filterForm);
         var stoneSkillIDs = skillIDsAndNames.Keys.ToList();
@@ -16,11 +16,12 @@ public partial class SkillSet
             return null;
         }
         
-        for (int i = 0; i < exceptSkIDs.Count; i++)
-        {
-            if (stoneSkillIDs.Contains(exceptSkIDs[i]))
-                stoneSkillIDs.Remove(exceptSkIDs[i]);
-        }
+        if (exceptSkIDs != null)
+            for (int i = 0; i < exceptSkIDs.Count; i++)
+            {
+                if (stoneSkillIDs.Contains(exceptSkIDs[i]))
+                    stoneSkillIDs.Remove(exceptSkIDs[i]);
+            }
         
         int ranDom = Random.Range(0, stoneSkillIDs.Count);
         return stoneSkillIDs[ranDom];

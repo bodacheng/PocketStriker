@@ -1,7 +1,5 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using Singleton;
@@ -27,6 +25,7 @@ public partial class StageEditor {
     
     int _selectedUnitIndex;
     string _focusingPosID;
+    int _unitCount = 3;
     
     void Members(FightMembers target, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
     {
@@ -35,7 +34,7 @@ public partial class StageEditor {
             var unitInfo = target.EnemySets.Get(0, posNum);
             var sprite = unitInfo != null ? await UnitIconDic.Load(unitInfo.r_id) : null;
             _unitBtnContent = new GUIContent(GetIconTexture2D(sprite));
-            if (GUI.Button(new Rect(posNum * 70, 0, 20, 20), _unitBtnContent, _focusingPosID == posNum.ToString() ? _unitIconSelectedStyle : _unitIconStyle))
+            if (GUI.Button(new Rect(posNum * 40, 0, 20, 20), _unitBtnContent, _focusingPosID == posNum.ToString() ? _unitIconSelectedStyle : _unitIconStyle))
             {
                 _selectedUnitIndex = 0;
                 _focusingPosID = posNum.ToString();
@@ -57,9 +56,18 @@ public partial class StageEditor {
         GUILayout.BeginHorizontal();
         var rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Height(50), GUILayout.Width(400));
         GUI.BeginGroup(rect);
-        UnitSlot(0, gangbangGet);
-        UnitSlot(1, gangbangGet);
-        UnitSlot(2, gangbangGet);
+        
+        _unitCount = Mathf.Max(target.EnemySets.GetValues().Count, _unitCount);
+        for (int i = 0; i < _unitCount; i++)
+        {
+            UnitSlot(i, gangbangGet);
+        }
+        
+        if (GUI.Button(new Rect(_unitCount * 40, 0, 20, 20), "+"))
+        {
+            _unitCount++;
+        }
+        
         GUI.EndGroup();
         GUILayout.EndHorizontal();
     }

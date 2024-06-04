@@ -1,4 +1,5 @@
-﻿using UniRx;
+﻿using System;
+using UniRx;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,8 +14,8 @@ public class FightLogger
     
     readonly IDictionary<Team, List<Data_Center>> TeamDeadMemberDic = new Dictionary<Team, List<Data_Center>>();
     private readonly List<Team> deadTeam = new List<Team>();
-    private readonly List<SingleAssignmentDisposable> WatchPlayers = new List<SingleAssignmentDisposable>();
     private readonly Dictionary<Team, string> IdDicRef = new Dictionary<Team, string>();
+    readonly IDictionary<Data_Center, IDisposable> deathWatchers = new Dictionary<Data_Center, IDisposable>(); 
     
     public string GetWinnerId()
     {
@@ -29,18 +30,11 @@ public class FightLogger
     public void WatchMissionsAbandon()
     {
         deadTeam.Clear();
-        for (var i = 0; i < WatchPlayers.Count; i++)
-        {
-            if (!WatchPlayers[i].IsDisposed)
-            {
-                WatchPlayers[i].Dispose();
-            }
-        }
-        WatchPlayers.Clear();
         GameOver.Value = false;
+        deathWatchers.Clear();
     }
     
-    public void ReadyToLog(IDictionary<TeamConfig, List<Data_Center>> TeamMembers)
+    public void ReadyToLog(IDictionary<TeamConfig, List<Data_Center>> teamMembers)
     {
         wholeTeamCount = 0;
         TeamDeadMemberDic.Clear();
@@ -49,37 +43,42 @@ public class FightLogger
         winnerTeam = Team.none;
         IdDicRef.Clear();
         
-        foreach (var pair in TeamMembers)
+        foreach (var pair in teamMembers)
         {
             IdDicRef.Add(pair.Key.myTeam, pair.Key.playID);
-            
             TeamDeadMemberDic.Add(pair.Key.myTeam, new List<Data_Center>());
             wholeTeamCount += 1;
-            foreach (var data_Center in pair.Value)
+            foreach (var dataCenter in pair.Value)
             {
-                var disposable = new SingleAssignmentDisposable();
-                disposable.Disposable = Observable.EveryUpdate()
-                .Subscribe(_ =>
+                dataCenter.FightDataRef.IsDead.Dispose();
+                dataCenter.FightDataRef.IsDead = new ReactiveProperty<bool>();
+
+                void WatchDeath()
                 {
-                    if (data_Center.FightDataRef.IsDead.Value)
+                    TeamDeadMemberDic[pair.Key.myTeam].Add(dataCenter);
+                    if (pair.Value.Count == TeamDeadMemberDic[pair.Key.myTeam].Count)
                     {
-                        TeamDeadMemberDic[pair.Key.myTeam].Add(data_Center);
-                        if (pair.Value.Count == TeamDeadMemberDic[pair.Key.myTeam].Count)
-                        {
-                            if (!deadTeam.Contains(pair.Key.myTeam))
-                                deadTeam.Add(pair.Key.myTeam);
-                        }
-                        if (wholeTeamCount == deadTeam.Count + 1) // 胜负已决
-                        {
-                            GameOver.Value = true;
-                            var teams = TeamMembers.Keys.ToList().Select(x => x.myTeam).ToList();
-                            var _winner = teams.Except(deadTeam).ToList();
-                            winnerTeam = _winner[0];
-                        }
-                        disposable.Dispose();
+                        if (!deadTeam.Contains(pair.Key.myTeam))
+                            deadTeam.Add(pair.Key.myTeam);
+                    }
+                    if (wholeTeamCount == deadTeam.Count + 1) // 胜负已决
+                    {
+                        GameOver.Value = true;
+                        var teams = teamMembers.Keys.ToList().Select(x => x.myTeam).ToList();
+                        var _winner = teams.Except(deadTeam).ToList();
+                        winnerTeam = _winner[0];
+                    }
+                }
+                
+                IDisposable disposable = dataCenter.FightDataRef.IsDead.Subscribe(x =>
+                {
+                    if (x)
+                    {
+                        WatchDeath();
+                        deathWatchers[dataCenter].Dispose();
                     }
                 });
-                WatchPlayers.Add(disposable);
+                deathWatchers.Add(dataCenter, disposable);
             }
         }
     }

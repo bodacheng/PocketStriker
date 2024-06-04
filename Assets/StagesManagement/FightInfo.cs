@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using dataAccess;
@@ -38,6 +39,7 @@ public class FightInfo : ScriptableObject
         get;
     }
     
+    public bool evolutionMode;
     public float team1HpRate = 1f;
     public float team2HpRate = 1f;
     public CriticalGaugeMode team1CGMode = CriticalGaugeMode.Normal;
@@ -48,8 +50,50 @@ public class FightInfo : ScriptableObject
     public AIMode team2AIMode = AIMode.Aggressive;
     public int dumbAIDecisionDelay = 20;
     public int dreamComboAIRateNum = 5;
-    public float stageRefLevel = 1;
     
+    public float StageRefLevel
+    {
+        get
+        {
+            var returnValue = 0f;
+            foreach (var data in UnitsData)
+            {
+                returnValue += data.level;
+            }
+            returnValue /= UnitsData.Count;
+            return (float)Math.Round(returnValue, 1);
+        }
+        set
+        {
+            if (!EvolutionMode)
+            {
+                foreach (var data in UnitsData)
+                {
+                    data.level = value;
+                }
+            }
+            else
+            {
+                
+            }
+        }
+    }
+    
+    
+    public bool EvolutionMode
+    {
+        get => evolutionMode;
+        set
+        {
+            if (value)
+            {
+                team1Mode = TeamMode.Rotation;
+                team2Mode = TeamMode.Rotation;
+            }
+            evolutionMode = value;
+        }
+    }
+
     public int ArcadeFightMode
     {
         get;
@@ -226,7 +270,7 @@ public class FightInfo : ScriptableObject
         stage.ArcadeFightMode = source.ArcadeFightMode;
         stage.FightMembers = source.FightMembers;
         stage.battleGroundID = source.battleGroundID;
-        stage.stageRefLevel = source.stageRefLevel;
+        stage.StageRefLevel = source.StageRefLevel;
         stage.fightBGM = source.fightBGM;
         stage.team1Mode = source.team1Mode;
         stage.team2Mode = source.team2Mode;

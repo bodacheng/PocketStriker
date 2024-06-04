@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using DummyLayerSystem;
-using FightScene;
 using UnityEngine;
 using UnityEngine.UI;
 using Soul;
@@ -44,8 +43,7 @@ public class MobileInputsManager : MonoBehaviour {
     IDictionary<Button, IDictionary<string, GameObject>> btnIcons = new Dictionary<Button, IDictionary<string, GameObject>>();
     readonly IDictionary<Element, ElementEffectsGroup> _elementEffects = new Dictionary<Element, ElementEffectsGroup>();
     Element _focusing;
-    public BOButton DreamComboBtn => dreamComboBtn;
-
+    
     async UniTask AddGemIcon(string skillID, IDictionary<string, GameObject> dic, Button btn)
     {
         if (!dic.ContainsKey(skillID))

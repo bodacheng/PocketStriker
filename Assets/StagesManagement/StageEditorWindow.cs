@@ -31,6 +31,7 @@ public class StageEditorWindow : EditorWindow
             return;
         }
         
+        _target.StageRefLevel = EditorGUILayout.FloatField("Stage Ref Level:", _target.StageRefLevel);
         _stageEditor.OnGUIView(_target.FightMembers);
         
         _pathAndNameForLocalSave = EditorGUILayout.TextField("local Path For Saving", _pathAndNameForLocalSave);

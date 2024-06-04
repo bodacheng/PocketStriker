@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -22,6 +21,12 @@ namespace FightScene
         
         public readonly IDictionary<Data_Center, UnitInfo> UnitInfoRef = new Dictionary<Data_Center, UnitInfo>();
         public readonly IDictionary<Data_Center, ReactiveProperty<float>> RefreshTimeDic = new Dictionary<Data_Center, ReactiveProperty<float>>();
+
+        private EvolutionManager evolutionManager;
+        public EvolutionManager EvolutionManager
+        {
+            get => evolutionManager ??= new EvolutionManager();
+        }
         
         FightInfo _loadFight;
 
