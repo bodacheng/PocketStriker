@@ -16,96 +16,57 @@ MonoBehaviour:
   fightBGM: 0
   unitsData:
   - id: 0
-    r_id: 8
-    level: 12
+    r_id: 11
+    level: 2.5
     set:
-      a1: 10
-      a2: 55
-      a3: 42
-      b1: 89
-      b2: 27
-      b3: 113
-      c1: 37
+      a1: 37
+      a2: 9
+      a3: 53
+      b1: 113
+      b2: 58
+      b3: 68
+      c1: 182
+      c2: 103
+      c3: 159
+  - id: 1
+    r_id: 13
+    level: 2.5
+    set:
+      a1: 27
+      a2: 99
+      a3: 9
+      b1: 182
+      b2: 113
+      b3: 37
+      c1: 89
       c2: 95
-      c3: 5
-  - id: 3
-    r_id: 1
-    level: 12
-    set:
-      a1: 55
-      a2: 5
-      a3: 103
-      b1: 176
-      b2: 3
-      b3: 125
-      c1: 113
-      c2: 80
-      c3: 42
+      c3: 80
   - id: 2
-    r_id: 6
-    level: 12
-    set:
-      a1: 115
-      a2: 179
-      a3: 42
-      b1: 36
-      b2: 9
-      b3: 53
-      c1: 10
-      c2: 95
-      c3: 116
-  - id: 3
-    r_id: 4
-    level: 12
+    r_id: 8
+    level: 3
     set:
       a1: 5
-      a2: 172
-      a3: 95
-      b1: 36
-      b2: 103
-      b3: 58
-      c1: 68
-      c2: 107
-      c3: 90
-  - id: 5
-    r_id: 11
-    level: 12
-    set:
-      a1: 17
-      a2: 59
-      a3: 115
-      b1: 171
-      b2: 116
-      b3: 156
-      c1: 77
-      c2: 170
-      c3: 140
-  - id: 5
-    r_id: 2
-    level: 12
-    set:
-      a1: 161
-      a2: 162
+      a2: 45
       a3: 166
-      b1: 44
-      b2: 59
-      b3: 17
-      c1: 118
-      c2: 116
-      c3: 183
-  - id: 6
-    r_id: 10
-    level: 12
+      b1: 150
+      b2: 170
+      b3: 80
+      c1: 125
+      c2: 53
+      c3: 113
+  - id: 3
+    r_id: 14
+    level: 4
     set:
-      a1: 137
-      a2: 145
-      a3: 171
-      b1: 17
-      b2: 156
-      b3: 102
-      c1: 143
-      c2: 44
-      c3: 63
+      a1: 180
+      a2: 36
+      a3: 117
+      b1: 170
+      b2: 150
+      b3: 77
+      c1: 118
+      c2: 154
+      c3: 45
   evolutionMode: 1
   team1HpRate: 1
   team2HpRate: 1
@@ -117,3 +78,4 @@ MonoBehaviour:
   team2AIMode: 0
   dumbAIDecisionDelay: 20
   dreamComboAIRateNum: 100
+  stageRefLevel: 3

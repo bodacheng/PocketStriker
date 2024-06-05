@@ -16,96 +16,57 @@ MonoBehaviour:
   fightBGM: 0
   unitsData:
   - id: 0
-    r_id: 5
-    level: 12
+    r_id: 8
+    level: 5.5
     set:
-      a1: 5
-      a2: 113
-      a3: 99
-      b1: 9
-      b2: 125
-      b3: 10
-      c1: 167
-      c2: 3
+      a1: 103
+      a2: 89
+      a3: 5
+      b1: 58
+      b2: 159
+      b3: 113
+      c1: 53
+      c2: 182
       c3: 42
-  - id: 3
-    r_id: 3
-    level: 12
+  - id: 1
+    r_id: 14
+    level: 5.5
     set:
       a1: 68
-      a2: 95
-      a3: 37
-      b1: 167
-      b2: 5
-      b3: 113
-      c1: 9
-      c2: 125
-      c3: 159
+      a2: 12
+      a3: 89
+      b1: 125
+      b2: 45
+      b3: 5
+      c1: 170
+      c2: 159
+      c3: 9
   - id: 2
     r_id: 6
-    level: 12
+    level: 6
     set:
-      a1: 144
-      a2: 180
-      a3: 44
-      b1: 37
-      b2: 10
-      b3: 3
+      a1: 89
+      a2: 17
+      a3: 99
+      b1: 3
+      b2: 68
+      b3: 117
       c1: 179
-      c2: 99
-      c3: 182
+      c2: 80
+      c3: 37
   - id: 3
-    r_id: 10
-    level: 12
+    r_id: 4
+    level: 7
     set:
-      a1: 10
-      a2: 182
-      a3: 37
-      b1: 171
-      b2: 3
-      b3: 27
-      c1: 125
-      c2: 115
-      c3: 145
-  - id: 5
-    r_id: 15
-    level: 12
-    set:
-      a1: 17
-      a2: 59
-      a3: 170
-      b1: 39
-      b2: 143
-      b3: 63
-      c1: 127
-      c2: 156
-      c3: 144
-  - id: 5
-    r_id: 2
-    level: 12
-    set:
-      a1: 180
-      a2: 169
-      a3: 44
-      b1: 172
-      b2: 150
-      b3: 136
-      c1: 77
-      c2: 102
-      c3: 183
-  - id: 6
-    r_id: 7
-    level: 12
-    set:
-      a1: 144
-      a2: 171
-      a3: 173
-      b1: 184
-      b2: 116
-      b3: 107
-      c1: 143
-      c2: 150
-      c3: 145
+      a1: 39
+      a2: 98
+      a3: 144
+      b1: 36
+      b2: 102
+      b3: 90
+      c1: 107
+      c2: 162
+      c3: 118
   evolutionMode: 1
   team1HpRate: 1
   team2HpRate: 1
@@ -117,3 +78,4 @@ MonoBehaviour:
   team2AIMode: 0
   dumbAIDecisionDelay: 20
   dreamComboAIRateNum: 100
+  stageRefLevel: 6

@@ -46,15 +46,6 @@ public class FightMembers
     {
     }
     
-    public void SetEnemyLevel(float level)
-    {
-        foreach (var unitInfo in EnemySets.GetValues())
-        {
-            if (unitInfo != null)
-                unitInfo.level = level;
-        }
-    }
-    
     static UnitInfo ArrangeUnitInfo(string type, string unitRecordID)
     {
         var skillId = UnitPassiveTable.GetUnitPassiveRecordId(unitRecordID);

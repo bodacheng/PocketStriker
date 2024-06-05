@@ -19,7 +19,7 @@ public class FightInfo : ScriptableObject
     public List<UnitInfo> UnitsData
     {
         get => unitsData;
-        set => unitsData = value;
+        protected set => unitsData = value;
     }
 
     public string GetBGMKey()
@@ -53,38 +53,34 @@ public class FightInfo : ScriptableObject
     public int dumbAIDecisionDelay = 20;
     public int dreamComboAIRateNum = 5;
 
-    [HideInInspector] [SerializeField] float stageRefLevel;
-    public float StageRefLevel
+    public float stageRefLevel;
+
+    public void SetUnitLevelByRefLevel()
     {
-        get => stageRefLevel;
-        set
+        if (!EvolutionMode)
         {
-            stageRefLevel = Mathf.Clamp(value, 1, 999);
-            if (!EvolutionMode)
+            foreach (var data in UnitsData)
             {
-                foreach (var data in UnitsData)
-                {
-                    data.level = stageRefLevel;
-                }
+                data.level = stageRefLevel;
             }
-            else
+        }
+        else
+        {
+            for (var index = 0; index < UnitsData.Count; index++)
             {
-                for (var index = 0; index < UnitsData.Count; index++)
+                var unitInfo = UnitsData[index];
+                switch (index)
                 {
-                    var unitInfo = UnitsData[index];
-                    switch (index)
-                    {
-                        case 0:
-                        case 1:
-                            unitInfo.level = StageRefLevel - 0.5f;
-                            break;
-                        case 2:
-                            unitInfo.level = StageRefLevel;
-                            break;
-                        default:
-                            unitInfo.level = StageRefLevel + 0.5f;
-                            break;
-                    }
+                    case 0:
+                    case 1:
+                        unitInfo.level = stageRefLevel - 0.5f;
+                        break;
+                    case 2:
+                        unitInfo.level = stageRefLevel;
+                        break;
+                    default:
+                        unitInfo.level = stageRefLevel + 1f;
+                        break;
                 }
             }
         }
@@ -113,7 +109,7 @@ public class FightInfo : ScriptableObject
         for (var index = 0; index < _evolutionEnemyCount; index++)
         {
             var currentUnit = target.EnemySets.Get(0, index);
-            UnitConfig config = Units.GetUnitConfig(currentUnit?.r_id);
+            var config = Units.GetUnitConfig(currentUnit?.r_id);
             if (currentUnit != null && config != null) continue;
             
             var recordIds = Units.GetMonsterIDsAndNamesDic(type).Keys.ToList();;
@@ -350,7 +346,7 @@ public class FightInfo : ScriptableObject
         stage.ArcadeFightMode = source.ArcadeFightMode;
         stage.FightMembers = source.FightMembers;
         stage.battleGroundID = source.battleGroundID;
-        stage.StageRefLevel = source.StageRefLevel;
+        stage.stageRefLevel = source.stageRefLevel;
         stage.fightBGM = source.fightBGM;
         stage.team1Mode = source.team1Mode;
         stage.team2Mode = source.team2Mode;

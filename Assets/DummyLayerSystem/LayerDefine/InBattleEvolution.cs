@@ -40,7 +40,8 @@ public class InBattleEvolution : UILayer
         var recommendedTargetReplaceSlot = 
             focusUnit.UnitInfo.set.RecommendedTargetReplaceSlot
                 (RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
-        nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set);
+        if (RTFightManager.Target.EvolutionManager.EvolutionCount < 3)
+            nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set);
         nineForShow.ClickTargetSlot(recommendedTargetReplaceSlot);
         
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
