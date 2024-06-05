@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using dataAccess;
 using System.IO;
+using System.Linq;
+using mainMenu;
+using NoSuchStudio.Common;
 using PlayFab.ClientModels;
 
 public class FightInfo : ScriptableObject
@@ -39,7 +41,7 @@ public class FightInfo : ScriptableObject
         get;
     }
     
-    public bool evolutionMode;
+    [SerializeField] bool evolutionMode;
     public float team1HpRate = 1f;
     public float team2HpRate = 1f;
     public CriticalGaugeMode team1CGMode = CriticalGaugeMode.Normal;
@@ -50,36 +52,45 @@ public class FightInfo : ScriptableObject
     public AIMode team2AIMode = AIMode.Aggressive;
     public int dumbAIDecisionDelay = 20;
     public int dreamComboAIRateNum = 5;
-    
+
+    [HideInInspector] [SerializeField] float stageRefLevel;
     public float StageRefLevel
     {
-        get
-        {
-            var returnValue = 0f;
-            foreach (var data in UnitsData)
-            {
-                returnValue += data.level;
-            }
-            returnValue /= UnitsData.Count;
-            return (float)Math.Round(returnValue, 1);
-        }
+        get => stageRefLevel;
         set
         {
+            stageRefLevel = Mathf.Clamp(value, 1, 999);
             if (!EvolutionMode)
             {
                 foreach (var data in UnitsData)
                 {
-                    data.level = value;
+                    data.level = stageRefLevel;
                 }
             }
             else
             {
-                
+                for (var index = 0; index < UnitsData.Count; index++)
+                {
+                    var unitInfo = UnitsData[index];
+                    switch (index)
+                    {
+                        case 0:
+                        case 1:
+                            unitInfo.level = StageRefLevel - 0.5f;
+                            break;
+                        case 2:
+                            unitInfo.level = StageRefLevel;
+                            break;
+                        default:
+                            unitInfo.level = StageRefLevel + 0.5f;
+                            break;
+                    }
+                }
             }
         }
     }
     
-    
+    // 首发版本我们未必把进化模式的等级分配想的太过复杂。。
     public bool EvolutionMode
     {
         get => evolutionMode;
@@ -89,8 +100,77 @@ public class FightInfo : ScriptableObject
             {
                 team1Mode = TeamMode.Rotation;
                 team2Mode = TeamMode.Rotation;
+                AutoFillEvolution(FightMembers, "human");
             }
             evolutionMode = value;
+        }
+    }
+
+    // 我们设想这个玩法下玩家一共进化三次
+    private readonly int _evolutionEnemyCount = 4;
+    void AutoFillEvolution(FightMembers target, string type)
+    {
+        for (var index = 0; index < _evolutionEnemyCount; index++)
+        {
+            var currentUnit = target.EnemySets.Get(0, index);
+            UnitConfig config = Units.GetUnitConfig(currentUnit?.r_id);
+            if (currentUnit != null && config != null) continue;
+            
+            var recordIds = Units.GetMonsterIDsAndNamesDic(type).Keys.ToList();;
+            var unitInfo = new UnitInfo
+            {
+                id = index.ToString(),
+                r_id = recordIds.Random()
+            };
+            target.EnemySets.Set(0, index, unitInfo);
+            SaveDicToData();
+        }
+        
+        for (var index = 0; index < UnitsData.Count; index++)
+        {
+            var unitInfo = UnitsData[index];
+            if (unitInfo.set.CheckEdit() != SkillSet.SkillEditError.NotFull && 
+                unitInfo.set.CheckEdit() != SkillSet.SkillEditError.Empty)
+            {
+                continue;
+            }
+            
+            var form = new SkillStonesBox.StoneFilterForm
+            {
+                Type = type,
+                ExType = new[] { 0 }
+            };
+            var passiveSKillRecordId = UnitPassiveTable.GetUnitPassiveRecordId(unitInfo.r_id);
+            switch (index)
+            {
+                case 0:
+                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, false);
+                    break;
+                case 1:
+                    form = new SkillStonesBox.StoneFilterForm
+                    {
+                        Type = type,
+                        ExType = new[] { 0 , 1 }
+                    };
+                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, false);
+                    break;
+                case 2:
+                    form = new SkillStonesBox.StoneFilterForm
+                    {
+                        Type = type,
+                        ExType = new[] { 1, 2, 3 }
+                    };
+                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, false);
+                    break;
+                default:
+                    form = new SkillStonesBox.StoneFilterForm
+                    {
+                        Type = type,
+                        ExType = new[] { 1, 2, 3 }
+                    };
+                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, true);
+                    break;
+            }
         }
     }
 

@@ -61,18 +61,22 @@ public partial class StageEditor
         {
             if (GUILayout.Button("Delete", _addDeleteMember))
             {
-                target.EnemySets.Set(0, int.Parse(_focusingPosID), null);
                 _focusingUnitInfo = null;
+                target.EnemySets.Set(0, int.Parse(_focusingPosID), _focusingUnitInfo);
                 _targetSlot = 0;
             }
         }
         GUILayout.EndHorizontal();
         
         if (_focusingUnitInfo == null)
+        {
+            if (_focusingPosID != null)
+                _focusingUnitInfo = target.EnemySets.Get(0, int.Parse(_focusingPosID));
             goto A;
+        }
         
         UnitSelect();
-            
+        
         // 九宫格
         NineSlotPart();
         

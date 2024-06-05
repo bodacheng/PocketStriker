@@ -135,7 +135,7 @@ public partial class SkillSet
                 var found = RandomSkillIDOfStone(filterForm, exceptSkIds);
                 if (found == null) // 如果账户已经没有符合要求的石头
                 {
-                    Debug.Log("无法为" + targetSlot + "找到合适技能石");
+                    //Debug.Log("无法为" + targetSlot + "找到合适技能石");
                     return skillSet;
                 }
                 skillId = found;

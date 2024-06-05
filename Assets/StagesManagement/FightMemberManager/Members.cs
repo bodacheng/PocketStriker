@@ -41,6 +41,7 @@ public partial class StageEditor {
                 _focusingUnitInfo = target.EnemySets.Get(0, posNum);
                 _targetSlot = 0;
             }
+            
             if (gangbangGet != null)
             {
                 var info = target.EnemySets.Get(0, posNum);
@@ -62,7 +63,6 @@ public partial class StageEditor {
         {
             UnitSlot(i, gangbangGet);
         }
-        
         if (GUI.Button(new Rect(_unitCount * 40, 0, 20, 20), "+"))
         {
             _unitCount++;
