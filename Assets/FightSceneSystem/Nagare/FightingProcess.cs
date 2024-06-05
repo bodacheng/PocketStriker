@@ -60,7 +60,7 @@ namespace FightScene
             RTFightManager.Target.RefreshTimeDic.Clear();
             RTFightManager.Target.ClearUnitData();
             FightLogger.value.WatchMissionsAbandon();
-            
+            RTFightManager.Target._CameraManager.Assign_Camera(C_Mode.NULL, null,null);
             BoundaryControlByGod.target.SensorUnity.Stop();
         }
 

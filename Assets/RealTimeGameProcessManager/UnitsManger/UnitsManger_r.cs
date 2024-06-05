@@ -80,6 +80,13 @@ namespace FightScene
         // 切换队员
         bool ChangeFightingUnit(Data_Center changeTo, bool emptyState = false, Transform iniStandPoint = null)
         {
+            if (changeTo == null)
+            {
+                var returnValue = RMode_Unit.Value != changeTo;
+                RMode_Unit.Value = changeTo;
+                return returnValue;
+            }
+            
             if (changeTo.FightDataRef.IsDead.Value)
             {
                 return false;
