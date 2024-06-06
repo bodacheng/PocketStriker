@@ -117,6 +117,7 @@ namespace Soul
             BehaviourDic.Clear();
             ConditionAndRespondPriority.Clear();
             BehaviourAndStrategicExitCondition.Clear();
+            fixedSkillSequence.Clear();
             foreach (var s in behaviorDic)
             {
                 if (SkillEntityDic.ContainsKey(s.Key))

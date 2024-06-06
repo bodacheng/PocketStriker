@@ -28,6 +28,20 @@ public class QuestInfoPage : MSceneProcess
                 _layer.SetTeamEditFeature(GoToTeamEditArena);
                 break;
             case FightEventType.Quest:
+                var arcadeTeam = TeamSet.GetTargetSet("arcade");
+                
+                // 处理以前的旧逻辑
+                if (arcadeTeam.PosNumsWithLocalKeys.Length > 1)
+                {
+                    for (var index = 0; index < arcadeTeam.PosNumsWithLocalKeys.Length; index++)
+                    {
+                        if (index > 0)
+                        {
+                            arcadeTeam.SetPosUnitByInstanceID(index, null);
+                        }
+                    }
+                }
+                
                 FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
                 void GoToTeamEditArcade()
                 {
@@ -154,6 +168,11 @@ public class QuestInfoPage : MSceneProcess
                 }
                 break;
             case FightEventType.Quest:
+                if (fight.FightMembers.HeroSets.GetValues().Count != 1)
+                {
+                    return false;
+                }
+                break;
             case FightEventType.Event:
                 if (PlayerAccountInfo.Me.tutorialProgress == "SkillEditFinished2")
                 {
@@ -258,6 +277,17 @@ public class QuestInfoPage : MSceneProcess
                 }
 
                 RealFight();
+                break;
+            case FightEventType.Quest:
+                fightInfo.LoadMyTeam();
+                if (fightInfo.FightMembers.HeroSets.GetValues().Count != 1)
+                {
+                    PopupLayer.ArrangeConfirmWindow(
+                        () => { FightLoad.Go(fightInfo);},
+                        Translate.Get("Error"));// 按理说不应该出现这个问题
+                    return;
+                }
+                FightLoad.Go(fightInfo);
                 break;
             default:
                 fightInfo.LoadMyTeam();

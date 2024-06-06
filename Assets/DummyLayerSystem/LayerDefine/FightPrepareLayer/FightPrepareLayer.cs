@@ -123,8 +123,12 @@ public partial class FightPrepareLayer : UILayer
                 PreScene.target.trySwitchToStep(MainSceneStep.UnitSkillEdit);
             },
             myTeamShowT, true, PlayerAccountInfo.Me.tutorialProgress == "Finished");
-        if (dataAccess.Units.Dic.Count > stage.FightMembers.HeroSets.GetValues().Count
-            && stage.FightMembers.HeroSets.GetValues().Count < 3)
+
+        bool hasExtraSeat = (stage.EventType != FightEventType.Quest &&
+                             (dataAccess.Units.Dic.Count > stage.FightMembers.HeroSets.GetValues().Count
+                              && stage.FightMembers.HeroSets.GetValues().Count < 3));
+        
+        if (hasExtraSeat)
         {
             teamEditIndicatorText.text = Translate.Get("HasExtraSeat");
             teamEditIndicator.SetActive(true);

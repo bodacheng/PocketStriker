@@ -14,7 +14,7 @@ public class PosKeySet
         public OneSet()
         {
         }
-
+        
         public OneSet(int posNum, string instanceId)
         {
             this.posNum = posNum;

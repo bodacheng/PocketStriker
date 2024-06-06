@@ -39,6 +39,7 @@ namespace DummyLayerSystem
             {"SelfFightLayer", "DummyLayerSystem/SelfFightLayer"},
             {"FightPrepareLayer", "DummyLayerSystem/FightPrepareLayer"},
             {"TeamEditLayer", "DummyLayerSystem/TeamEditLayer"},
+            {"TeamSingleSelectLayer", "DummyLayerSystem/TeamSingleSelectLayer"},
             {"SkillShowLayer", "DummyLayerSystem/SkillShowLayer"},
             {"GotchaLayer", "DummyLayerSystem/GotchaLayer"},
             {"GotchaResultLayer", "DummyLayerSystem/GotchaResultLayer"},
