@@ -13,7 +13,7 @@ public class ArcadeTop : UILayer
     [SerializeField] VerticalLayoutGroup container;
     [SerializeField] Button jumpToNewStage;
     [SerializeField] StageButton normalStagePrefab;
-    [SerializeField] StageButton bossStagePrefab;
+    [SerializeField] StageButton evolutionStagePrefab;
     [SerializeField] NineForShow nineForShow;
     [SerializeField] Button nextChapter;
     [SerializeField] Button lastChapter;
@@ -79,18 +79,21 @@ public class ArcadeTop : UILayer
 
     void ToNew()
     {
-        var stages = NewStages(step == MainSceneStep.ArcadeFront ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess);
+        var stages = NewStages(step == MainSceneStep.ArcadeFront ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess,
+            step == MainSceneStep.ArcadeFront ? 3:5);
         ShowStages(stages).Forget();
     }
 
     void ShowNextStages()
     {
-        ShowStages(NewStages( _currentStages.Count > 0 ? _currentStages.Max() + 1:0)).Forget();
+        ShowStages(NewStages( _currentStages.Count > 0 ? _currentStages.Max() + 1:0,
+            step == MainSceneStep.ArcadeFront ? 3:5)).Forget();
     }
     
     void ShowLastStages()
     {
-        ShowStages(NewStages(_currentStages.Count > 0 ?_currentStages.Min() - 2:0)).Forget();
+        ShowStages(NewStages(_currentStages.Count > 0 ?_currentStages.Min() - 2:0,
+            step == MainSceneStep.ArcadeFront ? 3:5)).Forget();
     }
     
     public async UniTask ShowStages(List<int> stages)
@@ -123,7 +126,7 @@ public class ArcadeTop : UILayer
             return;
         }
         
-        var stageBtn = Instantiate(stageNo % 5 == 0 ? bossStagePrefab : normalStagePrefab);
+        var stageBtn = Instantiate(step == MainSceneStep.ArcadeFront ? evolutionStagePrefab : normalStagePrefab);
         _stageButtons.Add(stageBtn);
         stageBtn.Button.onClick.AddListener(
             ()=>
@@ -194,7 +197,7 @@ public class ArcadeTop : UILayer
         container.SetLayoutVertical();
     }
     
-    public List<int> NewStages(int progress)
+    public List<int> NewStages(int progress, int stageCountPerPage)
     {
         if (progress > _maxStageNum)
         {
@@ -204,12 +207,12 @@ public class ArcadeTop : UILayer
         {
             progress -= 1;
         }
-
-        var currentChapter = progress / 5;
+        
+        var currentChapter = progress / stageCountPerPage;
         var returnValue = new List<int>();
-        for (int stageNoPlus = 1; stageNoPlus <= 5; stageNoPlus++)
+        for (int stageNoPlus = 1; stageNoPlus <= stageCountPerPage; stageNoPlus++)
         {
-            int targetNo = stageNoPlus + currentChapter * 5;
+            int targetNo = stageNoPlus + currentChapter * stageCountPerPage;
             if (targetNo <= _maxStageNum)
             {
                 returnValue.Add(targetNo);

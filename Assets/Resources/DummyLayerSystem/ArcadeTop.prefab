@@ -482,7 +482,7 @@ MonoBehaviour:
   jumpToNewStage: {fileID: 287933490346035037}
   normalStagePrefab: {fileID: 3416358147097766526, guid: 8beb627230cfe453fa023b5c8bcd53eb,
     type: 3}
-  bossStagePrefab: {fileID: 3416358147097766526, guid: d241d53239c674729b7cd974a44d7de2,
+  evolutionStagePrefab: {fileID: 3416358147097766526, guid: d241d53239c674729b7cd974a44d7de2,
     type: 3}
   nineForShow: {fileID: 5340505936988530625}
   nextChapter: {fileID: 1205889481844079161}
@@ -989,7 +989,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 75}
-  m_SizeDelta: {x: 600, y: -150}
+  m_SizeDelta: {x: 750, y: -150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2742158833340172455
 CanvasRenderer:
@@ -1016,12 +1016,12 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: 5
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
+  m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0

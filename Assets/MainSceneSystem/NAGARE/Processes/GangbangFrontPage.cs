@@ -25,7 +25,7 @@ public class GangbangFrontPage : MSceneProcess
     {
         await _gangbangModeManager.Initialize();
         _arcadeTop.SetupGangbangArcade(_gangbangModeManager.MaxStageNum, _gangbangModeManager.LoadStage, _gangbangModeManager.DirectToGangStage);
-        var stages = _arcadeTop.NewStages(PlayerAccountInfo.Me.gangbangProcess);
+        var stages = _arcadeTop.NewStages(PlayerAccountInfo.Me.gangbangProcess, 5);
         await _arcadeTop.ShowStages(stages);
         SetLoaded(true);
     }
