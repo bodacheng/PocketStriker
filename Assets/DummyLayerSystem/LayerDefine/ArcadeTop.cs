@@ -112,7 +112,8 @@ public class ArcadeTop : UILayer
         }
         await UniTask.WhenAll(tasks);
         Refresh(step == MainSceneStep.ArcadeFront ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess,  
-            step == MainSceneStep.ArcadeFront ? PlayFabReadClient.StageAwards : PlayFabReadClient.GangbangAwards);
+            step == MainSceneStep.ArcadeFront ? PlayFabReadClient.StageAwards : PlayFabReadClient.GangbangAwards,
+            step == MainSceneStep.ArcadeFront ? 3:5);
         if (container != null)
             container.transform.gameObject.SetActive(true);
         ProgressLayer.Close();
@@ -156,7 +157,7 @@ public class ArcadeTop : UILayer
         }
     }
 
-    void Refresh(int progress, IDictionary<string, Award> stageAwards)
+    void Refresh(int progress, IDictionary<string, Award> stageAwards, int stageCountPerPage)
     {
         if (container.IsDestroyed())
             return;
@@ -182,12 +183,12 @@ public class ArcadeTop : UILayer
         
         int currentStagesMax = _currentStages.Count > 0 ? _currentStages.Max() : progress;
         nextChapter.gameObject.SetActive((progress + 1 > currentStagesMax) && (_maxStageNum > currentStagesMax));
-        lastChapter.gameObject.SetActive(_currentStages.Count == 0 || _currentStages.Min() > 5);
+        lastChapter.gameObject.SetActive(_currentStages.Count == 0 || _currentStages.Min() > stageCountPerPage);
 
         var progressChapter = progress == _maxStageNum
-            ? (progress - 1) / 5
-            : progress / 5;
-        var currentChapter = _currentStages.Count != 0 ? _currentStages.Min() / 5 : _maxStageNum / 5;
+            ? (progress - 1) / stageCountPerPage
+            : progress / stageCountPerPage;
+        var currentChapter = _currentStages.Count != 0 ? _currentStages.Min() / stageCountPerPage : _maxStageNum / stageCountPerPage;
         
         jumpToNewStage.gameObject.SetActive(progressChapter != currentChapter);
         
