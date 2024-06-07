@@ -84,6 +84,10 @@ public class EvolutionManager
         focusUnit.SetAT();
         focusUnit._MyBehaviorRunner.ChangeToWaitingState();
 
+        if (EvolutionCount == 2)
+        {
+            focusUnit.FightDataRef.CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
+        }
         if (EvolutionCount >= 3)
         {
             focusUnit.FightDataRef.CriticalGaugeMode = CriticalGaugeMode.Unlimited;

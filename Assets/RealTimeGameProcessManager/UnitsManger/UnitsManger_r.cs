@@ -60,13 +60,47 @@ namespace FightScene
                                 var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
                                 fightingLayer.gameObject.SetActive(false);
                                 RTFightManager.Target.team1.InputsManager.FocusUnit(null);
+                                
+                                RTFightManager.Target.EvolutionManager.EvolutionCount++;
+                                string bottomText = "";
+                                switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
+                                {
+                                    case 1:
+                                        bottomText = Translate.Get("InBattleEvolutionInfo1");
+                                        break;
+                                    case 2:
+                                        bottomText = Translate.Get("InBattleEvolutionInfo2");
+                                        break;
+                                    case 3:
+                                        bottomText = Translate.Get("InBattleEvolutionInfo3");
+                                        break;
+                                }
+                                
                                 inBattleEvolution.Setup(RTFightManager.Target.team1.RMode_Unit.Value, () =>
                                 {
                                     UILayerLoader.Remove<InBattleEvolution>();
                                     ToNewUnit(0);
+                                    
+                                    switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
+                                    {
+                                        case 1:
+                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                .CriticalGaugeMode = CriticalGaugeMode.Normal;
+                                            break;
+                                        case 2:
+                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                .CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
+                                            break;
+                                        case 3:
+                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                .CriticalGaugeMode = CriticalGaugeMode.Unlimited;
+                                            break;
+                                    }
+                                    
                                     fightingLayer.gameObject.SetActive(true);
                                     RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1.RMode_Unit.Value);
-                                });
+                                }, 
+                                    Translate.Get("ChooseYourEvolution"), bottomText);
                             }
                             else
                             {

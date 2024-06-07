@@ -6,14 +6,13 @@ using UnityEngine.UI;
 public class InBattleEvolution : UILayer
 {
     [SerializeField] private NineForShow nineForShow;
-    [SerializeField] private Text indicatorText;
+    [SerializeField] private Text upperText;
+    [SerializeField] private Text bottomText;
     [SerializeField] private EvolutionSkill[] skillOptions;
     [SerializeField] private GameObject selectedFrame;
 
-    public async void Setup(Data_Center focusUnit, Action onFinishedSkillEvolution)
+    public async void Setup(Data_Center focusUnit, Action onFinishedSkillEvolution, string upperText, string bottomText)
     {
-        RTFightManager.Target.EvolutionManager.EvolutionCount++;
-        
         var set = focusUnit.UnitInfo.set;
         await nineForShow.ShowStones(
             set.a1, set.a2, set.a3,
@@ -33,6 +32,9 @@ public class InBattleEvolution : UILayer
             }
         );
         ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution);
+        
+        this.upperText.text = upperText;
+        this.bottomText.text = bottomText;
     }
     
     void ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution)
