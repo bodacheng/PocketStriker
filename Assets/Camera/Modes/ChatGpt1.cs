@@ -28,6 +28,21 @@ class ChatGptFix : CameraMode
         set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 5f);
     }
 
+    private readonly int _autoRotateDirectionInterval = 20;
+    private int _autoRotateDirectionIntervalCounter;
+    private int AutoRotateDirectionIntervalCounter
+    {
+        get => _autoRotateDirectionIntervalCounter;
+        set
+        {
+            _autoRotateDirectionIntervalCounter = value;
+            if (_autoRotateDirectionIntervalCounter > _autoRotateDirectionInterval)
+            {
+                _autoRotateDirectionIntervalCounter = 0;
+            }
+        }
+    }
+
     private readonly float _originHeight;
     private float CameraHeight
     {
@@ -82,7 +97,7 @@ class ChatGptFix : CameraMode
 
     private Vector3 mePos;
     private float _autoRotateTimer;
-    private bool _currentRotateClockWiseDirection;
+    private bool lastRotateDirection;
     
     public override void LocalUpdate(Camera camera)
     {
@@ -118,7 +133,8 @@ class ChatGptFix : CameraMode
         {
             h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         }
-        
+
+        AutoRotateDirectionIntervalCounter++;
         if (h != 0)
         {
             xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
@@ -146,20 +162,24 @@ class ChatGptFix : CameraMode
                 {
                     bool Clock()
                     {
-                        if (meScreenPos.x < enemyScreenPos.x)
+                        if (AutoRotateDirectionIntervalCounter == 0)
                         {
-                            return meScreenPos.y < enemyScreenPos.y;
+                            if (meScreenPos.x < enemyScreenPos.x)
+                            {
+                                lastRotateDirection = meScreenPos.y < enemyScreenPos.y;
+                            }
+                            else
+                            {
+                                lastRotateDirection = meScreenPos.y > enemyScreenPos.y;
+                            }
                         }
-                        else
-                        {
-                            return meScreenPos.y > enemyScreenPos.y;
-                        }
+                        return lastRotateDirection;
                     }
-                    _currentRotateClockWiseDirection = Clock();
+                    
                     // 如果夹角大于限制，则缓慢调整相机角度
                     xzOff = Quaternion.Euler(0f, autoRotateSpeed *
-                                                 ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
-                                                 * (_currentRotateClockWiseDirection ? -1f : 1f), 0f) * xzOff;
+                                                ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime *  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
+                                                  (Clock() ? -1f : 1f), 0f) * xzOff;
                 }
             }
         }

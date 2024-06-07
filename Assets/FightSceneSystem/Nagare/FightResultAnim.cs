@@ -46,7 +46,7 @@ namespace FightScene
                     winners = RTFightManager.Target.team2.teamMembers.GetValues();
                     break;
             }
-            
+            RTFightManager.Target._CameraManager.Assign_Camera(C_Mode.NULL, null,null);
             foreach (Data_Center one in winners)
             {
                 if (!one.FightDataRef.IsDead.Value)
