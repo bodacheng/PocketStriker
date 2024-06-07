@@ -12,7 +12,7 @@ class ChatGptFix : CameraMode
     Vector3 lookPoint;
     Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 20f;
+    float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
     private float speedUpRate = 5;
@@ -133,8 +133,7 @@ class ChatGptFix : CameraMode
         {
             h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         }
-
-        AutoRotateDirectionIntervalCounter++;
+        
         if (h != 0)
         {
             xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
@@ -162,6 +161,7 @@ class ChatGptFix : CameraMode
                 {
                     bool Clock()
                     {
+                        AutoRotateDirectionIntervalCounter++;
                         if (AutoRotateDirectionIntervalCounter == 0)
                         {
                             if (meScreenPos.x < enemyScreenPos.x)
@@ -179,7 +179,9 @@ class ChatGptFix : CameraMode
                     // 如果夹角大于限制，则缓慢调整相机角度
                     xzOff = Quaternion.Euler(0f, autoRotateSpeed *
                                                 ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime *  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
-                                                  (Clock() ? -1f : 1f), 0f) * xzOff;
+                                                   -1,//(Clock() ? -1f : 1f), 
+                                0f) 
+                            * xzOff;
                 }
             }
         }
