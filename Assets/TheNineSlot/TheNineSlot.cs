@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NoSuchStudio.Common;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,9 +50,6 @@ namespace mainMenu
         [Header("选中框")]
         [SerializeField] GameObject selectedFrame;
         
-        [Header("type特效管理")]
-        public SkillStoneBoxTabEffectsManager _tabEffects;
-        
         public BOButton comboShowBtn, dreamComboShowBtn, comboCloseBtn;
         
         SkillStoneSlot _a1Slot, _a2Slot, _a3Slot;
@@ -60,7 +57,7 @@ namespace mainMenu
         SkillStoneSlot _c1Slot, _c2Slot, _c3Slot;
         SkillStoneSlot _focusingSlot;
         public readonly List<SkillStoneSlot> AllSlot = new List<SkillStoneSlot>();
-
+        readonly IDictionary<int, ParticleSystem> _slotEffects = new Dictionary<int, ParticleSystem>();
         public Action<string> PrintSkillInfo;
 
         // For Combo Instruction
@@ -305,14 +302,14 @@ namespace mainMenu
         
          async void RefreshEffects()
          {
-             foreach (var slot in AllSlot)
+            await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
+            foreach (var slot in AllSlot)
             {
                 var item = slot._cell.GetItem();
-                await Task.Delay(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
-                if (slot != null && slot._cell != null)
+                if (slot._cell != null)
                 {
                     var worldPos = PosCal.GetWorldPos(PreScene.target.postProcessCamera, slot._cell.GetComponent<RectTransform>(), 5f);
-                    _tabEffects.RefreshSlotEffect(slot.num, worldPos, item != null ? item._SkillConfig.SP_LEVEL : -1);
+                    await NineForShow.RefreshSlotEffects(slot.num, item != null ? item._SkillConfig.SP_LEVEL : -1, worldPos, transform, _slotEffects);
                 }
             }
          }

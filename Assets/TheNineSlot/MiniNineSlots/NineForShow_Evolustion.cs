@@ -129,5 +129,7 @@ public partial class NineForShow : MonoBehaviour
                 item.image.color = gray;
             }
         }
+        
+        RefreshEffects(FightScene.FightScene.target.fxCamera, 5f/3);
     }
 }

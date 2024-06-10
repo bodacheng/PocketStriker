@@ -161,44 +161,6 @@ public class ElementStoneTagsGroup
         p.Play(true);
     }
     
-    public async void RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget)
-    {
-        if (_slotEffects.ContainsKey(slotNum) && _slotEffects[slotNum] != null)
-        {
-            Object.Destroy(_slotEffects[slotNum].gameObject);
-        }
-        
-        if (!_btnEffectsSetsForStoneBox.ContainsKey(eX)) return;
-        string effectName;
-        switch (eX)
-        {
-            case 1:
-                effectName = "SlotEffects/ex1";
-                break;
-            case 2:
-                effectName = "SlotEffects/ex2";
-                break;
-            case 3:
-                effectName = "SlotEffects/ex3";
-                break;
-            default:
-                effectName = "SlotEffects/normal";
-                break;
-        }
-        var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, releaseTarget.gameObject);
-
-        var slotT = slotEffect.transform;
-
-        var oldScale = slotT.localScale;
-        slotT.localScale = new Vector3(oldScale.x * PosCal.TempRate(), oldScale.y * PosCal.TempRate(), oldScale.z);
-        
-        //slotEffect.transform.SetParent(parent);
-        DicAdd<int, ParticleSystem>.Add(_slotEffects, slotNum, slotEffect);
-        slotEffect.gameObject.name = "slotEffect"+ slotNum;
-        slotT.position = pos;
-        slotEffect.Play(true);
-    }
-    
     public void Clear()
     {
         foreach (var variable in _exTagEffects)

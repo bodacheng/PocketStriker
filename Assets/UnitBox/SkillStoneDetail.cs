@@ -46,7 +46,7 @@ namespace mainMenu
         public Text SkillIntro => skillIntro;
         
         // 额外生成一个技能石图像
-        async void IconForShow(string skillID)
+        public async void IconForShow(string skillID)
         {
             var item = await Stones.GenerateStoneModel(skillID, false);
             if (iconShowT != null)

@@ -71,10 +71,10 @@ namespace mainMenu
             _focusingEffectsGroup.RefreshBoxEffects(sp_level, pos);
         }
         
-        public void RefreshSlotEffect(int slotNum ,Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
-        {
-            _focusingEffectsGroup.RefreshSlotEffects(slotNum, sp_level, pos, transform);
-        }
+        // public void RefreshSlotEffect(int slotNum ,Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
+        // {
+        //     NineForShow.RefreshSlotEffects(slotNum, sp_level, pos, transform, _slotEffects);
+        // }
         
         public void SkillButtonExplosion(int spLevel, Vector3 targetPos, Transform parent)
         {

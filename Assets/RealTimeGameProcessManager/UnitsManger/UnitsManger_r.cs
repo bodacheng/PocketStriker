@@ -80,7 +80,6 @@ namespace FightScene
                                 {
                                     UILayerLoader.Remove<InBattleEvolution>();
                                     ToNewUnit(0);
-                                    
                                     switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
                                     {
                                         case 1:
@@ -99,7 +98,7 @@ namespace FightScene
                                     
                                     fightingLayer.gameObject.SetActive(true);
                                     RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1.RMode_Unit.Value);
-                                }, 
+                                },
                                     Translate.Get("ChooseYourEvolution"), bottomText);
                             }
                             else
