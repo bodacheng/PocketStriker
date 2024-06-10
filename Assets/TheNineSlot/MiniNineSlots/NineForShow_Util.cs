@@ -41,7 +41,7 @@ public partial class NineForShow : MonoBehaviour
     }
     
     public static async UniTask RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget, 
-        IDictionary<int, ParticleSystem> _slotEffects, float scale = 1)
+        IDictionary<int, ParticleSystem> _slotEffects, float scale = 1, int targetLayer = 0)
     {
         if (_slotEffects.ContainsKey(slotNum) && _slotEffects[slotNum] != null)
         {
@@ -78,6 +78,7 @@ public partial class NineForShow : MonoBehaviour
         //slotEffect.transform.SetParent(parent);
         DicAdd<int, ParticleSystem>.Add(_slotEffects, slotNum, slotEffect);
         slotEffect.gameObject.name = "slotEffect"+ slotNum;
+        slotEffect.gameObject.layer = targetLayer;
         slotT.position = pos;
         slotEffect.Play(true);
     }
@@ -144,7 +145,7 @@ public partial class NineForShow : MonoBehaviour
                 var worldPos = PosCal.GetWorldPos(camera,
                     item.GetComponentInParent<BOButton>().transform.GetComponent<RectTransform>(), 5f);
                 await RefreshSlotEffects(index+1, item != null ? item._SkillConfig.SP_LEVEL : -1,
-                    worldPos, transform, _slotEffects, scale);
+                    worldPos, transform, _slotEffects, scale, 5);
             }
         }
     }
