@@ -194,7 +194,7 @@ namespace mainMenu
             return _focusingSlot;
         }
         
-        void SlotBehaviour(SkillStoneSlot slot, Action<SKStoneItem> playSkill)
+        void SlotBehaviour(SkillStoneSlot slot, Action<SKStoneItem> playSkill, Action extraOnSlotAction = null)
         {
             void ButtonFeature()
             {
@@ -235,14 +235,17 @@ namespace mainMenu
             slot._cell.btn.onHold.AddListener(GoToLevelUpPage);
             slot._cell.btn.onDoubleClick.AddListener(DoubleClick);
             
-            slot._cell.SetOnDropAction(((from, to) =>
-            {
-                StoneCell.Install(from, to);
-                ValidateWarn();
-            }));
+            slot._cell.SetOnDropAction(
+                (from, to) =>
+                {
+                    StoneCell.Install(from, to);
+                    ValidateWarn();
+                    extraOnSlotAction?.Invoke();
+                }
+            );
         }
         
-        public void StartUp(Action<SKStoneItem> runSkill)
+        public void StartUp(Action<SKStoneItem> runSkill, Action extraOnSlotAction = null)
         {
             SelectedRender(null);
             
@@ -267,9 +270,9 @@ namespace mainMenu
             AllSlot.Add(_c2Slot);
             AllSlot.Add(_c3Slot);
             
-            foreach (var _slot in AllSlot)
+            foreach (var slot in AllSlot)
             {
-                SlotBehaviour(_slot, runSkill);
+                SlotBehaviour(slot, runSkill, extraOnSlotAction);
             }
         }
         

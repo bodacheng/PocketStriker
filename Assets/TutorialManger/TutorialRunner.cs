@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using mainMenu;
-using UnityEngine;
 
 public class TutorialRunner
 {
@@ -27,8 +26,8 @@ public class TutorialRunner
         var skillEditTry = new SkillEditTry("openInstruction1");
         var explainCombo = new ExplainCombo();
         _tutorialProcesses.Clear();
-        _tutorialProcesses.Add(goToUnitList);
-        _tutorialProcesses.Add(openSkillEdit);
+        //_tutorialProcesses.Add(goToUnitList);
+        //_tutorialProcesses.Add(openSkillEdit);
         _tutorialProcesses.Add(skillEditTry);
         _tutorialProcesses.Add(explainCombo);
     }

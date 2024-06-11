@@ -31,11 +31,6 @@ public partial class SkillEditLayer : UILayer
     [Header("During Combo Hide")]
     [SerializeField] RectTransform[] duringComboHide;
     
-    [Header("Tutorial")]
-    [SerializeField] ClickNextTutorial clickNextTutorial1, clickNextTutorial2;
-    [SerializeField] GameObject clickAutoEditIndicator;
-    [SerializeField] GameObject mask;
-    
     public bool Initialized { get; set; } = false;
     
     // For Transition Effects
@@ -162,12 +157,21 @@ public partial class SkillEditLayer : UILayer
         stonesBox.GenerateCells(9);
         gameObject.SetActive(false);
         nineSlot.PrintSkillInfo = skillStoneDetail.RefreshInfo;
+        
         nineSlot.StartUp(
             x=>
             {
                 RunSkillAndShowTransition(x).Forget();
-            }
+            },
+            PlayerAccountInfo.Me.tutorialProgress == "Started"?
+            ExtraTipForSpStoneEquip:null
         );
+
+        if (PlayerAccountInfo.Me.tutorialProgress == "Started")
+        {
+            ExtraTipForSpStoneEquip();
+        }
+        
         stonesBox.AddFeatureToCells(StoneCellFeature);
         stonesBox.IniExTabs();
         
@@ -192,7 +196,6 @@ public partial class SkillEditLayer : UILayer
         //ResizeCameraConnectorRefTopAndSideWidth(camConnector.GetComponent<RectTransform>(), PosCal.VTopSafeAreaHeight,1100);
         var camRect = camConnector.GetComponent<RectTransform>();
         ResizeCameraConnectorAsMaxSquare(camRect, camRect.rect.width, camRect.rect.height);
-        
         
         nineSlot.comboShowBtn.SetListener(
             async ()=>

@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace mainMenu
 {
-    public class PreScene : MonoBehaviour
+    public partial class PreScene : MonoBehaviour
     {
         public static PreScene target;
 
@@ -242,11 +242,27 @@ namespace mainMenu
             }
             else
             {
-                if (MainMenuNote.GoingTo != MainSceneStep.FrontPage)
+                if (PlayerAccountInfo.Me.tutorialProgress == "Started")
                 {
-                    ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> trySwitchToStep(x, false));
+                    PreScene.target.DataLoading(
+                        () =>
+                        {
+                            string focusInstanceID = GetFocusInstanceID();
+                            SetFocusingUnit(focusInstanceID);
+                            LowerMainBar.Open();
+                            MainMenuNote.GoingTo = MainSceneStep.UnitSkillEdit;
+                            trySwitchToStep(MainMenuNote.GoingTo, false);
+                        }
+                    );
                 }
-                trySwitchToStep(MainMenuNote.GoingTo, false);
+                else
+                {
+                    if (MainMenuNote.GoingTo != MainSceneStep.FrontPage)
+                    {
+                        ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> trySwitchToStep(x, false));
+                    }
+                    trySwitchToStep(MainMenuNote.GoingTo, false);
+                }
             }
         }
         

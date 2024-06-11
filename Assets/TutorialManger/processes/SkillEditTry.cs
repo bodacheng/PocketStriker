@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using DummyLayerSystem;
+using mainMenu;
 using PlayFab.ClientModels;
 
 public class SkillEditTry : TutorialProcess
 {
     private ReturnLayer _returnLayer;
     private SkillEditLayer _skillEditLayer;
+    private LowerMainBar _lowerMainBar;
     private UpperInfoBar _upperInfoBar;
     private bool _skillEditFinished = false;
     private readonly string _tutorialFlag;
@@ -28,6 +30,15 @@ public class SkillEditTry : TutorialProcess
             if (_returnLayer != null)
             {
                 _returnLayer.gameObject.SetActive(false);
+            }
+        }
+        
+        if (_lowerMainBar == null)
+        {
+            _lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+            if (_lowerMainBar != null)
+            {
+                _lowerMainBar.PlsClickBtn(MainSceneStep.None);
             }
         }
         
@@ -60,7 +71,7 @@ public class SkillEditTry : TutorialProcess
                 string nextTutorialProgress = null;
                 if (this._tutorialFlag == "openInstruction1")
                 {
-                    _skillEditLayer.OpenTutorial1();
+                    //_skillEditLayer.OpenTutorial1();
                     nextTutorialProgress = "SkillEditFinished";
                 }
                 

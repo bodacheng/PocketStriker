@@ -24,7 +24,7 @@ public partial class NineForShow : MonoBehaviour
         };
     }
     
-    public List<SKStoneItem> AllStones()
+    List<SKStoneItem> AllStones()
     {
         return new List<SKStoneItem>()
         {
@@ -72,8 +72,6 @@ public partial class NineForShow : MonoBehaviour
 
         var oldScale = slotT.localScale;
         slotT.localScale = new Vector3(oldScale.x * PosCal.TempRate() * scale, oldScale.y * PosCal.TempRate() * scale, oldScale.z);
-        
-        Debug.Log(slotNum+"确切尺寸："+ slotT.localScale);
         
         //slotEffect.transform.SetParent(parent);
         DicAdd<int, ParticleSystem>.Add(_slotEffects, slotNum, slotEffect);
