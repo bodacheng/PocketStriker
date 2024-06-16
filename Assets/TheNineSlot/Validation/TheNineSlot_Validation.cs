@@ -55,5 +55,27 @@ namespace mainMenu
             }
             return SkillSet.CheckEdit(a1, a2, a3, b1, b2, b3, c1, c2, c3);
         }
+
+        public void ForceFirstColumn(bool firstColumnOnly)
+        {
+            if (firstColumnOnly)
+            {
+                _a2Slot._cell.gameObject.SetActive(false);
+                _a3Slot._cell.gameObject.SetActive(false);
+                
+                _b2Slot._cell.gameObject.SetActive(false);
+                _b3Slot._cell.gameObject.SetActive(false);
+                
+                _c2Slot._cell.gameObject.SetActive(false);
+                _c3Slot._cell.gameObject.SetActive(false);
+            }
+            else
+            {
+                foreach (var slot in AllSlot)
+                {
+                    slot._cell.gameObject.SetActive(true);
+                }
+            }
+        }
     }
 }

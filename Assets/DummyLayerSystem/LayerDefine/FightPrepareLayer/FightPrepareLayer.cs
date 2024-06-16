@@ -51,10 +51,12 @@ public partial class FightPrepareLayer : UILayer
         beginFight.SetAction(fightBegin);
     }
     
-    public void SetFightBeginEnableRender(bool canFight)
+    public void SetFightBeginEnableRender(bool canFight, bool guide = false)
     {
-        beginFight.Enable(canFight);
+        beginFight.Enable(canFight, guide);
     }
+    
+    
 
     public void SetTeamEditFeature(Action teamEdit)
     {

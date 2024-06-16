@@ -92,7 +92,10 @@ public class TeamEdit : TutorialProcess
                 }
                 else if (_tutorialStep == "teamEdit2")
                 {
-                    qualified = qualified && unitCount > 1;
+                    var onsSet = TeamSet.Default.GetPosMemInfo(0);
+                    var fullInfo = dataAccess.Units.Get(onsSet.instanceID);
+                    var unitConfig = Units.GetUnitConfig(fullInfo.r_id);
+                    qualified = qualified && unitConfig.REAL_NAME == "adam";
                 }
                 break;
             case "gangbang":

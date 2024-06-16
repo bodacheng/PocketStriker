@@ -12,9 +12,10 @@ public class FightBeginBtn : MonoBehaviour
         btn.onClick.AddListener(action.Invoke);
     }
     
-    public void Enable(bool on)
+    public void Enable(bool on, bool guide = false)
     {
         btn.interactable = on;
         animator.SetBool("On", on);
+        animator.SetBool("Guide", guide);
     }
 }

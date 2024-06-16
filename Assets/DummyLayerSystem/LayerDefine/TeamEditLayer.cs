@@ -228,7 +228,7 @@ public class TeamEditLayer : UILayer
             _focusingPos.Value = posNum;
             var instanceID = TeamSet.GetTargetSet(teamMode).GetInstanceIdOnPos(_focusingPos.Value);
             PreScene.target.SetFocusingUnit(instanceID);
-                
+            
             var unitInfo = dataAccess.Units.Get(instanceID);
             if (unitInfo != null)
             {

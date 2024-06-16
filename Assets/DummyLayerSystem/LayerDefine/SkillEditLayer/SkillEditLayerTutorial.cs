@@ -5,9 +5,9 @@ using System.Linq;
 public partial class SkillEditLayer : UILayer
 {
     [Header("Tutorial")] 
-    [SerializeField] GameObject spStoneGuide1, spStoneGuide2, spStoneGuide3, spStoneGuide4, spStoneGuide5,spStoneGuide6;
+    [SerializeField] GameObject spStoneGuide1, spStoneGuide2, spStoneGuide3, spStoneGuide4, spStoneGuide5, spStoneGuide6;
     [SerializeField] ClickNextTutorial clickNextTutorial1, clickNextTutorial2;
-    [SerializeField] GameObject clickAutoEditIndicator;
+    [SerializeField] GameObject clickAutoEditIndicator, clickAutoEditIndicator2;
     [SerializeField] GameObject mask;
     
     bool HasTargetSpLevelStone(int[] targetSpLevels)
@@ -27,7 +27,19 @@ public partial class SkillEditLayer : UILayer
 
     int FullSpLevelEquipTutorialStep()
     {
+        if (PlayerAccountInfo.Me.tutorialProgress == "SkillEditFinished2" ||
+            PlayerAccountInfo.Me.tutorialProgress == "Finished")
+        {
+            return 7;
+        }
+        
         var valid = nineSlot.ValidateWarn();
+        if (PlayerAccountInfo.Me.tutorialProgress == "GotchaFinished" && 
+            valid != SkillSet.SkillEditError.Perfect)
+        {
+            return 6;
+        }
+        
         if (valid == SkillSet.SkillEditError.Perfect)
         {
             return 5;
@@ -52,7 +64,7 @@ public partial class SkillEditLayer : UILayer
         return 4;
     }
     
-    void ExtraTipForSpStoneEquip()
+    public void ExtraTipForSpStoneEquip()
     {
         int step = FullSpLevelEquipTutorialStep();
         spStoneGuide1.SetActive(step == 0);
@@ -61,6 +73,12 @@ public partial class SkillEditLayer : UILayer
         spStoneGuide4.SetActive(step == 3);
         spStoneGuide5.SetActive(step == 4);
         spStoneGuide6.SetActive(step == 5);
+        
+        clickAutoEditIndicator.SetActive(step == 6);
+        clickAutoEditIndicator2.SetActive(step == 6);
+        
+        nineSlot.ForceFirstColumn(step == 0);
+        
         switch (step)
         {
             case 0:

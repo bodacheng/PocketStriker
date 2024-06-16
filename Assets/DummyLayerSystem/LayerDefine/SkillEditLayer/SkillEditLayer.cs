@@ -163,11 +163,11 @@ public partial class SkillEditLayer : UILayer
             {
                 RunSkillAndShowTransition(x).Forget();
             },
-            PlayerAccountInfo.Me.tutorialProgress == "Started"?
+            PlayerAccountInfo.Me.tutorialProgress != "Finished"?
             ExtraTipForSpStoneEquip:null
         );
 
-        if (PlayerAccountInfo.Me.tutorialProgress == "Started")
+        if (PlayerAccountInfo.Me.tutorialProgress != "Finished")
         {
             ExtraTipForSpStoneEquip();
         }

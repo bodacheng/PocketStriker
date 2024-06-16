@@ -39,7 +39,7 @@ namespace mainMenu
         {
             missionWatcher.Finish("arcadeTFinished", value);
         }
-
+        
         public void DataLoading(Action onDataLoad)
         {
             ProgressLayer.Loading(string.Empty);
@@ -51,7 +51,14 @@ namespace mainMenu
             PlayFabReadClient.LoadItems(ItemsLoadFinished);
             PlayFabReadClient.GetAllTitleData(StageRewardFinished);
             PlayFabReadClient.GetAllUserData( new List<string>(){"arcade", "gangbang", "noAds", PlayFabSetting._timeLimitBuyCode}, ArcadeTFinished);
-        
+
+            void Next()
+            {
+                ProgressLayer.Close();
+                onDataLoad.Invoke();
+                Stones.RenderAll().Forget(); // 在背后运行，从而加快石头列表和技能编辑画面的读取速度
+            }
+            
             missionWatcher = new MissionWatcher(
                 new List<string>
                 {
@@ -60,9 +67,34 @@ namespace mainMenu
                 },
                 () =>
                 {
-                    ProgressLayer.Close();
-                    onDataLoad.Invoke();
-                    Stones.RenderAll().Forget(); // 在背后运行，从而加快石头列表和技能编辑画面的读取速度
+                    switch (PlayerAccountInfo.Me.tutorialProgress)
+                    {
+                        case "Started":
+                            TeamSet.GetTargetSet("arcade").SetPosUnitByInstanceID(0, GetFocusInstanceID());
+                            TeamSet.SaveTeamSet("arcade", (x) =>
+                            {
+                                if (x)
+                                {
+                                    Next();
+                                }
+                            });
+                            break;
+                        case "SkillEditFinished2":
+                            var adam = dataAccess.Units.GetByRId("1");
+                            TeamSet.GetTargetSet("arcade").SetPosUnitByInstanceID(0, adam.id);
+                            TeamSet.SaveTeamSet("arcade", (x) =>
+                            {
+                                Debug.Log("we are here:"+ adam.id);
+                                if (x)
+                                {
+                                    Next();
+                                }
+                            });
+                            break;
+                        default:
+                            Next();
+                            break;
+                    }
                 }
             );
         }

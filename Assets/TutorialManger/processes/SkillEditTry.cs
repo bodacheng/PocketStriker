@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using dataAccess;
 using DummyLayerSystem;
 using mainMenu;
 using PlayFab.ClientModels;
@@ -77,7 +79,7 @@ public class SkillEditTry : TutorialProcess
                 
                 if (this._tutorialFlag == "openInstruction2")
                 {
-                    _skillEditLayer.OpenTutorial2();
+                    //_skillEditLayer.OpenTutorial2();
                     nextTutorialProgress = "SkillEditFinished2";
                 }
                 
@@ -98,6 +100,7 @@ public class SkillEditTry : TutorialProcess
                                 PlayFabReadClient.DontShowFrontFight = "true";
                                 _skillEditFinished = true;
                                 _skillEditLayer.nineSlot.confirmBtnIndicator.SetActive(false);
+                                _skillEditLayer.ExtraTipForSpStoneEquip();
                             }
                         );
                     }

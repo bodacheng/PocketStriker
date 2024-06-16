@@ -16,8 +16,8 @@ public class GotchaFront : MSceneProcess
     }
     
     private int _startIndex = 1;
-    private Action _extraSuccessAction;
-    public void SetExtraSuccessAction(Action extraSuccessAction)
+    private Action<Action> _extraSuccessAction;
+    public void SetExtraSuccessAction(Action<Action> extraSuccessAction)
     {
         this._extraSuccessAction = extraSuccessAction;
     }
@@ -158,13 +158,23 @@ public class GotchaFront : MSceneProcess
                         gotStones.Add(stoneOfPlayerInfo);
                     }
                 }
-                
-                PlayFabReadClient.LoadItems(null);
-                
-                GotchaResult.Result = gotStones;
-                PreScene.target.trySwitchToStep(MainSceneStep.GotchaResult, itemId, true);
-                _extraSuccessAction?.Invoke();
-                _processingGotcha = false;
+
+                void Next()
+                {
+                    PlayFabReadClient.LoadItems(null);
+                    GotchaResult.Result = gotStones;
+                    PreScene.target.trySwitchToStep(MainSceneStep.GotchaResult, itemId, true);
+                    _processingGotcha = false;
+                }
+
+                if (_extraSuccessAction != null)
+                {
+                    _extraSuccessAction.Invoke(Next);
+                }
+                else
+                {
+                    Next();
+                }
             },
             (x) =>
             {

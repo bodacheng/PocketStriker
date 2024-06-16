@@ -73,13 +73,11 @@ public class FightInfo : ScriptableObject
                 {
                     case 0:
                     case 1:
-                        unitInfo.level = stageRefLevel - 0.5f;
-                        break;
                     case 2:
                         unitInfo.level = stageRefLevel;
                         break;
                     default:
-                        unitInfo.level = stageRefLevel + 1f;
+                        unitInfo.level = stageRefLevel + 0.5f;
                         break;
                 }
             }

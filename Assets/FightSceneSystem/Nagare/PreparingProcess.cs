@@ -196,6 +196,25 @@ public class PreparingProcess : FSceneProcess
             }
         ).AddTo(RTFightManager.Target.Disposables);
         
+        if (FightLoad.Fight.RunTutorial)
+        {
+            IDisposable dreamComboIntro = null;
+            dreamComboIntro = RTFightManager.Target.team1.RMode_Unit.Value.FightDataRef.DreamComboGauge.Subscribe(
+                (x) =>
+                {
+                    var percent = (float)x / FightGlobalSetting._DreamComboGaugeMax;
+                    if (percent >= 1)
+                    {
+                        var _layer = UILayerLoader.Get<FightingStepLayer>();
+                        _layer.ForceClickDreamComboBtn();
+                        _layer.Team1UI.AutoSwitch.ChangeAutoState(false);
+                        _layer.Team2UI.AutoSwitch.ChangeAutoState(false);
+                        dreamComboIntro?.Dispose();
+                    }
+                }
+            ).AddTo(RTFightManager.Target.Disposables);
+        }
+        
         ProgressLayer.Close();
     }
     

@@ -125,7 +125,7 @@ public class QuestInfoPage : MSceneProcess
         
         var canFight = CanFightCheck(FightLoad.Fight, _controllingGangbangInfo);
         //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
-        _layer.SetFightBeginEnableRender(canFight);
+        _layer.SetFightBeginEnableRender(canFight, PlayerAccountInfo.Me.tutorialProgress != "Finished");
         SetLoaded(true);
     }
     

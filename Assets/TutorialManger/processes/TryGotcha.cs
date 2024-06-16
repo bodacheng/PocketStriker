@@ -20,7 +20,7 @@ public class TryGotcha : TutorialProcess
             {
                 var gotchaFront  = (GotchaFront)ProcessesRunner.Main.GetProcess(MainSceneStep.GotchaFront);
                 gotchaFront.SetExtraSuccessAction(
-                    () =>
+                    (x) =>
                     {
                         PlayFabReadClient.UpdateUserData(
                             new UpdateUserDataRequest()
@@ -33,6 +33,7 @@ public class TryGotcha : TutorialProcess
                             () =>
                             {
                                 PlayerAccountInfo.Me.tutorialProgress = "GotchaFinished";
+                                x.Invoke();
                             }
                         );
                     }

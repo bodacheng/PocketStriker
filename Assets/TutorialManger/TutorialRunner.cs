@@ -24,19 +24,19 @@ public class TutorialRunner
         var goToUnitList = new GoTo(MainSceneStep.UnitList);
         var openSkillEdit = new OpenSkillEdit("3");
         var skillEditTry = new SkillEditTry("openInstruction1");
-        var explainCombo = new ExplainCombo();
+        //var explainCombo = new ExplainCombo();
         _tutorialProcesses.Clear();
         //_tutorialProcesses.Add(goToUnitList);
         //_tutorialProcesses.Add(openSkillEdit);
         _tutorialProcesses.Add(skillEditTry);
-        _tutorialProcesses.Add(explainCombo);
+        //_tutorialProcesses.Add(explainCombo);
     }
     
     void GenerateStep2Tutorial()
     {
-        var goTo1 = new GoTo(MainSceneStep.FrontPage);
-        var goTo2 = new GoTo(MainSceneStep.QuestInfo);
-        var teamEdit1 = new TeamEdit("teamEdit1");
+        //var goTo1 = new GoTo(MainSceneStep.FrontPage);
+        //var goTo2 = new GoTo(MainSceneStep.QuestInfo);
+        //var teamEdit1 = new TeamEdit("teamEdit1");
         
         bool StageOneFinished()
         {
@@ -46,9 +46,11 @@ public class TutorialRunner
         var waitFighting = new WaitProcess(StageOneFinished);
         
         _tutorialProcesses.Clear();
-        _tutorialProcesses.Add(goTo1);
-        _tutorialProcesses.Add(goTo2);
-        _tutorialProcesses.Add(teamEdit1);
+        // _tutorialProcesses.Add(goTo1);
+        // _tutorialProcesses.Add(goTo2);
+        // _tutorialProcesses.Add(teamEdit1);
+        
+        PlayerAccountInfo.Me.ArcadeModeManager.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, false);
         _tutorialProcesses.Add(waitFighting);
     }
 
@@ -146,9 +148,6 @@ public class TutorialRunner
                 Main.MoveToNext();
                 break;
             case "GotchaFinished":
-                var _focusUnitInfo = dataAccess.Units.GetByRId("1");
-                if (_focusUnitInfo != null)
-                    PreScene.target.SetFocusingUnit(_focusUnitInfo.id);
                 GenerateStep4Tutorial();
                 Main.MoveToNext();
                 break;

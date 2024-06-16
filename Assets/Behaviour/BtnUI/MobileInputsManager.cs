@@ -128,24 +128,6 @@ public class MobileInputsManager : MonoBehaviour {
                 }
             ).AddTo(this.gameObject);
             
-            if (FightLoad.Fight.RunTutorial)
-            {
-                IDisposable dreamComboIntro = null;
-                dreamComboIntro = center.FightDataRef.DreamComboGauge.Subscribe(
-                    (x) =>
-                    {
-                        var percent = (float)x / FightGlobalSetting._DreamComboGaugeMax;
-                        if (percent == 1)
-                        {
-                            var _layer = UILayerLoader.Get<FightingStepLayer>();
-                            _layer.ForceClickDreamComboBtn();
-                            _layer.Team1UI.AutoSwitch.ChangeAutoState(false);
-                            _layer.Team2UI.AutoSwitch.ChangeAutoState(false);
-                            dreamComboIntro?.Dispose();
-                        }
-                    }
-                ).AddTo(this.gameObject);
-            }
             TurnOnButtons();
         }
         else

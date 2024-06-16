@@ -8,10 +8,10 @@ namespace dataAccess
     public static partial class TeamSet
     {
         // 缺乏合理验证环节
-        public static void SaveTeamSet(string Mode, Action<bool> success)
+        public static void SaveTeamSet(string mode, Action<bool> success)
         {
             var form = new TeamPos();
-            switch (Mode)
+            switch (mode)
             {
                 case "arcade":
                     form.f = Default.GetInstanceIdOnPos(0);
@@ -32,7 +32,7 @@ namespace dataAccess
             }
             
             var targetModeCode = "";
-            switch (Mode)
+            switch (mode)
             {
                 case "arcade":
                     targetModeCode = "arcade";
