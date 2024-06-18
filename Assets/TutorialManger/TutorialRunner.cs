@@ -81,12 +81,19 @@ public class TutorialRunner
     {
         var goTo = new GoTo(MainSceneStep.QuestInfo);
         //var forceTeamEdit = new ForceToTeamEdit("teamEdit2");
-        var teamEdit2 = new TeamEdit("teamEdit2");
-
+        //var teamEdit2 = new TeamEdit("teamEdit2");
+        
+        bool StageTwoFinished()
+        {
+            return PlayerAccountInfo.Me.tutorialProgress == "Finished";
+        }
+        
+        var waitFighting = new WaitProcess(StageTwoFinished);
+        
         _tutorialProcesses.Clear();
         _tutorialProcesses.Add(goTo);
         //_tutorialProcesses.Add(forceTeamEdit);
-        _tutorialProcesses.Add(teamEdit2);
+        _tutorialProcesses.Add(waitFighting);
     }
     
     public void Process()

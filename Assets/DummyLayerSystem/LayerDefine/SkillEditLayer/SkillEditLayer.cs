@@ -162,13 +162,12 @@ public partial class SkillEditLayer : UILayer
             x=>
             {
                 RunSkillAndShowTransition(x).Forget();
-            },
-            PlayerAccountInfo.Me.tutorialProgress != "Finished"?
-            ExtraTipForSpStoneEquip:null
+            }
         );
-
+        
         if (PlayerAccountInfo.Me.tutorialProgress != "Finished")
         {
+            nineSlot.SetExtraOnNineSlotChanged(ExtraTipForSpStoneEquip);
             ExtraTipForSpStoneEquip();
         }
         

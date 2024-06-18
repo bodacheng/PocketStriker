@@ -56,24 +56,27 @@ namespace FightScene
                                 FightLoad.Fight.ID,
                                 result =>
                                 {
-                                    var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
-                                    var hasReward = jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
-                                    var hasRewardBool = (bool)hasReward;
-                                    var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
-                                    arenaFightOver.Setup();
-                                    arenaFightOver.Step2Anim();
-                                    if (hasRewardBool)
+                                    void Next()
                                     {
-                                        var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
-                                        var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
-                                        PlayerAccountInfo.Me.arcadeProcess = levelInt;
-                                        var rewardGdInt = Convert.ToInt32(rewardGd);
-                                        var rewardDmInt = Convert.ToInt32(rewardDm);
-                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt, 
-                                            levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
-                                            levelInt);
+                                        var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
+                                        var hasReward = jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
+                                        var hasRewardBool = (bool)hasReward;
+                                        var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
+                                        arenaFightOver.Setup();
+                                        arenaFightOver.Step2Anim();
+                                        if (hasRewardBool)
+                                        {
+                                            var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
+                                            var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
+                                            PlayerAccountInfo.Me.arcadeProcess = levelInt;
+                                            var rewardGdInt = Convert.ToInt32(rewardGd);
+                                            var rewardDmInt = Convert.ToInt32(rewardDm);
+                                            arenaFightOver.ShowAward(rewardDmInt, rewardGdInt, 
+                                                levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
+                                                levelInt);
+                                        }
+                                        arenaFightOver.LoadNextArcadeStage();
                                     }
-                                    arenaFightOver.LoadNextArcadeStage();
                                     
                                     if (FightLoad.Fight.ID == "1")
                                     {
@@ -86,8 +89,26 @@ namespace FightScene
                                                     { "TutorialProgress", "StageOneFinished" }
                                                 }
                                             },
-                                            () => {}
+                                            Next
                                         );
+                                    }
+                                    else if (FightLoad.Fight.ID == "2")
+                                    {
+                                        PlayerAccountInfo.Me.tutorialProgress = "Finished";
+                                        PlayFabReadClient.UpdateUserData(
+                                            new UpdateUserDataRequest()
+                                            {
+                                                Data = new Dictionary<string, string>()
+                                                {
+                                                    { "TutorialProgress", "Finished" }
+                                                }
+                                            },
+                                            Next
+                                        );
+                                    }
+                                    else
+                                    {
+                                        Next();
                                     }
                                 }
                             );

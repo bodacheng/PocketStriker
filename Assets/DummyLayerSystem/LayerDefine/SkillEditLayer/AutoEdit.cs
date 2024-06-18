@@ -21,7 +21,6 @@ public partial class SkillEditLayer : UILayer
         {
             Finish(info, targetSkillSet);
         }
-        ExtraTipForSpStoneEquip();
     }
     
     void RandomAll()

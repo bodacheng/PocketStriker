@@ -90,13 +90,7 @@ public class TeamEditPage : MSceneProcess
         UILayerLoader.Remove<TeamEditLayer>();
         UILayerLoader.Remove<TeamSingleSelectLayer>();
     }
-
-    private Action _extraArcadeTeamEditSuccess;
-    public void SetExtraArcadeTeamEditSuccess(Action extraArcadeTeamEditSuccess)
-    {
-        this._extraArcadeTeamEditSuccess = extraArcadeTeamEditSuccess;
-    }
-
+    
     private bool Legal(string teamMode)
     {
         var qualified = true;
@@ -179,7 +173,6 @@ public class TeamEditPage : MSceneProcess
                     },
                     ()=>
                     {
-                        _extraArcadeTeamEditSuccess?.Invoke();
                         ReturnLayer.POP();
                         ProgressLayer.Close();
                     }
@@ -194,7 +187,6 @@ public class TeamEditPage : MSceneProcess
                     },
                     ()=>
                     {
-                        _extraArcadeTeamEditSuccess?.Invoke();
                         ReturnLayer.POP();
                         ProgressLayer.Close();
                     }

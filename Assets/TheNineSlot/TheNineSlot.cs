@@ -194,7 +194,7 @@ namespace mainMenu
             return _focusingSlot;
         }
         
-        void SlotBehaviour(SkillStoneSlot slot, Action<SKStoneItem> playSkill, Action extraOnSlotAction = null)
+        void SlotBehaviour(SkillStoneSlot slot, Action<SKStoneItem> playSkill)
         {
             void ButtonFeature()
             {
@@ -240,12 +240,11 @@ namespace mainMenu
                 {
                     StoneCell.Install(from, to);
                     ValidateWarn();
-                    extraOnSlotAction?.Invoke();
                 }
             );
         }
         
-        public void StartUp(Action<SKStoneItem> runSkill, Action extraOnSlotAction = null)
+        public void StartUp(Action<SKStoneItem> runSkill)
         {
             SelectedRender(null);
             
@@ -272,8 +271,14 @@ namespace mainMenu
             
             foreach (var slot in AllSlot)
             {
-                SlotBehaviour(slot, runSkill, extraOnSlotAction);
+                SlotBehaviour(slot, runSkill);
             }
+        }
+
+        private Action _extraOnNineSlotChanged;
+        public void SetExtraOnNineSlotChanged(Action extraOnNineSlotChanged)
+        {
+            _extraOnNineSlotChanged = extraOnNineSlotChanged;
         }
         
         // 当前技能编辑形成的各项参数更新
@@ -300,6 +305,8 @@ namespace mainMenu
             RefreshEffects();
             var valR = ValidateWarn();
             //ConfirmSkillChangeButton.gameObject.SetActive(valR == SkillSet.SkillEditError.Perfect);
+            
+            _extraOnNineSlotChanged?.Invoke();
             return full;
         }
         

@@ -84,7 +84,6 @@ namespace mainMenu
                             TeamSet.GetTargetSet("arcade").SetPosUnitByInstanceID(0, adam.id);
                             TeamSet.SaveTeamSet("arcade", (x) =>
                             {
-                                Debug.Log("we are here:"+ adam.id);
                                 if (x)
                                 {
                                     Next();
