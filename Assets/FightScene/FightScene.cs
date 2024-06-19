@@ -138,7 +138,7 @@ namespace FightScene
         void Update()
         {
             FSceneProcessesRunner.Main.ProcessUpdate();
-            TutorialRunner.Main.Process();
+            //TutorialRunner.Main.Process();
         }
 
         void FixedUpdate()

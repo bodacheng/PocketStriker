@@ -56,22 +56,34 @@ public class TutorialRunner
 
     void GenerateStep3Tutorial()
     {
+        if (MainMenuNote.GoingTo != MainSceneStep.FrontPage)
+        {
+            ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> PreScene.target.trySwitchToStep(x, false));
+        }
+        PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+        
         var goTo = new GoTo(MainSceneStep.GotchaFront);
         var tryGotcha = new TryGotcha();
+        var goToFront = new GoTo(MainSceneStep.UnitList);
         
         _tutorialProcesses.Clear();
         _tutorialProcesses.Add(goTo);
         _tutorialProcesses.Add(tryGotcha);
+        _tutorialProcesses.Add(goToFront);
     }
 
     void GenerateStep4Tutorial()
     {
-        var goTo = new GoTo(MainSceneStep.UnitList);
+        if (ProcessesRunner.Main.currentProcess.Step != MainSceneStep.UnitList)
+        {
+            MainMenuNote.GoingTo = MainSceneStep.UnitList;
+            PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+        }
+        
         var openSkillEdit = new OpenSkillEdit("1");
         var skillEditTry = new SkillEditTry("openInstruction2");
         var goTo1 = new GoTo(MainSceneStep.FrontPage);
         _tutorialProcesses.Clear();
-        _tutorialProcesses.Add(goTo);
         _tutorialProcesses.Add(openSkillEdit);
         _tutorialProcesses.Add(skillEditTry);
         _tutorialProcesses.Add(goTo1);
@@ -79,6 +91,12 @@ public class TutorialRunner
     
     void GenerateStep5Tutorial()
     {
+        if (ProcessesRunner.Main.currentProcess.Step != MainSceneStep.FrontPage)
+        {
+            ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> PreScene.target.trySwitchToStep(x, false));
+            PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+        }
+        
         var goTo = new GoTo(MainSceneStep.QuestInfo);
         //var forceTeamEdit = new ForceToTeamEdit("teamEdit2");
         //var teamEdit2 = new TeamEdit("teamEdit2");

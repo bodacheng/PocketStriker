@@ -17,13 +17,16 @@ public class SkillEditTry : TutorialProcess
         this._tutorialFlag = tutorialFlag;
     }
     
-    public override void ProcessEnd()
+    public override void ProcessEnter()
     {
-        string focusInstanceID = PreScene.target.GetFocusInstanceID();
-        PreScene.target.SetFocusingUnit(focusInstanceID);
-        LowerMainBar.Open();
-        MainMenuNote.GoingTo = MainSceneStep.UnitSkillEdit;
-        PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+        if (_tutorialFlag == "openInstruction1")
+        {
+            string focusInstanceID = PreScene.target.GetFocusInstanceID();
+            PreScene.target.SetFocusingUnit(focusInstanceID);
+            LowerMainBar.Open();
+            MainMenuNote.GoingTo = MainSceneStep.UnitSkillEdit;
+            PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+        }
     }
     
     public override bool CanEnterOtherProcess()
