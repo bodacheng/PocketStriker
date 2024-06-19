@@ -1,4 +1,6 @@
 using DG.Tweening;
+using DummyLayerSystem;
+using NoSuchStudio.Common;
 using UnityEngine;
 
 public class SkillEditTutorial11 : MonoBehaviour
@@ -10,8 +12,13 @@ public class SkillEditTutorial11 : MonoBehaviour
     
     private Tween moveTween;
     
-    private void Start()
+    void OnEnable()
     {
+        var layer = UILayerLoader.Get<SkillEditLayer>();
+        var emptySlots = layer.nineSlot.GetEmptySlots();
+        var target = emptySlots.Random();
+        endPoint = target._cell.GetComponent<RectTransform>();
+        
         MoveElement();
     }
     
@@ -26,9 +33,6 @@ public class SkillEditTutorial11 : MonoBehaviour
     
     private void OnDestroy()
     {
-        if (moveTween != null)
-        {
-            moveTween.Kill();
-        }
+        moveTween?.Kill();
     }
 }

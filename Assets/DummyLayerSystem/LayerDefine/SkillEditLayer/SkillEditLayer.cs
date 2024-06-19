@@ -165,12 +165,6 @@ public partial class SkillEditLayer : UILayer
             }
         );
         
-        if (PlayerAccountInfo.Me.tutorialProgress != "Finished")
-        {
-            nineSlot.SetExtraOnNineSlotChanged(ExtraTipForSpStoneEquip);
-            ExtraTipForSpStoneEquip();
-        }
-        
         stonesBox.AddFeatureToCells(StoneCellFeature);
         stonesBox.IniExTabs();
         

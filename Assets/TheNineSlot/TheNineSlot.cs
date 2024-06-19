@@ -275,6 +275,17 @@ namespace mainMenu
             }
         }
 
+        public List<SkillStoneSlot> GetEmptySlots()
+        {
+            List<SkillStoneSlot> returnValue = new List<SkillStoneSlot>();
+            foreach (var slot in AllSlot)
+            {
+                if (slot._cell.GetItem() == null && slot._cell.gameObject.activeSelf)
+                    returnValue.Add(slot);
+            }
+            return returnValue;
+        }
+
         private Action _extraOnNineSlotChanged;
         public void SetExtraOnNineSlotChanged(Action extraOnNineSlotChanged)
         {

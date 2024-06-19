@@ -115,6 +115,8 @@ public class SkillEditTry : TutorialProcess
                         );
                     }
                 );
+                _skillEditLayer.nineSlot.SetExtraOnNineSlotChanged(_skillEditLayer.ExtraTipForSpStoneEquip);
+                _skillEditLayer.ExtraTipForSpStoneEquip();
                 _skillEditLayer.Initialized = false;
             }
         }
