@@ -145,7 +145,6 @@ namespace mainMenu
             
             BasicPhase();
             ToInitialPhase();
-            TutorialRunner.Main.TutorialCheck();
         }
 
         async UniTask PrepareModelOftenUse()
@@ -242,16 +241,12 @@ namespace mainMenu
             }
             else
             {
-                if (PlayerAccountInfo.Me.tutorialProgress == "Started")
+                if (PlayerAccountInfo.Me.tutorialProgress != "Finished")
                 {
-                    PreScene.target.DataLoading(
+                    DataLoading(
                         () =>
                         {
-                            string focusInstanceID = GetFocusInstanceID();
-                            SetFocusingUnit(focusInstanceID);
-                            LowerMainBar.Open();
-                            MainMenuNote.GoingTo = MainSceneStep.UnitSkillEdit;
-                            trySwitchToStep(MainMenuNote.GoingTo, false);
+                            TutorialRunner.Main.TutorialCheck();
                         }
                     );
                 }

@@ -11,6 +11,10 @@ public class QuestInfoPage : MSceneProcess
     
     async UniTask EnterProcess(FightInfo stage)
     {
+        var represent = stage.GetRepresentUnitInfo();
+        UnitConfig unitConfig = Units.GetUnitConfig(represent.r_id);
+        BackGroundPS.target.ChangeBGByElement(unitConfig.element);
+        
         FightLoad.Fight = stage;
         _layer = UILayerLoader.Load<FightPrepareLayer>();
         

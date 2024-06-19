@@ -17,6 +17,15 @@ public class SkillEditTry : TutorialProcess
         this._tutorialFlag = tutorialFlag;
     }
     
+    public override void ProcessEnd()
+    {
+        string focusInstanceID = PreScene.target.GetFocusInstanceID();
+        PreScene.target.SetFocusingUnit(focusInstanceID);
+        LowerMainBar.Open();
+        MainMenuNote.GoingTo = MainSceneStep.UnitSkillEdit;
+        PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+    }
+    
     public override bool CanEnterOtherProcess()
     {
         return _skillEditFinished;

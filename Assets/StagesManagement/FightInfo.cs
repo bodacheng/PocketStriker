@@ -16,6 +16,11 @@ public class FightInfo : ScriptableObject
     // 底下这个记录的是敌人的信息
     [SerializeField] List<UnitInfo> unitsData = new List<UnitInfo>();
 
+    public UnitInfo GetRepresentUnitInfo()
+    {
+        return unitsData.FirstOrDefault(x => x != null);
+    }
+    
     public List<UnitInfo> UnitsData
     {
         get => unitsData;
