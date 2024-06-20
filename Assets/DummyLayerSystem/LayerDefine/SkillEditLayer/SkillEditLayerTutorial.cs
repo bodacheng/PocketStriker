@@ -67,6 +67,7 @@ public partial class SkillEditLayer : UILayer
     public void ExtraTipForSpStoneEquip()
     {
         int step = FullSpLevelEquipTutorialStep();
+        nineSlot.ForceFirstColumn(step == 0);
         spStoneGuide1.SetActive(step == 0);
         spStoneGuide2.SetActive(step == 1);
         spStoneGuide3.SetActive(step == 2);
@@ -76,8 +77,6 @@ public partial class SkillEditLayer : UILayer
         
         clickAutoEditIndicator.SetActive(step == 6);
         clickAutoEditIndicator2.SetActive(step == 6);
-        
-        nineSlot.ForceFirstColumn(step == 0);
         
         switch (step)
         {

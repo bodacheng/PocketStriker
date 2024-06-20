@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using mainMenu;
+using UnityEngine;
 
 public class TutorialRunner
 {
@@ -74,7 +75,7 @@ public class TutorialRunner
 
     void GenerateStep4Tutorial()
     {
-        if (ProcessesRunner.Main.currentProcess.Step != MainSceneStep.UnitList)
+        if (ProcessesRunner.Main.currentProcess == null || ProcessesRunner.Main.currentProcess.Step != MainSceneStep.UnitList)
         {
             MainMenuNote.GoingTo = MainSceneStep.UnitList;
             PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
@@ -91,7 +92,7 @@ public class TutorialRunner
     
     void GenerateStep5Tutorial()
     {
-        if (ProcessesRunner.Main.currentProcess.Step != MainSceneStep.FrontPage)
+        if (ProcessesRunner.Main.currentProcess == null || ProcessesRunner.Main.currentProcess.Step != MainSceneStep.FrontPage)
         {
             ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> PreScene.target.trySwitchToStep(x, false));
             PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);

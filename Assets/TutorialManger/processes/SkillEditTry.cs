@@ -115,6 +115,7 @@ public class SkillEditTry : TutorialProcess
                         );
                     }
                 );
+                _skillEditLayer.stonesBox.ScrollRect.vertical = false;
                 _skillEditLayer.nineSlot.SetExtraOnNineSlotChanged(_skillEditLayer.ExtraTipForSpStoneEquip);
                 _skillEditLayer.ExtraTipForSpStoneEquip();
                 _skillEditLayer.Initialized = false;

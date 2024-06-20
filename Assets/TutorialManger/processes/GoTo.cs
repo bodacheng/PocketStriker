@@ -23,7 +23,7 @@ public class GoTo : TutorialProcess
     {
         if (_lowerMainBar == null)
         {
-            _lowerMainBar = UILayerLoader.Get<LowerMainBar>();
+            _lowerMainBar = UILayerLoader.Load<LowerMainBar>();
             if (_lowerMainBar != null)
             {
                 _lowerMainBar.PlsClickBtn(_goto);

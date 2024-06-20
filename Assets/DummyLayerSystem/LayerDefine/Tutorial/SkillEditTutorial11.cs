@@ -18,13 +18,13 @@ public class SkillEditTutorial11 : MonoBehaviour
         var emptySlots = layer.nineSlot.GetEmptySlots();
         var target = emptySlots.Random();
         endPoint = target._cell.GetComponent<RectTransform>();
-        
         MoveElement();
     }
     
     private void MoveElement()
     {
         targetUIElement.position = startPoint.position;
+        moveTween?.Kill();
         moveTween = targetUIElement.DOMove(endPoint.position, moveDuration)
             .OnComplete(() => targetUIElement.position = startPoint.position)
             .SetEase(Ease.Linear)

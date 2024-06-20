@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using dataAccess;
@@ -20,7 +21,7 @@ namespace mainMenu
         public ScrollRect ScrollRect => scrollRect;
         public static GameObject Selected;
         readonly IDictionary<int, StoneCell> _cellsDic = new Dictionary<int, StoneCell>();
-
+        
         public void SetBoxHeight(float sizeNeedToRemain)
         {
             var stoneBoxRect = transform.GetComponent<RectTransform>();
@@ -91,7 +92,7 @@ namespace mainMenu
             }
             return null;
         }
-
+        
         public void ReturnStoneToBox(SKStoneItem item)
         {
             if (item._SkillConfig.SP_LEVEL == FocusingExType)
