@@ -32,20 +32,21 @@ public class StageEditorWindow : EditorWindow
         }
         
         _target.SetUnitLevelByRefLevel();
-        _stageEditor.OnGUIView(_target.FightMembers);
-        
-        _pathAndNameForLocalSave = EditorGUILayout.TextField("local Path For Saving", _pathAndNameForLocalSave);
-        _fileName = EditorGUILayout.TextField("file", _fileName);
-        
-        if (GUILayout.Button("Save FightInfo"))
+        _stageEditor.OnGUIView(_target.FightMembers, null, () =>
         {
-            FightInfo.CreateFightInfoAsset(_target.FightMembers, _pathAndNameForLocalSave, _fileName);
-        }
+            _pathAndNameForLocalSave = EditorGUILayout.TextField("local Path For Saving", _pathAndNameForLocalSave);
+            _fileName = EditorGUILayout.TextField("file", _fileName);
         
-        if (GUILayout.Button("Save GangbangInfo"))
-        {
-            FightInfo.CreateGangbangInfoAsset(_target.FightMembers, _pathAndNameForLocalSave, _fileName);
-        }
+            if (GUILayout.Button("Save FightInfo"))
+            {
+                FightInfo.CreateFightInfoAsset(_target.FightMembers, _pathAndNameForLocalSave, _fileName);
+            }
+        
+            if (GUILayout.Button("Save GangbangInfo"))
+            {
+                FightInfo.CreateGangbangInfoAsset(_target.FightMembers, _pathAndNameForLocalSave, _fileName);
+            }
+        });
     }
 }
 #endif

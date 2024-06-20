@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public partial class StageEditor{
 
     bool Initialized = false;
+    bool Running = false;
     GUIStyle _buttonStyle;
     GUIStyle _unitIconStyle, _unitIconSelectedStyle;
     GUIContent _unitBtnContent;

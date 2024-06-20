@@ -27,14 +27,15 @@ public class GangbangInfoGUI : Editor
         }
         
         gangbangInfo.SetUnitLevelByRefLevel();
-        _stageEditor.OnGUIView(gangbangInfo.FightMembers, gangbangInfo.GetTeam2GroupSet);
-        
-        if (GUILayout.Button("Save"))
+        _stageEditor.OnGUIView(gangbangInfo.FightMembers, gangbangInfo.GetTeam2GroupSet, () =>
         {
-            gangbangInfo.SaveDicToData();
-            EditorUtility.SetDirty(gangbangInfo);
-            AssetDatabase.SaveAssets();
-        }
+            if (GUILayout.Button("Save"))
+            {
+                gangbangInfo.SaveDicToData();
+                EditorUtility.SetDirty(gangbangInfo);
+                AssetDatabase.SaveAssets();
+            }
+        });
     }
 }
 #endif

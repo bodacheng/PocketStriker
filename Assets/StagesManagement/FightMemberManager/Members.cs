@@ -1,5 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using Singleton;
@@ -27,9 +30,9 @@ public partial class StageEditor {
     string _focusingPosID;
     int _unitCount = 3;
     
-    void Members(FightMembers target, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
+    async UniTask Members(FightMembers target, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
     {
-        async void UnitSlot(int posNum, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
+        async UniTask UnitSlot(int posNum, Func<string, GangbangInfo.SoldierGroupSet> gangbangGet = null)
         {
             var unitInfo = target.EnemySets.Get(0, posNum);
             var sprite = unitInfo != null ? await UnitIconDic.Load(unitInfo.r_id) : null;
@@ -59,10 +62,13 @@ public partial class StageEditor {
         GUI.BeginGroup(rect);
         
         _unitCount = Mathf.Max(target.EnemySets.GetValues().Count, _unitCount);
+
+        List<UniTask> tasks = new List<UniTask>();
         for (int i = 0; i < _unitCount; i++)
         {
-            UnitSlot(i, gangbangGet);
+            tasks.Add(UnitSlot(i, gangbangGet));
         }
+        await UniTask.WhenAll(tasks.ToArray());
         if (GUI.Button(new Rect(_unitCount * 40, 0, 20, 20), "+"))
         {
             _unitCount++;

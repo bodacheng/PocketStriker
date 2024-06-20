@@ -10,9 +10,14 @@ public class FightInfoGUI : Editor
 {
     private StageEditor _stageEditor;
     private bool _initialized = false;
+    private bool _running = false;
     
     public override void OnInspectorGUI()
     {
+        if (_running)
+            return;
+        _running = true;
+        
         if (!Starter.ConfigInitialised)
         {
             EditorGUILayout.LabelField("Loading config");
@@ -29,14 +34,17 @@ public class FightInfoGUI : Editor
         
         fightInfo.EvolutionMode = EditorGUILayout.Toggle("进化模式", fightInfo.EvolutionMode);
         fightInfo.SetUnitLevelByRefLevel();
-        _stageEditor.OnGUIView(fightInfo.FightMembers);
-        
-        if (GUILayout.Button("Save"))
+        _stageEditor.OnGUIView(fightInfo.FightMembers,null,
+            ()=>
         {
-            fightInfo.SaveDicToData();
-            EditorUtility.SetDirty(fightInfo);
-            AssetDatabase.SaveAssets();
-        }
+            if (GUILayout.Button("Save"))
+            {
+                fightInfo.SaveDicToData();
+                EditorUtility.SetDirty(fightInfo);
+                AssetDatabase.SaveAssets();
+            }
+            _running = false;
+        });
     }
     
     public static Sprite GetSprite(string name)
