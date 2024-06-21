@@ -39,14 +39,25 @@ namespace FightScene
                 }).AddTo(RTFightManager.Target.Disposables);
         }
         
-        public void TeamsIniRotate(float teamHpRate, CriticalGaugeMode teamCGMode, AIMode aiMode, int aiDelayFrame, Func<bool> AITriggerDreamComboRateCondition)
+        public void TeamsIniRotate(float teamHpRate, CriticalGaugeMode teamCGMode, AIMode aiMode, int aiDelayFrame, 
+            Func<bool> aiTriggerDreamComboRateCondition, bool evolutionMode = false)
         {
-            foreach (var center in teamMembers.GetValues())
+            var list = teamMembers.GetValues();
+            for (var index = 0; index < list.Count; index++)
             {
+                var center = list[index];
                 //  时间刷新整备
                 RTFightManager.Target.RefreshTimeDic.Add(center, new ReactiveProperty<float>(0));
-                center.Step3Initialize(teamConfig, teamCGMode, aiMode, aiDelayFrame, AITriggerDreamComboRateCondition, teamHpRate, RTFightManager.Target.UnitInfoRef[center]);
-                center.FightDataRef.IsDead.Subscribe(x => {
+                if (!evolutionMode)
+                    center.Step3Initialize(teamConfig, teamCGMode, aiMode, aiDelayFrame, aiTriggerDreamComboRateCondition, teamHpRate, RTFightManager.Target.UnitInfoRef[center]);
+                else
+                {
+                    float HPRate = index > 2 ? teamHpRate : 1;
+                    center.Step3Initialize(teamConfig, teamCGMode, aiMode, aiDelayFrame, aiTriggerDreamComboRateCondition, HPRate, RTFightManager.Target.UnitInfoRef[center]);
+                }
+                
+                center.FightDataRef.IsDead.Subscribe(x =>
+                {
                     if (x)
                     {
                         Sensor.AddOrRemoveSharedDeadUnitInfo(center, teamConfig.myTeam, true);
@@ -60,7 +71,7 @@ namespace FightScene
                                 var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
                                 fightingLayer.gameObject.SetActive(false);
                                 RTFightManager.Target.team1.InputsManager.FocusUnit(null);
-                                
+
                                 RTFightManager.Target.EvolutionManager.EvolutionCount++;
                                 string bottomText = "";
                                 switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
@@ -75,30 +86,31 @@ namespace FightScene
                                         bottomText = Translate.Get("InBattleEvolutionInfo3");
                                         break;
                                 }
-                                
+
                                 inBattleEvolution.Setup(RTFightManager.Target.team1.RMode_Unit.Value, () =>
-                                {
-                                    UILayerLoader.Remove<InBattleEvolution>();
-                                    ToNewUnit(0);
-                                    switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
                                     {
-                                        case 1:
-                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                .CriticalGaugeMode = CriticalGaugeMode.Normal;
-                                            break;
-                                        case 2:
-                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                .CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
-                                            break;
-                                        case 3:
-                                            RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                .CriticalGaugeMode = CriticalGaugeMode.Unlimited;
-                                            break;
-                                    }
-                                    
-                                    fightingLayer.gameObject.SetActive(true);
-                                    RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1.RMode_Unit.Value);
-                                },
+                                        UILayerLoader.Remove<InBattleEvolution>();
+                                        ToNewUnit(0);
+                                        switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
+                                        {
+                                            case 1:
+                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                    .CriticalGaugeMode = CriticalGaugeMode.Normal;
+                                                break;
+                                            case 2:
+                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                    .CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
+                                                break;
+                                            case 3:
+                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
+                                                    .CriticalGaugeMode = CriticalGaugeMode.Unlimited;
+                                                break;
+                                        }
+
+                                        fightingLayer.gameObject.SetActive(true);
+                                        RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1
+                                            .RMode_Unit.Value);
+                                    },
                                     Translate.Get("ChooseYourEvolution"), bottomText);
                             }
                             else
@@ -106,16 +118,18 @@ namespace FightScene
                                 ToNewUnit(2);
                             }
                         }
-                        
+
                         var disposable = new SerialDisposable();
                         disposable.Disposable = Observable.Timer(TimeSpan.FromSeconds(1)).Subscribe(
                             async (_) =>
                             {
                                 if (center != null)
                                 {
-                                    await EffectsManager.GenerateEffect(CommonSetting.MemberShiftEffectCode, null, center.geometryCenter.position, Quaternion.identity, null);
+                                    await EffectsManager.GenerateEffect(CommonSetting.MemberShiftEffectCode, null,
+                                        center.geometryCenter.position, Quaternion.identity, null);
                                     center.WholeT.gameObject.SetActive(false);
                                 }
+
                                 disposable.Dispose();
                             }).AddTo(center);
                     }

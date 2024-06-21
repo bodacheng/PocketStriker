@@ -10,14 +10,9 @@ public class FightInfoGUI : Editor
 {
     private StageEditor _stageEditor;
     private bool _initialized = false;
-    private bool _running = false;
     
     public override void OnInspectorGUI()
     {
-        if (_running)
-            return;
-        _running = true;
-        
         if (!Starter.ConfigInitialised)
         {
             EditorGUILayout.LabelField("Loading config");
@@ -43,7 +38,6 @@ public class FightInfoGUI : Editor
                 EditorUtility.SetDirty(fightInfo);
                 AssetDatabase.SaveAssets();
             }
-            _running = false;
         });
     }
     

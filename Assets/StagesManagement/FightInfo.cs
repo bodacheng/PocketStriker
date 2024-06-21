@@ -71,20 +71,11 @@ public class FightInfo : ScriptableObject
         }
         else
         {
+            // 原本希望让敌人按登场顺序逐渐等级提升。。。
             for (var index = 0; index < UnitsData.Count; index++)
             {
                 var unitInfo = UnitsData[index];
-                switch (index)
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        unitInfo.level = stageRefLevel;
-                        break;
-                    default:
-                        unitInfo.level = stageRefLevel + 0.5f;
-                        break;
-                }
+                unitInfo.level = stageRefLevel;
             }
         }
     }
@@ -157,7 +148,7 @@ public class FightInfo : ScriptableObject
                     form = new SkillStonesBox.StoneFilterForm
                     {
                         Type = type,
-                        ExType = new[] { 1, 2, 3 }
+                        ExType = new[] { 0, 1, 2 }
                     };
                     unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, false);
                     break;
@@ -165,9 +156,9 @@ public class FightInfo : ScriptableObject
                     form = new SkillStonesBox.StoneFilterForm
                     {
                         Type = type,
-                        ExType = new[] { 1, 2, 3 }
+                        ExType = new[] { 0, 1, 2, 3 }
                     };
-                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, true);
+                    unitInfo.set =  SkillSet.RandomSkillSet(type, passiveSKillRecordId,  false, form, false);
                     break;
             }
         }
