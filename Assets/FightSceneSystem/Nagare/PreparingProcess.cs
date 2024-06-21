@@ -112,6 +112,12 @@ public class PreparingProcess : FSceneProcess
             RTFightManager.Target.team1.TurnAllUnitsInvincible(FightGlobalSetting._Team1Invincible);
             RTFightManager.Target.team2.TurnAllUnitsInvincible(false);
         }
+
+        if (FightLoad.Fight.EvolutionMode)
+        {
+            RTFightManager.Target.team1.TeamMode = TeamMode.Rotation;
+            RTFightManager.Target.team2.TeamMode = TeamMode.Rotation;
+        }
         
         switch (RTFightManager.Target.team1.TeamMode)
         {
