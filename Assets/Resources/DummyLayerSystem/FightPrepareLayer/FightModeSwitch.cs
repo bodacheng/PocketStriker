@@ -38,6 +38,10 @@ public class FightModeSwitch : MonoBehaviour
                 animator.enabled = false;
                 SetMode(TeamMode.Rotation);
             break;
+            case 3:
+                btn.gameObject.SetActive(false);
+                SetMode(TeamMode.Rotation);
+            break;
             default:
                 btn.onClick.AddListener(OnClick);
                 btn.interactable = true;

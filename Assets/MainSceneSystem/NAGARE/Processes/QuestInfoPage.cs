@@ -114,6 +114,11 @@ public class QuestInfoPage : MSceneProcess
         {
             int FightMode()
             {
+                if (FightLoad.Fight.EvolutionMode)
+                {
+                    return 3;
+                }
+                
                 switch (FightLoad.Fight.EventType)
                 {
                     case FightEventType.Quest:

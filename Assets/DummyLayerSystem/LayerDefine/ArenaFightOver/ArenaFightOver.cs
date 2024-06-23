@@ -140,12 +140,12 @@ public partial class ArenaFightOver : UILayer
         var nextFight = await PlayerAccountInfo.Me.ArcadeModeManager.LoadStage(nextStageNo);
         if (nextFight != null && PlayerAccountInfo.Me.tutorialProgress == "Finished" && nowStageNo != 5)
         {
-            nextTab.SetUp(nextFight.ArcadeFightMode, "Stage " + nextStageNo);
+            nextTab.SetUp(nextFight.EvolutionMode ? 3 : nextFight.ArcadeFightMode, "Stage " + nextStageNo);
             nextTab.gameObject.SetActive(true);
             nextTab.SetUpAction(
                 () =>
                 {
-                    NextFight((TeamMode)nextFight.ArcadeFightMode, nextFight);
+                    NextFight(nextFight.EvolutionMode ? TeamMode.Rotation: (TeamMode)nextFight.ArcadeFightMode, nextFight);
                 },
                 () =>
                 {
@@ -175,7 +175,7 @@ public partial class ArenaFightOver : UILayer
             case FightEventType.Arena:
                 break;
             case FightEventType.Quest:
-                againTab.SetUp(FightLoad.Fight.ArcadeFightMode, "Stage " + FightLoad.Fight.ID);
+                againTab.SetUp(FightLoad.Fight.EvolutionMode ? 3 : FightLoad.Fight.ArcadeFightMode, "Stage " + FightLoad.Fight.ID);
                 break;
             case FightEventType.Gangbang:
                 againTab.SetUp(-1, "Stage " + FightLoad.Fight.ID);
