@@ -759,6 +759,7 @@ GameObject:
   - component: {fileID: 3633094281250910035}
   - component: {fileID: 1511213152559089187}
   - component: {fileID: 7643379560085363472}
+  - component: {fileID: 5810599698332918490}
   m_Layer: 5
   m_Name: 5
   m_TagString: Untagged
@@ -806,7 +807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -841,6 +842,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip5
   target: {fileID: 1511213152559089187}
+--- !u!114 &5810599698332918490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519272762522999893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &802632018728760608
 GameObject:
   m_ObjectHideFlags: 0
@@ -2503,6 +2519,7 @@ GameObject:
   - component: {fileID: 5132306132645028779}
   - component: {fileID: 2829545681729103624}
   - component: {fileID: 8995573429683961876}
+  - component: {fileID: 6499322034208068404}
   m_Layer: 5
   m_Name: 1
   m_TagString: Untagged
@@ -2551,7 +2568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2571,7 +2588,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: TIP1
+  m_Text: TIP1TIP1TIP1TIP1
 --- !u!114 &8995573429683961876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2586,6 +2603,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip1
   target: {fileID: 2829545681729103624}
+--- !u!114 &6499322034208068404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863713576742856623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &2043076154713742979
 GameObject:
   m_ObjectHideFlags: 0
@@ -11475,6 +11507,7 @@ GameObject:
   - component: {fileID: 8513741006304494331}
   - component: {fileID: 1259442252115629698}
   - component: {fileID: 3579828571890171103}
+  - component: {fileID: 5449440793362037044}
   m_Layer: 5
   m_Name: 3
   m_TagString: Untagged
@@ -11523,7 +11556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -11558,6 +11591,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip3
   target: {fileID: 1259442252115629698}
+--- !u!114 &5449440793362037044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5790055383081309333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &5917874841818350793
 GameObject:
   m_ObjectHideFlags: 0
@@ -11903,6 +11951,7 @@ GameObject:
   - component: {fileID: 3097753451808706631}
   - component: {fileID: 2330775011185679223}
   - component: {fileID: 3721770278483859999}
+  - component: {fileID: 802595133396493048}
   m_Layer: 5
   m_Name: 2
   m_TagString: Untagged
@@ -11951,7 +12000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -11986,6 +12035,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip2
   target: {fileID: 2330775011185679223}
+--- !u!114 &802595133396493048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6372452939235631218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &6381468797884707277
 GameObject:
   m_ObjectHideFlags: 0
@@ -13438,6 +13502,7 @@ GameObject:
   - component: {fileID: 1610506101590922803}
   - component: {fileID: 7022302414200395650}
   - component: {fileID: 6673439873092094747}
+  - component: {fileID: 6501006335361587092}
   m_Layer: 5
   m_Name: 6
   m_TagString: Untagged
@@ -13485,7 +13550,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -13520,6 +13585,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip6
   target: {fileID: 7022302414200395650}
+--- !u!114 &6501006335361587092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7802268604775520653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &8352507537641828362
 GameObject:
   m_ObjectHideFlags: 0
@@ -13750,6 +13830,7 @@ GameObject:
   - component: {fileID: 2129492918424982775}
   - component: {fileID: 1753320231244620594}
   - component: {fileID: 1223483925786604487}
+  - component: {fileID: 7516148676287717237}
   m_Layer: 5
   m_Name: 4
   m_TagString: Untagged
@@ -13798,7 +13879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -13833,6 +13914,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: SpStoneEquipTip4
   target: {fileID: 1753320231244620594}
+--- !u!114 &7516148676287717237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8470485887328604505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &8574462433376753252
 GameObject:
   m_ObjectHideFlags: 0
@@ -14284,6 +14380,7 @@ GameObject:
   - component: {fileID: 6315063441865620888}
   - component: {fileID: 3439347392573392108}
   - component: {fileID: 7101599459579140769}
+  - component: {fileID: 4471910551089293594}
   m_Layer: 5
   m_Name: AutoEquipText
   m_TagString: Untagged
@@ -14331,7 +14428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9490196, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -14366,6 +14463,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageCode: AutoEquipIntro
   target: {fileID: 3439347392573392108}
+--- !u!114 &4471910551089293594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9172398427629062552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &9210809497775020969
 GameObject:
   m_ObjectHideFlags: 0

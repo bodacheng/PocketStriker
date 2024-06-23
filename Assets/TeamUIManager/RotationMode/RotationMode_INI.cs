@@ -12,7 +12,7 @@ namespace FightScene
             foreach (var center in _teamMembers.GetValues())
             {
                 var sideIcon = Instantiate(unitIconPrefab);
-                sideIcon.name = center.name + " ICon";
+                sideIcon.name = center.UnitInfo.r_id + "_icon";
                 sideIcon.Icon.iconButton.onClick.RemoveAllListeners();
                 sideIcon.Icon.iconButton.onClick.AddListener(() => { ChangeUnit(center); });
                 var info = RTFightManager.Target.UnitInfoRef[center];
