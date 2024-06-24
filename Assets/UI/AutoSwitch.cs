@@ -9,12 +9,11 @@ public class AutoSwitch : MonoBehaviour
     private Action<bool> _action;
     private Func<bool> _currentState;
     public Func<bool> CurrentState => _currentState;
-
-    private bool startState;
-
+    
     void OnEnable()
     {
-        Switch(startState);
+        if (_currentState != null)
+            Switch(_currentState());
     }
     
     void Switch(bool on)
@@ -38,7 +37,6 @@ public class AutoSwitch : MonoBehaviour
             ChangeAutoState(changedState);
         });
         
-        startState = this._currentState();
         Switch(this._currentState());
     }
 }

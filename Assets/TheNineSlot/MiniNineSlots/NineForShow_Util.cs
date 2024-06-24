@@ -131,7 +131,7 @@ public partial class NineForShow : MonoBehaviour
     /// 技能编辑画面的slot特效和格子尺寸的适配关系，前提无非是他们的prefab尺寸正好就是适配起来了，这个是前提，
     /// 然后技能进化画面里面的那个格子在Canvas上的长度是技能编辑画面中的两倍，把2给撑上正好尺寸也适配了
     /// </param>
-    async void RefreshEffects(Camera camera, float scale)
+    async UniTask RefreshEffects(Camera camera, float scale)
     {
         await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
         var allStones = AllStones();
@@ -140,10 +140,11 @@ public partial class NineForShow : MonoBehaviour
             var item = allStones[index];
             if (item != null)
             {
+                BOButton parentBtn = item.GetComponentInParent<BOButton>();
                 var worldPos = PosCal.GetWorldPos(camera,
-                    item.GetComponentInParent<BOButton>().transform.GetComponent<RectTransform>(), 5f);
+                    parentBtn.transform.GetComponent<RectTransform>(), 5f);
                 await RefreshSlotEffects(index+1, item != null ? item._SkillConfig.SP_LEVEL : -1,
-                    worldPos, transform, _slotEffects, scale, 5);
+                    worldPos, parentBtn.transform, _slotEffects, scale, 5);
             }
         }
     }

@@ -29,6 +29,10 @@ public static class FightLoad
             fightInfo.Team1Auto = false;
             fightInfo.Team2Auto = false;
         }
+        else
+        {
+            fightInfo.RunTutorial = false;
+        }
         
         Fight =  FightInfo.Copy(fightInfo);
 

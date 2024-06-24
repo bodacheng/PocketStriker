@@ -19,6 +19,8 @@ public class InBattleEvolution : UILayer
             set.b1, set.b2, set.b3,
             set.c1, set.c2, set.c3
         );
+        
+        await nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set);
         nineForShow.AddOnClickToSlots(
             (BOButton btn) =>
             {
@@ -42,8 +44,7 @@ public class InBattleEvolution : UILayer
         var recommendedTargetReplaceSlot = 
             focusUnit.UnitInfo.set.RecommendedTargetReplaceSlot
                 (RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
-        if (RTFightManager.Target.EvolutionManager.EvolutionCount < 3)
-            nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set);
+        
         nineForShow.ClickTargetSlot(recommendedTargetReplaceSlot);
         
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);

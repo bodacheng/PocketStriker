@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public partial class NineForShow : MonoBehaviour
@@ -93,7 +94,7 @@ public partial class NineForShow : MonoBehaviour
         });
     }
 
-    public void EvolutionModeSlotInteractiveRefresh(SkillSet set)
+    public async UniTask EvolutionModeSlotInteractiveRefresh(SkillSet set)
     {
         // 第一列技能必须有普通技能
         var normalSkillsOfAList = new List<string>();
@@ -130,6 +131,6 @@ public partial class NineForShow : MonoBehaviour
             }
         }
         
-        RefreshEffects(FightScene.FightScene.target.fxCamera, 5f/3);
+        await RefreshEffects(FightScene.FightScene.target.fxCamera, 5f/3);
     }
 }

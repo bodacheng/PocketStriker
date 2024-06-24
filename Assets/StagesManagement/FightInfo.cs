@@ -357,6 +357,7 @@ public class FightInfo : ScriptableObject
         stage.Team1LeaderboardEntry = source.Team1LeaderboardEntry;
         stage.Team2LeaderboardEntry = source.Team2LeaderboardEntry;
         stage.RunTutorial = source.RunTutorial;
+        stage.evolutionMode = source.evolutionMode;
         stage.EventType = source.EventType;
         stage.dreamComboAIRateNum = source.dreamComboAIRateNum;
         return stage;
