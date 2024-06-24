@@ -42,6 +42,32 @@ public partial class NineForShow : MonoBehaviour
         }
         target.onClick.Invoke();
     }
+
+    public BOButton GetClickedSlot()
+    {
+        switch (_clickedSlot)
+        {
+            case 1:
+                return A1T;
+            case 2:
+                return A2T;
+            case 3:
+                return A3T;
+            case 4:
+                return B1T;
+            case 5:
+                return B2T;
+            case 6:
+                return B3T;
+            case 7:
+                return C1T;
+            case 8:
+                return C2T;
+            case 9:
+                return C3T;
+        }
+        return null;
+    }
     
     public void AddOnClickToSlots(Action<BOButton> onClickStone)
     {

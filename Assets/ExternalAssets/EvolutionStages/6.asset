@@ -17,7 +17,7 @@ MonoBehaviour:
   unitsData:
   - id: 0
     r_id: 10
-    level: 0.5
+    level: 2
     set:
       a1: 58
       a2: 182
@@ -30,7 +30,7 @@ MonoBehaviour:
       c3: 10
   - id: 1
     r_id: 4
-    level: 0.5
+    level: 2
     set:
       a1: 113
       a2: 95
@@ -43,7 +43,7 @@ MonoBehaviour:
       c3: 90
   - id: 2
     r_id: 8
-    level: 0.5
+    level: 2
     set:
       a1: 172
       a2: 53
@@ -56,7 +56,7 @@ MonoBehaviour:
       c3: 37
   - id: 3
     r_id: 12
-    level: 0.5
+    level: 2
     set:
       a1: 42
       a2: 10
@@ -69,7 +69,7 @@ MonoBehaviour:
       c3: 68
   evolutionMode: 1
   team1HpRate: 1
-  team2HpRate: 1
+  team2HpRate: 3
   team1CGMode: 0
   team2CGMode: 0
   team1Mode: 2
@@ -78,4 +78,4 @@ MonoBehaviour:
   team2AIMode: 0
   dumbAIDecisionDelay: 20
   dreamComboAIRateNum: 100
-  stageRefLevel: 2
+  stageRefLevel: 0.6

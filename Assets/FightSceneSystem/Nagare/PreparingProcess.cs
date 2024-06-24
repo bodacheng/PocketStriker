@@ -155,7 +155,7 @@ public class PreparingProcess : FSceneProcess
                     FightLoad.Fight.team2HpRate, FightLoad.Fight.team2CGMode, 
                     FightLoad.Fight.team2AIMode, FightLoad.Fight.dumbAIDecisionDelay,
                     CreateRandomBoolFunc(FightLoad.Fight.EventType == FightEventType.Arena ? 
-                        FightGlobalSetting.ArenaEnemyDreamComboAIRate: FightLoad.Fight.dreamComboAIRateNum)
+                        FightGlobalSetting.ArenaEnemyDreamComboAIRate: FightLoad.Fight.dreamComboAIRateNum), FightLoad.Fight.EvolutionMode
                 );
                 break;
         }
