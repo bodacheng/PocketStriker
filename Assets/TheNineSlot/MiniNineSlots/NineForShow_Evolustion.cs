@@ -94,7 +94,7 @@ public partial class NineForShow : MonoBehaviour
         });
     }
 
-    public async UniTask EvolutionModeSlotInteractiveRefresh(SkillSet set)
+    public async UniTask EvolutionModeSlotInteractiveRefresh(SkillSet set, bool mugen = false)
     {
         // 第一列技能必须有普通技能
         var normalSkillsOfAList = new List<string>();
@@ -109,7 +109,7 @@ public partial class NineForShow : MonoBehaviour
         if (skillConfigC1 is { SP_LEVEL: 0 })
             normalSkillsOfAList.Add(skillConfigC1.REAL_NAME);
         
-        if (normalSkillsOfAList.Count == 1)
+        if (!mugen && normalSkillsOfAList.Count == 1)
         {
             if (skillConfigA1 is { SP_LEVEL: 0 })
             {

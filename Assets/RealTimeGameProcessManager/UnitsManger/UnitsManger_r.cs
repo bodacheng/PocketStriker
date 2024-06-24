@@ -71,7 +71,6 @@ namespace FightScene
                                 var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
                                 fightingLayer.gameObject.SetActive(false);
                                 RTFightManager.Target.team1.InputsManager.FocusUnit(null);
-
                                 RTFightManager.Target.EvolutionManager.EvolutionCount++;
                                 string bottomText = "";
                                 switch (RTFightManager.Target.EvolutionManager.EvolutionCount)

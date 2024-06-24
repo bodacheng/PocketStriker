@@ -135,6 +135,7 @@ public partial class NineForShow : MonoBehaviour
     {
         await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
         var allStones = AllStones();
+        var tasks = new List<UniTask>();
         for (var index = 0; index < allStones.Count; index++)
         {
             var item = allStones[index];
@@ -143,9 +144,18 @@ public partial class NineForShow : MonoBehaviour
                 BOButton parentBtn = item.GetComponentInParent<BOButton>();
                 var worldPos = PosCal.GetWorldPos(camera,
                     parentBtn.transform.GetComponent<RectTransform>(), 5f);
-                await RefreshSlotEffects(index+1, item != null ? item._SkillConfig.SP_LEVEL : -1,
-                    worldPos, parentBtn.transform, _slotEffects, scale, 5);
+                var task = RefreshSlotEffects(
+                    index + 1,
+                    item != null ? item._SkillConfig.SP_LEVEL : -1,
+                    worldPos,
+                    parentBtn.transform,
+                    _slotEffects,
+                    scale,
+                    5
+                );
+                tasks.Add(task);
             }
         }
+        await UniTask.WhenAll(tasks);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using FightScene;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,13 +15,16 @@ public class InBattleEvolution : UILayer
     public async void Setup(Data_Center focusUnit, Action onFinishedSkillEvolution, string upperText, string bottomText)
     {
         var set = focusUnit.UnitInfo.set;
-        await nineForShow.ShowStones(
-            set.a1, set.a2, set.a3,
-            set.b1, set.b2, set.b3,
-            set.c1, set.c2, set.c3
+
+        await UniTask.WhenAll(
+            nineForShow.ShowStones(
+                set.a1, set.a2, set.a3,
+                set.b1, set.b2, set.b3,
+                set.c1, set.c2, set.c3
+            ),
+            ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution)
         );
         
-        await nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set);
         nineForShow.AddOnClickToSlots(
             (BOButton btn) =>
             {
@@ -33,20 +37,20 @@ public class InBattleEvolution : UILayer
                 selectedFrame.gameObject.SetActive(true);
             }
         );
-        ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution);
         
-        this.upperText.text = upperText;
-        this.bottomText.text = bottomText;
-    }
-    
-    void ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution)
-    {
         var recommendedTargetReplaceSlot = 
             focusUnit.UnitInfo.set.RecommendedTargetReplaceSlot
                 (RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
         
         nineForShow.ClickTargetSlot(recommendedTargetReplaceSlot);
         
+        this.upperText.text = upperText;
+        this.bottomText.text = bottomText;
+    }
+    
+    async UniTask ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution)
+    {
+        await nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
         for (var i = 0; i < skillOptions.Length; i++)
         {
@@ -57,7 +61,6 @@ public class InBattleEvolution : UILayer
                     await RTFightManager.Target.EvolutionManager.ChangeSkill(focusUnit, nineForShow.ClickedSlot, skills[index]);
                     onFinishedSkillEvolution.Invoke();
                 });
-            
             skillOptions[i].ShowIcon(skills[i]);
         }
     }
