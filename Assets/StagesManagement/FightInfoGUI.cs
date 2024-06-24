@@ -29,8 +29,7 @@ public class FightInfoGUI : Editor
         
         fightInfo.EvolutionMode = EditorGUILayout.Toggle("进化模式", fightInfo.EvolutionMode);
         fightInfo.SetUnitLevelByRefLevel();
-        _stageEditor.OnGUIView(fightInfo.FightMembers,null,
-            ()=>
+        _stageEditor.OnGUIView(fightInfo.FightMembers,null, ()=>
         {
             if (GUILayout.Button("Save"))
             {
