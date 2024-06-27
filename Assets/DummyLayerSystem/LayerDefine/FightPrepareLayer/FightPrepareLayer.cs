@@ -28,6 +28,7 @@ public partial class FightPrepareLayer : UILayer
     [SerializeField] RewardUI rewardUI;
     [SerializeField] BOButton toArcadeFrontBtn;
     [SerializeField] Image view2D;
+    [SerializeField] Animator layerAnimator;
     [SerializeField] Animator unitOutAnimator;
     [SerializeField] NineForShow nineForShow;
     [SerializeField] DedicatedCameraConnector connector;
@@ -35,6 +36,11 @@ public partial class FightPrepareLayer : UILayer
     [SerializeField] BattleGroundSwitch battleGroundSwitch;
 
     public BattleGroundSwitch BattleGroundSwitch => battleGroundSwitch;
+
+    public void SetLayerAnimatorTrigger(string code)
+    {
+        layerAnimator.SetTrigger(code);
+    }
     
     public void SetFightMode(int fightMode)
     {
@@ -57,7 +63,6 @@ public partial class FightPrepareLayer : UILayer
     }
     
     
-
     public void SetTeamEditFeature(Action teamEdit)
     {
         editTeamButton.onClick.RemoveAllListeners();

@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using DummyLayerSystem;
 using FightScene;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public class InBattleEvolution : UILayer
     [SerializeField] private EvolutionSkill[] skillOptions;
     [SerializeField] private GameObject selectedFrame;
     [SerializeField] private float animEndInSeconds = 0.5f;
+    [SerializeField] private float animEndOutSeconds = 0.2f;
     public async void Setup(Data_Center focusUnit, Action onFinishedSkillEvolution, string upperText, string bottomText)
     {
         var set = focusUnit.UnitInfo.set;
@@ -51,6 +53,7 @@ public class InBattleEvolution : UILayer
     
     async UniTask ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution)
     {
+        
         await nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
         for (var i = 0; i < skillOptions.Length; i++)
@@ -61,7 +64,8 @@ public class InBattleEvolution : UILayer
                 {
                     await RTFightManager.Target.EvolutionManager.ChangeSkill(focusUnit, nineForShow.ClickedSlot, skills[index]);
                     var t = skillOptions[index].Btn.transform.GetComponentInChildren<SKStoneItem>();
-                    t.transform.DOMove( nineForShow.GetClickedSlot().transform.position, animEndInSeconds);
+                    var clickedSlot = nineForShow.GetClickedSlot();
+                    t.transform.DOMove( clickedSlot.transform.position, animEndInSeconds).SetEase(Ease.Flash);
                     for (var a = 0; a < skillOptions.Length; a++)
                     {
                         if (a != index)
@@ -70,6 +74,17 @@ public class InBattleEvolution : UILayer
                         }
                     }
                     await UniTask.Delay(TimeSpan.FromSeconds(animEndInSeconds));
+                    var targetPos = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, clickedSlot.transform.GetComponent<RectTransform>(), 7);
+                    
+                    var _layer = UILayerLoader.Get<FightingStepLayer>();
+                    var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skills[index]);
+                    var explosion = _layer.InputsManager.GetCurrentElementEffectsGroup()
+                        .GetExplosionEffect(skillConfig.SP_LEVEL);
+                    explosion.transform.position = targetPos;
+                    explosion.transform.localScale *= 3;
+                    explosion.Play();
+                    await UniTask.Delay(TimeSpan.FromSeconds(animEndOutSeconds));
+                    explosion.transform.localScale /= 3;
                     onFinishedSkillEvolution.Invoke();
                 });
             skillOptions[i].ShowIcon(skills[i]);

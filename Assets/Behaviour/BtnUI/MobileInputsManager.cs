@@ -199,6 +199,11 @@ public class MobileInputsManager : MonoBehaviour {
         _elementEffects[element].Close(ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
+    public ElementEffectsGroup GetCurrentElementEffectsGroup()
+    {
+        return _elementEffects[_focusing];
+    }
+
     public void GroupSkillIcons()
     {
         btnIcons = new Dictionary<Button, IDictionary<string, GameObject>>

@@ -27,13 +27,16 @@ public class QuestInfoPage : MSceneProcess
                     PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arena", true);
                 }
                 
+                _layer.SetLayerAnimatorTrigger("normal");
                 await _layer.BattleGroundSwitch.INI();
                 _layer.BattleGroundSwitch.gameObject.SetActive(true);
                 _layer.SetTeamEditFeature(GoToTeamEditArena);
+                
                 break;
             case FightEventType.Quest:
-                var arcadeTeam = TeamSet.GetTargetSet("arcade");
+                _layer.SetLayerAnimatorTrigger("evolution");
                 
+                var arcadeTeam = TeamSet.GetTargetSet("arcade");
                 // 处理以前的旧逻辑
                 if (arcadeTeam.PosNumsWithLocalKeys.Length > 1)
                 {
@@ -61,11 +64,13 @@ public class QuestInfoPage : MSceneProcess
                 );
                 break;
             case FightEventType.Event:
+                _layer.SetLayerAnimatorTrigger("normal");
                 FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
                 _layer.SetTeamEditFeature(GoToTeamEditArcade);
                 _layer.SetEventFeature(FightLoad.Fight.ID);
                 break;
             case FightEventType.Gangbang:
+                _layer.SetLayerAnimatorTrigger("normal");
                 _controllingGangbangInfo = GangbangInfo.Copy((GangbangInfo)stage);
                 _controllingGangbangInfo.FightMembers.HeroSets = TeamSet.GetTargetSet("gangbang").LoadTeamDic(); // 为了队员显示
                 _layer.SetTeamEditFeature(
