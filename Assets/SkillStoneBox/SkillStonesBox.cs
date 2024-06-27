@@ -24,6 +24,16 @@ namespace mainMenu
         [SerializeField] Toggle closeCheckBox;
         [SerializeField] Toggle nearCheckBox;
         [SerializeField] Toggle farCheckBox;
+
+        [SerializeField] ShowAllMyStoneLevel showAllMyStoneLevel;
+
+        public void TutorialSimpleMode()
+        {
+            closeCheckBox.gameObject.SetActive(false);
+            nearCheckBox.gameObject.SetActive(false);
+            farCheckBox.gameObject.SetActive(false);
+            showAllMyStoneLevel.gameObject.SetActive(false);
+        }
         
         void Awake()
         {

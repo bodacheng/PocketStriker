@@ -42,7 +42,7 @@ class ChatGptFix : CameraMode
         set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 5f);
     }
 
-    private readonly int _autoRotateDirectionInterval = 20;
+    private readonly int _autoRotateDirectionInterval = 1;
     private int _autoRotateDirectionIntervalCounter;
     private int AutoRotateDirectionIntervalCounter
     {
@@ -106,7 +106,7 @@ class ChatGptFix : CameraMode
             _canSetH = value;
             if (!_canSetH)
                 h = 0;
-        }   
+        }
     }
 
     private Vector3 mePos;

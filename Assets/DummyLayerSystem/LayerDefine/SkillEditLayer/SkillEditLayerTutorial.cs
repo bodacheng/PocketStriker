@@ -99,5 +99,10 @@ public partial class SkillEditLayer : UILayer
                 CloseAutoEditIndicator();
                 break;
         }
+
+        if (step != 7)
+        {
+            stonesBox.TutorialSimpleMode();
+        }
     }
 }
