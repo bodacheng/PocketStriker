@@ -8,6 +8,7 @@ public class AppSetting
 {
     public static AppSetting Value = new AppSetting();
     float _bgmVolume = 0.5f, _effectsVolume = 0.5f;
+    bool _autoRotateCamera;
     
     public SystemLanguage Language { get; set; } = SystemLanguage.English;
 
@@ -85,6 +86,12 @@ public class AppSetting
         }
     }
 
+    public bool AutoRotateCamera
+    {
+        get => _autoRotateCamera;
+        set => _autoRotateCamera = value;
+    }
+
     public static void Save()
     {
         string json = JsonConvert.SerializeObject(Value);
@@ -106,7 +113,8 @@ public class AppSetting
                 Language = (Application.systemLanguage == SystemLanguage.ChineseSimplified ||
                            Application.systemLanguage == SystemLanguage.ChineseTraditional) ? 
                     SystemLanguage.Chinese : Application.systemLanguage,
-                _bgmVolume = 0.5f, _effectsVolume = 0.5f
+                _bgmVolume = 0.5f, _effectsVolume = 0.5f,
+                _autoRotateCamera = true
             };
             Save();
         }

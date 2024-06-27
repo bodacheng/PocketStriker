@@ -1,4 +1,5 @@
 ﻿using System;
+using FightScene;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,8 @@ public class FightScenePauseSupport : UILayer
 {
     private Action resumeAction;
     private Action returnAction;
+
+    [SerializeField] Toggle autoRoateCamera;
     
     #region Sound
     [SerializeField] Slider bgmSlider;
@@ -19,6 +22,14 @@ public class FightScenePauseSupport : UILayer
         this.returnAction = returnToFront;
         runNow.Invoke();
         ResetSliders();
+        autoRoateCamera.onValueChanged.AddListener(x =>
+        {
+            var c = RTFightManager.Target._CameraManager.GetMode(C_Mode.CertainYAntiVibration);
+            var mode = ((ChatGptFix)c);
+            mode.AutoRotateCamera = x;
+            AppSetting.Value.AutoRotateCamera = x;
+        });
+        autoRoateCamera.isOn = AppSetting.Value.AutoRotateCamera;
     }
 
     public void Resume()

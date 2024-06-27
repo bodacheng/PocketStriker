@@ -12,7 +12,7 @@ class ChatGptFix : CameraMode
     Vector3 lookPoint;
     Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 30f;
+    float autoChangeAngleLimit = 45f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
     private float speedUpRate = 5;
@@ -21,6 +21,20 @@ class ChatGptFix : CameraMode
     readonly float _minXZ;
     float fieldOfView;
     private float screenDifferForRotate = 20;
+    private bool _autoRotateCamera = false;
+
+    public bool AutoRotateCamera
+    {
+        get => _autoRotateCamera;
+        set
+        {
+            _autoRotateCamera = value;
+            if (_autoRotateCamera)
+            {
+                _autoRotateDirectionIntervalCounter = 0;
+            }
+        }
+    }
     
     float TransitionSpeedPara
     {
@@ -141,7 +155,7 @@ class ChatGptFix : CameraMode
         }
         else
         {
-            if (hasTargets && meCenter != null && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
+            if (_autoRotateCamera && hasTargets && meCenter != null && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
             {
                 float angleToHorizontal = 0;
                 float CheckNeedForAutoRotate()
@@ -179,8 +193,8 @@ class ChatGptFix : CameraMode
                     // 如果夹角大于限制，则缓慢调整相机角度
                     xzOff = Quaternion.Euler(0f, autoRotateSpeed *
                                                 ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime *  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
-                                                   -1,//(Clock() ? -1f : 1f), 
-                                0f) 
+                                                   (Clock() ? -1f : 1f), 
+                                0f)
                             * xzOff;
                 }
             }
