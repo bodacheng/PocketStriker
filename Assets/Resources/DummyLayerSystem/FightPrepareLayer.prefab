@@ -3619,6 +3619,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7090545318320839565}
     m_Modifications:
+    - target: {fileID: 74828162754256726, guid: 52b964cdb371f45b1bff917216a4914c,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 74828162754256726, guid: 52b964cdb371f45b1bff917216a4914c,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 74828162754256726, guid: 52b964cdb371f45b1bff917216a4914c,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 74828162754256726, guid: 52b964cdb371f45b1bff917216a4914c,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 201907735416529248, guid: 52b964cdb371f45b1bff917216a4914c,
         type: 3}
       propertyPath: m_Pivot.x
@@ -3687,12 +3707,12 @@ PrefabInstance:
     - target: {fileID: 1259643082885048319, guid: 52b964cdb371f45b1bff917216a4914c,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 150
+      value: 170
       objectReference: {fileID: 0}
     - target: {fileID: 1259643082885048319, guid: 52b964cdb371f45b1bff917216a4914c,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 150
+      value: 170
       objectReference: {fileID: 0}
     - target: {fileID: 1259643082885048319, guid: 52b964cdb371f45b1bff917216a4914c,
         type: 3}
@@ -3758,6 +3778,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3231042581352979961, guid: 52b964cdb371f45b1bff917216a4914c,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 5306230554596567283, guid: 52b964cdb371f45b1bff917216a4914c,
         type: 3}

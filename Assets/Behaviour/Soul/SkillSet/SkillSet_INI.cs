@@ -260,15 +260,6 @@ public partial class SkillSet
             {
                 seDic.Add(new KeyValuePair<string, SkillEntity>(_SE.REAL_NAME, _SE));
             }
-            else
-            {
-                if (_SE.REAL_NAME == null)
-                {
-                    Debug.Log("键值为空？？");
-                }else{
-                    Debug.Log("角色自身技能产生键值重复："+_SE.REAL_NAME);
-                }
-            }
         }
         return seDic;
     }

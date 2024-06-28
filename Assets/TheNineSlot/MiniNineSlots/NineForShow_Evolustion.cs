@@ -120,7 +120,7 @@ public partial class NineForShow : MonoBehaviour
         });
     }
 
-    public async UniTask EvolutionModeSlotInteractiveRefresh(SkillSet set, bool mugen = false)
+    public void EvolutionModeSlotInteractiveRefresh(SkillSet set, bool mugen = false)
     {
         // 第一列技能必须有普通技能
         var normalSkillsOfAList = new List<string>();
@@ -156,7 +156,5 @@ public partial class NineForShow : MonoBehaviour
                 item.image.color = gray;
             }
         }
-        
-        await RefreshEffects(FightScene.FightScene.target.fxCamera, 5f/3);
     }
 }

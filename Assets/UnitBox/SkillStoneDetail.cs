@@ -46,7 +46,7 @@ namespace mainMenu
         public Text SkillIntro => skillIntro;
         
         // 额外生成一个技能石图像
-        public async void IconForShow(string skillID)
+        public async void IconForShow(string skillID, float size)
         {
             var item = await Stones.GenerateStoneModel(skillID, false);
             if (iconShowT != null)
@@ -59,7 +59,7 @@ namespace mainMenu
                 item.gameObject.SetActive(true);
                 item.transform.localPosition = Vector3.zero;
                 item.transform.localScale = Vector3.one;
-                item.transform.GetComponent<RectTransform>().sizeDelta = iconShowT.transform.GetComponent<RectTransform>().sizeDelta;
+                item.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(size, size);
             }
             else
             {
@@ -129,7 +129,7 @@ namespace mainMenu
         
         public void RefreshInfo(SkillConfig config)
         {
-            IconForShow(config.RECORD_ID);
+            IconForShow(config.RECORD_ID, iconShowT.transform.GetComponent<RectTransform>().sizeDelta.x);
             keyName.text = config.REAL_NAME;
             
             if (PlayerAccountInfo.Me.TitleDisplayName != null && PlayerAccountInfo.Me.TitleDisplayName.Contains("IconDev"))

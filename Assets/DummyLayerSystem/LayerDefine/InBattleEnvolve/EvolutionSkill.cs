@@ -9,10 +9,10 @@ public class EvolutionSkill : MonoBehaviour
     public BOButton Btn => btn;
     public Animator Animator => animator;
     
-    public void ShowIcon(string skillID)
+    public void ShowIcon(string skillID, float size)
     {
         var config = SkillConfigTable.GetSkillConfigByRecordId(skillID);
         skillStoneDetail.RefreshInfo(config);
-        skillStoneDetail.IconForShow(skillID);
+        skillStoneDetail.IconForShow(skillID, size);
     }
 }

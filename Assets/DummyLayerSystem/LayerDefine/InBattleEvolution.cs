@@ -19,13 +19,18 @@ public class InBattleEvolution : UILayer
     {
         var set = focusUnit.UnitInfo.set;
 
+        var nineSlotRect = nineForShow.transform.GetComponent<RectTransform>();
+        float cellSize = nineSlotRect.rect.height / 3;
+        var gridLayoutGroup = nineForShow.transform.GetComponent<GridLayoutGroup>();
+        gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize); 
+        
         await UniTask.WhenAll(
             nineForShow.ShowStones(
                 set.a1, set.a2, set.a3,
                 set.b1, set.b2, set.b3,
                 set.c1, set.c2, set.c3
             ),
-            ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution)
+            ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution, cellSize)
         );
         
         nineForShow.AddOnClickToSlots(
@@ -37,6 +42,7 @@ public class InBattleEvolution : UILayer
                 selectedFrame.GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
                 selectedFrame.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
                 selectedFrame.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+                selectedFrame.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize, cellSize);
                 selectedFrame.gameObject.SetActive(true);
             }
         );
@@ -51,10 +57,10 @@ public class InBattleEvolution : UILayer
         this.bottomText.text = bottomText;
     }
     
-    async UniTask ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution)
+    async UniTask ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution, float stoneSize)
     {
-        
-        await nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
+        nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
+        await nineForShow.RefreshEffects(FightScene.FightScene.target.fxCamera, stoneSize / 150f);
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
         for (var i = 0; i < skillOptions.Length; i++)
         {
@@ -65,7 +71,7 @@ public class InBattleEvolution : UILayer
                     await RTFightManager.Target.EvolutionManager.ChangeSkill(focusUnit, nineForShow.ClickedSlot, skills[index]);
                     var t = skillOptions[index].Btn.transform.GetComponentInChildren<SKStoneItem>();
                     var clickedSlot = nineForShow.GetClickedSlot();
-                    t.transform.DOMove( clickedSlot.transform.position, animEndInSeconds).SetEase(Ease.Flash);
+                    t.transform.DOMove( clickedSlot.transform.position, animEndInSeconds).SetEase(Ease.InBack);
                     for (var a = 0; a < skillOptions.Length; a++)
                     {
                         if (a != index)
@@ -87,7 +93,7 @@ public class InBattleEvolution : UILayer
                     explosion.transform.localScale /= 3;
                     onFinishedSkillEvolution.Invoke();
                 });
-            skillOptions[i].ShowIcon(skills[i]);
+            skillOptions[i].ShowIcon(skills[i], stoneSize);
         }
     }
 }

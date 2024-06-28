@@ -5,7 +5,6 @@ using mainMenu;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 // 抽卡技能石细节显示
 public partial class NineForShow : MonoBehaviour
 {
@@ -131,7 +130,7 @@ public partial class NineForShow : MonoBehaviour
     /// 技能编辑画面的slot特效和格子尺寸的适配关系，前提无非是他们的prefab尺寸正好就是适配起来了，这个是前提，
     /// 然后技能进化画面里面的那个格子在Canvas上的长度是技能编辑画面中的两倍，把2给撑上正好尺寸也适配了
     /// </param>
-    async UniTask RefreshEffects(Camera camera, float scale)
+    public async UniTask RefreshEffects(Camera camera, float scale)
     {
         await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
         var allStones = AllStones();
