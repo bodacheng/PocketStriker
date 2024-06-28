@@ -218,12 +218,36 @@ public partial class SkillSet
     public int RecommendedTargetReplaceSlot(bool mugen)
     {
         var list = SkillIDList();
-        for (int i = 0; i <= list.Count; i++)
+        var A1Config = SkillConfigTable.GetSkillConfigByRecordId(list[0]);
+        var B1Config = SkillConfigTable.GetSkillConfigByRecordId(list[3]);
+        var C1Config = SkillConfigTable.GetSkillConfigByRecordId(list[6]);
+
+        int normalSkillCountAtFirstRow = 0;
+
+        void temp(int sp)
         {
-            var config = SkillConfigTable.GetSkillConfigByRecordId(list[i]);
-            if (config.SP_LEVEL == 0 && (mugen || (i != 0 && i != 3 && i != 6)))
+            if (sp == 0)
             {
-                return i + 1;
+                normalSkillCountAtFirstRow += 1;
+            }
+        }
+        
+        temp(A1Config.SP_LEVEL);
+        temp(B1Config.SP_LEVEL);
+        temp(C1Config.SP_LEVEL);
+        
+        List<int> hopeSearchOrder = new List<int>()
+        {
+            0,3,6,1,4,7,2,5,8
+        };
+        for (int order = 0; order <= hopeSearchOrder.Count; order++)
+        {
+            var index = hopeSearchOrder[order];
+            var config = SkillConfigTable.GetSkillConfigByRecordId(list[index]);
+            if (config.SP_LEVEL == 0 && (mugen || ((index != 0 && index != 3 && index != 6))||
+                                         normalSkillCountAtFirstRow > 1))
+            {
+                return index + 1;
             }
         }
         return 0;
