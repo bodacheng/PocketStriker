@@ -139,8 +139,7 @@ public class FightInfo : ScriptableObject
         for (var index = 0; index < UnitsData.Count; index++)
         {
             var unitInfo = UnitsData[index];
-            if (unitInfo.set.CheckEdit() != SkillSet.SkillEditError.NotFull && 
-                unitInfo.set.CheckEdit() != SkillSet.SkillEditError.Empty)
+            if (unitInfo.set.CheckEdit() != SkillSet.SkillEditError.Empty)
             {
                 continue;
             }
