@@ -24,7 +24,7 @@ public class FightInfo : ScriptableObject
     public List<UnitInfo> UnitsData
     {
         get => unitsData;
-        protected set => unitsData = value;
+        set => unitsData = value;
     }
 
     public string GetBGMKey()
@@ -96,21 +96,41 @@ public class FightInfo : ScriptableObject
         }
     }
 
+    private List<List<int>> EnemyForEvolutionTeamUnitSets = new List<List<int>>
+    {
+        new List<int>(){10,10,10,4},
+        new List<int>(){1,2,3,4},
+        new List<int>(){11,12,16,9},
+        new List<int>(){9,9,9,11},
+        new List<int>(){13,13,13,8},
+        new List<int>(){12,12,12,6},
+        new List<int>(){10,10,7,14},
+        new List<int>(){9,9,9,8},
+        new List<int>(){11,11,11,13},
+        new List<int>(){16,16,16,15},
+        new List<int>(){4,3,4,3},
+        new List<int>(){12,12,12,5},
+        new List<int>(){9,6,8,5},
+        new List<int>(){1,7,14,3},
+        new List<int>(){15,15,4,2},
+    };
+
     // 我们设想这个玩法下玩家一共进化三次
     private readonly int _evolutionEnemyCount = 4;
     void AutoFillEvolution(FightMembers target, string type)
     {
+        var enemyRSet = EnemyForEvolutionTeamUnitSets.Random();
+        var recordIds = Units.GetMonsterIDsAndNamesDic(type).Keys.ToList();
         for (var index = 0; index < _evolutionEnemyCount; index++)
         {
             var currentUnit = target.EnemySets.Get(0, index);
             var config = Units.GetUnitConfig(currentUnit?.r_id);
             if (currentUnit != null && config != null) continue;
             
-            var recordIds = Units.GetMonsterIDsAndNamesDic(type).Keys.ToList();;
             var unitInfo = new UnitInfo
             {
                 id = index.ToString(),
-                r_id = recordIds.Random()
+                r_id = enemyRSet.Count > index ? enemyRSet[index].ToString() : recordIds.Random()
             };
             target.EnemySets.Set(0, index, unitInfo);
             SaveDicToData();

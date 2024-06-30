@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -28,16 +29,33 @@ public class FightInfoGUI : Editor
         }
         
         fightInfo.EvolutionMode = EditorGUILayout.Toggle("进化模式", fightInfo.EvolutionMode);
+        if (fightInfo.EvolutionMode)
+        {
+            if (GUILayout.Button("进化模式随机全部队员"))
+            {
+                fightInfo.FightMembers = new FightMembers();
+                fightInfo.UnitsData = new List<UnitInfo>();
+                fightInfo.EvolutionMode = true;
+                SaveProcess();
+                return;
+            }
+        }
+        
         fightInfo.SetUnitLevelByRefLevel();
         _stageEditor.OnGUIView(fightInfo.FightMembers,null, ()=>
         {
             if (GUILayout.Button("Save"))
             {
-                fightInfo.SaveDicToData();
-                EditorUtility.SetDirty(fightInfo);
-                AssetDatabase.SaveAssets();
+                SaveProcess();
             }
         });
+
+        void SaveProcess()
+        {
+            fightInfo.SaveDicToData();
+            EditorUtility.SetDirty(fightInfo);
+            AssetDatabase.SaveAssets();
+        }
     }
     
     public static Sprite GetSprite(string name)

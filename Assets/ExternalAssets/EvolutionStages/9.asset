@@ -16,57 +16,57 @@ MonoBehaviour:
   fightBGM: 0
   unitsData:
   - id: 0
-    r_id: 10
-    level: 2
+    r_id: 9
+    level: 0.6
     set:
       a1: 159
-      a2: 42
-      a3: 125
-      b1: 113
-      b2: 68
+      a2: 113
+      a3: 37
+      b1: 89
+      b2: 42
       b3: 80
-      c1: 89
-      c2: 3
-      c3: 27
+      c1: 103
+      c2: 99
+      c3: 167
   - id: 1
-    r_id: 16
-    level: 2
+    r_id: 9
+    level: 0.6
     set:
-      a1: 39
+      a1: 166
       a2: 68
-      a3: 45
-      b1: 102
-      b2: 182
-      b3: 42
-      c1: 159
-      c2: 113
-      c3: 12
+      a3: 39
+      b1: 99
+      b2: 148
+      b3: 159
+      c1: 125
+      c2: 3
+      c3: 5
   - id: 2
-    r_id: 6
-    level: 2
-    set:
-      a1: 182
-      a2: 102
-      a3: 125
-      b1: 68
-      b2: 161
-      b3: 179
-      c1: 167
-      c2: 170
-      c3: 159
-  - id: 3
-    r_id: 7
-    level: 2
+    r_id: 9
+    level: 0.6
     set:
       a1: 127
-      a2: 42
-      a3: 136
-      b1: 95
-      b2: 37
-      b3: 4
+      a2: 37
+      a3: 68
+      b1: 55
+      b2: 107
+      b3: 115
       c1: 5
-      c2: 103
-      c3: 184
+      c2: 45
+      c3: 36
+  - id: 3
+    r_id: 11
+    level: 0.6
+    set:
+      a1: 9
+      a2: 182
+      a3: 36
+      b1: 42
+      b2: 180
+      b3: 137
+      c1: 53
+      c2: 89
+      c3: 10
   evolutionMode: 1
   team1HpRate: 1
   team2HpRate: 3
@@ -78,4 +78,4 @@ MonoBehaviour:
   team2AIMode: 0
   dumbAIDecisionDelay: 20
   dreamComboAIRateNum: 100
-  stageRefLevel: 0.6
+  stageRefLevel: 0.5
