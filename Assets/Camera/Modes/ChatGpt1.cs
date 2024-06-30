@@ -20,7 +20,7 @@ class ChatGptFix : CameraMode
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
     float fieldOfView;
-    private float screenDifferForRotate = 20;
+    private float screenDifferForRotate = 100;
     private bool _autoRotateCamera = false;
 
     public bool AutoRotateCamera
@@ -89,6 +89,7 @@ class ChatGptFix : CameraMode
         xzOff.y = 0;
         TransitionSpeedPara = 5f;
         DOTween.To(()=> TransitionSpeedPara, (x) => TransitionSpeedPara = x, 0.001f, 1f);
+        AutoRotateCamera = AppSetting.Value.AutoRotateCamera;
     }
 
     float h;

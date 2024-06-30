@@ -71,13 +71,21 @@ namespace FightScene
                 if (TeamConfig.myTeam == RTFightManager.playerTeam)
                 {
                     sideIcon.transform.SetParent(sideIconsContainer.transform);
-                    sideIcon.transform.localScale = Vector3.one;
                 }
                 else
                 {
                     sideIcon.transform.SetParent(_targetCanvasT.transform);
+                }
+
+                if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+                {
+                    sideIcon.transform.localScale = Vector3.one / 2f;
+                }
+                else
+                {
                     sideIcon.transform.localScale = Vector3.one;
                 }
+                
                 DicAdd<Data_Center, SideUnitIcon>.Add(UnitIconDic, center, sideIcon);
                 
                 var maxHp = center.FightDataRef.CurrentHp.Value;

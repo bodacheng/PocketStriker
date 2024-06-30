@@ -29,6 +29,8 @@ public class FightScenePauseSupport : UILayer
             mode.AutoRotateCamera = x;
             AppSetting.Value.AutoRotateCamera = x;
         });
+        
+        autoRoateCamera.gameObject.SetActive(FightLoad.Fight.team1Mode == TeamMode.Rotation);
         autoRoateCamera.isOn = AppSetting.Value.AutoRotateCamera;
     }
 
