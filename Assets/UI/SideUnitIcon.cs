@@ -27,7 +27,7 @@ public class SideUnitIcon : MonoBehaviour {
     private Tweener hpBarTweener;
     public void RefreshHpBar(float currentHp, float wholeHp)
     {
-        hpText.text = Mathf.Ceil(currentHp).ToString();
+        //hpText.text = Mathf.Ceil(currentHp).ToString();
         hpBarTweener?.Kill();
         hpBarTweener = DOTween.To(() => hpBar.value, (x) => hpBar.value = x, currentHp / wholeHp, 0.2f);
     }

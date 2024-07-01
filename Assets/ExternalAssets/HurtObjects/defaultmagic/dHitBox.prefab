@@ -25,6 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 608360186512863025}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.66250247, z: 0, w: 0.7490598}
   m_LocalPosition: {x: 1108.9666, y: 609.2188, z: -2999.9827}
   m_LocalScale: {x: 1.6000005, y: 1.6000004, z: 1.6000003}
@@ -32,7 +33,6 @@ Transform:
   m_Children:
   - {fileID: 1905903546009877799}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 82.982, z: 0}
 --- !u!114 &7007343582443700653
 MonoBehaviour:
@@ -104,13 +104,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1420864978612344187}
+  serializedVersion: 2
   m_LocalRotation: {x: -0.0000003658134, y: 0.66250443, z: 0.0000005436815, w: -0.749058}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.62500036, y: 0.6250001, z: 0.62500036}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2919496090475456064}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8097785747071360705
 MonoBehaviour:
@@ -130,4 +130,4 @@ MonoBehaviour:
   enemyShieldLayer:
     serializedVersion: 2
     m_Bits: 0
-  radius: 0.65
+  radius: 1

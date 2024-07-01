@@ -18,7 +18,7 @@ public class FightInfo : ScriptableObject
 
     public UnitInfo GetRepresentUnitInfo()
     {
-        return unitsData.FirstOrDefault(x => x != null);
+        return FightMembers.EnemySets.GetValues().FirstOrDefault(x => x != null && x.id != null && Units.GetUnitConfig(x.r_id) != null);
     }
     
     public List<UnitInfo> UnitsData
