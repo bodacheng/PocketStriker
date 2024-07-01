@@ -40,6 +40,14 @@ public class HitBoxesProcesser : MonoBehaviour
         }
     }
 
+    public void AllProcessingFade()
+    {
+        for (var i = 0; i < _processingDecompositions.Count; i++)
+        {
+            _processingDecompositions[i].Phase = -1;
+        }
+    }
+
     void Update()
     {
         if (_processingDecompositions.Count > 0)

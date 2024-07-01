@@ -244,6 +244,7 @@ namespace Soul
 
         public void ChangeToWaitingState()
         {
+            EndSequence();
             BehaviourDic.TryGetValue(_commandWaitingState.StateKey, out _tryBehavior);
             if (_tryBehavior != GetNowState())//避免战斗待机状态重复进入
             {

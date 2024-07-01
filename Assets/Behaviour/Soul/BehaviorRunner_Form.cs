@@ -111,13 +111,12 @@ namespace Soul
             nineAndTwo.SortNineAndTwo();
             //这上下两个函数之间存在一个chuanEndCasualT0的问题，从而必须一前一后紧密连接，下次review时候可以看看代码能不能整更利索一些。
             SkillEntityDic = nineAndTwo.GenerateBehaviourSets();
-            skillEntityList = nineAndTwo.SkillEntityList();//这一行于本游戏本身已经无用，但该列表牵扯到开发环境下角色技能详细的显示，以及框架本身保存xml战斗脚本的功能。
+            skillEntityList = nineAndTwo.SkillEntityList();
             _statesIncubator = new BehaviorsIncubator(_emptyState, SkillEntityDic);
             var behaviorDic = _statesIncubator.BehaviorDic; // 理解整个系统的关键
             BehaviourDic.Clear();
             ConditionAndRespondPriority.Clear();
             BehaviourAndStrategicExitCondition.Clear();
-            fixedSkillSequence.Clear();
             foreach (var s in behaviorDic)
             {
                 if (SkillEntityDic.ContainsKey(s.Key))
@@ -130,16 +129,19 @@ namespace Soul
                     AddAITriggerConditionToBehavior(SkillEntityDic[s.Key]);
                     BehaviourDic.Add(new KeyValuePair<string, Behavior>(s.Key, s.Value));
 
-                    if (SkillEntityDic[s.Key].SP_LEVEL > 0)
-                    {
-                        fixedSkillSequence.Add(SkillEntityDic[s.Key]);
-                    }
-                }
-                else
-                {
-                    //Debug.Log("没用上的key？：" + s.num);
                 }
             }
+            
+            fixedSkillSequence.Clear();
+            for (var index = 0; index < skillEntityList.Count; index++)
+            {
+                var skill = skillEntityList[index];
+                if (skill.SP_LEVEL > 0)
+                {
+                    fixedSkillSequence.Add(skill);
+                }
+            }
+            
             AllConditionCodes = ConditionAndRespond.Keys.ToList();
             _commandWaitingState = BehaviourDic[nineAndTwo.GetM_STS().REAL_NAME];
         }

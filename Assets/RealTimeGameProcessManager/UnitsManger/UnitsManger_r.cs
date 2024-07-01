@@ -66,6 +66,7 @@ namespace FightScene
                         {
                             if (teamConfig.myTeam == Team.player2 && FightLoad.Fight.EvolutionMode)
                             {
+                                HitBoxesProcesser.Instance.AllProcessingFade();
                                 RTFightManager.Target.team1.RMode_Unit.Value._MyBehaviorRunner.ChangeToWaitingState();
                                 var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
                                 var fightingLayer = UILayerLoader.Load<FightingStepLayer>();

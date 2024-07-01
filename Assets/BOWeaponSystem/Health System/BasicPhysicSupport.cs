@@ -192,12 +192,11 @@ public class BasicPhysicSupport : MonoBehaviour
         }
     }
     
-    private Tweener rotateTween;
+    private Tweener _rotateTween;
     public void RotateToTarget_Tween(Vector3 target, float duration)
     {
-        if (rotateTween != null)
-            rotateTween.Kill();
-        rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
+        _rotateTween?.Kill();
+        _rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
     }
 
     private bool usingGravity;
