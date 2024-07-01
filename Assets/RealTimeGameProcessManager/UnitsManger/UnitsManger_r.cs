@@ -89,6 +89,7 @@ namespace FightScene
 
                                 inBattleEvolution.Setup(RTFightManager.Target.team1.RMode_Unit.Value, () =>
                                     {
+                                        HitBoxesProcesser.Instance.AllProcessingFade();
                                         UILayerLoader.Remove<InBattleEvolution>();
                                         ToNewUnit(0);
                                         switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
