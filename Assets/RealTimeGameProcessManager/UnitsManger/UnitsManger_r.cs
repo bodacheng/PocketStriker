@@ -284,10 +284,7 @@ namespace FightScene
         
         public void ReadyForNextMember(Data_Center next)
         {
-            if (waitingMember != next)
-            {
-                waitingMember = next;
-            }
+            waitingMember = next;
         }
         
         bool RandomToAliveUnit()
@@ -302,8 +299,10 @@ namespace FightScene
                     }
                 }
             }
-            foreach (var dataCenter in teamMembers.GetValues())
+
+            for (var index = 0; index < teamMembers.GetValues().Count; index++)
             {
+                var dataCenter = teamMembers.Get(0, index);
                 if (!dataCenter.FightDataRef.IsDead.Value)
                 {
                     if (ChangeFightingUnit(dataCenter))
@@ -312,6 +311,7 @@ namespace FightScene
                     }
                 }
             }
+            
             return false;
         }
     }
