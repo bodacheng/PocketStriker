@@ -53,37 +53,15 @@ namespace Soul
             }
             #endregion
         }
-
+        
         SkillEntity GetNextSkillEntityOnSequence()
         {
-            if (dreamComboStart)
+            if (_sequenceIndex + 1 < fixedSkillSequence.Count)
             {
-                dreamComboStart = false;
-                return fixedSkillSequence.FirstOrDefault();
-            }
-            
-            var index = fixedSkillSequence.IndexOf(currentSKillEntity);
-            if (index == -1)
-                return null;
-            if (index < fixedSkillSequence.Count - 1)
-            {
-                var nextSkillOnSequence = fixedSkillSequence[index + 1];
+                var nextSkillOnSequence = fixedSkillSequence[_sequenceIndex + 1];
                 return nextSkillOnSequence;
             }
             return null;
-        }
-
-        bool SequenceFengLiuShuiZhuan()
-        {
-            var current = fixedSkillSequence.IndexOf(currentSKillEntity);
-            if (processingProcessedSequenceIndex == fixedSkillSequence.Count - 1 && processingProcessedSequenceIndex != current)
-            {
-                processingProcessedSequenceIndex = -1;
-                return false;
-            }
-            
-            processingProcessedSequenceIndex = current;
-            return processingProcessedSequenceIndex != -1;
         }
         
         void BehaviourSequenceEngine()

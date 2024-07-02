@@ -84,7 +84,6 @@ namespace Soul
 
         public bool OnFixedSequence => onFixedSequence;
         private bool onFixedSequence = false;
-        private bool dreamComboStart = false;
 
         public Func<bool> SuperComboCondition { get; set; }
 
@@ -119,7 +118,6 @@ namespace Soul
             var first = fixedSkillSequence.FirstOrDefault();
             if (first != null)
             {
-                dreamComboStart = true;
                 onFixedSequence = true;
                 _SkillCancelFlag.Cancel_Flag = true;
                 InputsManager?.SkillExplosion(InputKey.DreamCombo, 3);
@@ -178,12 +176,12 @@ namespace Soul
         
         void EndSequence()
         {
-            processingProcessedSequenceIndex = -1;
-            this.sequenceEndAct?.Invoke();
+            _sequenceIndex = -1;
             onFixedSequence = false;
+            this.sequenceEndAct?.Invoke();
         }
         
-        private int processingProcessedSequenceIndex = -1;
+        private int _sequenceIndex = -1;
         public void ChangeState(string num)
         {
             _SkillCancelFlag.turn_off_flag();
@@ -203,7 +201,8 @@ namespace Soul
             
             if (onFixedSequence)
             {
-                if (!SequenceFengLiuShuiZhuan())
+                _sequenceIndex += 1;
+                if (_sequenceIndex == fixedSkillSequence.Count)
                 {
                     EndSequence();
                 }
@@ -230,7 +229,8 @@ namespace Soul
             
             if (onFixedSequence)
             {
-                if (!SequenceFengLiuShuiZhuan())
+                _sequenceIndex += 1;
+                if (_sequenceIndex == fixedSkillSequence.Count)
                 {
                     EndSequence();
                 }
