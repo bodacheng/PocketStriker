@@ -129,7 +129,8 @@ namespace mainMenu
         
         public void RefreshInfo(SkillConfig config)
         {
-            IconForShow(config.RECORD_ID, iconShowT.transform.GetComponent<RectTransform>().sizeDelta.x);
+            if (iconShowT != null)
+                IconForShow(config.RECORD_ID, iconShowT.transform.GetComponent<RectTransform>().sizeDelta.x);
             keyName.text = config.REAL_NAME;
             
             if (PlayerAccountInfo.Me.TitleDisplayName != null && PlayerAccountInfo.Me.TitleDisplayName.Contains("IconDev"))

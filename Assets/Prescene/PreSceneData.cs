@@ -50,7 +50,7 @@ namespace mainMenu
             PlayFabReadClient.GetMailCatalogItems(PlayFabSetting._UnitCatalog, UnitCatalogFinished);
             PlayFabReadClient.LoadItems(ItemsLoadFinished);
             PlayFabReadClient.GetAllTitleData(StageRewardFinished);
-            PlayFabReadClient.GetAllUserData( new List<string>(){"arcade", "gangbang", "noAds", PlayFabSetting._timeLimitBuyCode}, ArcadeTFinished);
+            PlayFabReadClient.GetAllUserData( new List<string>(){"arcade", "gangbang", "origin", "noAds", PlayFabSetting._timeLimitBuyCode}, ArcadeTFinished);
 
             void Next()
             {

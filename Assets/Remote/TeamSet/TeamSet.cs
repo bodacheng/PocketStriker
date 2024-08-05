@@ -3,6 +3,7 @@
     public static partial class TeamSet
     {
         public static PosKeySet Default = new PosKeySet();
+        public static PosKeySet Origin = new PosKeySet();
         public static PosKeySet Arena3V3 = new PosKeySet();
         public static PosKeySet Gangbang = new PosKeySet();
 
@@ -16,6 +17,8 @@
                     return Arena3V3;
                 case "gangbang":
                     return Gangbang;
+                case "origin":
+                    return Origin;
             }
             return null;
         }

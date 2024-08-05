@@ -64,9 +64,13 @@ public class QuestInfoPage : MSceneProcess
                 );
                 break;
             case FightEventType.Event:
+                void GoToOriginTeamEditArcade()
+                {
+                    PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "origin", true);
+                }
                 _layer.SetLayerAnimatorTrigger("normal");
-                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
-                _layer.SetTeamEditFeature(GoToTeamEditArcade);
+                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("origin").LoadTeamDic();
+                _layer.SetTeamEditFeature(GoToOriginTeamEditArcade);
                 _layer.SetEventFeature(FightLoad.Fight.ID);
                 break;
             case FightEventType.Gangbang:

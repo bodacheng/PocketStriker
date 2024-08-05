@@ -8,10 +8,10 @@ namespace dataAccess
     public static partial class TeamSet
     {
         // 缺乏合理验证环节
-        public static void SaveTeamSet(string mode, Action<bool> success)
+        public static void SaveTeamSet(string Mode, Action<bool> success)
         {
             var form = new TeamPos();
-            switch (mode)
+            switch (Mode)
             {
                 case "arcade":
                     form.f = Default.GetInstanceIdOnPos(0);
@@ -23,6 +23,11 @@ namespace dataAccess
                     form.l = Gangbang.GetInstanceIdOnPos(1);
                     form.r = Gangbang.GetInstanceIdOnPos(2);
                     break;
+                case "origin":
+                    form.f = Origin.GetInstanceIdOnPos(0);
+                    form.l = Origin.GetInstanceIdOnPos(1);
+                    form.r = Origin.GetInstanceIdOnPos(2);
+                    break;
                 case "arena":
                     return; // arena模式的队伍编辑不再和arcade相同
                     form.f = Arena3V3.GetInstanceIdOnPos(0);
@@ -31,25 +36,12 @@ namespace dataAccess
                     break;
             }
             
-            var targetModeCode = "";
-            switch (mode)
-            {
-                case "arcade":
-                    targetModeCode = "arcade";
-                    break;
-                case "arena":
-                    targetModeCode = "arena";
-                    break;
-                case "gangbang":
-                    targetModeCode = "gangbang";
-                    break;
-            }
             PlayFabReadClient.UpdateUserData(
                 new UpdateUserDataRequest()
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { targetModeCode, JsonConvert.SerializeObject(form) }
+                        { Mode, JsonConvert.SerializeObject(form) }
                     }
                 },
                 ()=>success(true),

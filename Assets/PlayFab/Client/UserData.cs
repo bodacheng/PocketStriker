@@ -1,4 +1,3 @@
-using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
 using System.Collections.Generic;
@@ -57,6 +56,10 @@ public partial class PlayFabReadClient
                                 value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
                                 TeamSet.Gangbang = value;
                                 break;
+                            case "origin":
+                                value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
+                                TeamSet.Origin = value;
+                                break;
                             case "noAds":
                                 Int32.TryParse(userData.Value, out var state);
                                 PlayerAccountInfo.Me.noAdsState = state == 1;
@@ -80,6 +83,9 @@ public partial class PlayFabReadClient
                                 break;
                             case "gangbang":
                                 TeamSet.Gangbang = new PosKeySet();
+                                break;
+                            case "origin":
+                                TeamSet.Origin = new PosKeySet();
                                 break;
                             case "noAds":
                                 PlayerAccountInfo.Me.noAdsState = false;
@@ -122,5 +128,4 @@ public class TimeLimitedBuyData // 針對的title
     public string eventID;
     public int dmAmount;
 }
-
 

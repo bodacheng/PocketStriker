@@ -137,7 +137,7 @@ public class ArcadeTop : UILayer
         );
         stageBtn.name = "Stage" + stageNo;
         stageBtn.StageNo = stageNo;
-        stageBtn.CriticalGaugeMode = one.team2CGMode;
+        stageBtn.CriticalGaugeMode = one.EvolutionMode ? CriticalGaugeMode.Normal : one.team2CGMode;
         if (one.FightMembers != null)
         {
             if (one is GangbangInfo)

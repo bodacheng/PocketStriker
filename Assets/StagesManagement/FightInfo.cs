@@ -331,6 +331,9 @@ public class FightInfo : ScriptableObject
             case FightEventType.Gangbang:
                 set = TeamSet.Gangbang;
                 break;
+            case FightEventType.Event:
+                set = TeamSet.Origin;
+                break;
             default:
                 set = TeamSet.Default;
                 break;
