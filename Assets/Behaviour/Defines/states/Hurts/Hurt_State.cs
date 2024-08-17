@@ -13,7 +13,7 @@ namespace Soul
         V_Damage target;
         SingleAssignmentDisposable _physicMissionDisposable;
         private float hurtAnimDuration = 0.05f;
-        Tween _tween;
+        private Sequence mySequence;
         
         void PlayHurtAnim(V_Damage newValue)
         {
@@ -38,8 +38,8 @@ namespace Soul
                 hurtAnimKey = newValue.DamageEffectPoint.y > _DATA_CENTER.geometryCenter.position.y ? "high" : "low";
             }
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim(hurtAnimKey), true, hurtAnimDuration);
-            //AnimationManger.TriggerExpression(Facial.hit);
-            RotateToTargetTween(rotateToTarget, 0.1f);
+            AnimationManger.TriggerExpression(Facial.hit);
+            mySequence.Append(RotateToTargetTween(rotateToTarget, 0.1f));
         }
 
         public override void AI_State_exit()
@@ -48,8 +48,8 @@ namespace Soul
             _Rigidbody.mass = FightGlobalSetting.FighterRigidMass;
             _BasicPhysicSupport.OpenEnemyTouchingDrag(0);
             FightParamsRef.GettingDamage = false;
-            if (_tween != null && _tween.active && _tween.IsPlaying())
-                _tween.Kill();
+            if (mySequence != null && mySequence.active && mySequence.IsPlaying())
+                mySequence.Kill();
             _physicMissionDisposable?.Dispose();
             if (_BuffsRunner.Freezing)
             {
@@ -111,7 +111,7 @@ namespace Soul
                     break;
                 case DamageType.pull_slight:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 1f, true);
+                    PushToMidStart(target, 1f);
                     break;
                 case DamageType.stable_damage:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
@@ -139,15 +139,15 @@ namespace Soul
                     break;
                 case DamageType.push_to_mid:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 10f, true);
+                    PushToMidStart(target, 10f);
                     break;
                 case DamageType.push_to_mid_slight:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 4f, true);
+                    PushToMidStart(target, 4f);
                     break;
                 case DamageType.same_height_to_mid:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 4f, false);
+                    PushToMidStart(target, 4f);
                     break;
                 case DamageType.sekka:
                     SekkaStart(target.from_weapon.element);

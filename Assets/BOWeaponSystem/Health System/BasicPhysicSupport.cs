@@ -11,8 +11,11 @@ public class BasicPhysicSupport : MonoBehaviour
     
     public bool AtRing
     {
-        get;
-        set;
+        get
+        {
+            var maxLimbDisFromCenter = _DATA_CENTER.GetFarthestPositionFromZero();
+            return maxLimbDisFromCenter.magnitude > BoundaryControlByGod._BattleRingRadius;
+        }
     }
 
     public class HiddenMethods
@@ -171,18 +174,12 @@ public class BasicPhysicSupport : MonoBehaviour
         var originY = _DATA_CENTER.WholeT.position.y;
         pos = _DATA_CENTER.WholeT.position;
         pos.y = 0;
-        var disFromCenter = maxLimbDisFromCenter.magnitude;
-        if (disFromCenter > BoundaryControlByGod._BattleRingRadius)
+        if (AtRing)
         {
             var sa = maxLimbDisFromCenter - maxLimbDisFromCenter.normalized * BoundaryControlByGod._BattleRingRadius;
-            pos -= sa;
+            pos = pos - sa;
             pos.y = originY;
-            _DATA_CENTER.WholeT.position = pos;//Vector3.Lerp(_DATA_CENTER.WholeT.position, pos, pushIntoRingSpeed * Time.deltaTime);
-            AtRing = true;
-        }
-        else
-        {
-            AtRing = false;
+            _DATA_CENTER.WholeT.position = Vector3.Lerp(_DATA_CENTER.WholeT.position, pos, pushIntoRingSpeed * Time.deltaTime);
         }
         
         if (originY < 0)
@@ -192,11 +189,12 @@ public class BasicPhysicSupport : MonoBehaviour
         }
     }
     
-    private Tweener _rotateTween;
-    public void RotateToTarget_Tween(Vector3 target, float duration)
+    private Tweener rotateTween;
+    public Tweener RotateToTarget_Tween(Vector3 target, float duration)
     {
-        _rotateTween?.Kill();
-        _rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
+        rotateTween?.Kill();
+        rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
+        return rotateTween;
     }
 
     private bool usingGravity;

@@ -1,4 +1,5 @@
-﻿using HittingDetection;
+﻿using DG.Tweening;
+using HittingDetection;
 using UnityEngine;
 using Skill;
 
@@ -228,9 +229,9 @@ namespace Soul
             return Vector3.SignedAngle(_Rigidbody.transform.forward, _lookDir, Vector3.up);
         }
         
-        public void RotateToTargetTween(Vector3 target, float duration)
+        public Tweener RotateToTargetTween(Vector3 target, float duration)
         {
-            _BasicPhysicSupport.RotateToTarget_Tween(target, duration);
+            return _BasicPhysicSupport.RotateToTarget_Tween(target, duration);
         }
 
         //protected void RotateToDirection_Tween(Vector3 direction, float duration, bool ignoreY)

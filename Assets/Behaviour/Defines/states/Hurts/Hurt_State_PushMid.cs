@@ -7,42 +7,38 @@ namespace Soul
 {
     public partial class Hurt_State : Behavior
     {
-        void PushToMidStart(V_Damage newValue, float dis, bool grounded)
+        void PushToMidStart(V_Damage newValue, float dis)
         {
             Vector3 midDistanceFromMe = newValue.attacker.Center.geometryCenter.transform.position + 
                                         newValue.attacker.Center.WholeT.transform.forward * dis;
-            if (grounded)
+            float originY = _DATA_CENTER.WholeT.position.y;
+            Vector3 temp = midDistanceFromMe;
+            temp.y = 0;
+            if (temp.magnitude > BoundaryControlByGod._BattleRingRadius)
             {
-                PlayHurtAnim(newValue);
+                midDistanceFromMe = temp.normalized * BoundaryControlByGod._BattleRingRadius;
+                midDistanceFromMe.y = originY;
+            }
+            if (originY < 0)
+            {
                 midDistanceFromMe.y = 0;
             }
-            else
-            {
-                AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.1f);
-            }
-            _tween = gameObject.transform.DOMove(midDistanceFromMe, 0.3f).OnComplete(
+            
+            mySequence.Append(_DATA_CENTER.WholeT.DOMove(midDistanceFromMe, 0.3f).OnUpdate(
                 () =>
-                {
-                    _Rigidbody.velocity = Vector3.zero;
-                });
-            _physicMissionDisposable = new SingleAssignmentDisposable();
-            _physicMissionDisposable.Disposable = Observable.EveryUpdate().Subscribe(_ =>
                 {
                     if (gameObject == null)
                     {
-                        _physicMissionDisposable.Dispose();
+                        mySequence.Kill();
                         return;
                     }
-                    
-                    if (Vector3.Distance(midDistanceFromMe, gameObject.transform.position) < 0.3f || _BasicPhysicSupport.AtRing)
+                    if (_BasicPhysicSupport.AtRing)
                     {
-                        _Rigidbody.velocity = Vector3.zero;
-                        _tween.Kill(false);
+                        mySequence.Kill();
                         _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-                        _physicMissionDisposable.Dispose();
                     }
-                }
-            ).AddTo(gameObject);
+                }) 
+            );
         }
     }
 }
