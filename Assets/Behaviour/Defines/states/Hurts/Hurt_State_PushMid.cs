@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using HittingDetection;
-using UniRx;
 using DG.Tweening;
 
 namespace Soul
@@ -17,11 +16,14 @@ namespace Soul
             if (temp.magnitude > BoundaryControlByGod._BattleRingRadius)
             {
                 midDistanceFromMe = temp.normalized * BoundaryControlByGod._BattleRingRadius;
-                midDistanceFromMe.y = originY;
             }
             if (originY < 0)
             {
                 midDistanceFromMe.y = 0;
+            }
+            else
+            {
+                midDistanceFromMe.y = originY;
             }
             
             mySequence.Append(_DATA_CENTER.WholeT.DOMove(midDistanceFromMe, 0.3f).OnUpdate(
