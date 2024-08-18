@@ -16,11 +16,4 @@ public class PlayerAccountInfo
     public int arcadeProcess; // 已经打通的关卡，所以初始账号是从0开始 
     public int gangbangProcess; // 已经打通的关卡，所以初始账号是从0开始 
     public string tutorialProgress = string.Empty;
-    
-    private readonly ArcadeModeManager _arcadeModeManager = new ArcadeModeManager();
-    private readonly GangbangModeManager _gangbangModeManager = new GangbangModeManager();
-    private readonly EventModeManager _eventModeManager = new EventModeManager();
-    public ArcadeModeManager ArcadeModeManager => _arcadeModeManager;
-    public GangbangModeManager GangbangModeManager => _gangbangModeManager;
-    public EventModeManager EventModeManager => _eventModeManager;
 }

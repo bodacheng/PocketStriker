@@ -18,7 +18,7 @@ public class FrontPage : MSceneProcess
         _frontLayer = UILayerLoader.Load<FrontLayer>();
         _frontLayer.Initialise(PreScene.target);
 
-        string focusInstanceID = PreScene.target.GetFocusInstanceID();
+        string focusInstanceID = PreScene.target.GetRandomFocusInstanceID();
         PreScene.target.SetFocusingUnit(focusInstanceID);
         _frontLayer.ShowMyModel(focusInstanceID).Forget();
         

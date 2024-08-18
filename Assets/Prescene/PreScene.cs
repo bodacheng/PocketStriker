@@ -121,8 +121,8 @@ namespace mainMenu
             await UniTask.WhenAll(
                 PlayFabReadClient.LoadReadMailsAsync(),
                 AddressablesLogic.Essentials(),
-                PlayerAccountInfo.Me.ArcadeModeManager.Initialize(),
-                PlayerAccountInfo.Me.GangbangModeManager.Initialize()
+                ArcadeModeManager.Instance.Initialize(),
+                GangbangModeManager.Instance.Initialize()
             );
             CashClear();
             UILayerLoader.Clear();
@@ -186,9 +186,9 @@ namespace mainMenu
             var questInfo = new QuestInfoPage();
             var unitListPage = new UnitListPage();
             var memberDetailEdit = new SkillEditPage();
-            var arcadeFrontPage = new ArcadeFrontPage(PlayerAccountInfo.Me.ArcadeModeManager);
-            var gangbangFrontPage = new GangbangFrontPage(PlayerAccountInfo.Me.GangbangModeManager);
-            var eventFrontPage = new EventFightPage(PlayerAccountInfo.Me.EventModeManager);
+            var arcadeFrontPage = new ArcadeFrontPage();
+            var gangbangFrontPage = new GangbangFrontPage();
+            var eventFrontPage = new EventFightPage();
             
             // Shop
             var shopTop = new ShopTop();

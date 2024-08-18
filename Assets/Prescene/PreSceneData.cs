@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using UnityEngine;
+using Random = System.Random;
 
 namespace mainMenu
 {
@@ -118,6 +120,13 @@ namespace mainMenu
                 }
             }
             return focusInstanceID;
+        }
+        
+        public string GetRandomFocusInstanceID()
+        {
+            Random random = new Random();
+            string focusInstanceID = null;
+            return dataAccess.Units.Dic.Keys.ElementAt(random.Next(dataAccess.Units.Dic.Count));;
         }
     }
 }

@@ -207,13 +207,13 @@ namespace FightScene
                     if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
                     {
                         var battleID = FightLoad.Fight.ID;
-                        if (!PlayerAccountInfo.Me.EventModeManager.CompletedLevels.Contains(battleID))
+                        if (!EventModeManager.Instance.CompletedLevels.Contains(battleID))
                         {
                             CloudScript.EventBattleProgress(
                                 battleID,
                                 result =>
                                 {
-                                    PlayerAccountInfo.Me.EventModeManager.CompletedLevels.Add(battleID);
+                                    EventModeManager.Instance.CompletedLevels.Add(battleID);
                                     var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
                                     var hasReward = jsonResult.TryGetValue("has_reward", out var value) ? value : false;
                                     var hasRewardBool = (bool)hasReward;

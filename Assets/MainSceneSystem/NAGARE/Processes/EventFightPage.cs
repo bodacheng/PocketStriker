@@ -4,12 +4,10 @@ using mainMenu;
 
 public class EventFightPage : MSceneProcess
 {
-    private readonly EventModeManager eventModeManager;
     private EventBattleTop layer;
     
-    public EventFightPage(EventModeManager eventModeManager)
+    public EventFightPage()
     {
-        this.eventModeManager = eventModeManager;
         Step = MainSceneStep.EventFight;
     }
     
@@ -20,10 +18,10 @@ public class EventFightPage : MSceneProcess
 
     async UniTask _ProcessEnter()
     {
-        await eventModeManager.Initialize();
+        await EventModeManager.Instance.Initialize();
         layer = UILayerLoader.Load<EventBattleTop>();
         layer.SetupCommon();
-        var unit = eventModeManager.GetRepresentativeUnit();
+        var unit = EventModeManager.Instance.GetRepresentativeUnit();
         if (unit != null)
         {
             await layer.IconButtonFeature(unit);
@@ -32,7 +30,7 @@ public class EventFightPage : MSceneProcess
         PlayFabReadClient.GetCompletedLevels(
             (x) =>
             {
-                eventModeManager.OnCloudScriptSuccess(x, layer);
+                EventModeManager.Instance.OnCloudScriptSuccess(x, layer);
                 LowerMainBar.Open();
                 SetLoaded(true);
             }

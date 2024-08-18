@@ -36,14 +36,14 @@ public class FrontLayer : UILayer
         ArcadeBtn.BOButton.onClick.AddListener(
         ()=>
             {
-                PlayerAccountInfo.Me.ArcadeModeManager.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, true);
+                ArcadeModeManager.Instance.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, true);
             });
         
         GangbangBtn.BOButton.onClick.AddListener(
             ()=>
             {
                 if (PlayerAccountInfo.Me.arcadeProcess >= 5)
-                    PlayerAccountInfo.Me.GangbangModeManager.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
+                    GangbangModeManager.Instance.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
                 else
                 {
                     PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));

@@ -12,6 +12,9 @@ public class ArcadeModeManager
     private readonly StageModeTable _stageModeTable = new StageModeTable();
     int _maxStageNum = -999;
     public int MaxStageNum => _maxStageNum;
+    
+    public static readonly ArcadeModeManager Instance = new ArcadeModeManager();
+    
     public async UniTask Initialize()
     {
         var locationHandle = Addressables.LoadResourceLocationsAsync("quest");

@@ -137,7 +137,7 @@ public partial class ArenaFightOver : UILayer
     {
         Int32.TryParse(FightLoad.Fight.ID, out var nowStageNo);
         var nextStageNo = nowStageNo + 1;
-        var nextFight = await PlayerAccountInfo.Me.ArcadeModeManager.LoadStage(nextStageNo);
+        var nextFight = await ArcadeModeManager.Instance.LoadStage(nextStageNo);
         if (nextFight != null && PlayerAccountInfo.Me.tutorialProgress == "Finished" && nowStageNo != 5)
         {
             nextTab.SetUp(nextFight.EvolutionMode ? 3 : nextFight.ArcadeFightMode, "Stage " + nextStageNo);

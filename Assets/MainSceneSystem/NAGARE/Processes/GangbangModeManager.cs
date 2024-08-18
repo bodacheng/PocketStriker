@@ -11,6 +11,9 @@ public class GangbangModeManager
     private readonly IDictionary<string, IResourceLocation> locationKeyDic = new Dictionary<string, IResourceLocation>();
     int _maxStageNum = -999;
     public int MaxStageNum => _maxStageNum;
+    
+    public static readonly GangbangModeManager Instance = new GangbangModeManager();
+    
     public async UniTask Initialize()
     {
         var locationHandle = Addressables.LoadResourceLocationsAsync("quest_gangbang");

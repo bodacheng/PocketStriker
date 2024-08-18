@@ -15,6 +15,8 @@ public class EventModeManager
     private FightInfo easyMode, normalMode, hardMode;
     private readonly StageModeTable _stageModeTable = new StageModeTable();
     private List<string> completedLevels;
+    
+    public static readonly EventModeManager Instance = new EventModeManager();
 
     public List<string> CompletedLevels
     {

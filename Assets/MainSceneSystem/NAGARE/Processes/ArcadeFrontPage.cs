@@ -5,13 +5,11 @@ using mainMenu;
 public delegate UniTask<FightInfo> LoadStageDelegate(int stageNo);
 public class ArcadeFrontPage : MSceneProcess
 {
-    readonly ArcadeModeManager arcadeModeManager;
     ArcadeTop _arcadeTop;
     
-    public ArcadeFrontPage(ArcadeModeManager arcadeModeManager)
+    public ArcadeFrontPage()
     {
         Step = MainSceneStep.ArcadeFront;
-        this.arcadeModeManager = arcadeModeManager;
     }
     
     public override void ProcessEnter()
@@ -22,8 +20,8 @@ public class ArcadeFrontPage : MSceneProcess
     
     async UniTask Load()
     {
-        await arcadeModeManager.Initialize();
-        _arcadeTop.SetupArcade(arcadeModeManager.MaxStageNum, arcadeModeManager.LoadStage, arcadeModeManager.DirectToArcadeStage);
+        await ArcadeModeManager.Instance.Initialize();
+        _arcadeTop.SetupArcade(ArcadeModeManager.Instance.MaxStageNum, ArcadeModeManager.Instance.LoadStage, ArcadeModeManager.Instance.DirectToArcadeStage);
         var stages = _arcadeTop.NewStages(PlayerAccountInfo.Me.arcadeProcess, 3);
         await _arcadeTop.ShowStages(stages);
         LowerMainBar.Open();

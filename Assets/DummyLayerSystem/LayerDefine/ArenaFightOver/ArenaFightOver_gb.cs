@@ -4,7 +4,7 @@ public partial class ArenaFightOver : UILayer
 {
     public async void LoadNextGangbangStage(int stageNo)
     {
-        var nextFight = await PlayerAccountInfo.Me.GangbangModeManager.LoadStage(stageNo);
+        var nextFight = await GangbangModeManager.Instance.LoadStage(stageNo);
         if (nextFight != null)
         {
             nextTab.SetUp(-1, "Stage " + stageNo);

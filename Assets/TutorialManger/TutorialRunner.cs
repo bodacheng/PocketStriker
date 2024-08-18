@@ -51,7 +51,7 @@ public class TutorialRunner
         // _tutorialProcesses.Add(goTo2);
         // _tutorialProcesses.Add(teamEdit1);
         
-        PlayerAccountInfo.Me.ArcadeModeManager.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, false);
+        ArcadeModeManager.Instance.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, false);
         _tutorialProcesses.Add(waitFighting);
     }
 
