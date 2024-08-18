@@ -28,7 +28,7 @@ public partial class PlayFabReadClient
     {
         get
         {
-            var customId = PlayerPrefs.GetString("DontShowFrontFight", null);
+            var customId = PlayerPrefs.GetString("DontShowFrontFight", "False");
             return customId;
         }
         set => PlayerPrefs.SetString("DontShowFrontFight", value);

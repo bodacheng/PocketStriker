@@ -41,7 +41,6 @@ public class Starter : MonoBehaviour
     public async UniTask Initialise()
     {
         ConfigInitialised = false;
-        NativeLeakDetection.Mode = NativeLeakDetectionMode.EnabledWithStackTrace;
         AddressablesLogic.ReleaseAsyncOperationHandles();
         inGameDebugConsole.gameObject.SetActive(CommonSetting.DevMode);
         playFabSetting.Initialise();

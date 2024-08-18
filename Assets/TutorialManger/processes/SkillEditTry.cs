@@ -107,7 +107,7 @@ public class SkillEditTry : TutorialProcess
                             () =>
                             {
                                 PlayerAccountInfo.Me.tutorialProgress = nextTutorialProgress;
-                                PlayFabReadClient.DontShowFrontFight = "true";
+                                PlayFabReadClient.DontShowFrontFight = "True";
                                 _skillEditFinished = true;
                                 _skillEditLayer.nineSlot.confirmBtnIndicator.SetActive(false);
                                 _skillEditLayer.ExtraTipForSpStoneEquip();
