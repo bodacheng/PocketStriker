@@ -69,7 +69,7 @@ namespace FightScene
                                 HitBoxesProcesser.Instance.AllProcessingFade();
                                 RTFightManager.Target.team1.RMode_Unit.Value._MyBehaviorRunner.ChangeToWaitingState();
                                 var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
-                                var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
+                                var fightingLayer = FightingStepLayer.Open();
                                 fightingLayer.gameObject.SetActive(false);
                                 RTFightManager.Target.team1.InputsManager.FocusUnit(null);
                                 RTFightManager.Target.EvolutionManager.EvolutionCount++;
@@ -121,8 +121,19 @@ namespace FightScene
                         }
 
                         var disposable = new SerialDisposable();
-                        disposable.Disposable = Observable.Timer(TimeSpan.FromSeconds(1)).Subscribe(
-                            async (_) =>
+
+// 假设你有一个 Observable<bool> 的布尔值监控（例如：boolObservable），这个值在变化时会发出事件。
+                        var boolObservable = Observable.EveryUpdate()
+                            .Where(_ => center._BasicPhysicSupport.AtRing)  // 当 bool 值为 true 时触发
+                            .Take(1)  // 只获取第一次触发的事件
+                            .Select(_ => Unit.Default);  // 转换为 Unit 类型
+
+                        var timerObservable = Observable.Timer(TimeSpan.FromSeconds(1))
+                            .Select(_ => Unit.Default);  // Timer 也转换为 Unit 类型
+
+// 使用 Observable.Amb<Unit>，谁先触发就执行哪个
+                        disposable.Disposable = Observable.Amb<Unit>(boolObservable, timerObservable)
+                            .Subscribe(async (_) =>
                             {
                                 if (center != null)
                                 {

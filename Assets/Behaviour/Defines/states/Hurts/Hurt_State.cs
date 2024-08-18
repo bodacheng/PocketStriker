@@ -39,6 +39,7 @@ namespace Soul
             }
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim(hurtAnimKey), true, hurtAnimDuration);
             AnimationManger.TriggerExpression(Facial.hit);
+            mySequence = DOTween.Sequence();
             mySequence.Append(RotateToTargetTween(rotateToTarget, 0.1f));
         }
 

@@ -149,7 +149,6 @@ public partial class Sensor
         _nearestDamagingWeapon = FindNearestCollider(_damagingWeaponAround);
     }
     
-    float _p1ToMe, _p2ToMe;
     int HorizontalDistanceCompare(Vector3 p1, Vector3 p2)
     {
         Vector3 center = Center.position;  // 只获取一次中心位置，提高效率
