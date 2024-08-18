@@ -165,7 +165,7 @@ public class PreparingProcess : FSceneProcess
         
         RTFightManager.Target.SetGame(FightLoad.Fight);
         ProgressLayer.LoadingPercent(Translate.Get("LoadingBattleAboutToEnd"), 0.8f);
-        fightingStepLayer = UILayerLoader.Load<FightingStepLayer>();
+        fightingStepLayer = FightingStepLayer.Open();
         await fightingStepLayer.Setup(false);
         ProgressLayer.LoadingPercent(Translate.Get("LoadingBattleAboutToEnd"), 1f);
         switch (RTFightManager.Target.team1.TeamMode)

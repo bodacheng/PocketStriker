@@ -36,6 +36,8 @@ public class MobileInputsManager : MonoBehaviour {
     [SerializeField] RadialSegmentedHealthBar radialSegmentedHealthBar;
     [SerializeField] float buttonStretchEdgeDis = 5f;
     
+    public Camera FXCamera { get; set; }
+    
     //攻击键系成员
     readonly IDictionary<string, GameObject> _aIcons = new Dictionary<string, GameObject>();
     readonly IDictionary<string, GameObject> _bIcons = new Dictionary<string, GameObject>();
@@ -166,9 +168,9 @@ public class MobileInputsManager : MonoBehaviour {
         {
             _focusing = element;
             _elementEffects[element].Open(
-                PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, defendBtn.GetComponent<RectTransform>(), 5), 
-                PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, dashBtn.GetComponent<RectTransform>(), 5),
-                PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, dreamComboBtn.GetComponent<RectTransform>(), 5)
+                PosCal.GetWorldPos(FXCamera, defendBtn.GetComponent<RectTransform>(), 5), 
+                PosCal.GetWorldPos(FXCamera, dashBtn.GetComponent<RectTransform>(), 5),
+                PosCal.GetWorldPos(FXCamera, dreamComboBtn.GetComponent<RectTransform>(), 5)
             );
         }else{
             Debug.Log("检查手机控制器渲染模块加载顺序");
@@ -225,16 +227,16 @@ public class MobileInputsManager : MonoBehaviour {
         switch (key)
         {
             case InputKey.Attack1:
-                targetExplode.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, a1Btn.GetComponent<RectTransform>(), 3);
+                targetExplode.transform.position = PosCal.GetWorldPos(FXCamera, a1Btn.GetComponent<RectTransform>(), 3);
                 break;
             case InputKey.Attack2:
-                targetExplode.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, a2Btn.GetComponent<RectTransform>(), 3);
+                targetExplode.transform.position = PosCal.GetWorldPos(FXCamera, a2Btn.GetComponent<RectTransform>(), 3);
                 break;
             case InputKey.Attack3:
-                targetExplode.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, a3Btn.GetComponent<RectTransform>(), 3);
+                targetExplode.transform.position = PosCal.GetWorldPos(FXCamera, a3Btn.GetComponent<RectTransform>(), 3);
                 break;
             case InputKey.DreamCombo:
-                targetExplode.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, dreamComboBtn.GetComponent<RectTransform>(), 3);
+                targetExplode.transform.position = PosCal.GetWorldPos(FXCamera, dreamComboBtn.GetComponent<RectTransform>(), 3);
                 break;
         }
         targetExplode?.Play();
@@ -488,7 +490,7 @@ public class MobileInputsManager : MonoBehaviour {
     
     void RefreshPattern(Button button, string skillId) //按钮切换也可以在这里做文章
     {
-        Vector3 targetPos = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, button.GetComponent<RectTransform>(), 5);
+        Vector3 targetPos = PosCal.GetWorldPos(FXCamera, button.GetComponent<RectTransform>(), 5);
         if (btnIcons.ContainsKey(button))
         {
             var target = btnIcons[button];

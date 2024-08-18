@@ -31,6 +31,13 @@ public class FightingStepLayer : UILayer
     
     public MobileInputsManager InputsManager => inputsManager;
     
+    public static FightingStepLayer Open()
+    {
+        var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
+        fightingLayer.InputsManager.FXCamera = FightScene.FightScene.target.fxCamera;
+        return fightingLayer;
+    }
+    
     public void PreparingMode(bool preparingMode)
     {
         if (team1UI.TeamMode == TeamMode.MultiRaid)

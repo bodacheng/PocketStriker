@@ -20,8 +20,8 @@ namespace FightScene
             //{
             //    ((OneVOneMode)nowC).xzMax = 100f;
             //}
-            
-            fightingStepLayer = UILayerLoader.Load<FightingStepLayer>();
+
+            fightingStepLayer = FightingStepLayer.Open();
             fightingStepLayer.gameObject.SetActive(true);
             fightingStepLayer.PreparingMode(true);
             if (FightLoad.Fight.RunTutorial)
