@@ -24,13 +24,13 @@ public class PreparingProcess : FSceneProcess
         
         RTFightManager.Target._CameraManager.VisibilityControl.Clear();
         
-        if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang || FightLoad.Fight.EventType == FightEventType.Event)
-            &&
-            !PlayerAccountInfo.Me.noAdsState)
+        if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang || FightLoad.Fight.EventType == FightEventType.Event))
         {
+#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
             FightScene.FightScene.target.LoadAds();
+#endif
         }
-
+        
         RTFightManager.Target.Disposables = new CompositeDisposable();
         
         Sensor.ClearFightingMember();
@@ -39,10 +39,10 @@ public class PreparingProcess : FSceneProcess
         RTFightManager.Target._CameraManager.SetPosToStart();
         UILayerLoader.Load<ProgressLayer>();
         ProgressLayer.LoadingPercent(Translate.Get("LoadingBattle"), 0.5f);
-
+        
         var effectPreloadCount = FightLoad.Fight.team1Mode == TeamMode.Rotation ? 1 :
             Mathf.Max(RTFightManager.Target.team1.teamMembers.GetValues().Count,
-            RTFightManager.Target.team2.teamMembers.GetValues().Count);
+                RTFightManager.Target.team2.teamMembers.GetValues().Count);
         
         var tasks = new List<UniTask>
         {
@@ -54,7 +54,7 @@ public class PreparingProcess : FSceneProcess
             EffectsManager.IniEffectsPool(CommonSetting.HitGroundEffectCode, null, effectPreloadCount),
             EffectsManager.IniEffectsPool(CommonSetting.WallCrackEffectCode, null, effectPreloadCount)
         };
-
+        
         List<Element> allElements = new List<Element>();
         void AddBasicEffectLoadingTask(List<UnitInfo> list)
         {
@@ -112,12 +112,6 @@ public class PreparingProcess : FSceneProcess
             RTFightManager.Target.team1.TurnAllUnitsInvincible(FightGlobalSetting._Team1Invincible);
             RTFightManager.Target.team2.TurnAllUnitsInvincible(false);
         }
-
-        if (FightLoad.Fight.EvolutionMode)
-        {
-            RTFightManager.Target.team1.TeamMode = TeamMode.Rotation;
-            RTFightManager.Target.team2.TeamMode = TeamMode.Rotation;
-        }
         
         switch (RTFightManager.Target.team1.TeamMode)
         {
@@ -155,7 +149,7 @@ public class PreparingProcess : FSceneProcess
                     FightLoad.Fight.team2HpRate, FightLoad.Fight.team2CGMode, 
                     FightLoad.Fight.team2AIMode, FightLoad.Fight.dumbAIDecisionDelay,
                     CreateRandomBoolFunc(FightLoad.Fight.EventType == FightEventType.Arena ? 
-                        FightGlobalSetting.ArenaEnemyDreamComboAIRate: FightLoad.Fight.dreamComboAIRateNum), FightLoad.Fight.EvolutionMode
+                        FightGlobalSetting.ArenaEnemyDreamComboAIRate: FightLoad.Fight.dreamComboAIRateNum)
                 );
                 break;
         }

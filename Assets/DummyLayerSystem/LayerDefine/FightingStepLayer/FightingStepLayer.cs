@@ -75,6 +75,7 @@ public class FightingStepLayer : UILayer
                     {
                         Time.timeScale = 1;
                         UILayerLoader.Remove<FightScenePauseSupport>();
+                        AppSetting.Save();
                     }
                 );
             });

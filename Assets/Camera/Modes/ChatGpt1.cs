@@ -12,71 +12,43 @@ class ChatGptFix : CameraMode
     Vector3 lookPoint;
     Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 45f;
+    float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 100;
     float _changeSpeed;
-    private float speedUpRate = 5;
     float _transitionSpeedPara = 10f;
     readonly float _lookPointHeight = 2f;
     readonly float _minXZ;
     float fieldOfView;
-    private float screenDifferForRotate = 100;
-    private bool _autoRotateCamera = false;
-
+    private float screenDifferForRotate = 150;
+    
     public bool AutoRotateCamera
     {
-        get => _autoRotateCamera;
+        get => PlayerPrefs.GetInt("AutoRotateCamera") == 1;
         set
         {
-            _autoRotateCamera = value;
-            if (_autoRotateCamera)
-            {
-                _autoRotateDirectionIntervalCounter = 0;
-            }
+            PlayerPrefs.SetInt("AutoRotateCamera", value ? 1 : 0);
+            PlayerPrefs.Save();
         }
     }
-    
+
     float TransitionSpeedPara
     {
         get => _transitionSpeedPara;
-        set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 5f);
-    }
-
-    private readonly int _autoRotateDirectionInterval = 1;
-    private int _autoRotateDirectionIntervalCounter;
-    private int AutoRotateDirectionIntervalCounter
-    {
-        get => _autoRotateDirectionIntervalCounter;
-        set
-        {
-            _autoRotateDirectionIntervalCounter = value;
-            if (_autoRotateDirectionIntervalCounter > _autoRotateDirectionInterval)
-            {
-                _autoRotateDirectionIntervalCounter = 0;
-            }
-        }
-    }
-
-    private readonly float _originHeight;
-    private float CameraHeight
-    {
-        get => this.YDis;
-        set => YDis = Mathf.Clamp(value, _originHeight, _originHeight + 5);
+        set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 2f);
     }
     
-    public ChatGptFix(float XZDis, float originHeight, float fieldOfView)
+    public ChatGptFix(float XZDis, float YDis, float fieldOfView)
     {
         _minXZ = XZDis;
         this.XZDis = XZDis;
-        this._originHeight = originHeight;
-        CameraHeight = this._originHeight;
+        this.YDis = YDis;
         this.fieldOfView = fieldOfView;
     }
 
     private float XZDistance
     {
         get => XZDis;
-        set => XZDis = Mathf.Clamp(value, _minXZ , _minXZ + 26f);
+        set => XZDis = Mathf.Clamp(value, _minXZ , _minXZ + 20f);
     }
 
     public override void Enter(Camera _camera)
@@ -89,7 +61,6 @@ class ChatGptFix : CameraMode
         xzOff.y = 0;
         TransitionSpeedPara = 5f;
         DOTween.To(()=> TransitionSpeedPara, (x) => TransitionSpeedPara = x, 0.001f, 1f);
-        AutoRotateCamera = AppSetting.Value.AutoRotateCamera;
     }
 
     float h;
@@ -107,12 +78,12 @@ class ChatGptFix : CameraMode
             _canSetH = value;
             if (!_canSetH)
                 h = 0;
-        }
+        }   
     }
 
     private Vector3 mePos;
     private float _autoRotateTimer;
-    private bool lastRotateDirection;
+    private bool _currentRotateClockWiseDirection;
     
     public override void LocalUpdate(Camera camera)
     {
@@ -122,7 +93,6 @@ class ChatGptFix : CameraMode
         }
         
         _changeSpeed = Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        _changeSpeed *= speedUpRate;
         bool hasTargets = targets != null && targets.Count > 0;
         if (hasTargets)
         {
@@ -156,18 +126,18 @@ class ChatGptFix : CameraMode
         }
         else
         {
-            if (_autoRotateCamera && hasTargets && meCenter != null && (meScreenPos - enemyScreenPos).sqrMagnitude > screenDifferForRotate * screenDifferForRotate)
+            if (AutoRotateCamera && hasTargets && meCenter != null && Vector2.Distance(meScreenPos, enemyScreenPos) > screenDifferForRotate)
             {
                 float angleToHorizontal = 0;
                 float CheckNeedForAutoRotate()
                 {
                     if (meScreenPos.x < enemyScreenPos.x)
                     {
-                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, Vector3.right));
+                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, Vector2.right));
                     }
                     else
                     {
-                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, -Vector3.right));
+                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, -Vector2.right));
                     }
                 }
                 
@@ -176,42 +146,35 @@ class ChatGptFix : CameraMode
                 {
                     bool Clock()
                     {
-                        AutoRotateDirectionIntervalCounter++;
-                        if (AutoRotateDirectionIntervalCounter == 0)
+                        if (meScreenPos.x < enemyScreenPos.x)
                         {
-                            if (meScreenPos.x < enemyScreenPos.x)
-                            {
-                                lastRotateDirection = meScreenPos.y < enemyScreenPos.y;
-                            }
-                            else
-                            {
-                                lastRotateDirection = meScreenPos.y > enemyScreenPos.y;
-                            }
+                            return meScreenPos.y < enemyScreenPos.y;
                         }
-                        return lastRotateDirection;
+                        else
+                        {
+                            return meScreenPos.y > enemyScreenPos.y;
+                        }
                     }
-                    
+                    _currentRotateClockWiseDirection = Clock();
                     // 如果夹角大于限制，则缓慢调整相机角度
                     xzOff = Quaternion.Euler(0f, autoRotateSpeed *
-                                                ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime *  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
-                                                   (Clock() ? -1f : 1f), 
-                                0f)
-                            * xzOff;
+                                                 ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
+                                                 * (_currentRotateClockWiseDirection ? -1f : 1f), 0f) * xzOff;
                 }
             }
         }
         
-        ePosX = (float)((decimal)enemyScreenPos.x / Screen.width);
-        ePosY = (float)((decimal)enemyScreenPos.y / Screen.height);
-        mPosX = (float)((decimal)meScreenPos.x / Screen.width);
-        mPosY = (float)((decimal)meScreenPos.y / Screen.height);
+        ePosX = enemyScreenPos.x / Screen.width;
+        ePosY = enemyScreenPos.y / Screen.height;
+        mPosX = meScreenPos.x / Screen.width;
+        mPosY = meScreenPos.y / Screen.height;
+        
         if (ePosX >= 0.3 && ePosX <= 0.7 &&
             mPosX >= 0.3 && mPosX <= 0.7 &&
             ePosY >= 0.3 && ePosY <= 0.7 &&
             mPosY >= 0.3 && mPosY <= 0.7)
         {
             XZDistance -= _changeSpeed;
-            CameraHeight -= _changeSpeed/2;
         }
         else if (ePosX <= 0.2 || ePosX >= 0.8 || 
                  mPosX <= 0.2 || mPosX >= 0.8 || 
@@ -219,7 +182,6 @@ class ChatGptFix : CameraMode
                  mPosY <= 0.2 || mPosY >= 0.8)
         {
             XZDistance += _changeSpeed;
-            CameraHeight += _changeSpeed / 2;
         }
         
         // 判断我与敌人哪个更接近相机位置
@@ -236,7 +198,7 @@ class ChatGptFix : CameraMode
         
         lookPoint = (backWPos - frontWPos) * 0.5f + frontWPos;
         cameraTargetPos = lookPoint + xzOff.normalized * XZDistance;
-        cameraTargetPos.y = CameraHeight;
+        cameraTargetPos.y = YDis;
         lookPoint.y = _lookPointHeight;
         
         if ((hasTargets && meCenter != null) || h != 0)

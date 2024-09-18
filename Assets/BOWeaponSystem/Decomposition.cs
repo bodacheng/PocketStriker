@@ -83,9 +83,12 @@ public partial class Decomposition : MonoBehaviour {
             _HitBox.CurrentHP = _HitBox.weaponHP;
         if (hasParticle)
             to_be_stop_emissions.Play(true);
-        
+
         if (AudioSource != null)
+        {
+            AudioSource.volume = AppSetting.Value.EffectsVolume;
             AudioSource.Play();
+        }
         
         SetMaterialsAlpha(1f);
     }
@@ -181,10 +184,10 @@ public partial class Decomposition : MonoBehaviour {
                 BO_Ani_E.hiddenMethods.MagicForward_core("c_r_bullet", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, _HitBox.GeneratedByStateKey);
                 break;
             case "bulletForward":
-                BO_Ani_E.hiddenMethods.Bullet_shoot_from_Core(hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 1, 10, _HitBox.GeneratedByStateKey);
+                BO_Ani_E.hiddenMethods.Bullet_shoot_from_Core(hitBoxSubEventManger.transform.position,hitBoxSubEventManger.transform.rotation, 1, 10, _HitBox.GeneratedByStateKey);
                 break;
             case "bulletForward3":
-                BO_Ani_E.hiddenMethods.Bullet_shoot_from_Core(hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, 10, _HitBox.GeneratedByStateKey);
+                BO_Ani_E.hiddenMethods.Bullet_shoot_from_Core(hitBoxSubEventManger.transform.position,hitBoxSubEventManger.transform.rotation, 3, 10, _HitBox.GeneratedByStateKey);
                 break;
             case "groundroundblast":
                 BO_Ani_E.hiddenMethods.MagicForward_core("groundroundblast", hitBoxSubEventManger.transform.position,hitBoxSubEventManger.transform.rotation,0,_HitBox.GeneratedByStateKey);
