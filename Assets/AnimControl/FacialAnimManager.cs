@@ -54,16 +54,20 @@ public class FacialAnimManager : MonoBehaviour
         switch (facial)
         {
             case Facial.hit:
-                animator.SetTrigger(hitTrigger);
+                if (hitAnimation != null)
+                    animator.SetTrigger(hitTrigger);
             break;
             case Facial.smile:
-                animator.SetTrigger(smileTrigger);
+                if (smileAnimation != null)
+                    animator.SetTrigger(smileTrigger);
             break;
             case Facial.aggressive:
-                animator.SetTrigger(aggressiveTrigger);
+                if (aggressiveAnimation != null)
+                    animator.SetTrigger(aggressiveTrigger);
             break;
             case Facial.wink:
-                animator.SetTrigger(winkTrigger);
+                if (winkAnimation != null)
+                    animator.SetTrigger(winkTrigger);
                 break;
         }
     }
