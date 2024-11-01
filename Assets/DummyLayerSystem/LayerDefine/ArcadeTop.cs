@@ -202,7 +202,7 @@ public class ArcadeTop : UILayer
     {
         if (progress > _maxStageNum)
         {
-            progress = _maxStageNum;
+            progress = _maxStageNum - 1;
         }
         else if (progress == _maxStageNum)
         {
