@@ -12,7 +12,7 @@ public partial class Decomposition : MonoBehaviour {
     [SerializeField] float DestructionDelay = 1.1f;//上面的值必须要大于下面的值
     [Tooltip("武器实际失效时间，也是特效停止生成时间")]
     [SerializeField] float stop_emission_delay = 0.9f;
-    
+    [SerializeField] private bool boundaryFade = true;
     public List<MeshRenderer> to_be_faded_renderers;
 
     [Tooltip("附属物体。这个只能自己把握。")]
@@ -203,6 +203,18 @@ public partial class Decomposition : MonoBehaviour {
             case "lightningspray":
                 BO_Ani_E.hiddenMethods.MagicForward_core("lightningspray", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 0, _HitBox.GeneratedByStateKey);
                 Phase = -1;
+                break;
+            case "twowayboltp1":
+                BO_Ani_E.hiddenMethods.MagicForward_core("twowayboltp1", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, _HitBox.GeneratedByStateKey);
+                break;
+            case "twowayboltp2":
+                BO_Ani_E.hiddenMethods.MagicForward_core("twowayboltp2", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, _HitBox.GeneratedByStateKey);
+                break;
+            case "twowayboltp3":
+                BO_Ani_E.hiddenMethods.MagicForward_core("twowayboltp3", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, _HitBox.GeneratedByStateKey);
+                break;
+            case "twowayboltp4":
+                BO_Ani_E.hiddenMethods.MagicForward_core("twowayboltp4", hitBoxSubEventManger.transform.position, hitBoxSubEventManger.transform.rotation, 3, _HitBox.GeneratedByStateKey);
                 break;
         }
     }

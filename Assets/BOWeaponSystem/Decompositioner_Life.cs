@@ -75,7 +75,8 @@ public partial class Decomposition : MonoBehaviour
             _tempPos = transform.position;
             _tempPos.y = 0;
             _disFromCenter = _tempPos.magnitude;
-            if (_disFromCenter > BoundaryControlByGod._BattleRingRadius + FightGlobalSetting._energyResolveAfterExtendBoundary)
+            if (boundaryFade && 
+                (_disFromCenter > BoundaryControlByGod._BattleRingRadius + FightGlobalSetting._energyResolveAfterExtendBoundary))
             {
                 Phase = -1;
             }

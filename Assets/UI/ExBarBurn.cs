@@ -1,35 +1,44 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using System;
+using DummyLayerSystem;
 using UnityEngine;
 
 public class ExBarBurn : MonoBehaviour
 {
-    [SerializeField] ParticleSystem explosionFigure;
-    private CancellationTokenSource cancelTokenSource;
+    public ParticleSystem explosionFigure;
+    void Awake()
+    {
+        OnLoad();
+    }
     
+    async void OnLoad()
+    {
+        explosionFigure = await AddressablesLogic.LoadTOnObject<ParticleSystem>("ButtonEffects/ui_exbarburn");
+        var layer = UILayerLoader.Get<FightingStepLayer>();
+        if (layer != null)
+            explosionFigure.transform.SetParent(layer.transform);
+    }
+
     private void OnDestroy()
     {
-        cancelTokenSource.Cancel();
-        Destroy(explosionFigure.gameObject);
+        if (explosionFigure != null)
+        {
+            Destroy(explosionFigure.gameObject);
+        }
     }
 
-    void OnEnable()
-    {
-        cancelTokenSource = new CancellationTokenSource();
-    }
-    
     void OnDisable()
     {
-        Burn(cancelTokenSource.Token).Forget();
+        Burn();
     }
 
-    async UniTask Burn(CancellationToken c)
+    void Burn()
     {
-        await UniTask.DelayFrame(1, cancellationToken: c);
-        if (c.IsCancellationRequested)
-            return;
-        explosionFigure.transform.SetParent(null);
-        explosionFigure.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera, transform.GetComponent<RectTransform>(), 10);
-        explosionFigure.Play();
+        if (explosionFigure != null)
+        {
+            explosionFigure.transform.position = PosCal.GetWorldPos(FightScene.FightScene.target.fxCamera,
+                transform.GetComponent<RectTransform>(), 3);
+            explosionFigure.Play();
+        }
     }
 }
+

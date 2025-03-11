@@ -60,26 +60,19 @@ public class TeamSingleSelectLayer : UILayer
     {
         var unitsLayer = UILayerLoader.Get<UnitsLayer>();
         var unitInfo = dataAccess.Units.Get(instanceID);
-        if (unitInfo != null && Stones.GetEquippingStones(instanceID).Count != 9)
-        {
-            return;
-        }
+        if (unitInfo == null) return;
+        
+        PreScene.target.SetFocusingUnit(instanceID);
+        nineForShow.ShowStones_Acc(instanceID);
+        
+        UniTask.WhenAll(
+            connector.ShowMyModel(instanceID), 
+            Set2DView(unitInfo.r_id, view2D, unitOutAnimator,
+                0, 0.6f, 0, DedicatedCameraConnector.Unit2DViewYoKoSpaceWhenAtRight(unitInfo.r_id))).Forget();
+        
+        unitsLayer.Selected.Value = instanceID;
         
         TeamSet.GetTargetSet(teamMode).SetPosUnitByInstanceID(targetPos, instanceID);
-        
-        if (unitInfo != null)
-        {
-            UniTask.WhenAll(
-                connector.ShowMyModel(instanceID), 
-                Set2DView(unitInfo.r_id, view2D, unitOutAnimator,
-                    0, 0.6f, 0, DedicatedCameraConnector.Unit2DViewYoKoSpaceWhenAtRight(unitInfo.r_id))).Forget();
-        }
-        else
-        {
-            connector.ShowMyModel(instanceID).Forget();
-        }
-        nineForShow.ShowStones_Acc(instanceID);
-        unitsLayer.Selected.Value = instanceID;
         SetConfirmBtnActive();
     }
     

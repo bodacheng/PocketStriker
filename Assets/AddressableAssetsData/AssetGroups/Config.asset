@@ -23,24 +23,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - config
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ba918278b8f5f41299cb4e7930b9b5b4
-    m_Address: Config/skill_name
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - config
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a68841c2c08ac4fefafe74c4812cbcd1
-    m_Address: Config/skill_ai_attrs
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - config
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fb73d0a5d0f8b483090a002c2d712a02
-    m_Address: Config/mst_skill
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - config
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0b7e9a68701b2457f8e322c57e0e682d
     m_Address: Config/LanguageCode
     m_ReadOnly: 0
@@ -55,12 +37,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f82352243f33a48c79e9de4316104397
     m_Address: Config/stage_mode
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - config
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 51d4bf73a53b04fc0a3cf967d3ecd761
-    m_Address: Config/SkillStaticAnalysis
     m_ReadOnly: 0
     m_SerializedLabels:
     - config
@@ -91,6 +67,30 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3fa6d424eec8e4467b6ab81decf4553c
     m_Address: TitleBg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca185a3b955da441fb05e1ef1736731c
+    m_Address: Config/skill_ai_attrs
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6318c023fc5f4b0a9bf343cfa62dd6c
+    m_Address: Config/mst_skill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 689c7e749ee0e4a03bc5561f63e2550c
+    m_Address: Config/skill_name
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - config
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 299427fe53b2c474aad3538768397895
+    m_Address: Config/SkillStaticAnalysis
     m_ReadOnly: 0
     m_SerializedLabels:
     - config
