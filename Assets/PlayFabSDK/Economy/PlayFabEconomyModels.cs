@@ -269,6 +269,10 @@ namespace PlayFab.EconomyModels
         /// </summary>
         public Rating Rating;
         /// <summary>
+        /// The real price the item was purchased for per marketplace.
+        /// </summary>
+        public RealMoneyPriceDetails RealMoneyPriceDetails;
+        /// <summary>
         /// The date of when the item will be available. If not provided then the product will appear immediately.
         /// </summary>
         public DateTime? StartDate;
@@ -452,11 +456,6 @@ namespace PlayFab.EconomyModels
         /// The Azure CDN URL for retrieval of the catalog item binary content.
         /// </summary>
         public string Url;
-    }
-
-    [Serializable]
-    public class ContentFeed : PlayFabBaseModel
-    {
     }
 
     public enum CountryCode
@@ -999,7 +998,7 @@ namespace PlayFab.EconomyModels
         public string IdempotencyId;
         /// <summary>
         /// The operations to run transactionally. The operations will be executed in-order sequentially and will succeed or fail as
-        /// a batch. Up to 10 operations can be added.
+        /// a batch. Up to 50 operations can be added.
         /// </summary>
         public List<InventoryOperation> Operations;
     }
@@ -1903,11 +1902,6 @@ namespace PlayFab.EconomyModels
     }
 
     [Serializable]
-    public class PayoutDetails : PlayFabBaseModel
-    {
-    }
-
-    [Serializable]
     public class Permissions : PlayFabBaseModel
     {
         /// <summary>
@@ -2077,11 +2071,6 @@ namespace PlayFab.EconomyModels
     }
 
     [Serializable]
-    public class PurchaseOverride : PlayFabBaseModel
-    {
-    }
-
-    [Serializable]
     public class PurchaseOverridesInfo : PlayFabBaseModel
     {
     }
@@ -2139,6 +2128,30 @@ namespace PlayFab.EconomyModels
     [Serializable]
     public class RealMoneyPriceDetails : PlayFabBaseModel
     {
+        /// <summary>
+        /// The 'AppleAppStore' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> AppleAppStorePrices;
+        /// <summary>
+        /// The 'GooglePlay' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> GooglePlayPrices;
+        /// <summary>
+        /// The 'MicrosoftStore' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> MicrosoftStorePrices;
+        /// <summary>
+        /// The 'NintendoEShop' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> NintendoEShopPrices;
+        /// <summary>
+        /// The 'PlayStationStore' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> PlayStationStorePrices;
+        /// <summary>
+        /// The 'Steam' price amount per CurrencyCode. 'USD' supported only.
+        /// </summary>
+        public Dictionary<string,int> SteamPrices;
     }
 
     /// <summary>
@@ -2408,26 +2421,26 @@ namespace PlayFab.EconomyModels
         /// </summary>
         public string FailureDetails;
         /// <summary>
+        /// The Marketplace Alternate ID being redeemed.
+        /// </summary>
+        public string MarketplaceAlternateId;
+        /// <summary>
         /// The transaction id in the external marketplace.
         /// </summary>
         public string MarketplaceTransactionId;
-        /// <summary>
-        /// The ID of the offer being redeemed.
-        /// </summary>
-        public string OfferId;
     }
 
     [Serializable]
     public class RedemptionSuccess : PlayFabBaseModel
     {
         /// <summary>
+        /// The Marketplace Alternate ID being redeemed.
+        /// </summary>
+        public string MarketplaceAlternateId;
+        /// <summary>
         /// The transaction id in the external marketplace.
         /// </summary>
         public string MarketplaceTransactionId;
-        /// <summary>
-        /// The ID of the offer being redeemed.
-        /// </summary>
-        public string OfferId;
         /// <summary>
         /// The timestamp for when the redeem was completed.
         /// </summary>
@@ -2549,10 +2562,6 @@ namespace PlayFab.EconomyModels
         /// </summary>
         public EntityKey ReviewerEntity;
         /// <summary>
-        /// Deprecated. Use ReviewerEntity instead. This property will be removed in a future release.
-        /// </summary>
-        public string ReviewerId;
-        /// <summary>
         /// The ID of the review.
         /// </summary>
         public string ReviewId;
@@ -2624,15 +2633,6 @@ namespace PlayFab.EconomyModels
         /// The ID of the review to take down.
         /// </summary>
         public string ReviewId;
-    }
-
-    [Serializable]
-    public class ScanResult : PlayFabBaseModel
-    {
-        /// <summary>
-        /// The URL of the item which failed the scan.
-        /// </summary>
-        public string Url;
     }
 
     [Serializable]
@@ -2787,15 +2787,6 @@ namespace PlayFab.EconomyModels
     [Serializable]
     public class SubmitItemReviewVoteResponse : PlayFabResultCommon
     {
-    }
-
-    [Serializable]
-    public class SubscriptionDetails : PlayFabBaseModel
-    {
-        /// <summary>
-        /// The length of time that the subscription will last in seconds.
-        /// </summary>
-        public double DurationInSeconds;
     }
 
     [Serializable]

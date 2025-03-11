@@ -701,7 +701,9 @@ namespace PlayFab.CloudScriptModels
         OpenIdConnect,
         Apple,
         NintendoSwitchAccount,
-        GooglePlayGames
+        GooglePlayGames,
+        XboxMobileStore,
+        King
     }
 
     [Serializable]

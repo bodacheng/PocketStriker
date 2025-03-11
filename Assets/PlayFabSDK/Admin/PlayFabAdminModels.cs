@@ -421,7 +421,7 @@ namespace PlayFab.AdminModels
         /// </summary>
         public string Reason;
         /// <summary>
-        /// The family type of the suer that is included in the ban.
+        /// The family type of the user that is included in the ban.
         /// </summary>
         public string UserFamilyType;
     }
@@ -2633,6 +2633,26 @@ namespace PlayFab.AdminModels
         StatisticDefinitionModificationNotAllowedWhileLinked,
         LeaderboardUpdateNotAllowedWhileLinked,
         CloudScriptAzureFunctionsEventHubRequestError,
+        ExternalEntityNotAllowedForTier,
+        InvalidBaseTimeForInterval,
+        EntityTypeMismatchWithStatDefinition,
+        SpecifiedVersionLeaderboardNotFound,
+        LeaderboardColumnLengthMismatchWithStatDefinition,
+        DuplicateColumnNameFound,
+        LinkedStatisticColumnNotFound,
+        LinkedStatisticColumnRequired,
+        MultipleLinkedStatisticsNotAllowed,
+        DuplicateLinkedStatisticColumnNameFound,
+        AggregationTypeNotAllowedForMultiColumnStatistic,
+        MaxQueryableVersionsValueNotAllowedForTier,
+        StatisticDefinitionHasNullOrEmptyVersionConfiguration,
+        StatisticColumnLengthMismatch,
+        InvalidExternalEntityId,
+        UpdatingStatisticsUsingTransactionIdNotAvailableForFreeTier,
+        TransactionAlreadyApplied,
+        ReportDataNotRetrievedSuccessfully,
+        ResetIntervalCannotBeModified,
+        VersionIncrementRateExceeded,
         MatchmakingEntityInvalid,
         MatchmakingPlayerAttributesInvalid,
         MatchmakingQueueNotFound,
@@ -2810,6 +2830,7 @@ namespace PlayFab.AdminModels
         EventSinkTitleUnauthorized,
         EventSinkInsufficientRoleAssignment,
         EventSinkContainerNotFound,
+        EventSinkTenantIdInvalid,
         OperationCanceled,
         InvalidDisplayNameRandomSuffixLength,
         AllowNonUniquePlayerDisplayNamesDisableNotAllowed,
@@ -2879,9 +2900,51 @@ namespace PlayFab.AdminModels
         TrueSkillJobAlreadyExists,
         TrueSkillJobNotFound,
         TrueSkillOperationCanceled,
-        StateShareUnauthorized,
+        TrueSkillActiveModelLimitExceeded,
+        TrueSkillTotalModelLimitExceeded,
+        TrueSkillUnknownInitialModelId,
+        TrueSkillUnauthorizedForJob,
+        TrueSkillInvalidScenarioName,
+        TrueSkillConditionStateIsRequired,
+        TrueSkillEventStateIsRequired,
+        TrueSkillDuplicateEvent,
+        TrueSkillDuplicateCondition,
+        TrueSkillInvalidAnomalyThreshold,
+        TrueSkillConditionKeyLimitExceeded,
+        TrueSkillConditionValuePerKeyLimitExceeded,
+        TrueSkillInvalidTimestamp,
+        TrueSkillEventLimitExceeded,
+        TrueSkillInvalidPlayers,
+        TrueSkillTrueSkillPlayerNull,
+        TrueSkillInvalidPlayerId,
+        TrueSkillInvalidSquadSize,
+        TrueSkillConditionSetNotInModel,
+        TrueSkillModelStateInvalidForOperation,
+        TrueSkillScenarioContainsActiveModel,
+        TrueSkillInvalidConditionRank,
+        GameSaveManifestNotFound,
+        GameSaveManifestVersionAlreadyExists,
+        GameSaveConflictUpdatingManifest,
+        GameSaveManifestUpdatesNotAllowed,
+        GameSaveFileAlreadyExists,
+        GameSaveManifestVersionNotFinalized,
+        GameSaveUnknownFileInManifest,
+        GameSaveFileExceededReportedSize,
+        GameSaveFileNotUploaded,
+        GameSaveBadRequest,
+        GameSaveOperationNotAllowed,
+        GameSaveDataStorageQuotaExceeded,
+        GameSaveNewerManifestExists,
+        GameSaveBaseVersionNotAvailable,
+        GameSaveManifestVersionQuarantined,
+        StateShareForbidden,
+        StateShareTitleNotInFlight,
         StateShareStateNotFound,
-        StateShareLinkNotFound
+        StateShareLinkNotFound,
+        StateShareStateRedemptionLimitExceeded,
+        StateShareStateRedemptionLimitNotUpdated,
+        StateShareCreatedStatesLimitExceeded,
+        StateShareIdMissingOrMalformed
     }
 
     [Serializable]
@@ -4284,7 +4347,9 @@ namespace PlayFab.AdminModels
         OpenIdConnect,
         Apple,
         NintendoSwitchAccount,
-        GooglePlayGames
+        GooglePlayGames,
+        XboxMobileStore,
+        King
     }
 
     [Serializable]
@@ -7510,7 +7575,9 @@ namespace PlayFab.AdminModels
         OpenIdConnect,
         Apple,
         NintendoSwitchAccount,
-        GooglePlayGames
+        GooglePlayGames,
+        XboxMobileStore,
+        King
     }
 
     [Serializable]
