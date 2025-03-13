@@ -16,6 +16,9 @@ namespace mainMenu
         
         public void UpdateStonesBaseOnSlots(UnitInfo unitInfo)
         {
+            // k v : stoneid , equipingMonster, slot
+            IDictionary<string, Tuple<string, string>> toEditStones = new Dictionary<string, Tuple<string, string>>();
+            
             var equipping = Stones.GetEquippingStones(unitInfo.id);
             // slot stone_id
             IDictionary<string, string> beforeDic = new Dictionary<string, string>();
@@ -28,7 +31,8 @@ namespace mainMenu
                         beforeDic.Add(stone.slot, stone.InstanceId);
                     else
                     {
-                        Debug.Log("unit :"+ unitInfo.id+ " has multi stones on one slot.");
+                        Debug.Log("unit :"+ unitInfo.id+ " has multi stones on one slot.");// somehow it happens...maybe not anymore though
+                        toEditStones.Add(stone.InstanceId, Tuple.Create(string.Empty, string.Empty));
                     }
                 }
             }
@@ -57,9 +61,6 @@ namespace mainMenu
                     afterDic.Add((i + 1).ToString(), null);
                 }
             }
-
-            // k v : stoneid , equipingMonster, slot
-            IDictionary<string, Tuple<string, string>> toEditStones = new Dictionary<string, Tuple<string, string>>();
             
             for (var i = 1; i < 10; i++)
             {
