@@ -11,6 +11,7 @@ namespace FightScene
     public class FightScene : MonoBehaviour
     {
         [SerializeField] Canvas canvas;
+        [SerializeField] RectTransform safeAreaRect;
         [SerializeField] AudioSource audioSource;
         [SerializeField] AudioSource uiAudioSource;
 
@@ -69,14 +70,17 @@ namespace FightScene
         void Awake()
         {
             target = this;
+            var targetSafeArea = safeAreaRect != null ? safeAreaRect : canvas.GetComponent<RectTransform>();
             PosCal.Canvas = this.canvas;
+            PosCal.SafeAreaRect = targetSafeArea;
             PosCal.TestIni();
         }
         
         void Start()
         {
             UILayerLoader.Clear();
-            UILayerLoader.SetHanger(canvas.GetComponent<RectTransform>());
+            var targetSafeArea = safeAreaRect != null ? safeAreaRect : canvas.GetComponent<RectTransform>();
+            UILayerLoader.SetHanger(targetSafeArea, canvas.transform);
             
             //HighLightLayer.DarkOff(Color.white, 0, true);
             Time.timeScale = 1;
@@ -149,6 +153,11 @@ namespace FightScene
         public void ReturnToFront(MainSceneStep mainSceneStep = MainSceneStep.FrontPage)
         {
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.None);
+            var cameraManager = RTFightManager.Target?._CameraManager;
+            if (cameraManager != null)
+            {
+                cameraManager.Assign_Camera(C_Mode.NULL, null, null);
+            }
             RTFightManager.Target.ClearUnitData();
             RTFightManager.Target.team1.Clear();
             RTFightManager.Target.team2.Clear();

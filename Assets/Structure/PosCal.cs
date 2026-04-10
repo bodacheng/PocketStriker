@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public static class PosCal
 {
     public static Canvas Canvas;
+    public static RectTransform SafeAreaRect;
     static CanvasScaler CanvasScaler => Canvas.GetComponent<CanvasScaler>();
     public static float CanvasWidth => Canvas.GetComponent<RectTransform>().rect.width;
     public static float CanvasHeight => Canvas.GetComponent<RectTransform>().rect.height;
@@ -20,6 +21,23 @@ public static class PosCal
         resolution.x = (int)(resolution.x * (Screen.width / (float)Screen.safeArea.width));
         resolution.y = (int)(resolution.y * (Screen.height / (float)Screen.safeArea.height));
         CanvasScaler.referenceResolution = resolution;
+
+        if (SafeAreaRect != null)
+        {
+            Rect safeArea = Screen.safeArea;
+            Vector2 anchorMin = new Vector2(
+                safeArea.xMin / Screen.width,
+                safeArea.yMin / Screen.height
+            );
+            Vector2 anchorMax = new Vector2(
+                (safeArea.xMin + safeArea.width) / Screen.width,
+                (safeArea.yMin + safeArea.height) / Screen.height
+            );
+            SafeAreaRect.anchorMin = anchorMin;
+            SafeAreaRect.anchorMax = anchorMax;
+            SafeAreaRect.offsetMin = Vector2.zero;
+            SafeAreaRect.offsetMax = Vector2.zero;
+        }
     }
     
     /// <summary>

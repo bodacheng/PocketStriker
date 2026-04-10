@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = System.Random;
 
 namespace mainMenu
@@ -44,7 +45,33 @@ namespace mainMenu
         
         public void DataLoading(Action onDataLoad)
         {
+            var timer = new SafeTimer();
+            var errorReturning = false;
+
+            async UniTaskVoid ReturnToTitleAsync()
+            {
+                ProgressLayer.Loading(Translate.Get("ReturnToLobbyForConnectionError"));
+                await UniTask.Delay(TimeSpan.FromSeconds(3));
+                if (SceneManager.GetActiveScene().buildIndex != 0)
+                {
+                    SceneManager.LoadScene(0);
+                }
+            }
+
+            void HandleDataLoadError()
+            {
+                if (errorReturning)
+                {
+                    return;
+                }
+
+                errorReturning = true;
+                timer.Stop();
+                ReturnToTitleAsync().Forget();
+            }
+
             ProgressLayer.Loading(string.Empty);
+            timer.StartTimer(5, HandleDataLoadError);
             PlayFabReadClient.GetStatistics(StatisticsLoadFinished);
         
             //AccountCharsSet.LoadTutorial();
@@ -69,6 +96,12 @@ namespace mainMenu
                 },
                 () =>
                 {
+                    timer.Stop();
+                    if (errorReturning)
+                    {
+                        return;
+                    }
+
                     switch (PlayerAccountInfo.Me.tutorialProgress)
                     {
                         case "Started":
@@ -96,6 +129,10 @@ namespace mainMenu
                             Next();
                             break;
                     }
+                },
+                () =>
+                {
+                    HandleDataLoadError();
                 }
             );
         }

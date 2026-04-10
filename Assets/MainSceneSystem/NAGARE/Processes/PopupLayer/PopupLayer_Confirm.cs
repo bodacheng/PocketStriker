@@ -14,6 +14,17 @@ public partial class PopupLayer : UILayer
     [SerializeField] BOButton NoButton;
 
     private static readonly Color windowBgColor = new Color(0,0,0,0.5f);
+
+    static PopupLayer OpenValidationLayer()
+    {
+        var layer = UILayerLoader.Load<PopupLayer>(true, null, true);
+        layer.bigCurtain.color = windowBgColor;
+        layer.ValidationWindow.gameObject.SetActive(true);
+        layer.unitIcon.gameObject.SetActive(false);
+        layer.YesButton.onClick.RemoveAllListeners();
+        layer.NoButton.onClick.RemoveAllListeners();
+        return layer;
+    }
     
     /// <summary>
     /// 闪一下就关闭的提示窗口
@@ -21,10 +32,7 @@ public partial class PopupLayer : UILayer
     /// <param name="intro"></param>
     public static void ArrangeWarnWindow(string intro)
     {
-        var layer = UILayerLoader.Load<PopupLayer>(true);
-        
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
+        var layer = OpenValidationLayer();
         
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(false);
@@ -34,14 +42,10 @@ public partial class PopupLayer : UILayer
     
     public static void ArrangeWarnWindow(UnityEngine.Events.UnityAction action, string intro)
     {
-        var layer = UILayerLoader.Load<PopupLayer>(true);
-        
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
+        var layer = OpenValidationLayer();
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(false);
         layer.ValidationIntro.text = intro;
-        layer.YesButton.onClick.RemoveAllListeners();
         layer.YesButton.onClick.AddListener(Close);
         layer.YesButton.onClick.AddListener(action);
     }
@@ -63,11 +67,9 @@ public partial class PopupLayer : UILayer
             return;
         }
         
-        var layer = UILayerLoader.Load<PopupLayer>(true);
+        var layer = OpenValidationLayer();
         layer.unitIcon.ChangeIcon(unitConfig.RECORD_ID);
         layer.unitIcon.gameObject.SetActive(true);
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
         
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(false);
@@ -83,11 +85,9 @@ public partial class PopupLayer : UILayer
             return;
         }
         
-        var layer = UILayerLoader.Load<PopupLayer>(true);
+        var layer = OpenValidationLayer();
         layer.unitIcon.ChangeIcon(unitConfig.RECORD_ID);
         layer.unitIcon.gameObject.SetActive(true);
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
         
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(false);
@@ -101,19 +101,14 @@ public partial class PopupLayer : UILayer
     
     public static void ArrangeConfirmWindow(UnityEngine.Events.UnityAction action, string intro)
     {
-        var layer = UILayerLoader.Load<PopupLayer>(true);
-        
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
+        var layer = OpenValidationLayer();
 
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(true);
         
-        layer.YesButton.onClick.RemoveAllListeners();
         layer.YesButton.onClick.AddListener(Close);
         layer.YesButton.onClick.AddListener(action);
         
-        layer.NoButton.onClick.RemoveAllListeners();
         layer.NoButton.onClick.AddListener(Close);
         
         layer.ValidationIntro.text = intro;
@@ -121,19 +116,14 @@ public partial class PopupLayer : UILayer
     
     public static void ArrangeConfirmWindow(UnityEngine.Events.UnityAction action, UnityEngine.Events.UnityAction cancel_action, string intro)
     {
-        var layer = UILayerLoader.Load<PopupLayer>(true);
-        
-        layer.bigCurtain.color = windowBgColor;
-        layer.ValidationWindow.gameObject.SetActive(true);
+        var layer = OpenValidationLayer();
 
         layer.YesButton.gameObject.SetActive(true);
         layer.NoButton.gameObject.SetActive(true);
         
-        layer.YesButton.onClick.RemoveAllListeners();
         layer.YesButton.onClick.AddListener(Close);
         layer.YesButton.onClick.AddListener(action);
         
-        layer.NoButton.onClick.RemoveAllListeners();
         layer.NoButton.onClick.AddListener(Close);
         layer.NoButton.onClick.AddListener(cancel_action);
         

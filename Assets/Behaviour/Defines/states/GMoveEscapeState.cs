@@ -48,7 +48,7 @@ namespace Soul
             base.AI_State_enter();
             _Animator.SetFloat("speed", 0f);
             _SkillCancelFlag.turn_off_flag();
-            _Rigidbody.velocity = Vector3.zero;
+            _Rigidbody.linearVelocity = Vector3.zero;
             pEvents.CloseAllPersonalityEffects();
             _Animator.applyRootMotion = true;
             AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);

@@ -20,7 +20,7 @@ namespace Soul
                 }
             ).AddTo(gameObject);
 
-            _Rigidbody.velocity = CalFixPushVector(newValue.DamageEffectPoint, newValue.attacker.Center.WholeT.position,
+            _Rigidbody.linearVelocity = CalFixPushVector(newValue.DamageEffectPoint, newValue.attacker.Center.WholeT.position,
                 gameObject.transform.position,
                 newValue.from_weapon.damage_type, newValue.from_weapon._WeaponMode);
         }

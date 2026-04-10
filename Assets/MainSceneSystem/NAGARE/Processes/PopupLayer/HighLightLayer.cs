@@ -21,7 +21,7 @@ public class HighLightLayer : UILayer
     #region 高亮显示
     public static void HighLightRect(RectTransform r, Options options = null)
     {
-        var highLightLayer = UILayerLoader.Load<HighLightLayer>();
+        var highLightLayer = UILayerLoader.Load<HighLightLayer>(true, null, true);
         highLightLayer._HighLightRect(r, options);
     }
     
@@ -50,7 +50,7 @@ public class HighLightLayer : UILayer
     #region 黑幕
     public static void DarkOff(Color color, float duration)
     {
-        var highLightLayer = UILayerLoader.Load<HighLightLayer>();
+        var highLightLayer = UILayerLoader.Load<HighLightLayer>(true, null, true);
         highLightLayer.bigCurtain.raycastTarget = true;
         highLightLayer.bigCurtain.DOColor(color, duration);
     }

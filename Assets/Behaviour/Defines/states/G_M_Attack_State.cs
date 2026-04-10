@@ -16,7 +16,7 @@ namespace Soul
         {
             base.AI_State_enter();
             _BasicPhysicSupport.OpenEnemyTouchingDrag(1);
-            _Rigidbody.velocity = Vector3.zero;
+            _Rigidbody.linearVelocity = Vector3.zero;
             AnimationManger.TriggerExpression(Facial.aggressive);
             _Animator.SetFloat("speed", 0f);
             _SkillCancelFlag.turn_off_flag();

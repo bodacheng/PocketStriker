@@ -9,7 +9,7 @@ namespace Soul
         void HeavyStart(V_Damage newValue)
         {
             //gameObject.transform.DOMove(fixDesPos, 0.1f);
-            _Rigidbody.velocity = CalFixPushVector(newValue.impactComingPoint, newValue.attacker.Center.WholeT.position, gameObject.transform.position, 
+            _Rigidbody.linearVelocity = CalFixPushVector(newValue.impactComingPoint, newValue.attacker.Center.WholeT.position, gameObject.transform.position, 
                 newValue.from_weapon.damage_type, newValue.from_weapon._WeaponMode);
             
             _physicMissionDisposable = new SingleAssignmentDisposable();
@@ -21,7 +21,7 @@ namespace Soul
                             _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
                         else
                         {
-                            _Rigidbody.velocity = Vector3.zero;
+                            _Rigidbody.linearVelocity = Vector3.zero;
                         }
                         _physicMissionDisposable.Dispose();
                     }

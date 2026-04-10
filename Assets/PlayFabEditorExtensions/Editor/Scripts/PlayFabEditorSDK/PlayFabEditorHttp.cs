@@ -221,7 +221,7 @@ namespace PlayFab.PfEditor
                 errorCallback("UnityWebRequest Object was null");
             }
         }
-#else 
+#else
         private static IEnumerator Post(WWW www, Action<string> callBack, Action<string> errorCallback)
         {
             yield return www;

@@ -114,7 +114,7 @@ public partial class PlayFabReadClient
             (x)=>
             {
                 error(x);
-                ErrorReport(x);
+                ErrorReportStayInScene(x);
             });
     }
 }
@@ -128,4 +128,3 @@ public class TimeLimitedBuyData // 針對的title
     public string eventID;
     public int dmAmount;
 }
-

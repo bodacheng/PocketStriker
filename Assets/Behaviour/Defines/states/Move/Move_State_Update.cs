@@ -85,7 +85,7 @@ namespace Soul
             else
             {
                 _Animator.SetFloat("speed", 0f);
-                _Rigidbody.velocity = Vector3.zero;
+                _Rigidbody.linearVelocity = Vector3.zero;
             }
         }
         
@@ -101,7 +101,7 @@ namespace Soul
             else
             {
                 _Animator.SetFloat("speed", 0f);
-                _Rigidbody.velocity = Vector3.zero;
+                _Rigidbody.linearVelocity = Vector3.zero;
             }
         }
     }

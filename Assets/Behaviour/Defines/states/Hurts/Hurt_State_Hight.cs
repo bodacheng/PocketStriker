@@ -12,7 +12,7 @@ namespace Soul
         {
             dropped = false;
             _Animator.SetFloat("speed", 0f);
-            _Rigidbody.velocity = Vector3.zero;
+            _Rigidbody.linearVelocity = Vector3.zero;
             _usedDizzyTime = FightGlobalSetting.HighHitLastingTime;
             _xz = newValue.attacker.Center.WholeT.forward;
             FightParamsRef.GetKnockOffCount().PlusTimeCounter(0.2f);
@@ -26,7 +26,7 @@ namespace Soul
                 if (TimeCounter > 0.1f && _BasicPhysicSupport.hiddenMethods.Grounded)
                 {
                     dropped = true;
-                    _Rigidbody.velocity = Vector3.zero;
+                    _Rigidbody.linearVelocity = Vector3.zero;
                 }
                 else
                 {

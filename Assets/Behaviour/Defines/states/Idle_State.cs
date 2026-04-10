@@ -28,8 +28,8 @@ namespace Soul
             this._Animator.SetFloat("speed", 0f);
             // if (showVictoryMotion)
                 AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
-            this._Rigidbody.velocity = Vector3.zero;
-            this._Rigidbody.drag = FightGlobalSetting.OnTouchEnemyBodyRigidDrag;
+            this._Rigidbody.linearVelocity = Vector3.zero;
+            this._Rigidbody.linearDamping = FightGlobalSetting.OnTouchEnemyBodyRigidDrag;
             
             if (clip_name == "victory")
             {
@@ -66,7 +66,7 @@ namespace Soul
         public override void AI_State_exit()
         {
             base.AI_State_exit();
-            this._Rigidbody.drag = 0;
+            this._Rigidbody.linearDamping = 0;
         }
     }
 }

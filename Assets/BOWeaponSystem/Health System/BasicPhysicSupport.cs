@@ -75,7 +75,7 @@ public class BasicPhysicSupport : MonoBehaviour
                 _touchingEnemyCs.Add(c);
             if (_touchingEnemyCs.Count > 0)
             {
-                _BasicPhysicSupport.Rigidbody.drag = overrideOnEnemyDrag >= 0 ?
+                _BasicPhysicSupport.Rigidbody.linearDamping = overrideOnEnemyDrag >= 0 ?
                     overrideOnEnemyDrag : FightGlobalSetting.OnTouchEnemyBodyRigidDrag;
             }
         }
@@ -85,14 +85,14 @@ public class BasicPhysicSupport : MonoBehaviour
                 _touchingEnemyCs.Remove(c);
             if (_touchingEnemyCs.Count == 0)
             {
-                _BasicPhysicSupport.Rigidbody.drag = 0f;
+                _BasicPhysicSupport.Rigidbody.linearDamping = 0f;
             }
         }
         
         public void ClearTouchedEnemyBody()
         {
             _touchingEnemyCs.Clear();
-            _BasicPhysicSupport.Rigidbody.drag = 0f;
+            _BasicPhysicSupport.Rigidbody.linearDamping = 0f;
         }
         
         public int overrideOnEnemyDrag = -1;
@@ -122,7 +122,7 @@ public class BasicPhysicSupport : MonoBehaviour
         
         public void RecoverRootPosChange( )
         {
-            if (!TouchingEnemy() && _BasicPhysicSupport.Rigidbody.velocity == Vector3.zero)
+            if (!TouchingEnemy() && _BasicPhysicSupport.Rigidbody.linearVelocity == Vector3.zero)
                 _BasicPhysicSupport._DATA_CENTER.WholeT.transform.position += _BasicPhysicSupport._DATA_CENTER.AnimationManger.AnimatorRef.deltaPosition;
         }
         
@@ -130,7 +130,7 @@ public class BasicPhysicSupport : MonoBehaviour
         {
             _BasicPhysicSupport.SetUsingGravity(false);
             _BasicPhysicSupport.Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-            _BasicPhysicSupport.Rigidbody.velocity = Vector3.zero;
+            _BasicPhysicSupport.Rigidbody.linearVelocity = Vector3.zero;
         }
     }
     

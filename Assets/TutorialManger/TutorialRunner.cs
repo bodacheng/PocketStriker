@@ -16,6 +16,13 @@ public class TutorialRunner
             return _instance;
         }
     }
+
+    public void Shutdown()
+    {
+        currentProcess?.ProcessEnd();
+        currentProcess = null;
+        _tutorialProcesses.Clear();
+    }
     
     TutorialProcess currentProcess;
     private readonly List<TutorialProcess> _tutorialProcesses = new List<TutorialProcess>();

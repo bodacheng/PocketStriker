@@ -37,7 +37,7 @@ namespace Soul
             _Animator.applyRootMotion = false;
             _Weapon_Animation_Events.ClearMarkerManagers();
             pEvents.CloseAllPersonalityEffects();
-            _Rigidbody.velocity = Vector3.zero;
+            _Rigidbody.linearVelocity = Vector3.zero;
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.05f);
             //_xz = newValue.attacker._Center.WholeT.forward;
             var position = gameObject.transform.position;
@@ -123,7 +123,7 @@ namespace Soul
                     }
                     break;
             }
-            _Rigidbody.velocity = Vector3.zero; //如果没有这一行的话会出现个非常意外的问题，就是产生一个向上的固定velocity，超过了角色自身下坠，导致FlyingStep一直为0
+            _Rigidbody.linearVelocity = Vector3.zero; //如果没有这一行的话会出现个非常意外的问题，就是产生一个向上的固定velocity，超过了角色自身下坠，导致FlyingStep一直为0
             _timeCounter += Time.deltaTime;
         }
     }

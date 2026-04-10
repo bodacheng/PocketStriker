@@ -38,7 +38,7 @@ namespace Soul
             _Animator.applyRootMotion = false;
             _Weapon_Animation_Events.ClearMarkerManagers();
             pEvents.CloseAllPersonalityEffects();
-            _Rigidbody.velocity = Vector3.zero;
+            _Rigidbody.linearVelocity = Vector3.zero;
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.05f);
             //_xz = newValue.attacker._Center.WholeT.forward;
             _xz = CalFixPushVector(newValue.impactComingPoint,  newValue.attacker.Center.WholeT.position, gameObject.transform.position, 

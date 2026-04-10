@@ -113,6 +113,6 @@ namespace PlayFab.PfEditor
                 return base.TrySerializeKnownTypes(input, out output);
             }
         }
-       
+
     }
 }

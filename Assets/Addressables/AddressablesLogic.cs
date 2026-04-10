@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -7,6 +8,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using Newtonsoft.Json.Linq;
+using UnityEngine.SceneManagement;
 
 public static class AddressablesLogic
 {
@@ -103,7 +105,6 @@ public static class AddressablesLogic
     public static async UniTask DownLoadConfig()
     {
         await DownLoadMission("config", (x)=>{});
-
     }
 
     public static async UniTask<CommonSetting> GetCommonSetting()
@@ -116,8 +117,11 @@ public static class AddressablesLogic
         if (handle.Status == AsyncOperationStatus.Succeeded)
         {
             CommonSetting commonSetting = handle.Result;
+            LoadingHandlerList.Add(handle);
             return commonSetting;
         }
+        if (handle.IsValid())
+            Addressables.Release(handle);
         return null;
     }
     
@@ -131,62 +135,87 @@ public static class AddressablesLogic
         });
     }
     
-    static async UniTask<long> DownLoadSize(string label, Action exceptionProcess)
+    static async UniTask<long> DownLoadSize(string label, Action<string> exceptionProcess)
     {
-        var handle = Addressables.GetDownloadSizeAsync(label);
-        await handle.Task;
-        if (handle.Status == AsyncOperationStatus.Succeeded)
+        AsyncOperationHandle<long> handle = default;
+        try
         {
-            var result = handle.Result;
-            if (result > 0)
+            handle = Addressables.GetDownloadSizeAsync(label);
+            await handle.Task;
+            if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                DicAdd<string,long>.Add(Sizes, label, result);
+                var result = handle.Result;
+                if (result > 0)
+                {
+                    DicAdd<string,long>.Add(Sizes, label, result);
+                }
+                return result;
             }
-            Addressables.Release(handle);
-            return result;
+            Debug.LogError($"[Addressables] Failed to get download size for label: {label}");
+            exceptionProcess?.Invoke(label);
+            return 0;
         }
-        else
+        catch (Exception ex)
         {
-            Debug.Log($"Failed to get size : {label}");
-            Addressables.Release(handle);
-            exceptionProcess.Invoke();
-            return default;
+            Debug.LogError($"[Addressables] Exception during GetDownloadSizeAsync for label: {label}, Exception: {ex}");
+            exceptionProcess?.Invoke(label);
+            return 0;
+        }
+        finally
+        {
+            if (handle.IsValid())
+                Addressables.Release(handle);
         }
     }
     
-    static async UniTask DownLoadMission(string label, Action<string> progressUIRefresh)
+    static async UniTask<bool> DownLoadMission(string label, Action<string> progressUIRefresh)
     {
-        var handle = Addressables.DownloadDependenciesAsync(label);
-        while (!handle.IsDone)
+        AsyncOperationHandle downloadHandle = default;
+        try
         {
-            if (downloadedBytes.ContainsKey(label))
+            downloadHandle = Addressables.DownloadDependenciesAsync(label, true);
+            while (!downloadHandle.IsDone)
             {
-                downloadedBytes[label] = handle.GetDownloadStatus().DownloadedBytes;
+                if (downloadedBytes.ContainsKey(label))
+                {
+                    downloadedBytes[label] = downloadHandle.GetDownloadStatus().DownloadedBytes;
+                }
+
+                var text = string.Empty;
+                switch (AppSetting.Value.Language)
+                {
+                    case SystemLanguage.English:
+                        text = "Downloading Assets";
+                        break;
+                    case SystemLanguage.Japanese:
+                        text = "リソースをダウンロード中です";
+                        break;
+                    case SystemLanguage.Chinese:
+                        text = "正在下载资源";
+                        break;
+                    default:
+                        text = "リソースをダウンロード中です";
+                        break;
+                }
+                progressUIRefresh(text);
+                await UniTask.DelayFrame(0);
             }
 
-            var text = string.Empty;
-            switch (AppSetting.Value.Language)
-            {
-                case SystemLanguage.English:
-                    text = "Downloading Assets";
-                    break;
-                case SystemLanguage.Japanese:
-                    text = "リソースをダウンロード中です";
-                    break;
-                case SystemLanguage.Chinese:
-                    text = "正在下载资源";
-                    break;
-                default:
-                    text = "リソースをダウンロード中です";
-                    break;
-            }
-            progressUIRefresh(text);
-            await UniTask.DelayFrame(0);
+            return true;
         }
-        Addressables.Release(handle);
+        catch (Exception ex)
+        {
+            Debug.LogError($"DownloadMission Exception: {ex}");
+            return false;
+        }
+        finally
+        {
+            if (downloadHandle.IsValid())
+                Addressables.Release(downloadHandle);
+        }
     }
     
-    public static async UniTask<long> GetWholeDownLoadSize(Action exception, List<string> downLoadLabel)
+    public static async UniTask<long> GetWholeDownLoadSize(Action<string> exception, List<string> downLoadLabel)
     {
         //Caching.ClearCache();
         
@@ -231,13 +260,18 @@ public static class AddressablesLogic
                 downloadedBytes.Add(label, 0);
         }
         
-        var downLoadTasks = new List<UniTask>();
+        var downLoadTasks = new List<UniTask<bool>>();
         foreach (var label in downLoadLabel)
         {
             if (Sizes.ContainsKey(label))
                 downLoadTasks.Add(DownLoadMission(label, progressUIRefresh));
         }
-        await UniTask.WhenAll(downLoadTasks);
+        var results = await UniTask.WhenAll(downLoadTasks);
+        if (results.Any(result => result == false))
+        {
+            await LoadErrorThenBackToStart();
+            return;
+        }
         complete.Invoke();
     }
     
@@ -249,6 +283,7 @@ public static class AddressablesLogic
         {
             Debug.Log($"Failed to load : {prefabPathName}");
             Addressables.ReleaseInstance(handle);
+            await LoadErrorThenBackToStart();
             return default;
         }
         else
@@ -270,6 +305,7 @@ public static class AddressablesLogic
         {
             Debug.Log($"Failed to load : {prefabPathName}");
             Addressables.ReleaseInstance(handle);
+            await LoadErrorThenBackToStart();
             return default;
         }
         else
@@ -290,21 +326,24 @@ public static class AddressablesLogic
     
     public static async UniTask<T> LoadTOnObject<T>(string prefabPathName, GameObject memoryReleaseTarget = null, CancellationTokenSource _cancellationTokenSource = null)
     {
+        AsyncOperationHandle<GameObject> handle = default;
         try
         {
-            var handle = Addressables.InstantiateAsync(prefabPathName);
+            handle = Addressables.InstantiateAsync(prefabPathName);
             if (_cancellationTokenSource != null)
             {
                 await handle.ToUniTask(cancellationToken: _cancellationTokenSource.Token);
-                // 检查是否已取消
-                _cancellationTokenSource.Token.ThrowIfCancellationRequested();
             }
-        
-            await handle.Task;
+            else
+            {
+                await handle.Task;
+            }
+
             if (handle.IsValid() && handle.Status != AsyncOperationStatus.Succeeded)
             {
                 Debug.Log($"Failed to load : {prefabPathName}");
                 Addressables.ReleaseInstance(handle);
+                await LoadErrorThenBackToStart();
                 return default;
             }
             else
@@ -328,9 +367,17 @@ public static class AddressablesLogic
                 return returnValue;
             }
         }
+        catch (OperationCanceledException)
+        {
+            if (handle.IsValid())
+                Addressables.ReleaseInstance(handle);
+        }
         catch (Exception e)
         {
+            if (handle.IsValid())
+                Addressables.ReleaseInstance(handle);
             Debug.Log(e.Message);
+            await LoadErrorThenBackToStart();
         }
         return default;
     }
@@ -345,6 +392,7 @@ public static class AddressablesLogic
         {
             Debug.Log($"Failed to load : {prefabPathName}");
             Addressables.Release(handle);
+            await LoadErrorThenBackToStart();
             return default;
         }
         else
@@ -357,7 +405,8 @@ public static class AddressablesLogic
             {
                 memoryReleaseTarget.AddOnDestroyCallback( () =>
                 {
-                    Addressables.ReleaseInstance(handle);
+                    if (handle.IsValid())
+                        Addressables.Release(handle);
                 });
             }
             return handle.Result;
@@ -372,6 +421,7 @@ public static class AddressablesLogic
         {
             Debug.Log($"Failed to load : {location}");
             Addressables.Release(handle);
+            await LoadErrorThenBackToStart();
             return default;
         }
         else
@@ -384,7 +434,8 @@ public static class AddressablesLogic
             {
                 memoryReleaseTarget.AddOnDestroyCallback( () =>
                 {
-                    Addressables.ReleaseInstance(handle);
+                    if (handle.IsValid())
+                        Addressables.Release(handle);
                 });
             }
             return handle.Result;
@@ -399,5 +450,15 @@ public static class AddressablesLogic
                 Addressables.Release(handle);
         }
         LoadingHandlerList.Clear();
+    }
+
+    static async UniTask LoadErrorThenBackToStart()
+    {
+        ProgressLayer.Loading("download error");
+        await UniTask.Delay(TimeSpan.FromSeconds(2));
+        if (SceneManager.GetActiveScene().buildIndex != 0)
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 }

@@ -9,7 +9,8 @@ namespace PlayFab.ProgressionModels
     public class CreateLeaderboardDefinitionRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// Leaderboard columns describing the sort directions, cannot be changed after creation.
+        /// Leaderboard columns describing the sort directions, cannot be changed after creation. A maximum of 5 columns are
+        /// allowed.
         /// </summary>
         public List<LeaderboardColumn> Columns;
         /// <summary>
@@ -21,6 +22,10 @@ namespace PlayFab.ProgressionModels
         /// 'external' as the type.
         /// </summary>
         public string EntityType;
+        /// <summary>
+        /// [In Preview]: The configuration for the events emitted by this leaderboard. If not specified, no events will be emitted.
+        /// </summary>
+        public LeaderboardEventEmissionConfig EventEmissionConfig;
         /// <summary>
         /// A name for the leaderboard, unique per title.
         /// </summary>
@@ -39,7 +44,13 @@ namespace PlayFab.ProgressionModels
     public class CreateStatisticDefinitionRequest : PlayFabRequestCommon
     {
         /// <summary>
-        /// The columns for the statistic defining the aggregation method for each column.
+        /// [In Preview]: The list of statistic definition names whose scores must be aggregated towards this stat. If
+        /// AggregationSource is specified, the entityType of this definition MUST be Title (making it a CommunityStat). Currently,
+        /// only one aggregation source can be specified.
+        /// </summary>
+        public List<string> AggregationSources;
+        /// <summary>
+        /// The columns for the statistic defining the aggregation method for each column. A maximum of 5 columns are allowed.
         /// </summary>
         public List<StatisticColumn> Columns;
         /// <summary>
@@ -50,6 +61,10 @@ namespace PlayFab.ProgressionModels
         /// The entity type allowed to have score(s) for this statistic.
         /// </summary>
         public string EntityType;
+        /// <summary>
+        /// [In Preview]: Configurations for different Statistics events that can be emitted by the service.
+        /// </summary>
+        public StatisticsEventEmissionConfig EventEmissionConfig;
         /// <summary>
         /// Name of the statistic. Must be less than 150 characters. Restricted to a-Z, 0-9, '(', ')', '_', '-' and '.'.
         /// </summary>
@@ -186,11 +201,11 @@ namespace PlayFab.ProgressionModels
     public class EntityStatistics : PlayFabBaseModel
     {
         /// <summary>
-        /// Entity key
+        /// The entity for which the statistics are returned.
         /// </summary>
         public EntityKey EntityKey;
         /// <summary>
-        /// All statistics for the given entitykey
+        /// The statistics for the given entity key.
         /// </summary>
         public List<EntityStatisticValue> Statistics;
     }
@@ -214,6 +229,13 @@ namespace PlayFab.ProgressionModels
         /// Statistic version
         /// </summary>
         public int Version;
+    }
+
+    public enum EventType
+    {
+        None,
+        Telemetry,
+        PlayStream
     }
 
     public enum ExternalFriendSources
@@ -241,7 +263,7 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public string LeaderboardName;
         /// <summary>
-        /// Maximum number of results to return from the leaderboard. Minimum 1, maximum 1,000.
+        /// Maximum number of results to return from the leaderboard. Minimum 1, maximum 100.
         /// </summary>
         public uint PageSize;
         /// <summary>
@@ -374,6 +396,10 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public string EntityType;
         /// <summary>
+        /// [In Preview]: The configuration for the events emitted by this leaderboard. If not specified, no events will be emitted.
+        /// </summary>
+        public LeaderboardEventEmissionConfig EventEmissionConfig;
+        /// <summary>
         /// Last time, in UTC, leaderboard version was incremented.
         /// </summary>
         public DateTime? LastResetTime;
@@ -436,6 +462,16 @@ namespace PlayFab.ProgressionModels
     public class GetStatisticDefinitionResponse : PlayFabResultCommon
     {
         /// <summary>
+        /// The list of statistic definitions names this definition aggregates to.
+        /// </summary>
+        public List<string> AggregationDestinations;
+        /// <summary>
+        /// The list of statistic definitions names whose values must be aggregated towards this stat. If AggregationSource is
+        /// specified, the entityType of this definition MUST be Title (making it a CommunityStat). Currently, only one aggregation
+        /// source can be specified.
+        /// </summary>
+        public List<string> AggregationSources;
+        /// <summary>
         /// The columns for the statistic defining the aggregation method for each column.
         /// </summary>
         public List<StatisticColumn> Columns;
@@ -447,6 +483,10 @@ namespace PlayFab.ProgressionModels
         /// The entity type that can have this statistic.
         /// </summary>
         public string EntityType;
+        /// <summary>
+        /// [In Preview]: Configurations for different Statistics events that can be emitted by the service.
+        /// </summary>
+        public StatisticsEventEmissionConfig EventEmissionConfig;
         /// <summary>
         /// Last time, in UTC, statistic version was incremented.
         /// </summary>
@@ -480,6 +520,10 @@ namespace PlayFab.ProgressionModels
         /// Collection of Entity IDs to retrieve statistics for.
         /// </summary>
         public List<EntityKey> Entities;
+        /// <summary>
+        /// The list of statistics to return for the user. If set to null, the current version of all statistics are returned.
+        /// </summary>
+        public List<string> StatisticNames;
     }
 
     [Serializable]
@@ -506,6 +550,10 @@ namespace PlayFab.ProgressionModels
         /// The optional entity to perform this action on. Defaults to the currently logged in entity.
         /// </summary>
         public EntityKey Entity;
+        /// <summary>
+        /// The list of statistics to return for the user. If set to null, the current version of all statistics are returned.
+        /// </summary>
+        public List<string> StatisticNames;
     }
 
     [Serializable]
@@ -604,6 +652,10 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public string EntityType;
         /// <summary>
+        /// [In Preview]: The configuration for the events emitted by this leaderboard. If not specified, no events will be emitted.
+        /// </summary>
+        public LeaderboardEventEmissionConfig EventEmissionConfig;
+        /// <summary>
         /// Last time, in UTC, leaderboard version was incremented.
         /// </summary>
         public DateTime? LastResetTime;
@@ -626,6 +678,19 @@ namespace PlayFab.ProgressionModels
     }
 
     [Serializable]
+    public class LeaderboardEntityRankOnVersionEndConfig : PlayFabBaseModel
+    {
+        /// <summary>
+        /// The type of event to emit when the leaderboard version end.
+        /// </summary>
+        public EventType EventType;
+        /// <summary>
+        /// The maximum number of entity to return on leaderboard version end. Range is 1 to 1000.
+        /// </summary>
+        public int RankLimit;
+    }
+
+    [Serializable]
     public class LeaderboardEntryUpdate : PlayFabBaseModel
     {
         /// <summary>
@@ -644,10 +709,32 @@ namespace PlayFab.ProgressionModels
         public List<string> Scores;
     }
 
+    [Serializable]
+    public class LeaderboardEventEmissionConfig : PlayFabBaseModel
+    {
+        /// <summary>
+        /// This event emits the top ranks of the leaderboard when the leaderboard version end.
+        /// </summary>
+        public LeaderboardEntityRankOnVersionEndConfig EntityRankOnVersionEndConfig;
+        /// <summary>
+        /// This event is emitted when the leaderboard version end.
+        /// </summary>
+        public LeaderboardVersionEndConfig VersionEndConfig;
+    }
+
     public enum LeaderboardSortDirection
     {
         Descending,
         Ascending
+    }
+
+    [Serializable]
+    public class LeaderboardVersionEndConfig : PlayFabBaseModel
+    {
+        /// <summary>
+        /// The type of event to emit when the leaderboard version end.
+        /// </summary>
+        public EventType EventType;
     }
 
     [Serializable]
@@ -746,6 +833,16 @@ namespace PlayFab.ProgressionModels
     public class StatisticDefinition : PlayFabBaseModel
     {
         /// <summary>
+        /// The list of statistic definitions names this definition aggregates to.
+        /// </summary>
+        public List<string> AggregationDestinations;
+        /// <summary>
+        /// The list of statistic definitions names whose values must be aggregated towards this stat. If AggregationSource is
+        /// specified, the entityType of this definition MUST be Title (making it a CommunityStat). Currently, only one aggregation
+        /// source can be specified.
+        /// </summary>
+        public List<string> AggregationSources;
+        /// <summary>
         /// The columns for the statistic defining the aggregation method for each column.
         /// </summary>
         public List<StatisticColumn> Columns;
@@ -757,6 +854,10 @@ namespace PlayFab.ProgressionModels
         /// The entity type that can have this statistic.
         /// </summary>
         public string EntityType;
+        /// <summary>
+        /// [In Preview]: Configurations for different Statistics events that can be emitted by the service.
+        /// </summary>
+        public StatisticsEventEmissionConfig EventEmissionConfig;
         /// <summary>
         /// Last time, in UTC, statistic version was incremented.
         /// </summary>
@@ -789,6 +890,24 @@ namespace PlayFab.ProgressionModels
     }
 
     [Serializable]
+    public class StatisticsEventEmissionConfig : PlayFabBaseModel
+    {
+        /// <summary>
+        /// Emitted when statistics are updated.
+        /// </summary>
+        public StatisticsUpdateEventConfig UpdateEventConfig;
+    }
+
+    [Serializable]
+    public class StatisticsUpdateEventConfig : PlayFabBaseModel
+    {
+        /// <summary>
+        /// The event type to emit when statistics are updated.
+        /// </summary>
+        public EventType EventType;
+    }
+
+    [Serializable]
     public class StatisticUpdate : PlayFabBaseModel
     {
         /// <summary>
@@ -811,6 +930,23 @@ namespace PlayFab.ProgressionModels
         /// Optional field to indicate the version of the statistic to set. When empty defaults to the statistic's current version.
         /// </summary>
         public uint? Version;
+    }
+
+    [Serializable]
+    public class UnlinkAggregationSourceFromStatisticRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
+        /// </summary>
+        public Dictionary<string,string> CustomTags;
+        /// <summary>
+        /// The name of the statistic to unlink.
+        /// </summary>
+        public string Name;
+        /// <summary>
+        /// The name of the aggregation source statistic to unlink.
+        /// </summary>
+        public string SourceStatisticName;
     }
 
     [Serializable]
@@ -837,6 +973,10 @@ namespace PlayFab.ProgressionModels
         /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
         /// </summary>
         public Dictionary<string,string> CustomTags;
+        /// <summary>
+        /// [In Preview]: The configuration for the events emitted by this leaderboard. If not specified, no events will be emitted.
+        /// </summary>
+        public LeaderboardEventEmissionConfig EventEmissionConfig;
         /// <summary>
         /// The name of the leaderboard to update the definition for.
         /// </summary>
@@ -876,6 +1016,10 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public Dictionary<string,string> CustomTags;
         /// <summary>
+        /// [In Preview]: Configurations for different Statistics events that can be emitted by the service.
+        /// </summary>
+        public StatisticsEventEmissionConfig EventEmissionConfig;
+        /// <summary>
         /// Name of the statistic. Must be less than 150 characters. Restricted to a-Z, 0-9, '(', ')', '_', '-' and '.'.
         /// </summary>
         public string Name;
@@ -901,8 +1045,7 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public List<StatisticUpdate> Statistics;
         /// <summary>
-        /// Optional transactionId of this update which can be used to ensure idempotence. Using this field is still in testing
-        /// stage.
+        /// Optional transactionId of this update which can be used to ensure idempotence.
         /// </summary>
         public string TransactionId;
     }

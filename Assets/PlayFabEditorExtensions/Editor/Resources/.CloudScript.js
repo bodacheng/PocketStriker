@@ -2,10 +2,10 @@
 //
 // Welcome to your first Cloud Script revision!
 //
-// Cloud Script runs in the PlayFab cloud and has full access to the PlayFab Game Server API 
+// Cloud Script runs in the PlayFab cloud and has full access to the PlayFab Game Server API
 // (https://api.playfab.com/Documentation/Server), and it runs in the context of a securely
 // authenticated player, so you can use it to implement logic for your game that is safe from
-// client-side exploits. 
+// client-side exploits.
 //
 // Cloud Script functions can also make web requests to external HTTP
 // endpoints, such as a database or private API for your title, which makes them a flexible
@@ -14,17 +14,17 @@
 // There are several different options for calling Cloud Script functions:
 //
 // 1) Your game client calls them directly using the "ExecuteCloudScript" API,
-// passing in the function name and arguments in the request and receiving the 
+// passing in the function name and arguments in the request and receiving the
 // function return result in the response.
 // (https://api.playfab.com/Documentation/Client/method/ExecuteCloudScript)
-// 
-// 2) You create PlayStream event actions that call them when a particular 
+//
+// 2) You create PlayStream event actions that call them when a particular
 // event occurs, passing in the event and associated player profile data.
 // (https://api.playfab.com/playstream/docs)
-// 
+//
 // 3) For titles using the Photon Add-on (https://playfab.com/marketplace/photon/),
 // Photon room events trigger webhooks which call corresponding Cloud Script functions.
-// 
+//
 // The following examples demonstrate all three options.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@
 //var currentPlayerId = playstreamEvent.Entity.Id;
 
 handlers.DeletePlayer = function(args, context) {
-    
+
     // 调用 GetAccountInfo 来获取用户的账户信息
     var accountInfoResult = server.GetUserAccountInfo({
         PlayFabId: currentPlayerId
@@ -48,7 +48,7 @@ handlers.DeletePlayer = function(args, context) {
                 DeviceId: accountInfoResult.UserInfo.IosDeviceInfo.IosDeviceId
             });
         }
-        
+
         // 检查并解除 Android 设备绑定
         if (accountInfoResult.UserInfo.AndroidDeviceInfo) {
             server.UnlinkAndroidDeviceID({
@@ -65,7 +65,7 @@ handlers.DeletePlayer = function(args, context) {
     var updateUserDataResult = server.DeletePlayer({
         PlayFabId: currentPlayerId
     });
-    
+
     // 返回操作结果
     return { updateUserDataResult };
 };
@@ -73,7 +73,7 @@ handlers.DeletePlayer = function(args, context) {
 handlers.BundleBought = function (args, context) {
 
     const key = args.bundleProductId;
-    
+
     var updateUserDataResult = server.UpdateUserReadOnlyData({
         PlayFabId: currentPlayerId,
         Data: {
@@ -90,10 +90,10 @@ handlers.GrantContainerIfNotOwnedFromConsole = function (args, context) {
     var request = {
         "PlayFabId": currentPlayerId
     };
-    
+
     // 获取玩家的物品列表
     var inventoryResult = server.GetUserInventory(request);
-    
+
     // 检查玩家是否已经拥有了这个物品
     var playerHasItem = false;
     for (var i = 0; i < inventoryResult.Inventory.length; i++) {
@@ -120,7 +120,7 @@ handlers.GrantContainerIfNotOwnedFromConsole = function (args, context) {
 };
 
 function GrantItemIfNotOwnedByUser(itemId, playFabItemCategory) {
-    
+
     var checkRequest = {
         "PlayFabId": currentPlayerId
     };
@@ -196,7 +196,7 @@ function GrantItemToCurrentUser(itemIds, CatalogVersion)
         "PlayFabId" : currentPlayerId,
         "ItemIds" : itemIds
     };
-    
+
     var GrantItemsToUserResult = server.GrantItemsToUser(GrantItemsToUserRequest);
     return GrantItemsToUserResult.ItemGrantResults;
 }
@@ -208,7 +208,7 @@ function GrantItemToCurrentUserAndSetCustomData(itemIds, CatalogVersion, customD
         "PlayFabId" : currentPlayerId,
         "ItemIds" : itemIds
     };
-    
+
     var GrantItemsToUserResult = server.GrantItemsToUser(GrantItemsToUserRequest);
 
     if (customData) {
@@ -222,17 +222,17 @@ function GrantItemToCurrentUserAndSetCustomData(itemIds, CatalogVersion, customD
             server.UpdateUserInventoryItemCustomData(UpdateUserInventoryItemDataRequest);
         }
     }
-    
+
     //log.info(GrantItemsToUserResult);
     return GrantItemsToUserResult.ItemGrantResults;
 }
 
 handlers.advertisementReward = function (args, context) {
-    
+
     if (args.stage != undefined) {
 
         var newLevelCompleted = Number(args.stage);
-        
+
         // Get the player's existing level ad status data.
         var playerData = server.GetUserReadOnlyData({
             PlayFabId: currentPlayerId,
@@ -262,7 +262,7 @@ handlers.advertisementReward = function (args, context) {
             Data: { "LevelAdStatus": JSON.stringify(levelAdStatus) }
         });
     }
-    
+
     var result = server.AddUserVirtualCurrency(
         {
             PlayFabId :currentPlayerId,
@@ -285,7 +285,7 @@ handlers.setNoAdsStatus = function(args, context) {
             PlayFabId: playerId,
             Data: {"noAds": "1"}
         });
-        
+
         var userSkippedAdRewards = GetUserSkippedAdRewards();
         if (userSkippedAdRewards > 0) {
             var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(
@@ -295,7 +295,7 @@ handlers.setNoAdsStatus = function(args, context) {
                     VirtualCurrency : "DM"
                 }
             );
-            
+
             return { rewardDM : userSkippedAdRewards };
         }
     }
@@ -308,9 +308,9 @@ function GetUserSkippedAdRewards() {
         PlayFabId: currentPlayerId,
         Keys: ["LevelAdStatus", "GangbangLevelAdStatus"]
     });
-    
+
     var rewardDM = 0;
-    
+
     if (playerData.Data.LevelAdStatus) {
         // 将LevelAdStatus数据解析为数组
         var levelAdStatus = JSON.parse(playerData.Data.LevelAdStatus.Value || '[]');
@@ -322,7 +322,7 @@ function GetUserSkippedAdRewards() {
             }
         }
     }
-    
+
     if (playerData.Data.GangbangLevelAdStatus) {
         // 将LevelAdStatus数据解析为数组
         var gangbangLevelAdStatus = JSON.parse(playerData.Data.GangbangLevelAdStatus.Value || '[]');
@@ -334,7 +334,7 @@ function GetUserSkippedAdRewards() {
             }
         }
     }
-    
+
     // 返回计算得到的奖励值
     return rewardDM;
 }
@@ -357,7 +357,7 @@ handlers.SubtractVirtualCurrency = function (args, context) {
 
 // 给予dev用户基本财产
 handlers.grantDevItems = function (args, context) {
-    
+
     var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(
         {
             PlayFabId :currentPlayerId,
@@ -388,13 +388,18 @@ handlers.grantDevItems = function (args, context) {
     }
     var stoneResult = GrantItemsIfNotOwnedByUser(stoneIds , "stone");
     var unitResult = GrantItemsIfNotOwnedByUser(["1","2","4","5","6","7"] , "unit");
-    
+
     return { result: true };
 };
 
 // 给予玩家基本财产
 handlers.grantBasicItems = function (args, context) {
-    
+
+    var getRequest = {
+        PlayFabId: currentPlayerId
+    };
+    var accountInfo = server.GetUserAccountInfo(getRequest);
+
     var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(
         {
             PlayFabId :currentPlayerId,
@@ -402,28 +407,33 @@ handlers.grantBasicItems = function (args, context) {
             VirtualCurrency : "DM"
         }
     );
-    
+
     var GrantedItems = GrantItemToCurrentUser(args.unit_ids, "unit");
     var GrantedStones = GrantItemToCurrentUser(args.stone_ids, "stone");
-    
+
+    if (accountInfo.UserInfo.TitleInfo.Origination === "Steam") {
+        GrantedPacks = GrantItemToCurrentUser(args.stone_package_ids, "stone");
+    }
+
     return { result: true };
 };
 
 // 将被动技能给予角色
 // 是控制台内grantitem的附属执行函数
+// 注意，添加新被动技能的时候再initStoneData这个函数里有十分重要的设置要做。
 handlers.givePassiveSkill= function (args, context) {
 
     var request = {
         "PlayFabId": currentPlayerId
     };
-    
+
     var playstreamEvent = context.playStreamEvent;
     var unit_InstanceId = playstreamEvent.InstanceId;
-    
+
     let itemIds = [];
     itemIds.push(args.skill_id);
     var grantResult = GrantItemToCurrentUser(itemIds, "stone");
-    
+
     // 虽然是for循环体但其实只执行一圈
     for (let i = 0; i < grantResult.length; i++)
     {
@@ -440,12 +450,12 @@ handlers.givePassiveSkill= function (args, context) {
         };
         server.UpdateUserInventoryItemCustomData(request);
     }
-    
+
     return { result : true };
 }
 
 handlers.completedLevel = function (args, context) {
-    
+
     var newLevelCompleted = Number(args.stage);
     var stageType = args.stageType;
     var stageProgressKey = stageType === "gangbang" ? "gangbangProgress" : "stageProgress";
@@ -470,23 +480,23 @@ handlers.completedLevel = function (args, context) {
             case 5:
                 unit_award = "2";
                 break;
-            case 20:
+            case 10:
                 unit_award = "4";
                 break;
-            case 35:
+            case 15:
                 unit_award = "7";
                 break;
-            case 50:
+            case 20:
                 unit_award = "6";
                 break;
-            case 100:
+            case 50:
                 unit_award = "5";
                 break;
             default:
                 break;
         }
     }
-    
+
     if (unit_award != -1) {
         var award_unit = GrantItemIfNotOwnedByUser(unit_award, "unit");
         return { award_unit };
@@ -496,7 +506,7 @@ handlers.completedLevel = function (args, context) {
 };
 
 handlers.claimQuestReward = function (args, context) {
-    
+
     // 传递过来的这个level是玩家试图更新到的进度，但这个数值来自客户端，并不能完全信任
     // 关卡更新机制我们只有一个逻辑就是一次只更新一关
 
@@ -504,7 +514,7 @@ handlers.claimQuestReward = function (args, context) {
     var isVip = args.isVip;
     var stageAwardsKey = stageType === "gangbang" ? "gangbang_awards" : "stage_awards";
     var adStatusKey = stageType === "gangbang" ? "GangbangLevelAdStatus" : "LevelAdStatus";
-    
+
     var level = args.level;
     var newLevelCompleted = Number(args.stage);
     var titleDataRequest = { "Keys": stageAwardsKey };
@@ -539,7 +549,7 @@ handlers.claimQuestReward = function (args, context) {
     if (award.hasOwnProperty("d")) {
         d = Number(award.d);
     }
-    
+
     // Get the player's existing level ad status data.
     var playerData = server.GetUserReadOnlyData({
         PlayFabId: currentPlayerId,
@@ -563,12 +573,12 @@ handlers.claimQuestReward = function (args, context) {
             levelAdStatus = JSON.parse(playerData.Data.GangbangLevelAdStatus.Value || '[]');
         }
     }
-    
+
     // If the level index is out of range, expand the levelAdStatus array.
     while(newLevelCompleted > levelAdStatus.length) {
         levelAdStatus.push(null);
     }
-    
+
     // Update the level ad status.
     if (levelAdStatus[newLevelCompleted - 1] === null) {
         levelAdStatus[newLevelCompleted - 1] = 0;
@@ -579,13 +589,13 @@ handlers.claimQuestReward = function (args, context) {
             }
         }
     }
-    
+
     // Save the updated level ad status data.
     var newPlayData = server.UpdateUserReadOnlyData({
         PlayFabId: currentPlayerId,
         Data: {[adStatusKey]:JSON.stringify(levelAdStatus)}
     });
-    
+
     if (g > 0) {
         server.AddUserVirtualCurrency({
             PlayFabID: currentPlayerId,
@@ -593,7 +603,7 @@ handlers.claimQuestReward = function (args, context) {
             Amount: g
         });
     }
-    
+
     if (d > 0) {
         server.AddUserVirtualCurrency({
             PlayFabID: currentPlayerId,
@@ -601,7 +611,7 @@ handlers.claimQuestReward = function (args, context) {
             Amount: d
         });
     }
-    
+
     return {
         has_reward: true,
         gold: g,
@@ -610,7 +620,7 @@ handlers.claimQuestReward = function (args, context) {
 };
 
 handlers.claimEventReward = function (args, context) {
-    
+
     var stageAwardsKey = "event_awards";
     var titleDataRequest = { "Keys": stageAwardsKey };
     var titleDataResponse = server.GetTitleData(titleDataRequest);
@@ -630,7 +640,7 @@ handlers.claimEventReward = function (args, context) {
             }
         }
     }
-    
+
     if (award === undefined) {
         return {
             has_reward: false
@@ -644,7 +654,7 @@ handlers.claimEventReward = function (args, context) {
     if (award.hasOwnProperty("d")) {
         d = Number(award.d);
     }
-    
+
     if (g > 0) {
         server.AddUserVirtualCurrency({
             PlayFabID: currentPlayerId,
@@ -707,7 +717,7 @@ handlers.checkAndUpdateEventBattleProgress = function (args, context) {
             PlayFabId: currentPlayerId,
             Data: { [progressKey]: JSON.stringify(levelsCompleted) }
         });
-        
+
         return { message: "Level added to progress.", levelId: levelId };
     } else {
         return { message: "Level already completed.", levelId: levelId };
@@ -717,7 +727,7 @@ handlers.checkAndUpdateEventBattleProgress = function (args, context) {
 
 // 技能石背包只能10个10个的往上买。但是必须应该有一个最大值。这个数字是多少要看这游戏是个什么感觉
 handlers.expandBox10 = function (args, context) {
-    
+
     var playerData = server.GetUserReadOnlyData({
         PlayFabId: currentPlayerId,
         Keys: ["stone_box_size"]
@@ -730,7 +740,7 @@ handlers.expandBox10 = function (args, context) {
             "stone_box_size": StoneBoxSize,
         }
     });
-    
+
     return StoneBoxSize;
 };
 
@@ -739,7 +749,7 @@ handlers.claimAllPresentMails = function (args, context) {
         "PlayFabId": currentPlayerId
     };
     var items = server.GetUserInventory(request);
-    
+
     let UnlockedList = [];
     var allDM = 0;
     var allGD = 0;
@@ -763,8 +773,8 @@ handlers.claimAllPresentMails = function (args, context) {
         }
     }
     return {
-        diamond: allDM,  
-        gold: allGD, 
+        diamond: allDM,
+        gold: allGD,
         UnlockedItemInstanceIds : UnlockedList
     };
 }
@@ -778,8 +788,8 @@ handlers.skillEdit = function (args, context) {
     var inventoryRequest = {
         "PlayFabId": currentPlayerId
     };
-    
-    
+
+
     let memo = [];
 
     // var items = server.GetUserInventory(inventoryRequest);
@@ -803,7 +813,7 @@ handlers.skillEdit = function (args, context) {
     //         }
     //     }
     // }
-    
+
     for (let i = 0; i < args.inputValue.length; i++) {
         var requestItem = args.inputValue[i];
         var request = {
@@ -814,7 +824,7 @@ handlers.skillEdit = function (args, context) {
         var result = server.UpdateUserInventoryItemCustomData(request);
         memo.push(
             {
-                "InstanceId": requestItem.ItemInstanceId, 
+                "InstanceId": requestItem.ItemInstanceId,
                 "slot": requestItem.Data.slot,
                 "unitInstanceId":requestItem.Data.unitInstanceId
             }
@@ -826,7 +836,7 @@ handlers.skillEdit = function (args, context) {
 handlers.updateStone = function (args, context) {
 
     var targetStone;
-    
+
     var inventoryRequest = {
         "PlayFabId": currentPlayerId
     };
@@ -846,11 +856,11 @@ handlers.updateStone = function (args, context) {
             }
         }
     }
-    
+
     var GD = Number(items.VirtualCurrency["GD"]);
-    
+
     // 是否有足够的金币升级？
-    
+
     let needGD = args.needGD ? Number(args.needGD) : 10;//这是升级到1.4.0版本阶段的一个过度写法
     if (GD < needGD) {
         return {  success: false, stoneId: args.target, level:0};
@@ -863,13 +873,13 @@ handlers.updateStone = function (args, context) {
             VirtualCurrency : "GD"
         }
     );
-    
+
     var revokeRequest = {
         "PlayFabId": currentPlayerId,
         "Items": args.resources,
     };
     server.RevokeInventoryItems(revokeRequest);
-    
+
     if (targetStone !== null) {
         targetStone.CustomData["level"] = currentLv;
         var levelUpRequest = {
@@ -880,26 +890,26 @@ handlers.updateStone = function (args, context) {
         var updateResult = server.UpdateUserInventoryItemCustomData(levelUpRequest);
         return { success: true, stoneId: targetStone.ItemInstanceId, level:currentLv };
     }
-    
+
     return {  success: false, stoneId: args.target, level:0};
 }
 
 handlers.ArenaDefendTeamSave = function (args, context) {
-    
+
     let members = [];
     if (args.Team == null) {
         return { success: false };
     }
-    
+
     for (let i = 0; i < args.Team.length; i++) {
         var item = args.Team[i];
         members.push(item);
     }
-    
+
     if (members.length != 3) {
         return { success: false  };
     }
-    
+
     var request = {
         "PlayFabId": currentPlayerId,
         "Data": {
@@ -919,7 +929,7 @@ handlers.ArenaDefendTeamSave = function (args, context) {
             arenapoint = playerStats.Statistics[i].Value;
         }
     }
-    
+
     if (arenapoint == -999) {
         var playerStatResult = server.UpdatePlayerStatistics(
             {
@@ -938,7 +948,7 @@ handlers.ArenaDefendTeamSave = function (args, context) {
             arenapoint : 0
         };
     }
-    
+
     return {
         success: true,
         messageValue: members
@@ -959,14 +969,14 @@ function arenaPlusPoint(mePosition, opponentPosition, mePoint, opponentPoint) {
 }
 
 function AddTeamInfoItem(Leaderboard, mePosition, mePoint) {
-    
+
     var playerTeamData = server.GetUserData(
         {
             PlayFabId: Leaderboard.PlayFabId,
             Keys: ["DefendTeam","OneWord"]
         }
     );
-    
+
     // 玩家可能未曾保存过防御队伍阵容，对这种玩家不返回。
     if (playerTeamData.Data["DefendTeam"] != null) {
         var item = {
@@ -1003,7 +1013,7 @@ handlers.GetLeaderboardAroundUser = function (args, context) {
     if (myTeamData.Data["DefendTeam"] == null){
         return { teamInfos };
     }
-    
+
     var request = {
         "PlayFabId": currentPlayerId,
         "MaxResultsCount": 4,
@@ -1012,7 +1022,7 @@ handlers.GetLeaderboardAroundUser = function (args, context) {
             "ShowDisplayName" : true
         }
     };
-    
+
     var result = server.GetLeaderboardAroundUser(request);
     var myTeam;
     for (let i = 0; i < result.Leaderboard.length; i++) {
@@ -1023,7 +1033,7 @@ handlers.GetLeaderboardAroundUser = function (args, context) {
             }
         }
     }
-    
+
     for (let i = 0; i < result.Leaderboard.length; i++) {
         if (result.Leaderboard[i].PlayFabId != currentPlayerId) {
             var item = AddTeamInfoItem(result.Leaderboard[i], myTeam.PlayerLeaderboardEntry.Position, myTeam.PlayerLeaderboardEntry.StatValue);
@@ -1032,7 +1042,7 @@ handlers.GetLeaderboardAroundUser = function (args, context) {
             }
         }
     }
-    
+
     // 该返回值内存在元素重复的可能(玩家很少情况下，higherPlayer已经在server.GetLeaderboardAroundUser结果内)
     return { teamInfos };
 }
@@ -1063,7 +1073,7 @@ function clampMax(value, max) {
 handlers.GetLeaderboard = function (args, context) {
 
     var request = {
-        "MaxResultsCount": 20, 
+        "MaxResultsCount": 20,
         "StatisticName": "arenapoint",
         "ProfileConstraints" : {
             "ShowDisplayName" : true
@@ -1101,7 +1111,7 @@ handlers.ArenaPointUp = function (args, context) {
     var getRequest = {
         PlayFabId: currentPlayerId
     };
-    
+
     let mePosition = args.mePosition;
     let opponentPosition = args.opponentPosition;
     let mePoint = args.mePoint;
@@ -1115,7 +1125,7 @@ handlers.ArenaPointUp = function (args, context) {
             Value: shouldPoint
         }]
     });
-    
+
     return {
         "currentPoint" : shouldPoint
     };
@@ -1135,13 +1145,13 @@ handlers.RankClear = function (args, context) {
             arenapoint = playerStats.Statistics[i].Value;
         }
     }
-    
+
     if (arenapoint == -1) {
         return { arenapoint : arenapoint };
     }
-    
+
     let targetPoint = Math.floor(clampMax(arenapoint * 0.3, 90));
-    
+
     server.UpdatePlayerStatistics({
         PlayFabId: currentPlayerId,
         Statistics: [{
@@ -1152,6 +1162,120 @@ handlers.RankClear = function (args, context) {
 
     return { arenapoint : targetPoint };
 }
+
+handlers.modifyRandomStatForPlayers = function (args, context) {
+    // 从 args 中读取参数
+    var statisticName = args.statName;      // 要修改的 Statistic 名称
+    var minValue      = args.minValue;      // 随机值下限（包含）
+    var maxValue      = args.maxValue;      // 随机值上限（包含）
+    var nameList      = args.nameList;      // 目标昵称列表（DisplayName 列表）
+    var segmentId     = args.segmentId;     // 需要遍历的玩家 Segment Id
+
+    if (!statisticName || minValue == null || maxValue == null || !nameList || !segmentId) {
+        return { error: "缺少必要参数，请确保传入了 statisticName, minValue, maxValue, nameList, segmentId 等。" };
+    }
+
+    // 获取目标 Segment 中的所有玩家
+    var allPlayers = getAllPlayersInSegment(segmentId);
+
+    // 统计更新结果
+    var updatedPlayers = [];
+
+    // 遍历玩家，匹配昵称并更新 Statistic
+    for (var i = 0; i < allPlayers.length; i++) {
+        var playerProfile = allPlayers[i];
+        var playerDisplayName = playerProfile.DisplayName;
+        var playerId = playerProfile.PlayerId;
+
+        // 如果 DisplayName 在我们传入的 nameList 里面，则更新该玩家的Statistic
+        if (nameList.indexOf(playerDisplayName) !== -1) {
+
+            var existingValue = getCurrentStatValue(playerId, statisticName);
+
+            // 生成随机值（在 [minValue, maxValue] 区间内）
+            var randomValue = getRandomInt(minValue, maxValue);
+            var newValue = existingValue + randomValue;
+
+            // 调用 UpdatePlayerStatistics
+            var updateResult = server.UpdatePlayerStatistics({
+                PlayFabId: playerId,
+                Statistics: [{
+                    StatisticName: statisticName,
+                    Value: newValue
+                }]
+            });
+
+            // 记录到返回结果中
+            updatedPlayers.push({
+                PlayFabId: playerId,
+                DisplayName: playerDisplayName,
+                newValue: newValue
+            });
+        }
+    }
+
+    return {
+        message: "更新完成",
+        updatedCount: updatedPlayers.length,
+        updatedPlayers: updatedPlayers
+    };
+};
+
+/**
+ * 获取玩家当前的某个 Statistic 值，如果不存在则返回 0
+ */
+function getCurrentStatValue(playFabId, statName) {
+    var result = server.GetPlayerStatistics({ PlayFabId: playFabId });
+    if (!result || !result.Statistics) {
+        return 0;
+    }
+
+    for (var i = 0; i < result.Statistics.length; i++) {
+        var stat = result.Statistics[i];
+        if (stat.StatisticName === statName) {
+            return stat.Value || 0;
+        }
+    }
+    return 0;
+}
+
+
+/**
+ * 根据 segmentId，遍历并返回该分段下的所有玩家列表（playerProfiles）。
+ * 请注意，如果玩家量巨大，该方式可能会有性能或时间限制，应按需优化或分段执行。
+ */
+function getAllPlayersInSegment(segmentId) {
+    var allPlayers = [];
+    var request = { SegmentId: segmentId };
+    var continueToken = null;
+
+    do {
+        if (continueToken) {
+            request.ContinuationToken = continueToken;
+        }
+        var response = server.GetPlayersInSegment(request);
+
+        if (response && response.PlayerProfiles) {
+            allPlayers = allPlayers.concat(response.PlayerProfiles);
+        }
+
+        continueToken = response.ContinuationToken;
+    } while (continueToken);
+
+    return allPlayers;
+}
+
+/**
+ * 生成 [min, max] 范围内的随机整数
+ */
+function getRandomInt(min, max) {
+    // 确保参数为整数
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    // 这里的随机包含 min、包含 max
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 
 handlers.DeleteNoDisplayNameUser = function (args, context) {
     var getRequest = {
@@ -1172,7 +1296,7 @@ handlers.DeleteNoDisplayNameUser = function (args, context) {
             stageProgress = playerStats.Statistics[i].Value;
         }
     }
-    
+
     if ((displayName == "" || displayName == null) && stageProgress < 3) {
         var deleted = server.DeletePlayer(getRequest);
         return { deleted };
@@ -1195,11 +1319,11 @@ handlers.initStoneData = function (args, context) {
     var playstreamEvent = context.playStreamEvent;
     let itemInstanceId = playstreamEvent.InstanceId;
     let itemId = playstreamEvent.ItemId;
-    if (itemId === "176" || itemId === "183" || itemId === "90" || itemId === "184" || itemId === "179") // 被动获得被动技能石有其他函数帮助更新数据
+    if (itemId === "176" || itemId === "183" || itemId === "90" || itemId === "184" || itemId === "179" || itemId === "165") // 被动获得被动技能石有其他函数帮助更新数据
     {
         return { };
     }
-    
+
     var request = {
         "PlayFabId": currentPlayerId,
         "ItemInstanceId": itemInstanceId,
@@ -1257,7 +1381,7 @@ handlers.Remove25Stones = function (args, context) {
     return { currentItemCount: currentItemCount};
 }
 
-// This an example of a function that calls a PlayFab Entity API. The function is called using the 
+// This an example of a function that calls a PlayFab Entity API. The function is called using the
 // 'ExecuteEntityCloudScript' API (https://api.playfab.com/documentation/CloudScript/method/ExecuteEntityCloudScript).
 handlers.makeEntityAPICall = function (args, context) {
 
@@ -1291,7 +1415,7 @@ handlers.makeHTTPRequest = function (args, context) {
     var headers = {
         "X-MyCustomHeader": "Some Value"
     };
-    
+
     var body = {
         input: args,
         userId: currentPlayerId,
@@ -1311,15 +1435,15 @@ handlers.makeHTTPRequest = function (args, context) {
 // This is a simple example of a function that is called from a
 // PlayStream event action. (https://playfab.com/introducing-playstream/)
 handlers.handlePlayStreamEventAndProfile = function (args, context) {
-    
-    // The event that triggered the action 
+
+    // The event that triggered the action
     // (https://api.playfab.com/playstream/docs/PlayStreamEventModels)
     var psEvent = context.playStreamEvent;
-    
+
     // The profile data of the player associated with the event
     // (https://api.playfab.com/playstream/docs/PlayStreamProfileModels)
     var profile = context.playerProfile;
-    
+
     // Post data about the event to an external API
     var content = JSON.stringify({ user: profile.PlayerId, event: psEvent.EventName });
     var response = http.request('https://httpbin.org/status/200', 'post', content, 'application/json', null);
@@ -1333,9 +1457,9 @@ handlers.handlePlayStreamEventAndProfile = function (args, context) {
 // defining these up top so we can easily change these later if we need to.
 var CHECK_IN_TRACKER = "CheckInTracker";    				// used as a key on the UserPublisherReadOnlyData
 var PROGRESSIVE_REWARD_TABLE = "ProgressiveRewardTable";	// TitleData key that contains the reward details
-var PROGRESSIVE_MIN_CREDITS = "MinStreak";					// PROGRESSIVE_REWARD_TABLE property denoting the minium number of logins to be eligible for this item 
+var PROGRESSIVE_MIN_CREDITS = "MinStreak";					// PROGRESSIVE_REWARD_TABLE property denoting the minium number of logins to be eligible for this item
 var PROGRESSIVE_REWARD = "Reward";							// PROGRESSIVE_REWARD_TABLE property denoting what item gets rewarded at this level
-var TRACKER_NEXT_GRANT = "NextEligibleGrant";				// CHECK_IN_TRACKER property containing the time at which we 
+var TRACKER_NEXT_GRANT = "NextEligibleGrant";				// CHECK_IN_TRACKER property containing the time at which we
 var TRACKER_LOGIN_STREAK = "LoginStreak";					// CHECK_IN_TRACKER property containing the streak length
 var login_bonus_catalog = "Present";
 var normalDMAward = "normalLoginBonusDM";
@@ -1365,17 +1489,17 @@ handlers.CheckInExample = function(args) {
         log.info("This was your first login, Login tomorrow to get a bonus!");
         return JSON.stringify([]);
     }
-    
+
     if(Date.now() > parseInt(tracker[TRACKER_NEXT_GRANT]))
     {
         // Eligible for an item grant.
         //check to ensure that it has been less than 24 hours since the last grant window opened
         var timeWindow = new Date(parseInt(tracker[TRACKER_NEXT_GRANT]));
-        timeWindow.setDate(timeWindow.getDate() + 1); // add 1 day 
+        timeWindow.setDate(timeWindow.getDate() + 1); // add 1 day
 
         if(Date.now() > timeWindow.getTime())
         {
-            // streak ended :(			
+            // streak ended :(
             tracker = ResetTracker();
             UpdateTrackerData(tracker);
 
@@ -1386,14 +1510,14 @@ handlers.CheckInExample = function(args) {
         // streak continues
         tracker[TRACKER_LOGIN_STREAK] += 1;
         var dateObj = new Date(Date.now());
-        dateObj.setDate(dateObj.getDate() + 1); // add one day 
+        dateObj.setDate(dateObj.getDate() + 1); // add one day
         tracker[TRACKER_NEXT_GRANT] = dateObj.getTime();
 
         // write back updated data to PlayFab
         log.info("Your consecutive login streak increased to: " + tracker[TRACKER_LOGIN_STREAK]);
         UpdateTrackerData(tracker);
 
-        // Get this title's reward table so we know what items to grant. 
+        // Get this title's reward table so we know what items to grant.
         var GetTitleDataRequest = {
             "Keys": [ PROGRESSIVE_REWARD_TABLE ]
         };
@@ -1410,7 +1534,7 @@ handlers.CheckInExample = function(args) {
             // parse our reward table
             var rewardTable = JSON.parse(GetTitleDataResult.Data[PROGRESSIVE_REWARD_TABLE]);
 
-            // find a matching reward 
+            // find a matching reward
             var reward;
             for(var level in rewardTable)
             {
@@ -1441,7 +1565,7 @@ handlers.CheckIn = function(args) {
     var loginBonusCustomData = {
         "streak": 1
     }
-    
+
     var GetUserReadOnlyDataRequest = {
         "PlayFabId": currentPlayerId,
         "Keys": [CHECK_IN_TRACKER]
@@ -1460,14 +1584,14 @@ handlers.CheckIn = function(args) {
         UpdateTrackerData(tracker);
         log.info("This was your first login, Login tomorrow to get a bonus!");
         GrantItemToCurrentUserAndSetCustomData([normalDMAward], login_bonus_catalog, loginBonusCustomData);
-        
+
         return {
             message: "FirstLogin",
             award : normalDMAward,
             streak : 1
         };
     }
-    
+
     var nowDate = Date.now();
     // 计算24小时（以毫秒为单位）
     //const millisecondsIn24Hours = 24 * 60 * 60 * 1000;
@@ -1475,17 +1599,17 @@ handlers.CheckIn = function(args) {
     //const timestampIn24Hours = nowDate + 3 * millisecondsIn24Hours;
     // 将时间戳转换为日期对象
     //nowDate = new Date(timestampIn24Hours);
-    
+
     if(nowDate > parseInt(tracker[TRACKER_NEXT_GRANT]))
     {
         // Eligible for an item grant.
         // check to ensure that it has been less than 24 hours since the last grant window opened
         var timeWindow = new Date(parseInt(tracker[TRACKER_NEXT_GRANT]));
-        timeWindow.setDate(timeWindow.getDate() + 1); // add 1 day 
-        
+        timeWindow.setDate(timeWindow.getDate() + 1); // add 1 day
+
         if(nowDate > timeWindow.getTime()) // 指的是目前这次登陆起码在上次登陆基础上跳过了一天
         {
-            // streak ended :(			
+            // streak ended :(
             tracker = ResetTracker();
             UpdateTrackerData(tracker);
             log.info("Your consecutive login streak has been broken. Login tomorrow to get a bonus!");
@@ -1499,7 +1623,7 @@ handlers.CheckIn = function(args) {
             // streak continues
             tracker[TRACKER_LOGIN_STREAK] += 1;
             var dateObj = new Date(nowDate);
-            dateObj.setDate(dateObj.getDate() + 1); // add one day 
+            dateObj.setDate(dateObj.getDate() + 1); // add one day
             tracker[TRACKER_NEXT_GRANT] = dateObj.getTime();
 
             // write back updated data to PlayFab
@@ -1533,10 +1657,10 @@ function ResetTracker()
 {
     var reset = {};
     reset[TRACKER_LOGIN_STREAK] = 1;
-    
+
     var dateObj = new Date(Date.now());
     dateObj.setDate(dateObj.getDate() + 1); // add one day
-    
+
     reset[TRACKER_NEXT_GRANT] = dateObj.getTime();
     return reset;
 }

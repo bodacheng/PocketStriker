@@ -1186,6 +1186,15 @@ namespace PlayFab.EconomyModels
         /// </summary>
         public List<CatalogAlternateId> AlternateIds;
         /// <summary>
+        /// An opaque token used to retrieve the next page of items created by the caller, if any are available. Should be null on
+        /// initial request.
+        /// </summary>
+        public string ContinuationToken;
+        /// <summary>
+        /// Number of items to retrieve. This value is optional. Default value is 10.
+        /// </summary>
+        public int? Count;
+        /// <summary>
         /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
         /// </summary>
         public Dictionary<string,string> CustomTags;
@@ -1389,6 +1398,10 @@ namespace PlayFab.EconomyModels
         /// The entity to perform this action on.
         /// </summary>
         public EntityKey Entity;
+        /// <summary>
+        /// The token to get the status of the inventory operation.
+        /// </summary>
+        public string OperationToken;
     }
 
     [Serializable]
@@ -2071,6 +2084,11 @@ namespace PlayFab.EconomyModels
     }
 
     [Serializable]
+    public class PurchaseOverride : PlayFabBaseModel
+    {
+    }
+
+    [Serializable]
     public class PurchaseOverridesInfo : PlayFabBaseModel
     {
     }
@@ -2180,6 +2198,50 @@ namespace PlayFab.EconomyModels
 
     [Serializable]
     public class RedeemAppleAppStoreInventoryItemsResponse : PlayFabResultCommon
+    {
+        /// <summary>
+        /// The list of failed redemptions from the external marketplace.
+        /// </summary>
+        public List<RedemptionFailure> Failed;
+        /// <summary>
+        /// The list of successful redemptions from the external marketplace.
+        /// </summary>
+        public List<RedemptionSuccess> Succeeded;
+        /// <summary>
+        /// The Transaction IDs associated with the inventory modifications
+        /// </summary>
+        public List<string> TransactionIds;
+    }
+
+    /// <summary>
+    /// The request for a redeem Apple AppStore With JWS
+    /// </summary>
+    [Serializable]
+    public class RedeemAppleAppStoreWithJwsInventoryItemsRequest : PlayFabRequestCommon
+    {
+        /// <summary>
+        /// The id of the entity's collection to perform this action on. (Default="default")
+        /// </summary>
+        public string CollectionId;
+        /// <summary>
+        /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
+        /// </summary>
+        public Dictionary<string,string> CustomTags;
+        /// <summary>
+        /// The entity to perform this action on.
+        /// </summary>
+        public EntityKey Entity;
+        /// <summary>
+        /// The JWS representation of a transaction.
+        /// </summary>
+        public List<string> JWSTransactions;
+    }
+
+    /// <summary>
+    /// The response for a redeem Apple AppStore With JWS
+    /// </summary>
+    [Serializable]
+    public class RedeemAppleAppStoreWithJwsInventoryItemsResponse : PlayFabResultCommon
     {
         /// <summary>
         /// The list of failed redemptions from the external marketplace.
@@ -2907,6 +2969,14 @@ namespace PlayFab.EconomyModels
         /// </summary>
         public string ApiName;
         /// <summary>
+        /// Additional details about the transaction. Null if it was not a clawback operation.
+        /// </summary>
+        public TransactionClawbackDetails ClawbackDetails;
+        /// <summary>
+        /// The custom tags associated with this transactions.
+        /// </summary>
+        public Dictionary<string,string> CustomTags;
+        /// <summary>
         /// The type of item that the the operation occurred on.
         /// </summary>
         public string ItemType;
@@ -2938,6 +3008,15 @@ namespace PlayFab.EconomyModels
         /// Additional details about the transaction. Null if it was not a transfer operation.
         /// </summary>
         public TransactionTransferDetails TransferDetails;
+    }
+
+    [Serializable]
+    public class TransactionClawbackDetails : PlayFabBaseModel
+    {
+        /// <summary>
+        /// The id of the clawed back operation.
+        /// </summary>
+        public string TransactionIdClawedback;
     }
 
     [Serializable]
@@ -2976,6 +3055,14 @@ namespace PlayFab.EconomyModels
     [Serializable]
     public class TransactionPurchaseDetails : PlayFabBaseModel
     {
+        /// <summary>
+        /// The friendly id of the item that was purchased.
+        /// </summary>
+        public string ItemFriendlyId;
+        /// <summary>
+        /// The id of the item that was purchased.
+        /// </summary>
+        public string ItemId;
         /// <summary>
         /// The friendly id of the Store the item was purchased from or null.
         /// </summary>

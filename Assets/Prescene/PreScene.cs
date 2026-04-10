@@ -6,6 +6,7 @@ using UnityEngine;
 using DummyLayerSystem;
 using ModelView;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace mainMenu
@@ -17,8 +18,10 @@ namespace mainMenu
         public Camera postProcessCamera;
         public Camera noPostProcessCamera;
         
-        [Header("T")]
-        [SerializeField] GameObject T;
+        [Header("SafeArea")]
+        [SerializeField] RectTransform safeAreaRect;
+        [FormerlySerializedAs("T")]
+        [SerializeField] GameObject legacySafeAreaRoot;
         [Header("AudioSource")]
         [SerializeField] AudioSource audioSource;
         [Header("UIAudioSource")]
@@ -51,10 +54,27 @@ namespace mainMenu
 
         [SerializeField] private RawImage effectBg;
         RenderTexture _effectRenderTexture;
+
+        RectTransform GetSafeAreaRect()
+        {
+            if (safeAreaRect != null)
+            {
+                return safeAreaRect;
+            }
+
+            if (legacySafeAreaRoot != null)
+            {
+                return legacySafeAreaRoot.GetComponent<RectTransform>();
+            }
+
+            return Canvas != null ? Canvas.GetComponent<RectTransform>() : null;
+        }
+
         void Awake()
         {
             target = this;
             PosCal.Canvas = this.Canvas;
+            PosCal.SafeAreaRect = GetSafeAreaRect();
             PosCal.TestIni();
             SetBgRenderTexture();
         }
@@ -118,6 +138,7 @@ namespace mainMenu
 
         async void Start()
         {
+            TutorialRunner.Main.Shutdown();
             await UniTask.WhenAll(
                 PlayFabReadClient.LoadReadMailsAsync(),
                 AddressablesLogic.Essentials(),
@@ -126,14 +147,8 @@ namespace mainMenu
             );
             CashClear();
             UILayerLoader.Clear();
-            if (T != null)
-            {
-                UILayerLoader.SetHanger(T.transform);
-            }
-            else
-            {
-                Debug.Log("不可理解的错误");
-            }
+            var targetSafeArea = GetSafeAreaRect();
+            UILayerLoader.SetHanger(targetSafeArea != null ? targetSafeArea : Canvas.transform, Canvas.transform);
             
             AppSetting.UiAudioSource = uiAudioSource;
             AppSetting.BGMSource = audioSource;

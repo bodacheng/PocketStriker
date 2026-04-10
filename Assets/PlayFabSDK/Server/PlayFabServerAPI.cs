@@ -208,6 +208,19 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Deletes title-specific custom properties for a player
+        /// </summary>
+        public static void DeletePlayerCustomProperties(DeletePlayerCustomPropertiesRequest request, Action<DeletePlayerCustomPropertiesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/DeletePlayerCustomProperties", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
         /// Deletes push notification template for title
         /// </summary>
         public static void DeletePushNotificationTemplate(DeletePushNotificationTemplateRequest request, Action<DeletePushNotificationTemplateResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -519,6 +532,19 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Retrieves a title-specific custom property value for a player.
+        /// </summary>
+        public static void GetPlayerCustomProperty(GetPlayerCustomPropertyRequest request, Action<GetPlayerCustomPropertyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/GetPlayerCustomProperty", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
         /// Retrieves the player's profile
         /// </summary>
         public static void GetPlayerProfile(GetPlayerProfileRequest request, Action<GetPlayerProfileResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -551,6 +577,7 @@ namespace PlayFab
         /// in the results. AB Test segments are currently not supported by this operation. NOTE: This API is limited to being
         /// called 30 times in one minute. You will be returned an error if you exceed this threshold.
         /// </summary>
+        [Obsolete("No longer available", true)]
         public static void GetPlayersInSegment(GetPlayersInSegmentRequest request, Action<GetPlayersInSegmentResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
             var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
@@ -598,6 +625,19 @@ namespace PlayFab
 
 
             PlayFabHttp.MakeApiCall("/Server/GetPlayerTags", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Retrieves the unique PlayFab identifiers for the given set of Battle.net account identifiers.
+        /// </summary>
+        public static void GetPlayFabIDsFromBattleNetAccountIds(GetPlayFabIDsFromBattleNetAccountIdsRequest request, Action<GetPlayFabIDsFromBattleNetAccountIdsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/GetPlayFabIDsFromBattleNetAccountIds", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>
@@ -1047,6 +1087,19 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Links the Battle.net account associated with the token to the user's PlayFab account.
+        /// </summary>
+        public static void LinkBattleNetAccount(LinkBattleNetAccountRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LinkBattleNetAccount", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
         /// Links the Nintendo account associated with the token to the user's PlayFab account
         /// </summary>
         public static void LinkNintendoServiceAccount(LinkNintendoServiceAccountRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -1148,6 +1201,87 @@ namespace PlayFab
 
 
             PlayFabHttp.MakeApiCall("/Server/LinkXboxAccount", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Links the Xbox Live account associated with the provided Xbox ID and Sandbox to the user's PlayFab account
+        /// </summary>
+        public static void LinkXboxId(LinkXboxIdRequest request, Action<LinkXboxAccountResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LinkXboxId", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Retrieves title-specific custom property values for a player.
+        /// </summary>
+        public static void ListPlayerCustomProperties(ListPlayerCustomPropertiesRequest request, Action<ListPlayerCustomPropertiesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/ListPlayerCustomProperties", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Signs the user in using the Android device identifier, returning a session identifier that can subsequently be used for
+        /// API calls which require an authenticated user
+        /// </summary>
+        public static void LoginWithAndroidDeviceID(LoginWithAndroidDeviceIDRequest request, Action<ServerLoginResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LoginWithAndroidDeviceID", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Sign in the user with a Battle.net identity token
+        /// </summary>
+        public static void LoginWithBattleNet(LoginWithBattleNetRequest request, Action<ServerLoginResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LoginWithBattleNet", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Signs the user in using a custom unique identifier generated by the title, returning a session identifier that can
+        /// subsequently be used for API calls which require an authenticated user
+        /// </summary>
+        public static void LoginWithCustomID(LoginWithCustomIDRequest request, Action<ServerLoginResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LoginWithCustomID", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Signs the user in using the iOS device identifier, returning a session identifier that can subsequently be used for API
+        /// calls which require an authenticated user
+        /// </summary>
+        public static void LoginWithIOSDeviceID(LoginWithIOSDeviceIDRequest request, Action<ServerLoginResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/LoginWithIOSDeviceID", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>
@@ -1579,6 +1713,19 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Unlinks the related Battle.net account from the user's PlayFab account.
+        /// </summary>
+        public static void UnlinkBattleNetAccount(UnlinkBattleNetAccountRequest request, Action<EmptyResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/UnlinkBattleNetAccount", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
         /// Unlinks the related Nintendo account from the user's PlayFab account
         /// </summary>
         public static void UnlinkNintendoServiceAccount(UnlinkNintendoServiceAccountRequest request, Action<EmptyResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -1765,6 +1912,19 @@ namespace PlayFab
 
 
             PlayFabHttp.MakeApiCall("/Server/UpdateCharacterStatistics", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Updates the title-specific custom property values for a player
+        /// </summary>
+        public static void UpdatePlayerCustomProperties(UpdatePlayerCustomPropertiesRequest request, Action<UpdatePlayerCustomPropertiesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/UpdatePlayerCustomProperties", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>

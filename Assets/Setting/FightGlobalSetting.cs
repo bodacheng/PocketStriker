@@ -44,7 +44,7 @@ public class FightGlobalSetting : ScriptableObject
     [SerializeField] int player1DreamComboAIRateNumM;//玩家队伍共斗模式下非控制队员DreamCombo触发率数字。
     [SerializeField] int arenaEnemyDreamComboAIRate;
     [SerializeField] int energyResolveAfterExtendBoundary = 5;
-    [SerializeField] PhysicMaterial _physicMaterial;
+    [SerializeField] PhysicsMaterial _physicMaterial;
 
     static string fightParamKey = "Config/fight_params";
     public static int SceneStep;//0 :mainmenu 1: fightscene
@@ -88,7 +88,7 @@ public class FightGlobalSetting : ScriptableObject
     public static bool HitBoxLogger = true;
     public static int _defendHP;
     public static int _energyResolveAfterExtendBoundary;
-    public static PhysicMaterial PhysicMaterial;
+    public static PhysicsMaterial PhysicMaterial;
     
     public void Initialise()
     {

@@ -30,7 +30,7 @@ public partial class PlayFabReadClient
                         success.Invoke();
                         // 底下这个操作就是放飞自我
                         UnLinkDevice(
-                            PlayerAccountInfo.Me.currentLinkedDeviceId,
+                            PlayFabReadClient.CustomId,
                             DeletePlayer
                         );
                     },

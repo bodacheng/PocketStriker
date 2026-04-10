@@ -60,9 +60,16 @@ namespace DummyLayerSystem
         };
 
         private static Transform _hanger;
+        private static Transform _fullScreenHanger;
         public static void SetHanger(Transform target)
         {
+            SetHanger(target, target);
+        }
+
+        public static void SetHanger(Transform target, Transform fullScreenHanger)
+        {
             _hanger = target;
+            _fullScreenHanger = fullScreenHanger;
         }
 
         private static RectTransform effectBg;
@@ -86,10 +93,16 @@ namespace DummyLayerSystem
             
             foreach (var layer in toRemove)
             {
-                Queues.Remove(layer);
                 if (layer != null && layer.gameObject != null)
+                {
                     Remove(layer.Index);
+                }
             }
+
+            if (_hanger != null)
+                EnsureMosakAtBottom(_hanger);
+            if (_fullScreenHanger != null)
+                EnsureMosakAtBottom(_fullScreenHanger);
         }
     
         static UILayer _Get(string key)
@@ -97,39 +110,39 @@ namespace DummyLayerSystem
             return Queues.Find(x => x.Index == key);
         }
         
-        public static T Get<T>()
+        public static T Get<T>() where T : UILayer
         {
             var target = Queues.Find(x => x.Index == typeof(T).Name);
             if (target != null)
-                return (T) Convert.ChangeType(target, typeof(T));
+                return target as T;
             else
             {
                 return default;
             }
         }
         
-        public static T Load<T>(bool insertToTop = false)
+        public static T Load<T>(bool insertToTop = false, string key = null, bool loadToFullScreen = false) where T : UILayer
         {
-            if (_hanger == null)
+            var targetHanger = loadToFullScreen ? _fullScreenHanger : _hanger;
+            if (targetHanger == null)
                 return default;
-            var layerName = typeof(T).Name;
+            var className = typeof(T).Name;
+            var layerName = key ?? className;
             var existed = Get<T>();
             if (existed != null)
             {
-                if (insertToTop)
-                {
-                    var target = existed as GameObject;
-                    target?.transform.SetAsLastSibling();
-                }
+                ApplySiblingOrder(existed.transform, insertToTop, loadToFullScreen);
+                EnsureMosakAtBottom(targetHanger);
                 return existed;
             }
             
             var path = Paths[layerName];
             var UILayerPrefab = Resources.Load<UILayer>(path);
             var t = GameObject.Instantiate(UILayerPrefab);
-            t.Index = layerName;
-            t.transform.SetParent(_hanger.transform);
+            t.Index = className;
+            t.transform.SetParent(targetHanger.transform);
             t.transform.localPosition = Vector3.zero;
+            ApplySiblingOrder(t.transform, insertToTop, loadToFullScreen);
             var rt = t.GetComponent<RectTransform>();
             rt.anchorMax = Vector2.one;
             rt.anchorMin = Vector2.zero;
@@ -139,13 +152,15 @@ namespace DummyLayerSystem
             rt.localScale = Vector3.one;
             t.ResizeAreas();
             Queues.Add(t);
-            var returnValue = (T) Convert.ChangeType(t, typeof(T));
+            var returnValue = t as T;
             
             if (effectBg != null)
             {
-                effectBg.transform.SetParent(_hanger);
+                effectBg.transform.SetParent(targetHanger);
                 effectBg.transform.SetAsLastSibling();
             }
+
+            EnsureMosakAtBottom(targetHanger);
             
             return returnValue;
         }
@@ -157,10 +172,14 @@ namespace DummyLayerSystem
                 var uiLayer = Queues[Queues.Count - 1];
                 if (uiLayer != null)
                 {
-                    uiLayer.OnDestroy();
-                    GameObject.Destroy(uiLayer);
+                    GameObject.Destroy(uiLayer.gameObject);
                 }
                 Queues.RemoveAt(Queues.Count - 1);
+
+                if (_hanger != null)
+                    EnsureMosakAtBottom(_hanger);
+                if (_fullScreenHanger != null)
+                    EnsureMosakAtBottom(_fullScreenHanger);
             }
         }
 
@@ -188,6 +207,47 @@ namespace DummyLayerSystem
                 if (layer != null)
                     GameObject.Destroy(layer.gameObject);
                 Queues.RemoveAt(toRemoveIndex);
+
+                if (_hanger != null)
+                    EnsureMosakAtBottom(_hanger);
+                if (_fullScreenHanger != null)
+                    EnsureMosakAtBottom(_fullScreenHanger);
+            }
+        }
+
+        private static void ApplySiblingOrder(Transform layerTransform, bool insertToTop, bool loadToFullScreen)
+        {
+            if (layerTransform == null)
+                return;
+
+            if (loadToFullScreen)
+            {
+                if (insertToTop)
+                {
+                    layerTransform.SetAsLastSibling();
+                }
+                else
+                {
+                    layerTransform.SetAsFirstSibling();
+                }
+                return;
+            }
+
+            if (insertToTop)
+            {
+                layerTransform.SetAsLastSibling();
+            }
+        }
+
+        private static void EnsureMosakAtBottom(Transform targetHanger)
+        {
+            if (targetHanger == null)
+                return;
+
+            var mosakTransform = targetHanger.Find("mosak");
+            if (mosakTransform != null)
+            {
+                mosakTransform.SetAsFirstSibling();
             }
         }
     }

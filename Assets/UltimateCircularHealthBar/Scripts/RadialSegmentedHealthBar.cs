@@ -275,7 +275,7 @@ namespace RengeGames.HealthBars {
 
         private string BaseMaterialName {
             get {
-                if (!forceBuiltInShader && GraphicsSettings.renderPipelineAsset && Int32.Parse(Application.unityVersion.Split('.')[0]) > 2019)
+                if (!forceBuiltInShader && GraphicsSettings.defaultRenderPipeline && Int32.Parse(Application.unityVersion.Split('.')[0]) > 2019)
                     return "RadialSegmentedHealthBarMaterial";
 
                 return "RadialSegmentedHealthBarMaterialBuiltIn";

@@ -195,7 +195,8 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
 
     public void OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
     {
-        Debug.Log("failureDescription " + failureDescription.productId + " : " + failureDescription.reason);
+        var failedProductId = product?.definition?.storeSpecificId ?? product?.definition?.id ?? failureDescription.item?.Product?.definition?.id ?? "unknown";
+        Debug.Log("failureDescription " + failedProductId + " : " + failureDescription.reason + " : " + failureDescription.message);
         ProgressLayer.Close();
     }
 

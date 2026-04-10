@@ -52,12 +52,20 @@ public class UpperInfoBar : UILayer
     private const float RewardTextChangeHalfDuration = 0.05f;
     private TweenerCore<int, int, NoOptions> _gdTween;
     private TweenerCore<int, int, NoOptions> _dmTween;
+    private bool _interactive = true;
+    private bool _shopInteractable;
     
     public void SetInteractive(bool on)
     {
+        _interactive = on;
         settingBtn.interactable = on;
         mailBtn.interactable = on;
-        diamondPlus.interactable = on;
+        ApplyDiamondButtonInteractable();
+    }
+
+    void ApplyDiamondButtonInteractable()
+    {
+        diamondPlus.interactable = _interactive && _shopInteractable && diamondPlus.gameObject.activeSelf;
     }
     
     public void Setup(string text, Action openSetting, Action openMail, Action openDmShop, bool isVip)
@@ -129,9 +137,12 @@ public class UpperInfoBar : UILayer
             diamondPlus.gameObject.SetActive(false);
         }
 
+        _shopInteractable = IAPManager.Target.IsInitialized.Value;
+        ApplyDiamondButtonInteractable();
         IAPManager.Target.IsInitialized.Subscribe(x =>
         {
-            diamondPlus.interactable = x;
+            _shopInteractable = x;
+            ApplyDiamondButtonInteractable();
         }).AddTo(this.gameObject);
         
         hasTimeLimitSaleFlag.SetActive(ShopTop.HasTimeLimitSale(PlayFabReadClient.TimeLimitedBuyData));

@@ -13,6 +13,7 @@ public class LowerMainBar : UILayer
     [SerializeField] GameObject hasStoneToBeUpdateBadge;
 
     private List<LowerBarIcon> icons;
+    private bool _initialized;
     
     private void Awake()
     {
@@ -57,35 +58,41 @@ public class LowerMainBar : UILayer
             icon.Animator.SetBool("selected", icon == targetBtn);
         }
     }
-    
+
     void Initialise(PreScene pre)
     {
-        ProcessesRunner.Main.CurrentStep.Subscribe(SelectUI).AddTo(this.gameObject);
-        
-        void Go(MainSceneStep step)
+        if (!_initialized)
         {
-            UILayerLoader.Remove<ReturnLayer>();
-            ReturnLayer.ReturnMissionList.Clear();
-            pre.trySwitchToStep(step, false);
-        }
-        
-        playTab.BOButton.SetListener(() =>
-        {
-            Go(MainSceneStep.FrontPage);
-        });
-        fighterTab.BOButton.SetListener(() =>
-        {
-            Go(MainSceneStep.UnitList);
-        });
-        stoneTab.BOButton.SetListener(() =>
-        {
-            Go(MainSceneStep.SkillStoneList);
-        });
-        gotchaTab.BOButton.SetListener(() =>
-        {
-            Go(MainSceneStep.GotchaFront);
-        });
+            ProcessesRunner.Main.CurrentStep.Subscribe(SelectUI).AddTo(this.gameObject);
 
+            void Go(MainSceneStep step)
+            {
+                UILayerLoader.Remove<ReturnLayer>();
+                ReturnLayer.ReturnMissionList.Clear();
+                pre.trySwitchToStep(step, false);
+            }
+
+            playTab.BOButton.SetListener(() =>
+            {
+                Go(MainSceneStep.FrontPage);
+            });
+            fighterTab.BOButton.SetListener(() =>
+            {
+                Go(MainSceneStep.UnitList);
+            });
+            stoneTab.BOButton.SetListener(() =>
+            {
+                Go(MainSceneStep.SkillStoneList);
+            });
+            gotchaTab.BOButton.SetListener(() =>
+            {
+                Go(MainSceneStep.GotchaFront);
+            });
+
+            _initialized = true;
+        }
+
+        SelectUI(ProcessesRunner.Main.CurrentStep.Value);
         RefreshBadge();
     }
 

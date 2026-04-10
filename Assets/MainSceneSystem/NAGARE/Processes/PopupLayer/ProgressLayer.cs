@@ -1,8 +1,6 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using UniRx;
 using DummyLayerSystem;
 
 public class ProgressLayer : UILayer
@@ -15,11 +13,16 @@ public class ProgressLayer : UILayer
     // 「正在读取」画面
     public static void Loading(string description, float curtainAlpha = 0.8f)
     {
-        var layer = UILayerLoader.Load<ProgressLayer>(true);
+        var layer = UILayerLoader.Load<ProgressLayer>(true, null, true);
         if (layer != null)
         {
+            currentTween?.Kill();
+            currentTween = null;
             layer.DarkOff(curtainAlpha,0.5f);
             layer.info.text = description;
+            layer.progressBar.gameObject.SetActive(false);
+            layer.progressBar.value = 0;
+            layer.percentage.text = "0%";
         }
     }
     
@@ -44,7 +47,19 @@ public class ProgressLayer : UILayer
     }
     #endregion
     
-    private static IDisposable current;
+    private static Tween currentTween;
+
+    static void SetProgressValue(ProgressLayer layer, float progress)
+    {
+        if (layer == null)
+        {
+            return;
+        }
+
+        layer.progressBar.value = progress;
+        layer.percentage.text = ((int)(progress * 100)) + "%";
+    }
+
     // 带进度条的正在读取画面。不会主动打开新的popuplayer
     public static void LoadingPercent(string description, float progress, bool tween = true)
     {
@@ -56,35 +71,46 @@ public class ProgressLayer : UILayer
         
         layer.progressBar.gameObject.SetActive(true);
         layer.info.text = description;
+        progress = Mathf.Clamp01(progress);
         
-        if (current != null)
-        {
-            current.Dispose();
-            current = null;
-        }
+        currentTween?.Kill();
+        currentTween = null;
         
         if (tween)
         {
-            current = DOTween.To
+            currentTween = DOTween.To
             (
                 () => layer.progressBar.value,
-                (x) =>
-                {
-                    layer.progressBar.value = x;
-                    layer.percentage.text = ((int)(x * 100)) + "%";
-                },
+                x => SetProgressValue(layer, x),
                 progress,
                 1
-            ).SetEase(Ease.OutFlash).OnCompleteAsObservable().Subscribe(_ => { }).AddTo(layer.gameObject);
+            ).SetEase(Ease.OutFlash).SetLink(layer.gameObject);
         }
         else
         {
-            layer.progressBar.value = progress;
+            var currentValue = layer.progressBar.value;
+            var delta = Mathf.Abs(progress - currentValue);
+            if (delta <= 0.001f)
+            {
+                SetProgressValue(layer, progress);
+                return;
+            }
+
+            var duration = Mathf.Clamp(delta * 0.35f, 0.08f, 0.2f);
+            currentTween = DOTween.To(
+                    () => layer.progressBar.value,
+                    x => SetProgressValue(layer, x),
+                    progress,
+                    duration)
+                .SetEase(Ease.OutCubic)
+                .SetLink(layer.gameObject);
         }
     }
     
     public static void Close()
     {
+        currentTween?.Kill();
+        currentTween = null;
         UILayerLoader.Remove<ProgressLayer>();
     }
 }

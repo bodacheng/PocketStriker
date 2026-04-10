@@ -11,14 +11,21 @@ public partial class PlayFabReadClient
     /// <param name="fail"></param>
     public static void LoginByCustomId(string customId, Action<LoginResult, LoginType> success)
     {
-        PlayFabClientAPI.LoginWithCustomID(
-            new LoginWithCustomIDRequest
+        RunLoginWithRetry(
+            (onSuccess, onError) =>
             {
-                CustomId = customId,
-                CreateAccount = true
+                PlayFabClientAPI.LoginWithCustomID(
+                    new LoginWithCustomIDRequest
+                    {
+                        CustomId = customId,
+                        CreateAccount = true
+                    },
+                    onSuccess,
+                    onError
+                );
             },
-            (x)=>success.Invoke(x, LoginType.dev),
-            ErrorReport
+            result => success?.Invoke(result, LoginType.dev),
+            "CustomId"
         );
     }
     

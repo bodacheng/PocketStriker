@@ -20,14 +20,19 @@ public class UILayer : MonoBehaviour
             midAreaSizeHelper.Resize();
 
         var offsetMinOffsetMax = CalculateOffsetForFullScreenAnchors(middle);
+        var parentRect = transform.parent as RectTransform;
+        var parentHeight = parentRect != null ? parentRect.rect.height : PosCal.CanvasHeight;
+        var useSafeAreaOffsets = parentRect == null || parentRect != PosCal.SafeAreaRect;
+        var topSafeAreaHeight = useSafeAreaOffsets ? PosCal.VTopSafeAreaHeight : 0;
+        var bottomSafeAreaHeight = useSafeAreaOffsets ? PosCal.VBottomSafeAreaHeight : 0;
         
-        float topAreaHeight = PosCal.CanvasHeight - offsetMinOffsetMax.Item1.y - middle.rect.height - PosCal.VTopSafeAreaHeight;
-        top.anchoredPosition = new Vector2(0, - PosCal.VTopSafeAreaHeight);
-        top.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, topAreaHeight);
+        float topAreaHeight = parentHeight - offsetMinOffsetMax.Item1.y - middle.rect.height - topSafeAreaHeight;
+        top.anchoredPosition = new Vector2(0, -topSafeAreaHeight);
+        top.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Max(0, topAreaHeight));
 
-        float downArenaHeight = PosCal.CanvasHeight + offsetMinOffsetMax.Item2.y - middle.rect.height - PosCal.VBottomSafeAreaHeight;
-        bottom.anchoredPosition = new Vector2(0, PosCal.VBottomSafeAreaHeight);
-        bottom.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, downArenaHeight);
+        float downArenaHeight = parentHeight + offsetMinOffsetMax.Item2.y - middle.rect.height - bottomSafeAreaHeight;
+        bottom.anchoredPosition = new Vector2(0, bottomSafeAreaHeight);
+        bottom.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Max(0, downArenaHeight));
     }
     
     (Vector2, Vector2) CalculateOffsetForFullScreenAnchors(RectTransform rectTransform)

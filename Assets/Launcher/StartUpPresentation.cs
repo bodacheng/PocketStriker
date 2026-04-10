@@ -4,11 +4,13 @@ using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class StartUpPresentation : MonoBehaviour
 {
     [SerializeField] Starter starter;
-    [SerializeField] RectTransform t;
+    [FormerlySerializedAs("t")]
+    [SerializeField] RectTransform safeAreaRect;
     [SerializeField] bool frontSceneFight;
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioSource uiAudioSource;
@@ -38,9 +40,11 @@ public class StartUpPresentation : MonoBehaviour
     
     void Start()
     {
+        var safeAreaRoot = safeAreaRect != null ? safeAreaRect : canvas.GetComponent<RectTransform>();
         PosCal.Canvas = this.canvas;
+        PosCal.SafeAreaRect = safeAreaRoot;
         PosCal.TestIni();
-        UILayerLoader.SetHanger(t);
+        UILayerLoader.SetHanger(safeAreaRoot, canvas.transform);
         AppSetting.Load();
         AppSetting.BGMSource = audioSource;
         AppSetting.BGMSource.volume = AppSetting.Value.BgmVolume;
@@ -119,7 +123,7 @@ public class StartUpPresentation : MonoBehaviour
         commonSetting.Initialise();
         
         var bytes = await AddressablesLogic.GetWholeDownLoadSize(
-            () =>
+            label =>
             {
                 PopupLayer.ArrangeConfirmWindow(
                     (
@@ -128,7 +132,7 @@ public class StartUpPresentation : MonoBehaviour
                             SceneManager.LoadScene(0);
                         }
                     ),
-                "Download Failed"
+                $"Download Failed: {label}"
                 );
             },
             commonSetting.DownLoadLabels
@@ -142,7 +146,7 @@ public class StartUpPresentation : MonoBehaviour
         }
         else
         {
-            Go(); // no asset to download.begin directly 
+            Go().Forget(); // no asset to download.begin directly
         }
     }
     
@@ -154,14 +158,9 @@ public class StartUpPresentation : MonoBehaviour
                 HighLightLayer.DarkOff(Color.white, 0);
                 var imageBg = UILayerLoader.Load<ImageBg>();
                 imageBg.Setup();
-                UILayerLoader.Load<ProgressLayer>();
+                UILayerLoader.Load<ProgressLayer>(true, null, true);
                 await AddressablesLogic.ResourcePrepareProcess(
-                    () =>
-                    {
-                        UILayerLoader.Remove<ProgressLayer>();
-                        UILayerLoader.Remove<ImageBg>();
-                        Go();
-                    },
+                    Complete,
                     (x) =>
                     {
                         ProgressLayer.LoadingPercent(x, AddressablesLogic.DownloadedBytes / wholeBytes);
@@ -174,9 +173,18 @@ public class StartUpPresentation : MonoBehaviour
         );
     }
 
-    async void Go()
+    private async void Complete()
+    {
+        UILayerLoader.Remove<ProgressLayer>();
+        UILayerLoader.Remove<ImageBg>();
+        await Go();
+    }
+
+    async UniTask Go()
     {
         HighLightLayer.Close();
+        Application.targetFrameRate = 70;
+        FightGlobalSetting.SceneStep = 1;
         await starter.Initialise();
         if (frontSceneFight && PlayFabReadClient.DontShowFrontFight == "False")
         {
@@ -185,10 +193,10 @@ public class StartUpPresentation : MonoBehaviour
         else
         {
             await AppSetting.PlayBGM(CommonSetting.StartThemeAddressKey);
-            var titleBgLayer= UILayerLoader.Load<TitleBgLayer>();
+            var titleBgLayer= UILayerLoader.Load<TitleBgLayer>(true, null, true);
             await titleBgLayer.Setup(1);
             titleBgLayer.Rotate(false);
-            var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>();
+            var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>(true, null, true);
             titleScreenLayer.Initialise();
         }
     }

@@ -24,7 +24,7 @@ namespace FightScene
             _layer = UILayerLoader.Get<FightingStepLayer>();
             if (FightLoad.Fight.EventType == FightEventType.Screensaver)
             {
-                var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>();
+                var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>(true, null, true);
                 titleScreenLayer.Initialise();
                 _layer.InputsManager.FocusUnit(null);
                 HighLightLayer.LightUp(1f);

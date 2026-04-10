@@ -11,19 +11,21 @@ public class FrontPage : MSceneProcess
     }
     
     FrontLayer _frontLayer;
+    UpperInfoBar _upperInfoBar;
     bool _askedIfLinkDevice;
     
     void EnterProcess()
     {
+        SetLoaded(false);
         _frontLayer = UILayerLoader.Load<FrontLayer>();
         _frontLayer.Initialise(PreScene.target);
+        _frontLayer.OnBusyStateChanged = SetBusyState;
 
         string focusInstanceID = PreScene.target.GetRandomFocusInstanceID();
         PreScene.target.SetFocusingUnit(focusInstanceID);
-        _frontLayer.ShowMyModel(focusInstanceID).Forget();
         
-        var upperInfoBar = UILayerLoader.Load<UpperInfoBar>();
-        upperInfoBar.Setup(PlayerAccountInfo.Me.TitleDisplayName,
+        _upperInfoBar = UILayerLoader.Load<UpperInfoBar>();
+        _upperInfoBar.Setup(PlayerAccountInfo.Me.TitleDisplayName,
             () => PreScene.target.trySwitchToStep(MainSceneStep.Setting), 
             () => PreScene.target.trySwitchToStep(MainSceneStep.MailBox),
             () => PreScene.target.trySwitchToStep(MainSceneStep.ShopTop),
@@ -33,7 +35,7 @@ public class FrontPage : MSceneProcess
         if (PlayerAccountInfo.Me.currentLinkedDeviceId != PlayFabReadClient.CustomId && !_askedIfLinkDevice)
         {
             _askedIfLinkDevice = true;
-            var askIfLinkDeviceLayer = UILayerLoader.Load<AskIfLinkDeviceLayer>();
+            var askIfLinkDeviceLayer = UILayerLoader.Load<AskIfLinkDeviceLayer>(true, null, true);
             askIfLinkDeviceLayer.Initialise(
                 () =>
                 {
@@ -48,7 +50,7 @@ public class FrontPage : MSceneProcess
                 },
                 () =>
                 {
-                    PopupLayer.ArrangeWarnWindow("U can link your account to this device later in setting.");
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("CanLinkLater"));
                     UILayerLoader.Remove<AskIfLinkDeviceLayer>();
                 }
             );
@@ -60,9 +62,27 @@ public class FrontPage : MSceneProcess
         }
         
         StoneLevelUpProccessor.CalUpdateAllForms();
-        
-        LowerMainBar.Open();
-        SetLoaded(true);
+
+        UniTask.Void(async () =>
+        {
+            try
+            {
+                await _frontLayer.ShowMyModel(focusInstanceID);
+            }
+            finally
+            {
+                if (ProcessesRunner.Main.currentProcess == this)
+                {
+                    LowerMainBar.Open();
+                    SetLoaded(true);
+                }
+            }
+        });
+    }
+
+    void SetBusyState(bool busy)
+    {
+        _upperInfoBar?.SetInteractive(!busy);
     }
     
     public override void ProcessEnter()
@@ -72,6 +92,10 @@ public class FrontPage : MSceneProcess
     
     public override void ProcessEnd()
     {
+        if (_frontLayer != null)
+        {
+            _frontLayer.OnBusyStateChanged = null;
+        }
         UILayerLoader.Remove<FrontLayer>();
         UILayerLoader.Remove<UpperInfoBar>();
     }

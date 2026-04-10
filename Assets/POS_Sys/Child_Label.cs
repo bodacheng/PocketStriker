@@ -20,6 +20,6 @@ public class Child_Label : MonoBehaviour {
     void OnDestroy()
     {
         if (GetComponent<Rigidbody>() != null)
-            GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+            GetComponent<Rigidbody>().linearVelocity = new Vector3(0, 0, 0);
     }
 }

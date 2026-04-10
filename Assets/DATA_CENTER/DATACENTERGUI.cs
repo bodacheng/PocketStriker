@@ -95,8 +95,8 @@ public class DATACENTERGUI : Editor {
             _myScript._BasicPhysicSupport.Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
             _myScript._BasicPhysicSupport.Rigidbody.useGravity = false;
             _myScript._BasicPhysicSupport.Rigidbody.mass = FightGlobalSetting.FighterRigidMass;
-            _myScript._BasicPhysicSupport.Rigidbody.drag = 0f;
-            _myScript._BasicPhysicSupport.Rigidbody.angularDrag = 0.05f;
+            _myScript._BasicPhysicSupport.Rigidbody.linearDamping = 0f;
+            _myScript._BasicPhysicSupport.Rigidbody.angularDamping = 0.05f;
             _myScript._BasicPhysicSupport.Rigidbody.isKinematic = false;
             _myScript._BasicPhysicSupport.Rigidbody.interpolation = RigidbodyInterpolation.None;
             _myScript._BasicPhysicSupport.Rigidbody.constraints = RigidbodyConstraints.None;

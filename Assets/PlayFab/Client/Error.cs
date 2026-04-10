@@ -7,37 +7,32 @@ public partial class PlayFabReadClient
 {
     public static void ErrorReport(PlayFabError error)
     {
+        ErrorReportInternal(error, true);
+    }
+
+    public static void ErrorReportStayInScene(PlayFabError error)
+    {
+        ErrorReportInternal(error, false);
+    }
+
+    static void ErrorReportInternal(PlayFabError error, bool returnToMainMenu)
+    {
         Debug.Log("error.ErrorMessage:"+ error.Error);
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
         switch (error.Error)
         {
             case PlayFabErrorCode.NotAuthorizedByTitle:
                 PopupLayer.ArrangeWarnWindow(
-                    ()=>
-                    {
-                        if (SceneManager.GetActiveScene().buildIndex != 0)
-                        {
-                            SceneManager.LoadScene(0);
-                        }
-                        else
-                        {
-                            UILayerLoader.Remove<PopupLayer>();
-                        }
-                    },
+                    () => { HandleErrorReturn(returnToMainMenu); },
                     Translate.Get("NotAuthorizedByTitle"));
                 break;
             case PlayFabErrorCode.ConnectionError:
                 PopupLayer.ArrangeWarnWindow(
-                    ()=>
-                    {
-                        if (SceneManager.GetActiveScene().buildIndex != 0)
-                        {
-                            SceneManager.LoadScene(0);
-                        }
-                        else
-                        {
-                            UILayerLoader.Remove<PopupLayer>();
-                        }
-                    },
+                    () => { HandleErrorReturn(returnToMainMenu); },
                     Translate.Get("ReturnToLobbyForConnectionError"));
                 break;
             case PlayFabErrorCode.InvalidUsername:
@@ -57,19 +52,27 @@ public partial class PlayFabReadClient
                 break;
             default:
                 PopupLayer.ArrangeWarnWindow(
-                    ()=>
-                    {
-                        if (SceneManager.GetActiveScene().buildIndex != 0)
-                        {
-                            SceneManager.LoadScene(0);
-                        }
-                        else
-                        {
-                            UILayerLoader.Remove<PopupLayer>();
-                        }
-                    },
+                    () => { HandleErrorReturn(returnToMainMenu); },
                     Translate.Get("ConnectionError"));
                 break;
+        }
+    }
+
+    static void HandleErrorReturn(bool returnToMainMenu)
+    {
+        if (!returnToMainMenu)
+        {
+            UILayerLoader.Remove<PopupLayer>();
+            return;
+        }
+
+        if (SceneManager.GetActiveScene().buildIndex != 0)
+        {
+            SceneManager.LoadScene(0);
+        }
+        else
+        {
+            UILayerLoader.Remove<PopupLayer>();
         }
     }
 }
