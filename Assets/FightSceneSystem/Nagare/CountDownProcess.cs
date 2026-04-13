@@ -26,7 +26,7 @@ namespace FightScene
             fightingStepLayer.PreparingMode(true);
             if (FightLoad.Fight.RunTutorial)
             {
-                fightingStepLayer.Team1UI.AutoSwitch.gameObject.SetActive(false);
+                fightingStepLayer.Team1UI.AutoSwitch?.gameObject.SetActive(false);
             }
             BeforeFightCountDown().Forget();
         }
@@ -45,7 +45,7 @@ namespace FightScene
             UILayerLoader.Remove<CountDownLayer>();
             if (FightLoad.Fight.RunTutorial)
             {
-                fightingStepLayer.Team1UI.AutoSwitch.gameObject.SetActive(true);
+                fightingStepLayer.Team1UI.AutoSwitch?.gameObject.SetActive(true);
             }
         }
         

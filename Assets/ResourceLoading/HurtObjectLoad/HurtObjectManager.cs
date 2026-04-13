@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UniRx;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 public static class HurtObjectManager
 {
     static DecompositionPool _defaultHitBoxPool;
     static readonly IDictionary<string, DecompositionPool> HurtPoolDic = new Dictionary<string, DecompositionPool>();
-    static AsyncOperationHandle<GameObject> _handle;
     
     static UniTask<GameObject> TryLoadWeaponPrefab(string key)
     {
@@ -31,6 +27,8 @@ public static class HurtObjectManager
     
     public static void Clear()
     {
+        _defaultHitBoxPool?.Clear();
+        _defaultHitBoxPool = null;
         foreach (var keyValuePair in HurtPoolDic)
         {
             keyValuePair.Value.Clear();
@@ -49,7 +47,7 @@ public static class HurtObjectManager
         }
         
         _defaultHitBoxPool = new DecompositionPool(resultObject);
-        await _defaultHitBoxPool.PreloadAsync(10, 1);
+        await _defaultHitBoxPool.PreloadAsync(10, 1).ToUniTask();
     }
     
     public static async UniTask ConstructHurtObjectPool(string resourceName, Element element, int preloadCount)
@@ -161,19 +159,23 @@ public static class HurtObjectManager
         if (HurtPoolDic.ContainsKey(key))
         {
             DicAdd<string, int>.Add(PreloadCountIncrementLog, key, PreloadCountIncrementLog[key]+1);
-            await HurtPoolDic[key].PreloadAsync(PreloadCountIncrementLog[key],1);
+            await HurtPoolDic[key].PreloadAsync(PreloadCountIncrementLog[key], 1).ToUniTask();
             return HurtPoolDic[key];
         }
-        else
+
+        if (prefab != null)
         {
-            if (prefab != null)
+            var poolToConstruct = new DecompositionPool(prefab);
+            await poolToConstruct.PreloadAsync(iniCount, 1).ToUniTask();
+            if (HurtPoolDic.ContainsKey(key))
             {
-                var poolToConstruct = new DecompositionPool(prefab);
-                poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});
-                HurtPoolDic.Add(key, poolToConstruct);
-                DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
-                return poolToConstruct;
+                poolToConstruct.Clear();
+                return HurtPoolDic[key];
             }
+
+            HurtPoolDic.Add(key, poolToConstruct);
+            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
+            return poolToConstruct;
         }
         return null;
     }

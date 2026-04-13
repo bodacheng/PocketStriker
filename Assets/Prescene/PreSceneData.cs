@@ -102,6 +102,8 @@ namespace mainMenu
                         return;
                     }
 
+                    TeamSet.SanitizeAgainstCurrentInventory(GetFocusInstanceID());
+
                     switch (PlayerAccountInfo.Me.tutorialProgress)
                     {
                         case "Started":

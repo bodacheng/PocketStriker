@@ -44,16 +44,18 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public async void ChangeIcon(UnitInfo unitInfo, bool withSkillCheck = false, Func<int> teamCountGet = null)
     {
-        var unitInfoFormal = UnitInfo.GetUnitInfo(unitInfo);
         if (unitInfo != null)
         {
+            var unitInfoFormal = UnitInfo.GetUnitInfo(unitInfo);
             this.unitConfig = Units.GetUnitConfig(unitInfo.r_id);
             var pic = await UnitIconDic.Load(unitInfo.r_id, gameObject);
-            if (this == null)
+            if (this == null || unitConfig == null)
                 return;
             ChangeIcon(pic, unitConfig.element);
             LightOn();
-            var skillEditCheck = unitInfoFormal.set.CheckEdit();
+            var skillEditCheck = unitInfoFormal != null
+                ? unitInfoFormal.set.CheckEdit()
+                : SkillSet.SkillEditError.Perfect;
             if ((withSkillCheck && skillEditCheck != SkillSet.SkillEditError.Perfect) 
                 ||
                 (teamCountGet != null && teamCountGet() == 0))
@@ -77,7 +79,11 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         this.unitConfig = Units.GetUnitConfig(recordId);
         var pic = await UnitIconDic.Load(recordId, gameObject);
-        ChangeIcon(pic, unitConfig.element);
+        if (this == null)
+        {
+            return;
+        }
+        ChangeIcon(pic, unitConfig != null ? unitConfig.element : Element.Null);
     }
     
     public void Clear()
@@ -87,11 +93,15 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     
     void AdjustSize(Image icon)
     {
+        if (icon == null || this == null)
+            return;
         var sprite = icon.sprite;
         if (sprite == null)
             return;
         var iconRect = icon.GetComponent<RectTransform>();
         var wholeParentRect = transform.GetComponent<RectTransform>();
+        if (iconRect == null || wholeParentRect == null)
+            return;
         float spriteAspectRatio = sprite.rect.width / sprite.rect.height;
         
         if (spriteAspectRatio < 1)
@@ -145,10 +155,25 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
                 break;
         }
         
+        if (this == null || frame == null || iconBg == null || icon == null)
+        {
+            return;
+        }
         frame.color = frameColor;
         iconBg.color = color;
         icon.sprite = sprite;
-        await UniTask.DelayFrame(1);
+        try
+        {
+            await UniTask.DelayFrame(1, cancellationToken: this.GetCancellationTokenOnDestroy());
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        if (this == null || icon == null)
+        {
+            return;
+        }
         AdjustSize(icon);
         icon.gameObject.SetActive(sprite != null);
     }

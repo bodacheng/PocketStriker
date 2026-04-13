@@ -1,4 +1,6 @@
-﻿namespace dataAccess
+﻿using UnityEngine;
+
+namespace dataAccess
 {
     public static partial class TeamSet
     {
@@ -31,6 +33,42 @@
                 posKeySet.SetPosMemInfoByInstanceID(kv.Key.Item2, kv.Value.id);
             }
             return posKeySet;
+        }
+
+        public static void SanitizeAgainstCurrentInventory(string fallbackInstanceId = null)
+        {
+            Default = SanitizeSet(Default, "arcade", fallbackInstanceId);
+            Arena3V3 = SanitizeSet(Arena3V3, "arena", fallbackInstanceId);
+            Gangbang = SanitizeSet(Gangbang, "gangbang", fallbackInstanceId);
+            Origin = SanitizeSet(Origin, "origin", fallbackInstanceId);
+        }
+
+        static PosKeySet SanitizeSet(PosKeySet targetSet, string setName, string fallbackInstanceId)
+        {
+            targetSet ??= new PosKeySet();
+            var hasValidMember = false;
+            foreach (var oneSet in targetSet.PosNumsWithLocalKeys)
+            {
+                if (string.IsNullOrEmpty(oneSet.instanceID))
+                {
+                    continue;
+                }
+
+                if (Units.Get(oneSet.instanceID) == null)
+                {
+                    Debug.LogWarning($"[TeamCompat] Clear unsupported team member {oneSet.instanceID} from {setName}:{oneSet.posNum}");
+                    oneSet.instanceID = null;
+                    continue;
+                }
+
+                hasValidMember = true;
+            }
+
+            if (!hasValidMember && !string.IsNullOrEmpty(fallbackInstanceId) && Units.Get(fallbackInstanceId) != null)
+            {
+                targetSet.SetPosMemInfoByInstanceID(0, fallbackInstanceId);
+            }
+            return targetSet;
         }
     }
 }

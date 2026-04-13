@@ -4,9 +4,17 @@ using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using UnityEngine;
 using FightScene;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class FightingStepLayer : UILayer
 {
+    const int TopButtonSortingOrder = 1000;
+    const float TeamMoveJoystickTouchWidth = 40f;
+    const float TeamMoveJoystickTouchHeight = 35f;
+    const float RotateCameraJoystickTouchWidth = 45f;
+    const float RotateCameraJoystickTouchHeight = 35f;
+
     [Header("Pause Button")]
     [SerializeField] BOButton pauseButton;
     
@@ -34,6 +42,7 @@ public class FightingStepLayer : UILayer
     public static FightingStepLayer Open()
     {
         var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
+        Debug.Log($"[FightingStepLayer] Open -> id={fightingLayer.GetInstanceID()} active={fightingLayer.gameObject.activeSelf} path={fightingLayer.transform.root.name}/{fightingLayer.transform.name}");
         fightingLayer.InputsManager.FXCamera = FightScene.FightScene.target.fxCamera;
         return fightingLayer;
     }
@@ -59,10 +68,12 @@ public class FightingStepLayer : UILayer
             (x) =>
             {
                 PlayerPrefs.SetInt("auto", x ? 1:0);
+                FightLoad.Fight.Team1Auto = x;
                 RTFightManager.Target.team1.Auto = x;
             },
             (x) =>
             {
+                FightLoad.Fight.Team2Auto = x;
                 RTFightManager.Target.team2.Auto = x;
             },
             ()=>
@@ -86,6 +97,7 @@ public class FightingStepLayer : UILayer
         var layer = UILayerLoader.Get<FightingStepLayer>();
         if (layer == null)
             return;
+        Debug.Log($"[FightingStepLayer] Close -> id={layer.GetInstanceID()}");
         layer.inputsManager.FocusUnit(null);
         layer.inputsManager.Clear();
         layer.team1UI.Clear();
@@ -98,12 +110,13 @@ public class FightingStepLayer : UILayer
         pauseButton.gameObject.SetActive(false);
         clickNextTutorial.Open();
     }
-    
+
     public bool Initialized { get; set; } = false;
 
     async UniTask StartUp(Action<bool> switchTeam1Auto, Action<bool> switchTeam2Auto, Action pauseAction)
     {
         Initialized = false;
+        ResetOverlayStates();
         
         RTFightManager.Target.team1.InputsManager = inputsManager;
         RTFightManager.Target.team2.InputsManager = inputsManager;
@@ -126,13 +139,16 @@ public class FightingStepLayer : UILayer
         team1UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
         team2UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
         
+        var members = RTFightManager.Target.team1.teamMembers.GetValues();
         var inputEffectsLoading = new List<UniTask>();
-        foreach (var d in RTFightManager.Target.team1.teamMembers.GetValues())
+        foreach (var d in members)
         {
             inputEffectsLoading.Add(inputsManager.ElementRegister(d.element, RTFightManager.Target.UnitInfoRef[d]));
         }
+
         await UniTask.WhenAll(inputEffectsLoading);
         inputsManager.GroupSkillIcons();
+        KeepTopButtonsClickable();
         
         // foreach (var d in RTFightManager.Target.team2.teamMembers.GetValues())
         // {
@@ -141,18 +157,105 @@ public class FightingStepLayer : UILayer
         Initialized = true;
     }
 
+    void ResetOverlayStates()
+    {
+        forceClickAutoBtnBlackMask.SetActive(false);
+        clickTriggerDreamCombo.SetActive(false);
+        clickNextTutorial.gameObject.SetActive(false);
+    }
+
+    void KeepTopButtonsClickable()
+    {
+        NormalizeJoystickTouchAreas();
+        PromoteButtonToOverlayCanvas(pauseButton.transform, TopButtonSortingOrder);
+        PromoteButtonToOverlayCanvas(team1UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
+        PromoteButtonToOverlayCanvas(team2UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
+        pauseButton.transform.parent.SetAsLastSibling();
+        DisableRaycastTarget(transform.Find("top"));
+        DisableRaycastTarget(transform.Find("middle"));
+        DisableRaycastTarget(transform.Find("bottom"));
+        team2UI.AutoSwitch.transform.SetAsLastSibling();
+        team1UI.AutoSwitch.transform.SetAsLastSibling();
+        pauseButton.transform.SetAsLastSibling();
+    }
+
+    void NormalizeJoystickTouchAreas()
+    {
+        foreach (var joystick in GetComponentsInChildren<UltimateJoystick>(true))
+        {
+            if (joystick == null)
+            {
+                continue;
+            }
+
+            switch (joystick.joystickName)
+            {
+                case "joystick":
+                    UpdateJoystickTouchArea(joystick, TeamMoveJoystickTouchWidth, TeamMoveJoystickTouchHeight, 0f, 0f);
+                    break;
+                case "RotateCamera":
+                    UpdateJoystickTouchArea(joystick, RotateCameraJoystickTouchWidth, RotateCameraJoystickTouchHeight, 0f, 100f);
+                    break;
+            }
+        }
+    }
+
+    static void UpdateJoystickTouchArea(UltimateJoystick joystick, float width, float height, float vertical, float horizontal)
+    {
+        joystick.customActivationRange = true;
+        joystick.activationWidth = width;
+        joystick.activationHeight = height;
+        joystick.activationPositionVertical = vertical;
+        joystick.activationPositionHorizontal = horizontal;
+        joystick.UpdatePositioning();
+    }
+
+    static void DisableRaycastTarget(Transform target)
+    {
+        var graphic = target != null ? target.GetComponent<Graphic>() : null;
+        if (graphic != null)
+        {
+            graphic.raycastTarget = false;
+        }
+    }
+
+    static void PromoteButtonToOverlayCanvas(Transform target, int sortingOrder)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        var canvas = target.GetComponent<Canvas>();
+        if (canvas == null)
+        {
+            canvas = target.gameObject.AddComponent<Canvas>();
+        }
+
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = sortingOrder;
+
+        if (target.GetComponent<GraphicRaycaster>() == null)
+        {
+            target.gameObject.AddComponent<GraphicRaycaster>();
+        }
+    }
+
     public void ForceClickAutoBtn()
     {
         forceClickAutoBtnBlackMask.SetActive(true);
-        clickNextTutorial.Button.onClick.AddListener(
-            ()=>
-            {
-                team1UI.AutoSwitch.ChangeAutoState(true);
-                forceClickAutoBtnBlackMask.SetActive(false);
-            });
+        UnityAction handler = null;
+        handler = () =>
+        {
+            clickNextTutorial.Button.onClick.RemoveListener(handler);
+            team1UI.AutoSwitch.ChangeAutoState(true);
+            forceClickAutoBtnBlackMask.SetActive(false);
+        };
+        clickNextTutorial.Button.onClick.AddListener(handler);
     }
 
     bool preTeam1AIState;
+    
     public void TutorialModeForceOnClickDreamCombo()
     {
         clickTriggerDreamCombo.SetActive(false);

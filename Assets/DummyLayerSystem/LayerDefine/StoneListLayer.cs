@@ -67,6 +67,7 @@ public class StoneListLayer : UILayer
     {
         skillStoneDetail.Clear();
         box._tabEffects.CloseShowingTagEffects();
+        base.OnDestroy();
     }
     
     public void CellFeature_StoneShow(StoneCell cell)

@@ -63,7 +63,10 @@ public class PosKeySet
                 if (unitInfoOrigin != null)
                 {
                     var unitInfoAdvanced = UnitInfo.GetUnitInfo(unitInfoOrigin);
-                    multiDictionary.Set(0, PosNumsWithLocalKeys[i].posNum, unitInfoAdvanced);
+                    if (unitInfoAdvanced != null)
+                    {
+                        multiDictionary.Set(0, PosNumsWithLocalKeys[i].posNum, unitInfoAdvanced);
+                    }
                 }
             }
         }

@@ -53,6 +53,10 @@ public partial class SkillSet
     // 获取平均技能等级
     public float GetAerLevel(List<float> levels)
     {
+        if (levels == null || levels.Count == 0)
+        {
+            return 1f;
+        }
         float aver = 0;
         foreach (var t in levels)
         {
@@ -67,6 +71,10 @@ public partial class SkillSet
         foreach (var skillId in skillIds)
         {
             var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillId);
+            if (skillConfig == null)
+            {
+                continue;
+            }
             wholeHp += FightGlobalSetting.StoneHpCal(skillConfig.HP_WEIGHT, lv);
         }
         return wholeHp;

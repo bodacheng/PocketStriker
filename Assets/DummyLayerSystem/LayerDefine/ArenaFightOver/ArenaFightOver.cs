@@ -52,6 +52,7 @@ public partial class ArenaFightOver : UILayer
     private TweenerCore<int, int, NoOptions> _gdAwardTweenerCore;
     private readonly TweenTextScaleManager _tweenTextScaleManager = new TweenTextScaleManager();
     private float rewardTextChangeHalfDuration = 0.05f;
+    private bool _destroyCleanupDone;
     
     private float resultAnimFactor = 0;
     
@@ -199,7 +200,7 @@ public partial class ArenaFightOver : UILayer
         
         returnBtn.SetListener(()=>
         {
-            OnDestroy();
+            CleanupBeforeDestroy();
             FightScene.FightScene.target.ReturnToFront();
         });
         
@@ -355,7 +356,18 @@ public partial class ArenaFightOver : UILayer
     
     public override void OnDestroy()
     {
+        CleanupBeforeDestroy();
         base.OnDestroy();
+    }
+
+    void CleanupBeforeDestroy()
+    {
+        if (_destroyCleanupDone)
+        {
+            return;
+        }
+
+        _destroyCleanupDone = true;
         _arenaPointTweenerCore?.Kill();
         _dmAwardTweenerCore?.Kill();
         _gdAwardTweenerCore?.Kill();

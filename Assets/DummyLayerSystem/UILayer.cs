@@ -57,10 +57,11 @@ public class UILayer : MonoBehaviour
     }
     
     public string Index { get; set; }
+    public bool IsClosing { get; set; }
     
     public virtual void OnDestroy()
     {
-        
+        DummyLayerSystem.UILayerLoader.NotifyDestroyed(this);
     }
     
     protected void ResizeCameraConnectorRefLeft(RectTransform target, float cameraConnectorRightSpace, float cameraConnectorVerticalSpace)

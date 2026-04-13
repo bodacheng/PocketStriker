@@ -37,6 +37,7 @@ public class MobileInputsManager : MonoBehaviour {
     [SerializeField] float buttonStretchEdgeDis = 5f;
     
     public Camera FXCamera { get; set; }
+    public BOButton DreamComboBtn => dreamComboBtn;
     
     //攻击键系成员
     readonly IDictionary<string, GameObject> _aIcons = new Dictionary<string, GameObject>();

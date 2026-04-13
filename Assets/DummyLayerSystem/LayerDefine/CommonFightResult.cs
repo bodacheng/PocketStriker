@@ -57,5 +57,6 @@ public class CommonFightResult : UILayer
     public override void OnDestroy()
     {
         Clear();
+        base.OnDestroy();
     }
 }

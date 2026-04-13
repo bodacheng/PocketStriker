@@ -111,5 +111,24 @@ namespace dataAccess
                 stoneOfPlayerInfo.slot = kv.Value.Item2;
             }
         }
+
+        public static void SanitizeAgainstCurrentUnits()
+        {
+            foreach (var kv in Dic)
+            {
+                var stone = kv.Value;
+                if (stone == null || string.IsNullOrEmpty(stone.unitInstanceId))
+                {
+                    continue;
+                }
+
+                if (Units.Get(stone.unitInstanceId) == null)
+                {
+                    Debug.LogWarning($"[StoneCompat] Unequip stone {stone.InstanceId} from unsupported unit {stone.unitInstanceId}");
+                    stone.unitInstanceId = null;
+                    stone.slot = null;
+                }
+            }
+        }
     }
 }

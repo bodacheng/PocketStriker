@@ -82,10 +82,11 @@ namespace DummyLayerSystem
         
         public static void Clear(string except = null)
         {
+            PruneInvalidEntries();
             var toRemove = new List<UILayer>();
             foreach (var queue in Queues)
             {
-                if (except != queue.Index)
+                if (queue != null && except != queue.Index)
                 {
                     toRemove.Add(queue);
                 }
@@ -112,13 +113,53 @@ namespace DummyLayerSystem
         
         public static T Get<T>() where T : UILayer
         {
-            var target = Queues.Find(x => x.Index == typeof(T).Name);
+            PruneInvalidEntries();
+            var key = typeof(T).Name;
+            var target = Queues.Find(x => x != null && !x.IsClosing && x.Index == key);
             if (target != null)
-                return target as T;
-            else
             {
-                return default;
+                return target as T;
             }
+
+            return RecoverExistingLayer<T>(key);
+        }
+
+        static T RecoverExistingLayer<T>(string key) where T : UILayer
+        {
+            var foundLayers = UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            T selected = null;
+            foreach (var layer in foundLayers)
+            {
+                if (layer == null || layer.IsClosing)
+                    continue;
+
+                if (selected == null || LayerScore(layer, key) > LayerScore(selected, key))
+                {
+                    selected = layer;
+                }
+            }
+
+            if (selected == null)
+                return default;
+
+            selected.Index = key;
+            selected.IsClosing = false;
+            if (!Queues.Contains(selected))
+            {
+                Queues.Add(selected);
+            }
+
+            foreach (var layer in foundLayers)
+            {
+                if (layer == null || layer.IsClosing || layer == selected)
+                    continue;
+
+                Debug.LogWarning($"[UILayerLoader] Duplicate {key} detected. Keeping {DescribeLayer(selected)}, removing {DescribeLayer(layer)}.");
+                MarkClosingAndDestroy(layer);
+            }
+
+            Debug.LogWarning($"[UILayerLoader] Recovered untracked {DescribeLayer(selected)}.");
+            return selected;
         }
         
         public static T Load<T>(bool insertToTop = false, string key = null, bool loadToFullScreen = false) where T : UILayer
@@ -131,6 +172,13 @@ namespace DummyLayerSystem
             var existed = Get<T>();
             if (existed != null)
             {
+                existed.IsClosing = false;
+                existed.Index = className;
+                if (existed.transform.parent != targetHanger)
+                {
+                    existed.transform.SetParent(targetHanger.transform, false);
+                    ResizeLayerRect(existed);
+                }
                 ApplySiblingOrder(existed.transform, insertToTop, loadToFullScreen);
                 EnsureMosakAtBottom(targetHanger);
                 return existed;
@@ -140,16 +188,11 @@ namespace DummyLayerSystem
             var UILayerPrefab = Resources.Load<UILayer>(path);
             var t = GameObject.Instantiate(UILayerPrefab);
             t.Index = className;
+            t.IsClosing = false;
             t.transform.SetParent(targetHanger.transform);
             t.transform.localPosition = Vector3.zero;
             ApplySiblingOrder(t.transform, insertToTop, loadToFullScreen);
-            var rt = t.GetComponent<RectTransform>();
-            rt.anchorMax = Vector2.one;
-            rt.anchorMin = Vector2.zero;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-            rt.localPosition = Vector3.zero;
-            rt.localScale = Vector3.one;
+            ResizeLayerRect(t);
             t.ResizeAreas();
             Queues.Add(t);
             var returnValue = t as T;
@@ -167,12 +210,13 @@ namespace DummyLayerSystem
         
         public static void Pop()
         {
+            PruneInvalidEntries();
             if (Queues.Count > 0)
             {
                 var uiLayer = Queues[Queues.Count - 1];
                 if (uiLayer != null)
                 {
-                    GameObject.Destroy(uiLayer.gameObject);
+                    MarkClosingAndDestroy(uiLayer);
                 }
                 Queues.RemoveAt(Queues.Count - 1);
 
@@ -191,11 +235,12 @@ namespace DummyLayerSystem
     
         static void Remove(string index)
         {
+            PruneInvalidEntries();
             var toRemoveIndex = -1;
             for (var i = 0; i < Queues.Count; i++)
             {
                 var uiLayer = Queues[i];
-                if (uiLayer.Index == index)
+                if (uiLayer != null && uiLayer.Index == index)
                 {
                     toRemoveIndex = i;
                 }
@@ -205,7 +250,7 @@ namespace DummyLayerSystem
             {
                 var layer = Queues[toRemoveIndex];
                 if (layer != null)
-                    GameObject.Destroy(layer.gameObject);
+                    MarkClosingAndDestroy(layer);
                 Queues.RemoveAt(toRemoveIndex);
 
                 if (_hanger != null)
@@ -248,6 +293,97 @@ namespace DummyLayerSystem
             if (mosakTransform != null)
             {
                 mosakTransform.SetAsFirstSibling();
+            }
+        }
+
+        static void ResizeLayerRect(UILayer layer)
+        {
+            if (layer == null)
+                return;
+
+            var rt = layer.GetComponent<RectTransform>();
+            if (rt == null)
+                return;
+
+            rt.anchorMax = Vector2.one;
+            rt.anchorMin = Vector2.zero;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.localPosition = Vector3.zero;
+            rt.localScale = Vector3.one;
+        }
+
+        static void MarkClosingAndDestroy(UILayer layer)
+        {
+            if (layer == null)
+                return;
+
+            layer.IsClosing = true;
+            if (layer.gameObject != null)
+            {
+                layer.gameObject.SetActive(false);
+                GameObject.Destroy(layer.gameObject);
+            }
+        }
+
+        static void PruneInvalidEntries()
+        {
+            for (var i = Queues.Count - 1; i >= 0; i--)
+            {
+                if (Queues[i] == null)
+                {
+                    Queues.RemoveAt(i);
+                }
+            }
+        }
+
+        static int LayerScore(UILayer layer, string key)
+        {
+            if (layer == null)
+                return int.MinValue;
+
+            var score = 0;
+            if (layer.gameObject.activeInHierarchy)
+                score += 4;
+            if (layer.transform.parent == _hanger || layer.transform.parent == _fullScreenHanger)
+                score += 2;
+            if (layer.Index == key)
+                score += 1;
+            return score;
+        }
+
+        static string DescribeLayer(UILayer layer)
+        {
+            if (layer == null)
+                return "<null>";
+
+            return $"{layer.GetType().Name}#{layer.GetInstanceID()} path={GetPath(layer.transform)} active={layer.gameObject.activeInHierarchy}";
+        }
+
+        static string GetPath(Transform target)
+        {
+            if (target == null)
+                return "<missing>";
+
+            var path = target.name;
+            while (target.parent != null)
+            {
+                target = target.parent;
+                path = target.name + "/" + path;
+            }
+
+            return path;
+        }
+
+        internal static void NotifyDestroyed(UILayer layer)
+        {
+            for (var i = Queues.Count - 1; i >= 0; i--)
+            {
+                var queued = Queues[i];
+                if (queued == null || ReferenceEquals(queued, layer))
+                {
+                    Queues.RemoveAt(i);
+                }
             }
         }
     }

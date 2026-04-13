@@ -402,6 +402,11 @@ public static class Units
         List<Row> references = FindAll_MONSTER_TYPE(type);
         foreach (Row one in references)
         {
+            if (AddressablesLogic.HasIndexedTag("unit") &&
+                !AddressablesLogic.CheckKeyExist("unit", one.MONSTER_TYPE + "/" + one.REAL_NAME))
+            {
+                continue;
+            }
             mdic.Add(one.RECORD_ID, one.REAL_NAME);
         }
         return mdic;
@@ -493,4 +498,3 @@ public static class Units
         return typeList;
     }
 }
-

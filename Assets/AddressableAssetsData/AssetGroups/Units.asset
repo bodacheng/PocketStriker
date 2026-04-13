@@ -13,36 +13,46 @@ MonoBehaviour:
   m_Name: Units
   m_EditorClassIdentifier: 
   m_GroupName: Units
-  m_Data:
-    m_SerializedData: []
   m_GUID: f0dd6dc67cdb345bfa012551500cd672
   m_SerializeEntries:
-  - m_GUID: 1c468f7e0bdba47c8bab26b46949e3c1
-    m_Address: human/sybill
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - unit
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ed65d821dc9c84997b1d9b2715a9e85a
-    m_Address: human/robot3
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - unit
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 57e13ab20d3924743a5cfbf1986e1ce4
-    m_Address: human/mutant_b
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - unit
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 00ba5ea5ac23d47a7a5655738e4235e8
     m_Address: human/earth_golem
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c468f7e0bdba47c8bab26b46949e3c1
+    m_Address: human/sybill
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 200e6fa22ba83492eb37a20631dfb603
+    m_Address: human/adam
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2c0003c4fd3d54b8e95eb2077acb728a
     m_Address: human/maggie
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d4952c0f19e3493aa329c411da0ec58
+    m_Address: human/adam_naked
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40f6c2d0dd4cf4da8ab63517181c986a
+    m_Address: human/ice_golem
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 57e13ab20d3924743a5cfbf1986e1ce4
+    m_Address: human/mutant_b
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
@@ -59,20 +69,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3d4952c0f19e3493aa329c411da0ec58
-    m_Address: human/adam_naked
+  - m_GUID: 8314c4cfec3c14e2b8a4d179e2d2dc2e
+    m_Address: human/tetsuya
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a04811d0f4d3841d1bfe43264730d60a
-    m_Address: human/NanoCyborg
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - unit
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 200e6fa22ba83492eb37a20631dfb603
-    m_Address: human/adam
+  - m_GUID: 91cc7d6d6ca4a4026a800ffc3ee4bc11
+    m_Address: human/clown_r
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
@@ -83,8 +87,8 @@ MonoBehaviour:
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b6984d7f05c934250a3f9a02626e5108
-    m_Address: human/baruk
+  - m_GUID: a04811d0f4d3841d1bfe43264730d60a
+    m_Address: human/NanoCyborg
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
@@ -95,26 +99,32 @@ MonoBehaviour:
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 40f6c2d0dd4cf4da8ab63517181c986a
-    m_Address: human/ice_golem
+  - m_GUID: b6984d7f05c934250a3f9a02626e5108
+    m_Address: human/baruk
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8314c4cfec3c14e2b8a4d179e2d2dc2e
-    m_Address: human/tetsuya
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - unit
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d05f66cbfa5d34265bd09c6892b652df
-    m_Address: human/mutant
+  - m_GUID: a9bd22f7069c4d36b1cff4f393d88155
+    m_Address: human/yuta_n
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e4f4fac402acf443099f2670646fdc5a
     m_Address: human/HeavyBioMutant
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 466f393cb9eb4aa995c57d852018039b
+    m_Address: human/maggie_n
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - unit
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed65d821dc9c84997b1d9b2715a9e85a
+    m_Address: human/robot3
     m_ReadOnly: 0
     m_SerializedLabels:
     - unit

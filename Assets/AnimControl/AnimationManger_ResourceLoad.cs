@@ -161,7 +161,17 @@ public partial class AnimationManger
         {
             return; // When the character model is displayed, there may be issues such as the menu suddenly closing
         }
+        if (Animator.runtimeAnimatorController == null)
+        {
+            Debug.LogWarning($"[AnimationCompat] Missing runtimeAnimatorController on {Animator.gameObject.name}");
+            return;
+        }
         animatorOverride = new AnimatorOverrideController(Animator.runtimeAnimatorController);
+        if (animatorOverride.runtimeAnimatorController == null)
+        {
+            Debug.LogWarning($"[AnimationCompat] Missing override base controller on {Animator.gameObject.name}");
+            return;
+        }
 
         // 以上内容为个性化动画片段对base层基础动画的覆盖
         foreach (var animationClip in basicAnims)

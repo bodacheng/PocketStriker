@@ -12,7 +12,7 @@ public class AbstractShaderMesh : MonoBehaviour
     private static readonly int kPropertyEmissionColor1 = Shader.PropertyToID("_Emissive");
 
     public Renderer Mesh => mesh;
-    public Material[] CurrentMaterials { get; set; } = default;
+    public Material[] CurrentMaterials { get; set; } = System.Array.Empty<Material>();
 
     protected virtual void Awake()
     {
@@ -22,13 +22,21 @@ public class AbstractShaderMesh : MonoBehaviour
             var materials = new List<Material>();
             foreach (var m in Mesh.sharedMaterials)
             {
+                if (m == null || m.shader == null)
+                {
+                    continue;
+                }
                 var new_m = new Material(m.shader);
                 new_m.CopyPropertiesFromMaterial(m);
                 new_m.EnableKeyword("_EMISSION");
                 materials.Add(new_m);
             }
             mesh.sharedMaterials = materials.ToArray();
-            CurrentMaterials = GetMaterials();
+            CurrentMaterials = GetMaterials() ?? System.Array.Empty<Material>();
+        }
+        else
+        {
+            CurrentMaterials = System.Array.Empty<Material>();
         }
     }
 
@@ -36,16 +44,24 @@ public class AbstractShaderMesh : MonoBehaviour
     {
         get
         {
+            if (CurrentMaterials == null)
+                return Color.clear;
             foreach (var m in CurrentMaterials)
             {
+                if (m == null)
+                    continue;
                 return m.GetColor(kPropertyBaseColor);
             }
             return Color.clear;
         }
         set
         {
+            if (CurrentMaterials == null)
+                return;
             foreach (var m in CurrentMaterials)
             {
+                if (m == null)
+                    continue;
                 m.SetColor(kPropertyBaseColor, value);
             }
         }
@@ -55,8 +71,12 @@ public class AbstractShaderMesh : MonoBehaviour
     {
         get
         {
+            if (CurrentMaterials == null)
+                return Color.clear;
             foreach (var m in CurrentMaterials)
             {
+                if (m == null)
+                    continue;
                 if (m.HasProperty(kPropertyEmissionColor1))
                 {
                     return m.GetColor(kPropertyEmissionColor1);
@@ -68,8 +88,12 @@ public class AbstractShaderMesh : MonoBehaviour
         }
         set
         {
+            if (CurrentMaterials == null)
+                return;
             foreach (var m in CurrentMaterials)
             {
+                if (m == null)
+                    continue;
                 if (m.HasProperty(kPropertyEmissionColor1))
                 {
                     m.SetColor(kPropertyEmissionColor1,value);

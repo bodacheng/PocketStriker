@@ -23,6 +23,7 @@ namespace mainMenu
         public override void OnDestroy()
         {
             _connector.Clear();
+            base.OnDestroy();
         }
 
         public void RefreshMemberDetailPageByFocusingUnit()

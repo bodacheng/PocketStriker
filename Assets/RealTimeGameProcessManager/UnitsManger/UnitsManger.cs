@@ -23,30 +23,56 @@ namespace FightScene
         {
             set
             {
+                var autoChanged = _auto != value;
                 _auto = value;
                 foreach (var dataCenter in teamMembers.GetValues())
                 {
+                    if (dataCenter == null || dataCenter._MyBehaviorRunner == null)
+                    {
+                        continue;
+                    }
+
+                    bool targetAIState;
                     if (TeamMode == TeamMode.Rotation)
-                        dataCenter._MyBehaviorRunner.AI = _auto;
+                    {
+                        targetAIState = _auto;
+                    }
                     else if (TeamMode == TeamMode.MultiRaid)
                     {
                         if (this.teamConfig.myTeam == RTFightManager.playerTeam)
                         {
                             if (InputsManager != null && InputsManager.CurrentFocus != null && InputsManager.CurrentFocus.Value == dataCenter)
                             {
-                                dataCenter._MyBehaviorRunner.AI = _auto;
+                                targetAIState = _auto;
                             }
                             else
                             {
-                                dataCenter._MyBehaviorRunner.AI = true;
+                                targetAIState = true;
                             }
                         }
                         else
                         {
-                            dataCenter._MyBehaviorRunner.AI = _auto;
+                            targetAIState = _auto;
                         }
                     }
+                    else
+                    {
+                        targetAIState = dataCenter._MyBehaviorRunner.AI;
+                    }
+
+                    var aiChanged = dataCenter._MyBehaviorRunner.AI != targetAIState;
+                    dataCenter._MyBehaviorRunner.AI = targetAIState;
+
+                    if (autoChanged && aiChanged && dataCenter.FightDataRef != null && !dataCenter.FightDataRef.IsDead.Value)
+                    {
+                        dataCenter._MyBehaviorRunner.ChangeToWaitingState();
+                    }
                 }
+
+                Debug.Log(
+                    $"[UnitsManger.Auto] team={teamConfig?.myTeam} mode={TeamMode} auto={_auto} focus={InputsManager?.CurrentFocus?.Value?.name ?? "null"}",
+                    this
+                );
             }
             get => _auto;
         }

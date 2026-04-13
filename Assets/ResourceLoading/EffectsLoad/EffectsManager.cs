@@ -1,15 +1,12 @@
-﻿using UniRx;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Animations;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 public static class EffectsManager
 {
     // 以下的重点是主界面和战斗界面通用问题
     static readonly IDictionary<string, DecompositionPool> EffectPoolsDic = new Dictionary<string, DecompositionPool>();
-    static AsyncOperationHandle<GameObject> _handle;
     
     static UniTask<GameObject> TryLoadEffectPrefab(string key)
     {
@@ -65,17 +62,25 @@ public static class EffectsManager
         if (EffectPoolsDic.ContainsKey(key))
         {
             DicAdd<string, int>.Add(PreloadCountIncrementLog, key, PreloadCountIncrementLog[key]+1);
-            await EffectPoolsDic[key].PreloadAsync(PreloadCountIncrementLog[key], 1);
+            await EffectPoolsDic[key].PreloadAsync(PreloadCountIncrementLog[key], 1).ToUniTask();
             return EffectPoolsDic[key];
         }
-        else
+
+        if (prefab != null)
         {
             var poolToConstruct = new DecompositionPool(prefab);
-            poolToConstruct.PreloadAsync(iniCount, 1).Subscribe(_ => {});
+            await poolToConstruct.PreloadAsync(iniCount, 1).ToUniTask();
+            if (EffectPoolsDic.ContainsKey(key))
+            {
+                poolToConstruct.Clear();
+                return EffectPoolsDic[key];
+            }
+
             EffectPoolsDic.Add(new KeyValuePair<string, DecompositionPool>(key, poolToConstruct));
             DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
             return poolToConstruct;
         }
+        return null;
     }
     
     public static async UniTask<DecompositionPool> IniEffectsPool(string resourceName, string effectPath, int objectCount)

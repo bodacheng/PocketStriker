@@ -41,8 +41,16 @@ public class AnimationResourceLoader
         {
             return;
         }
+
+        var resourceKey = clipKey + ".anim";
+        if (AddressablesLogic.HasIndexedTag("skill_anim") &&
+            !AddressablesLogic.CheckKeyExist("skill_anim", resourceKey))
+        {
+            Debug.LogWarning($"[SkillAnim] Missing animation key: {resourceKey}");
+            return;
+        }
         
-        var result = await AddressablesLogic.LoadT<AnimationClip>(type+"/skill/"+ key +".anim");
+        var result = await AddressablesLogic.LoadT<AnimationClip>(resourceKey);
         if (result != null)
         {
             DicAdd<string, AnimationClip>.Add(AnimationClipDic, clipKey, result);

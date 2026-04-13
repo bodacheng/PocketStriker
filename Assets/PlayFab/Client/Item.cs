@@ -3,6 +3,7 @@ using PlayFab.ClientModels;
 using dataAccess;
 using System;
 using System.Linq;
+using UnityEngine;
 
 public partial class PlayFabReadClient
 {
@@ -44,6 +45,18 @@ public partial class PlayFabReadClient
                 }
                 else
                 {
+                    var unitConfig = global::Units.GetUnitConfig(item.ItemId);
+                    if (unitConfig == null)
+                    {
+                        Debug.LogWarning($"[InventoryCompat] Ignore unsupported unit item: {item.ItemId}");
+                        continue;
+                    }
+                    if (AddressablesLogic.HasIndexedTag("unit") &&
+                        !AddressablesLogic.CheckKeyExist("unit", unitConfig.TYPE + "/" + unitConfig.REAL_NAME))
+                    {
+                        Debug.LogWarning($"[InventoryCompat] Ignore unit without Pocket resource: {item.ItemId}");
+                        continue;
+                    }
                     var info = new UnitInfo
                     {
                         id = item.ItemInstanceId,
@@ -77,6 +90,8 @@ public partial class PlayFabReadClient
                 _AddMailData(item);
             }
         }
+
+        Stones.SanitizeAgainstCurrentUnits();
         
         MyMailList = MyMailList.OrderByDescending(x => x.NotClaimed()).ToList();
         

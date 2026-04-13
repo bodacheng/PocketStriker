@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using dataAccess;
 using Newtonsoft.Json;
+using UnityEngine;
 
 public partial class PlayFabReadClient
 {
@@ -29,6 +30,24 @@ public partial class PlayFabReadClient
     
     public static void GetAllUserData(List<string> keys, Action<bool> finished)
     {
+        PosKeySet ReadTeamPosSafely(string rawValue, string key)
+        {
+            if (string.IsNullOrWhiteSpace(rawValue))
+            {
+                return new PosKeySet();
+            }
+
+            try
+            {
+                return JsonConvert.DeserializeObject<TeamPos>(rawValue)?.ToPosKeySet() ?? new PosKeySet();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[TeamCompat] Failed to parse user data {key}: {e.Message}");
+                return new PosKeySet();
+            }
+        }
+
         PlayFabClientAPI.GetUserData(
             new GetUserDataRequest()
             {
@@ -45,19 +64,19 @@ public partial class PlayFabReadClient
                         switch (key)
                         {
                             case "arcade":
-                                value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
+                                value = ReadTeamPosSafely(userData.Value, key);
                                 TeamSet.Default = value;
                                 break;
                             case "arena": // 因为一些特殊处理这个地方现在其实没用。
-                                value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
+                                value = ReadTeamPosSafely(userData.Value, key);
                                 TeamSet.Arena3V3 = value;
                                 break;
                             case "gangbang":
-                                value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
+                                value = ReadTeamPosSafely(userData.Value, key);
                                 TeamSet.Gangbang = value;
                                 break;
                             case "origin":
-                                value = JsonConvert.DeserializeObject<TeamPos>(userData.Value).ToPosKeySet();
+                                value = ReadTeamPosSafely(userData.Value, key);
                                 TeamSet.Origin = value;
                                 break;
                             case "noAds":

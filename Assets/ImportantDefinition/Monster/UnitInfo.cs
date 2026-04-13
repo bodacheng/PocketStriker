@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Skill;
 
 [Serializable]
 public class UnitInfo
@@ -53,9 +54,35 @@ public class UnitInfo
                 return null;
             }
 
+            bool IsCompatibleSkill(string skillId, out SkillConfig skillConfig)
+            {
+                skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillId);
+                if (skillConfig == null)
+                {
+                    return false;
+                }
+                if (skillConfig.TYPE != unitConfigInfo.TYPE)
+                {
+                    Debug.LogWarning($"[TeamCompat] Skip skill {skillId} for unit {info.r_id}: type mismatch {skillConfig.TYPE} != {unitConfigInfo.TYPE}");
+                    return false;
+                }
+                var animationKey = unitConfigInfo.TYPE + "/skill/" + skillConfig.REAL_NAME + ".anim";
+                if (AddressablesLogic.HasIndexedTag("skill_anim") &&
+                    !AddressablesLogic.CheckKeyExist("skill_anim", animationKey))
+                {
+                    Debug.LogWarning($"[TeamCompat] Skip skill {skillId} for unit {info.r_id}: missing animation {animationKey}");
+                    return false;
+                }
+                return true;
+            }
+
             var levels = new List<float>();
             foreach (var t in targets)
             {
+                if (!IsCompatibleSkill(t.SkillId, out var sc))
+                {
+                    continue;
+                }
                 switch (t.slot)
                 {
                     case "1":
@@ -86,11 +113,13 @@ public class UnitInfo
                         set.c3 = t.SkillId;
                         break;
                 }
-                var sc = SkillConfigTable.GetSkillConfigByRecordId(t.SkillId);
                 if (t.Born == "true" && sc.EVENT_CODE == "Born")
                 {
-                }else
+                }
+                else
+                {
                     levels.Add(t.Level);
+                }
             }
             
             unitInfo.level = set.GetAerLevel(levels);

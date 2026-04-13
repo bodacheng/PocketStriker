@@ -225,6 +225,7 @@ public partial class SkillEditLayer : UILayer
         }
         _tweens.Clear();
         stonesBox._tabEffects.CloseShowingTagEffects();
+        base.OnDestroy();
     }
 
     void SkillEditButtonFeature(UnitInfo _unitInfo)

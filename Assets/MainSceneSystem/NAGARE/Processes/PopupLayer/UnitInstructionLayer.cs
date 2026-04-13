@@ -31,12 +31,14 @@ public class UnitInstructionLayer : UILayer
         ChangeUnitTheme();
     }
 
-    void OnDestroy()
+    public override void OnDestroy()
     {
         foreach (var tweener in _tweenerCores)
         {
             if (tweener != null && tweener.IsActive())
                 tweener.Kill();
         }
+
+        base.OnDestroy();
     }
 }

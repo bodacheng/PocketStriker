@@ -11,12 +11,17 @@ public class DecompositionPool : ObjectPool<Decomposition> {
     static GameObject Marker;
     readonly GameObject Prefab;
 
-    public DecompositionPool(GameObject prefab)
+    static void EnsureMarker()
     {
         if (Marker == null)
         {
             Marker = new GameObject("Object Pools Container");
         }
+    }
+
+    public DecompositionPool(GameObject prefab)
+    {
+        EnsureMarker();
         Prefab = prefab;
     }
     
@@ -26,8 +31,11 @@ public class DecompositionPool : ObjectPool<Decomposition> {
     public override void Return(Decomposition instance)
     {
         if (isDisposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
-        if (instance == null) throw new ArgumentNullException("instance");
-        if (q == null) q = new List<Decomposition>();       
+        if (instance == null)
+        {
+            return;
+        }
+        if (q == null) q = new List<Decomposition>();
         if ((q.Count + 1) == MaxPoolCount)
         {
             throw new InvalidOperationException("Reached Max PoolSize");
@@ -46,6 +54,7 @@ public class DecompositionPool : ObjectPool<Decomposition> {
     public override Decomposition Rent()
     {
         if (isDisposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
+        if (q == null) q = new List<Decomposition>();
         Decomposition instance = null;
         if (q.Count > 0)
         {
@@ -56,6 +65,10 @@ public class DecompositionPool : ObjectPool<Decomposition> {
             instance = CreateInstance();
         }else{
             q.Remove(instance);
+        }
+        if (instance == null)
+        {
+            return null;
         }
         OnBeforeRent(instance);
         return instance;
@@ -84,6 +97,7 @@ public class DecompositionPool : ObjectPool<Decomposition> {
     // オブジェクトが空のときにInstantiateする関数
     protected override Decomposition CreateInstance()
     {
+        EnsureMarker();
         var a = UnityEngine.Object.Instantiate(Prefab);
         if (a == null)
         {
@@ -97,13 +111,6 @@ public class DecompositionPool : ObjectPool<Decomposition> {
             return null;
         }
 
-        if (Marker == null)
-        {
-            Debug.Log("特效物体的parent已经被销毁？");
-            GameObject.Destroy(a);
-            return null;
-        }
-        
         a.transform.SetParent(Marker.transform);
         
         var bbmm = a.GetComponent<HitBoxManager>();

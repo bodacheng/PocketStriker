@@ -1,6 +1,7 @@
 ﻿using DummyLayerSystem;
 using System.Collections.Generic;
 using Log;
+using UnityEngine;
 
 namespace FightScene
 {
@@ -21,12 +22,22 @@ namespace FightScene
         
         public override void ProcessEnter()
         {
+            UILayerLoader.Remove<InBattleEvolution>();
             _layer = UILayerLoader.Get<FightingStepLayer>();
+            if (_layer == null)
+            {
+                _layer = FightingStepLayer.Open();
+            }
+            if (_layer == null)
+            {
+                Debug.LogError("FightingStepLayer not found.");
+                return;
+            }
             if (FightLoad.Fight.EventType == FightEventType.Screensaver)
             {
                 var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>(true, null, true);
                 titleScreenLayer.Initialise();
-                _layer.InputsManager.FocusUnit(null);
+                _layer.InputsManager?.FocusUnit(null);
                 HighLightLayer.LightUp(1f);
             }
             else
