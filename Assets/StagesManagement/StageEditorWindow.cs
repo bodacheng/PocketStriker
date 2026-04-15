@@ -7,7 +7,7 @@ public class StageEditorWindow : EditorWindow
 {
     private StageEditor _stageEditor;
     private FightInfo _target;
-    string _pathAndNameForLocalSave = "Assets/ExternalAssets/ArcadeStages";
+    string _pathAndNameForLocalSave = "Assets/ExternalAssets/Stage";
     string _fileName;
     bool _initialized;
     void OnGUI()

@@ -143,7 +143,7 @@ public partial class SkillConfigTable
                     skillConfig.SP_LEVEL = -1;
                     break;
             }
-            skillConfig.SHOW_NAME = SkillNameTable.GetSkillName(row.RECORD_ID);
+            skillConfig.SHOW_NAME = SkillNameTable.GetSkillNameOrDefault(row.RECORD_ID, row.REAL_NAME);
             skillConfig.EVENT_CODE = row.EVENT_CODE;
             return skillConfig;
         }
@@ -169,7 +169,7 @@ public partial class SkillConfigTable
             
             if (!skillIDAndNameDic.ContainsKey(one.RECORD_ID))
             {
-                skillIDAndNameDic.Add(one.RECORD_ID, one.REAL_NAME);
+                skillIDAndNameDic.Add(one.RECORD_ID, one.SHOW_NAME);
             }
             else
             {

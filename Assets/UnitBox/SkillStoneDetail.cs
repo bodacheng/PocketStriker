@@ -135,11 +135,11 @@ namespace mainMenu
             
             if (PlayerAccountInfo.Me.TitleDisplayName != null && PlayerAccountInfo.Me.TitleDisplayName.Contains("IconDev"))
             {
-                showName.text = config.RECORD_ID +"."+ SkillNameTable.GetSkillName(config.RECORD_ID);
+                showName.text = config.RECORD_ID + "." + config.SHOW_NAME;
             }
             else
             {
-                showName.text = SkillNameTable.GetSkillName(config.RECORD_ID);    
+                showName.text = config.SHOW_NAME;
             }
             
             ATTitle.text = Translate.Get("at_title");

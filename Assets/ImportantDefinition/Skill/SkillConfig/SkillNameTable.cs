@@ -27,6 +27,17 @@ public class SkillNameTable
             return SkillNameDic[recordId];
         return "UnKnown";
     }
+
+    public static string GetSkillNameOrDefault(string recordId, string fallback)
+    {
+        var skillName = GetSkillName(recordId);
+        if (!string.Equals(skillName, "UnKnown"))
+        {
+            return skillName;
+        }
+
+        return string.IsNullOrEmpty(fallback) ? skillName : fallback;
+    }
     
     public static string GetSkillIntro(string recordId)
     {

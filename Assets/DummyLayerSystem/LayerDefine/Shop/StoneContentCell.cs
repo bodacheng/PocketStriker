@@ -15,7 +15,8 @@ public class StoneContentCell : MonoBehaviour
 
     async void Render()
     {
-        skillName.text = SkillNameTable.GetSkillName(skillId);
+        var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillId);
+        skillName.text = skillConfig != null ? skillConfig.SHOW_NAME : SkillNameTable.GetSkillName(skillId);
         var icon = await Stones.GenerateStoneModel(skillId, false);
         if (this == null)
         {

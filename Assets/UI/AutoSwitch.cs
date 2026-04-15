@@ -13,16 +13,60 @@ public class AutoSwitch : MonoBehaviour
     private Action<bool> _action;
     private Func<bool> _currentState;
     private bool startState;
+    private bool _hasStarted;
+    private bool _hasPendingVisualState;
+    private bool _pendingState;
+    private bool _pendingRestartAnimation;
     public Func<bool> CurrentState => _currentState;
     
     void OnEnable()
     {
-        ApplyVisualState(startState, true);
+        ApplyOrQueueVisualState(startState, true);
+    }
+
+    void Start()
+    {
+        _hasStarted = true;
+        FlushPendingVisualState();
     }
     
     void Switch(bool on)
     {
         animator.SetBool(AutoBool, on);
+    }
+
+    void ApplyOrQueueVisualState(bool on, bool restartAnimation)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        // During the first enable of an instantiated prefab, forcing Animator.Update(0)
+        // can run before animated targets finish Awake.
+        if (!_hasStarted)
+        {
+            _pendingState = on;
+            _pendingRestartAnimation |= restartAnimation;
+            _hasPendingVisualState = true;
+            return;
+        }
+
+        ApplyVisualState(on, restartAnimation);
+    }
+
+    void FlushPendingVisualState()
+    {
+        if (!_hasPendingVisualState || !isActiveAndEnabled)
+        {
+            return;
+        }
+
+        var pendingState = _pendingState;
+        var pendingRestartAnimation = _pendingRestartAnimation;
+        _hasPendingVisualState = false;
+        _pendingRestartAnimation = false;
+        ApplyVisualState(pendingState, pendingRestartAnimation);
     }
 
     void ApplyVisualState(bool on, bool restartAnimation)
@@ -44,7 +88,7 @@ public class AutoSwitch : MonoBehaviour
     {
         startState = on;
         _action?.Invoke(on);
-        ApplyVisualState(on, true);
+        ApplyOrQueueVisualState(on, true);
     }
     
     public void Initialize(Func<bool> state, Action<bool> action)
@@ -59,6 +103,6 @@ public class AutoSwitch : MonoBehaviour
         });
         
         startState = this._currentState();
-        ApplyVisualState(startState, true);
+        ApplyOrQueueVisualState(startState, true);
     }
 }
