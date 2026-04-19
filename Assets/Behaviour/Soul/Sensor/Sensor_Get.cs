@@ -112,8 +112,8 @@ public partial class Sensor
         GetAlliesAndSelfByDistance(true);
         if (_enemiesByDistance.Count > 0 && _alliesByDistance.Count > 1)
         {
-            float disToNearestEnemy2j = HorizontalDistanceCompare(_enemiesByDistance[0].transform.position, Center.position);
-            float disToNearestAlly2j = HorizontalDistanceCompare(_alliesByDistance[1].transform.position, Center.position);
+            float disToNearestEnemy2j = HorizontalDistanceSqrToCenter(_enemiesByDistance[0].transform.position);
+            float disToNearestAlly2j = HorizontalDistanceSqrToCenter(_alliesByDistance[1].transform.position);
             return disToNearestEnemy2j >= disToNearestAlly2j && disToNearestEnemy2j < Mathf.Pow(judgmentRange, 2) && 
                    Vector3.Angle((_enemiesByDistance[0].transform.position - Center.position), (_alliesByDistance[1].transform.position - Center.position)) < 40;
         }

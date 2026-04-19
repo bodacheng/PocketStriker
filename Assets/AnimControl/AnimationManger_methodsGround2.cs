@@ -86,12 +86,20 @@ public partial class AnimationManger
                 target = _hurtClipsHigh;
             break;
         }
+        if (target == null || target.Count == 0)
+        {
+            return null;
+        }
         int ranDom = Random.Range(0, target.Count);
         return target[ranDom];
     }
     
     public AnimationClip GetRandomKnockOffAnim()
     {
+        if (knockoffAnimations == null || knockoffAnimations.Count == 0)
+        {
+            return null;
+        }
         int ranDom = Random.Range(0, knockoffAnimations.Count);
         return knockoffAnimations[ranDom];
     }

@@ -44,6 +44,10 @@ public static class Translate
     public static string[] GetRandomGameTip()
     {
 	    var key = GameTipsRecordIds.Keys.ToList().Random();
+	    if (string.IsNullOrEmpty(key) || !GameTipsRecordIds.ContainsKey(key))
+	    {
+		    return new string[2] { string.Empty, string.Empty };
+	    }
 	    return new string[2] { Get(key), Get(GameTipsRecordIds[key]) };
     }
     

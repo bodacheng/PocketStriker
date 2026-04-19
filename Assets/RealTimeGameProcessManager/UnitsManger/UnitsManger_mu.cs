@@ -35,9 +35,8 @@ namespace FightScene
                     unit = kv.Value;
                 if (TeamStandPoints[kv.Key.Item2] != null)
                 {
-                    dataCenter.WholeT.transform.position = TeamStandPoints[kv.Key.Item2].position;
-                    dataCenter.WholeT.transform.rotation = TeamStandPoints[kv.Key.Item2].rotation;
                     dataCenter.WholeT.parent = null;
+                    PlaceUnitAtStandPoint(dataCenter, TeamStandPoints[kv.Key.Item2]);
                     dataCenter.WholeT.gameObject.SetActive(true);
                 }
                 else

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 //using DG.DemiEditor;
 using UnityEngine;
 using UnityEditor;
@@ -29,6 +30,7 @@ namespace Cocone.ProjectP3
 		public string keyaliasPass;
 		public string buildKind;
 		public string assetKind;
+		public string machineName;
 		public HashSet<AndroidArchitecture> androidArchitectures;
 
 		public BuildTargetGroup TargetGroup
@@ -134,8 +136,19 @@ namespace Cocone.ProjectP3
 		{
 			get
 			{
-				// export用のplistから、provisioning関連の設定を拝借
-				return $"./Assets/App/Editor/Build/Configs/iOS/ExportOptions_{playerBuildConfig.buildKind}.plist";
+				var baseDirectory = "./Assets/App/Editor/Build/Configs/iOS";
+				if (!string.IsNullOrEmpty(playerBuildConfig.machineName))
+				{
+					var machinePath = Path.Combine(baseDirectory, playerBuildConfig.machineName,
+						$"ExportOptions_{playerBuildConfig.buildKind}.plist");
+					if (File.Exists(machinePath))
+					{
+						return machinePath;
+					}
+				}
+
+				// 旧配置との互換用フォールバック
+				return Path.Combine(baseDirectory, $"ExportOptions_{playerBuildConfig.buildKind}.plist");
 			}
 		}
 
@@ -344,6 +357,11 @@ namespace Cocone.ProjectP3
 					
 					case "-buildKind":
 						config.buildKind = args[i + 1];
+						i++;
+						break;
+
+					case "-machineName":
+						config.machineName = args[i + 1];
 						i++;
 						break;
 				}
@@ -662,7 +680,10 @@ namespace Cocone.ProjectP3
 					// どこからこの設定値が来ているか不明情報求む
 					// productNameが微妙に連動していそうだが、合致はしていない。直値指定なので注意すること
 					var pbxProjectContent = File.ReadAllText(projectPath);
-					pbxProjectContent = pbxProjectContent.Replace("PRODUCT_NAME_APP = mcombat;", $"PRODUCT_NAME_APP = {BuildConfigurations.cfBundleName};");
+					pbxProjectContent = Regex.Replace(
+						pbxProjectContent,
+						@"PRODUCT_NAME_APP = [^;]+;",
+						$"PRODUCT_NAME_APP = {BuildConfigurations.cfBundleName};");
 					File.WriteAllText(projectPath, pbxProjectContent);
 				}
 
@@ -735,7 +756,10 @@ namespace Cocone.ProjectP3
 
 				// Firebase プッシュ通知を有効にする
 				const string targetName = "Unity-iPhone";
-				const string entitlementFileName = "mcombat.entitlements";
+				var entitlementBaseName = !string.IsNullOrEmpty(BuildConfigurations?.cfBundleName)
+					? BuildConfigurations.cfBundleName
+					: Application.productName;
+				var entitlementFileName = $"{entitlementBaseName}.entitlements";
 				var isDevelopment = Debug.isDebugBuild;
 				var capabilities = new ProjectCapabilityManager(projectPath, targetName + "/" + entitlementFileName, targetName);
 				//capabilities.AddPushNotifications(isDevelopment);

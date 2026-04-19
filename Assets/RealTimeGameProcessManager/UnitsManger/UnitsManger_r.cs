@@ -184,8 +184,10 @@ namespace FightScene
             {
                 if (RMode_Unit.Value != null)
                 {
-                    targetPos = RMode_Unit.Value.transform.position;
-                    targetRot = Quaternion.Euler(new Vector3(1,0,1));
+                    targetPos = RMode_Unit.Value.geometryCenter != null
+                        ? RMode_Unit.Value.geometryCenter.position
+                        : RMode_Unit.Value.WholeT.position;
+                    targetRot = RMode_Unit.Value.WholeT.rotation;
                 }
             }
             
@@ -205,6 +207,7 @@ namespace FightScene
                     Sensor.AddOrRemoveSharedUnitInfo(changeTo, teamConfig.myTeam, true);
                     RMode_Unit.Value = changeTo;
                     RMode_Unit.Value.WholeT.gameObject.SetActive(true);
+                    PlaceUnitByGeometryCenter(RMode_Unit.Value, targetPos, targetRot);
                     
                     if (emptyState)
                     {
@@ -214,8 +217,6 @@ namespace FightScene
                     {
                         RMode_Unit.Value._MyBehaviorRunner.ChangeToWaitingState();
                     }
-                    RMode_Unit.Value.WholeT.transform.position = targetPos;
-                    RMode_Unit.Value.WholeT.transform.rotation = targetRot;
                     EffectsManager.GenerateEffect(CommonSetting.MemberShiftEffectCode, null, RMode_Unit.Value.WholeT.transform.position, Quaternion.identity, RMode_Unit.Value.geometryCenter).Forget();
                     unitChanged = true;
                 }

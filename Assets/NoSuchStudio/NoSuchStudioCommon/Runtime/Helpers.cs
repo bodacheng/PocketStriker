@@ -22,7 +22,7 @@ namespace NoSuchStudio.Common {
         }
 
         public static T Random<T>(this List<T> list) {
-            if (list.Count == 0) return default;
+            if (list == null || list.Count == 0) return default;
 
             int i = UnityEngine.Random.Range(0, list.Count);
             return list[i];

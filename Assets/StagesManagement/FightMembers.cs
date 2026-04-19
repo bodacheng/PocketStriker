@@ -208,7 +208,7 @@ public class FightMembers
 #if UNITY_EDITOR
             string _path = AssetDatabase.GetAssetPath(Script);
             string[] pathsplit = _path.Split(new string[] { "Assets" }, StringSplitOptions.None);
-            _path = _path.Length > 1 ? pathsplit[1] : pathsplit[0];
+            _path = pathsplit.Length > 1 ? pathsplit[1] : pathsplit[0];
             Debug.Log("4V4模式文件" + _path);
 #endif
             

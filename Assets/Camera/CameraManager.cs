@@ -52,7 +52,7 @@ public class CameraManager : MonoBehaviour
         }
     }
     
-    void Update()
+    void LateUpdate()
     {
         if (CurrentMode != null)
         {
@@ -62,15 +62,22 @@ public class CameraManager : MonoBehaviour
     
     public void Assign_Camera(C_Mode num, Transform me, List<Transform> targets, List<Transform> mes = null)
     {
-        CurrentMode?.Exit(_camera);
-        CModeDic.TryGetValue(num, out CurrentMode);
+        CModeDic.TryGetValue(num, out var nextMode);
+        var modeChanged = CurrentMode != nextMode;
+        if (modeChanged)
+        {
+            CurrentMode?.Exit(_camera);
+        }
+        CurrentMode = nextMode;
         if (CurrentMode != null)
         {
-            //有些相机模式的enter函数内处理需要根据targets来
             CurrentMode.SetMeCenter(me);
             CurrentMode.targets = targets;
             CurrentMode.myTeamTargets = mes;
-            CurrentMode.Enter(_camera);
+            if (modeChanged)
+            {
+                CurrentMode.Enter(_camera);
+            }
         }
     }
 }

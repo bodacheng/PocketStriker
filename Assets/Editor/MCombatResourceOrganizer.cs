@@ -23,12 +23,10 @@ public static class MCombatResourceOrganizer
     private const string SkillIconLabel = "skill_icon";
     private const string SkillAnimGroupName = "SkillAnim";
     private const string SkillAnimLabel = "skill_anim";
+    private const string RecoveredRoot = "Assets/MCombatRecovered";
     private static readonly HashSet<string> SupportedSkillIconExtensions = new HashSet<string>(
         new[] { ".png", ".jpg", ".jpeg", ".psd", ".tif", ".tiff" },
         StringComparer.OrdinalIgnoreCase);
-    private static readonly HashSet<string> SupportedAttackTypes = new HashSet<string>(
-        new[] { "GR", "GM", "GI", "CT", "NONE" },
-        StringComparer.Ordinal);
 
     private enum GroupScope
     {
@@ -71,6 +69,7 @@ public static class MCombatResourceOrganizer
         {
             SyncSharedPublicDependencies(changes);
             SyncSkillResources(changes);
+            AuditRecoveredResources(changes);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -431,8 +430,13 @@ public static class MCombatResourceOrganizer
     private static void AuditLegacyAttackTypes(IReadOnlyCollection<SkillRecord> skillRecords, List<string> changes)
     {
         var legacyRecords = skillRecords
-            .Where(record => !SupportedAttackTypes.Contains(record.AttackType))
-            .OrderBy(record => int.Parse(record.Id))
+            .Select(record => new
+            {
+                Record = record,
+                Normalized = SkillConfigTable.NormalizeAttackType(record.AttackType)
+            })
+            .Where(x => x.Normalized == null || !string.Equals(x.Record.AttackType, x.Normalized, StringComparison.Ordinal))
+            .OrderBy(x => int.Parse(x.Record.Id))
             .ToArray();
         if (legacyRecords.Length == 0)
         {
@@ -440,7 +444,71 @@ public static class MCombatResourceOrganizer
         }
 
         changes.Add(
-            $"Skill attack-type legacy rows: {legacyRecords.Length} ({string.Join(", ", legacyRecords.Select(record => $"{record.Id}:{record.AttackType}"))})");
+            $"Skill attack-type legacy rows: {legacyRecords.Length} ({string.Join(", ", legacyRecords.Select(x => $"{x.Record.Id}:{x.Record.AttackType}->{x.Normalized ?? "INVALID"}"))})");
+    }
+
+    private static void AuditRecoveredResources(List<string> changes)
+    {
+        if (!AssetDatabase.IsValidFolder(RecoveredRoot))
+        {
+            return;
+        }
+
+        var recoveredAssetPaths = CollectFileAssetPaths(RecoveredRoot);
+        if (recoveredAssetPaths.Count == 0)
+        {
+            changes.Add("Recovered MCombat assets: none found.");
+            return;
+        }
+
+        var projectAssetPaths = CollectFileAssetPaths("Assets")
+            .Where(path => !path.StartsWith(RecoveredRoot + "/", StringComparison.Ordinal))
+            .ToArray();
+
+        var assetsByComparableKey = projectAssetPaths
+            .Select(path => new { Path = path, Key = BuildComparableAssetKey(path) })
+            .Where(x => !string.IsNullOrEmpty(x.Key))
+            .GroupBy(x => x.Key, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.Select(x => x.Path).ToArray(), StringComparer.Ordinal);
+
+        var matched = new List<string>();
+        var missing = new List<string>();
+        var ambiguous = new List<string>();
+
+        foreach (var recoveredAssetPath in recoveredAssetPaths)
+        {
+            var key = BuildComparableAssetKey(recoveredAssetPath);
+            if (string.IsNullOrEmpty(key))
+            {
+                continue;
+            }
+
+            if (!assetsByComparableKey.TryGetValue(key, out var matches))
+            {
+                missing.Add(recoveredAssetPath);
+                continue;
+            }
+
+            if (matches.Length > 1)
+            {
+                ambiguous.Add($"{Path.GetFileName(recoveredAssetPath)} -> {string.Join(" | ", matches.Take(3))}");
+                continue;
+            }
+
+            matched.Add($"{Path.GetFileName(recoveredAssetPath)} -> {matches[0]}");
+        }
+
+        changes.Add($"Recovered MCombat assets covered by current project: {matched.Count}/{recoveredAssetPaths.Count}");
+
+        if (ambiguous.Count > 0)
+        {
+            changes.Add($"Recovered MCombat assets with ambiguous matches: {ambiguous.Count} ({string.Join(", ", ambiguous.Take(6))})");
+        }
+
+        if (missing.Count > 0)
+        {
+            changes.Add($"Recovered MCombat assets still unmatched: {missing.Count} ({string.Join(", ", missing.Take(8).Select(Path.GetFileName))})");
+        }
     }
 
     private static void SyncSharedPublicDependencies(List<string> changes)
@@ -740,6 +808,38 @@ public static class MCombatResourceOrganizer
                !string.IsNullOrEmpty(dependencyPath) &&
                dependencyPath.StartsWith("Assets/", StringComparison.Ordinal) &&
                !AssetDatabase.IsValidFolder(dependencyPath);
+    }
+
+    private static List<string> CollectFileAssetPaths(string rootPath)
+    {
+        return AssetDatabase.FindAssets(string.Empty, new[] { rootPath })
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Where(IsScannableAssetPath)
+            .ToList();
+    }
+
+    private static string BuildComparableAssetKey(string assetPath)
+    {
+        var extension = Path.GetExtension(assetPath);
+        if (string.IsNullOrEmpty(extension))
+        {
+            return null;
+        }
+
+        var stem = Path.GetFileNameWithoutExtension(assetPath);
+        var hashSuffixIndex = stem.IndexOf("__", StringComparison.Ordinal);
+        if (hashSuffixIndex >= 0)
+        {
+            stem = stem.Substring(0, hashSuffixIndex);
+        }
+
+        stem = stem.Trim();
+        if (string.IsNullOrEmpty(stem))
+        {
+            return null;
+        }
+
+        return $"{stem.ToLowerInvariant()}|{extension.ToLowerInvariant()}";
     }
 
     private static string BuildPublicAddress(string assetPath)

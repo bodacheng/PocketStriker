@@ -86,6 +86,16 @@ public class VisibilityControl : MonoBehaviour
 
     public void Clear()
     {
+        foreach (var renderer in _hiddenObjects)
+        {
+            if (renderer != null)
+            {
+                renderer.enabled = true;
+            }
+        }
         _hiddenObjects.Clear();
+        thisFrameDetected.Clear();
+        unitTargets.Clear();
+        wallTargets.Clear();
     }
 }

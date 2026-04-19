@@ -157,9 +157,7 @@ public partial class NineForShow : MonoBehaviour
         _c3S = results[8];
         
         Parent();
-        
-        return;
-        
+
         if (_a1S != null && A1Frame != null)
         {
             A1Frame.color = RefreshFrameColor(_a1S._SkillConfig.SP_LEVEL);

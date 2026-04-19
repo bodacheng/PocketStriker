@@ -32,14 +32,43 @@ public partial class SkillConfigTable
     	return isLoaded;
     }
 
-    static readonly List<string> AttackTypes = new List<string>
+    static readonly HashSet<string> CanonicalAttackTypes = new HashSet<string>(StringComparer.Ordinal)
     {
-        "GR","GM","GI","CT"
+        "GR", "GM", "GI", "CT", "NONE"
     };
-    
+
+    static readonly Dictionary<string, string> LegacyAttackTypeAliases = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        // PocketStriker still carries a few MCombat-era codes in mst_skill.csv.
+        // Normalize them here so those skills do not silently degrade into NONE at runtime.
+        { "GMB", "GM" },
+        { "RB", "CT" }
+    };
+
+    public static string NormalizeAttackType(string attackType)
+    {
+        if (string.IsNullOrWhiteSpace(attackType))
+        {
+            return null;
+        }
+
+        var trimmed = attackType.Trim();
+        if (LegacyAttackTypeAliases.TryGetValue(trimmed, out var normalized))
+        {
+            return normalized;
+        }
+
+        return CanonicalAttackTypes.Contains(trimmed) ? trimmed : null;
+    }
+
+    public static string NormalizeAttackTypeOrOriginal(string attackType)
+    {
+        return NormalizeAttackType(attackType) ?? attackType?.Trim();
+    }
+
     static bool LegalStateType(string attackType)
     {
-        return AttackTypes.Contains(attackType);
+        return NormalizeAttackType(attackType) != null;
     }
     
     public static async UniTask LoadAllSkillConfigs()
@@ -129,9 +158,11 @@ public partial class SkillConfigTable
                 grid[i][3] = rowList[i - 1].SP_LEVEL;
                 grid[i][4] = rowList[i - 1].ATTACK_WEIGHT;
                 grid[i][5] = rowList[i - 1].HP_WEIGHT;
-                grid[i][6] = rowList[i - 1].ATTACK_TYPE;
+                var normalizedAttackType = NormalizeAttackTypeOrOriginal(rowList[i - 1].ATTACK_TYPE);
+                rowList[i - 1].ATTACK_TYPE = normalizedAttackType;
+                grid[i][6] = normalizedAttackType;
                 grid[i][7] = rowList[i - 1].EVENT_CODE;
-                if (!LegalStateType(rowList[i - 1].ATTACK_TYPE))
+                if (!LegalStateType(normalizedAttackType))
                 {
                     Debug.Log("崩溃级错误，技能Type有错：RECORDID"+ rowList[i - 1].RECORD_ID);
                 }
@@ -157,6 +188,7 @@ public partial class SkillConfigTable
         {
             for (int i = 1; i < grid.Length; i++)
             {
+                var normalizedAttackType = NormalizeAttackTypeOrOriginal(grid[i][6]);
                 Row row = new Row
                 {
                     RECORD_ID = grid[i][0],
@@ -165,10 +197,10 @@ public partial class SkillConfigTable
                     SP_LEVEL = grid[i][3],
                     ATTACK_WEIGHT = grid[i][4],
                     HP_WEIGHT = grid[i][5],
-                    ATTACK_TYPE = grid[i][6],
+                    ATTACK_TYPE = normalizedAttackType,
                     EVENT_CODE = grid[i][7]
                 };
-                if (!LegalStateType(grid[i][6]))
+                if (!LegalStateType(normalizedAttackType))
                 {
                     Debug.Log("崩溃级错误，技能Type有错：RECORDID"+ grid[i][0]);
                 }

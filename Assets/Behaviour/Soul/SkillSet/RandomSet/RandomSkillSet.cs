@@ -22,6 +22,11 @@ public partial class SkillSet
                 if (stoneSkillIDs.Contains(exceptSkIDs[i]))
                     stoneSkillIDs.Remove(exceptSkIDs[i]);
             }
+
+        if (stoneSkillIDs.Count == 0)
+        {
+            return null;
+        }
         
         int ranDom = Random.Range(0, stoneSkillIDs.Count);
         return stoneSkillIDs[ranDom];

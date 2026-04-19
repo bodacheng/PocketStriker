@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using UniRx;
 using UnityEngine;
-using Random = System.Random;
 
 public class PreparingProcess : FSceneProcess
 {
@@ -222,13 +221,7 @@ public class PreparingProcess : FSceneProcess
     
     Func<bool> CreateRandomBoolFunc(int probabilityPercentage)
     {
-        // 使用Random类生成随机数
-        Random random = new Random();
-
-        // 生成一个介于0到99之间的随机数
-        int randomNumber = random.Next(100);
-
-        // 如果随机数小于等于给定的概率百分比，返回true；否则返回false
-        return () => randomNumber <= probabilityPercentage;
+        probabilityPercentage = Mathf.Clamp(probabilityPercentage, 0, 100);
+        return () => UnityEngine.Random.Range(0, 100) < probabilityPercentage;
     }
 }

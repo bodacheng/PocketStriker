@@ -11,18 +11,23 @@ class MCamera : CameraMode
     Vector2 enemyScreenPos;
     Vector3 xzOff;
     Vector3 lookPoint;
-    Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 30f;
-    float autoRotateSpeed = 100;
     float _changeSpeed;
     float zoomOutSpeedExtra = 8;
     float zoomInSpeedExtra = 8;
     float _transitionSpeedPara = 10f;
-    readonly float _lookPointHeight = 2f;
+    readonly float _lookPointHeight = 2.2f;
     readonly float _minXZ;
-    float fieldOfView;
-    private float screenDifferForRotate = 150;
+    readonly float fieldOfView;
+    const float AutoRotateLerp = 4f;
+    const float LookPointEnemyBias = 0.55f;
+    const float FocusSmoothTime = 0.08f;
+    const float EnemySmoothTime = 0.1f;
+    Vector3 _smoothedMePos;
+    Vector3 _smoothedEnemyCenter;
+    Vector3 _mePosVelocity;
+    Vector3 _enemyCenterVelocity;
+    bool _followStateInitialized;
     
     float TransitionSpeedPara
     {
@@ -51,20 +56,30 @@ class MCamera : CameraMode
     public override void Enter(Camera _camera)
     {
         CanSetH = true;
+        _followStateInitialized = false;
+        _mePosVelocity = Vector3.zero;
+        _enemyCenterVelocity = Vector3.zero;
         _camera.fieldOfView = this.fieldOfView;
         CameraManager._subCamera.fieldOfView = this.fieldOfView;
         LocalUpdate(_camera);
         xzOff = _camera.transform.position - lookPoint;
         xzOff.y = 0;
+        if (xzOff.sqrMagnitude <= 0.001f)
+        {
+            xzOff = GetDesiredOrbitDirection(mePos, enemiesCenter, -Vector3.forward);
+        }
         TransitionSpeedPara = 5f;
         DOTween.To(()=> TransitionSpeedPara, (x) => TransitionSpeedPara = x, 0.001f, 1f);
     }
 
+    public override void Exit(Camera _camera)
+    {
+        _followStateInitialized = false;
+        _mePosVelocity = Vector3.zero;
+        _enemyCenterVelocity = Vector3.zero;
+    }
+
     float h;
-    float ePosX;
-    float ePosY;
-    float mPosX;
-    float mPosY;
 
     private bool _canSetH;
     public bool CanSetH
@@ -79,45 +94,45 @@ class MCamera : CameraMode
     }
 
     private Vector3 mePos;
-    private float _autoRotateTimer;
-    private bool _currentRotateClockWiseDirection;
     
     public override void LocalUpdate(Camera camera)
     {
+        Vector3 rawMePos;
         if (meCenter != null)
         {
-            mePos = meCenter.position;
+            rawMePos = meCenter.position;
         }
         else
         {
-            if (myTeamTargets.Count > 0)
+            if (!TryGetAveragePosition(myTeamTargets, out rawMePos))
             {
-                mePos = Vector3.zero;
-                foreach (var o in myTeamTargets)
-                {
-                    if (o != null)
-                    {
-                        mePos += o.transform.position;
-                    }
-                }
-                mePos /= myTeamTargets.Count;
+                return;
             }
         }
         
         _changeSpeed = Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        bool hasTargets = targets != null && targets.Count > 0;
-        if (hasTargets)
+        bool hasTargets = TryGetAveragePosition(targets, out var rawEnemiesCenter);
+        if (!hasTargets)
         {
-            enemiesCenter = Vector3.zero;
-            foreach (var o in targets)
-            {
-                if (o != null)
-                {
-                    enemiesCenter += o.transform.position;
-                }
-            }
-            enemiesCenter /= targets.Count;
+            var fallbackForward = meCenter != null ? meCenter.forward : Vector3.forward;
+            fallbackForward.y = 0;
+            rawEnemiesCenter = rawMePos + (fallbackForward.sqrMagnitude > 0.001f ? fallbackForward.normalized : Vector3.forward) * 10f;
         }
+
+        if (!_followStateInitialized)
+        {
+            _smoothedMePos = rawMePos;
+            _smoothedEnemyCenter = rawEnemiesCenter;
+            _followStateInitialized = true;
+        }
+        else
+        {
+            _smoothedMePos = Vector3.SmoothDamp(_smoothedMePos, rawMePos, ref _mePosVelocity, FocusSmoothTime);
+            _smoothedEnemyCenter = Vector3.SmoothDamp(_smoothedEnemyCenter, rawEnemiesCenter, ref _enemyCenterVelocity, EnemySmoothTime);
+        }
+
+        mePos = _smoothedMePos;
+        enemiesCenter = _smoothedEnemyCenter;
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
         meScreenPos = camera.WorldToScreenPoint(mePos);
@@ -129,55 +144,38 @@ class MCamera : CameraMode
         
         if (h != 0)
         {
-            xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
+            xzOff = Quaternion.AngleAxis(h * 2f, Vector3.up) * xzOff;
             xzOff.y = 0;
         }
-        else
+        else if (hasTargets)
         {
-            // if (Vector2.Distance(meScreenPos, enemyScreenPos) > screenDifferForRotate)
-            // {
-            //     float angleToHorizontal = 0;
-            //     float CheckNeedForAutoRotate()
-            //     {
-            //         if (meScreenPos.x < enemyScreenPos.x)
-            //         {
-            //             return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, Vector3.right));
-            //         }
-            //         else
-            //         {
-            //             return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, -Vector3.right));
-            //         }
-            //     }
-            //     
-            //     angleToHorizontal = CheckNeedForAutoRotate();
-            //     if (angleToHorizontal > autoChangeAngleLimit)
-            //     {
-            //         bool Clock()
-            //         {
-            //             if (meScreenPos.x < enemyScreenPos.x)
-            //             {
-            //                 return meScreenPos.y < enemyScreenPos.y;
-            //             }
-            //             else
-            //             {
-            //                 return meScreenPos.y > enemyScreenPos.y;
-            //             }
-            //         }
-            //         _currentRotateClockWiseDirection = Clock();
-            //         // 如果夹角大于限制，则缓慢调整相机角度
-            //         xzOff = Quaternion.Euler(0f, autoRotateSpeed *
-            //                                      ((angleToHorizontal - autoChangeAngleLimit)/(90 - autoChangeAngleLimit)) * Time.deltaTime  // 分母是垂直情况下两个对象屏幕连线超出的"垂直界限"，分子是实际超过的界限。这个值是确保在垂直时候相机扭转最快，随后扭转变缓和
-            //                                      * (_currentRotateClockWiseDirection ? -1f : 1f), 0f) * xzOff;
-            //     }
-            // }
+            var desiredOrbit = GetDesiredOrbitDirection(mePos, enemiesCenter, xzOff);
+            if (xzOff.sqrMagnitude <= 0.001f)
+            {
+                xzOff = desiredOrbit;
+            }
+            else
+            {
+                xzOff = Vector3.Slerp(xzOff.normalized, desiredOrbit, AutoRotateLerp * Time.deltaTime);
+            }
+            xzOff.y = 0;
         }
 
         void AdjustXZDis(List<Transform> targets)
         {
+            if (targets == null || targets.Count == 0)
+            {
+                return;
+            }
+
             bool shouldZoomOut = false;
             bool shouldZoomIn = true;
             foreach (var target in targets)
             {
+                if (target == null)
+                {
+                    continue;
+                }
                 var screenPos = camera.WorldToScreenPoint(target.position);
                 var ePosX = (float)((decimal)screenPos.x / Screen.width);
                 var ePosY = (float)((decimal)screenPos.y / Screen.height);
@@ -199,28 +197,26 @@ class MCamera : CameraMode
         }
         
         var wholeTargets = new List<Transform>() { };
-        wholeTargets.AddRange(myTeamTargets);
-        wholeTargets.AddRange(targets);
+        if (meCenter != null)
+        {
+            wholeTargets.Add(meCenter);
+        }
+        if (myTeamTargets != null)
+        {
+            wholeTargets.AddRange(myTeamTargets);
+        }
+        if (targets != null)
+        {
+            wholeTargets.AddRange(targets);
+        }
         AdjustXZDis(wholeTargets);
         
         YDis = XZDistance * disToH;
-        
-        // 判断我与敌人哪个更接近相机位置
-        if (enemyScreenPos.y >= meScreenPos.y)
-        {
-            frontWPos = mePos;
-            backWPos = enemiesCenter;
-        }
-        else
-        {
-            frontWPos = enemiesCenter;
-            backWPos = mePos;
-        }
-        
-        lookPoint = (backWPos - frontWPos) * 0.5f + frontWPos;
+
+        lookPoint = Vector3.Lerp(mePos, enemiesCenter, hasTargets ? LookPointEnemyBias : 0.5f);
         cameraTargetPos = lookPoint + xzOff.normalized * XZDistance;
         cameraTargetPos.y = YDis;
-        lookPoint.y = _lookPointHeight;
+        lookPoint.y = Mathf.Lerp(mePos.y, enemiesCenter.y, hasTargets ? 0.5f : 0f) + _lookPointHeight;
         
         if (hasTargets || h != 0)
         {

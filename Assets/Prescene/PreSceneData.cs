@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using dataAccess;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Random = System.Random;
 
 namespace mainMenu
 {
@@ -163,9 +162,12 @@ namespace mainMenu
         
         public string GetRandomFocusInstanceID()
         {
-            Random random = new Random();
-            string focusInstanceID = null;
-            return dataAccess.Units.Dic.Keys.ElementAt(random.Next(dataAccess.Units.Dic.Count));;
+            if (dataAccess.Units.Dic == null || dataAccess.Units.Dic.Count == 0)
+            {
+                return null;
+            }
+
+            return dataAccess.Units.Dic.Keys.ElementAt(UnityEngine.Random.Range(0, dataAccess.Units.Dic.Count));
         }
     }
 }

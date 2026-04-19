@@ -60,6 +60,55 @@ public abstract class CameraMode
         _dir = Quaternion.AngleAxis(90, Vector3.up) * _dir;
         return _dir;
     }
+
+    protected bool TryGetAveragePosition(IList<Transform> targetList, out Vector3 averagePosition)
+    {
+        averagePosition = Vector3.zero;
+        if (targetList == null)
+        {
+            return false;
+        }
+
+        var validCount = 0;
+        for (var i = 0; i < targetList.Count; i++)
+        {
+            var target = targetList[i];
+            if (target == null)
+            {
+                continue;
+            }
+
+            averagePosition += target.position;
+            validCount++;
+        }
+
+        if (validCount == 0)
+        {
+            return false;
+        }
+
+        averagePosition /= validCount;
+        return true;
+    }
+
+    protected Vector3 GetDesiredOrbitDirection(Vector3 mePosition, Vector3 enemyPosition, Vector3 currentOrbit)
+    {
+        var combatLine = enemyPosition - mePosition;
+        combatLine.y = 0;
+        if (combatLine.sqrMagnitude <= 0.001f)
+        {
+            currentOrbit.y = 0;
+            return currentOrbit.sqrMagnitude > 0.001f ? currentOrbit.normalized : -Vector3.forward;
+        }
+
+        var desiredOrbit = Quaternion.AngleAxis(90f, Vector3.up) * combatLine.normalized;
+        currentOrbit.y = 0;
+        if (currentOrbit.sqrMagnitude > 0.001f && Vector3.Dot(desiredOrbit, currentOrbit.normalized) < 0f)
+        {
+            desiredOrbit = -desiredOrbit;
+        }
+        return desiredOrbit.normalized;
+    }
 }
 
 public enum C_Mode

@@ -88,6 +88,7 @@ public partial class SkillConfigTable
     {
         try
         {
+            var normalizedAttackType = NormalizeAttackType(row.ATTACK_TYPE);
             var skillConfig = new SkillConfig
             {
                 TYPE = row.TYPE,
@@ -97,7 +98,7 @@ public partial class SkillConfigTable
                 HP_WEIGHT = float.Parse(row.HP_WEIGHT)
             };
             
-            switch (row.ATTACK_TYPE)
+            switch (normalizedAttackType)
             {
                 case "GR":
                     skillConfig.STATE_TYPE = BehaviorType.GR;
@@ -116,9 +117,13 @@ public partial class SkillConfigTable
                     break;
             }
             
-            if (!LegalStateType(row.ATTACK_TYPE))
+            if (!LegalStateType(normalizedAttackType))
             {
                 Debug.Log("崩溃级错误，技能Type有错：RECORDID"+ skillConfig.RECORD_ID);
+            }
+            else
+            {
+                row.ATTACK_TYPE = normalizedAttackType;
             }
             
             skillConfig.AIAttrs.AI_MIN_DIS = float.Parse(aiRow.TRIGGER_DIS_MIN);

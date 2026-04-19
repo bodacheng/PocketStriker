@@ -154,6 +154,35 @@ namespace FightScene
             }
             return null;
         }
+
+        void PlaceUnitAtStandPoint(Data_Center dataCenter, Transform standPoint)
+        {
+            if (standPoint == null)
+            {
+                return;
+            }
+            PlaceUnitByGeometryCenter(dataCenter, standPoint.position, standPoint.rotation);
+        }
+
+        void PlaceUnitByGeometryCenter(Data_Center dataCenter, Vector3 targetGeometryCenterPosition, Quaternion targetRotation)
+        {
+            if (dataCenter == null || dataCenter.WholeT == null)
+            {
+                return;
+            }
+
+            if (dataCenter.geometryCenter == null)
+            {
+                dataCenter.WholeT.SetPositionAndRotation(targetGeometryCenterPosition, targetRotation);
+                return;
+            }
+
+            // geometryCenter is the battle-space anchor used by camera, sensor, and hit logic.
+            var rootScale = dataCenter.WholeT.lossyScale;
+            var localCenterPoint = dataCenter.WholeT.InverseTransformPoint(dataCenter.geometryCenter.position);
+            var centerOffset = Vector3.Scale(localCenterPoint, rootScale);
+            dataCenter.WholeT.SetPositionAndRotation(targetGeometryCenterPosition - targetRotation * centerOffset, targetRotation);
+        }
         
         // 全队无敌
         public void TurnAllUnitsInvincible(bool _Invincible)

@@ -119,6 +119,11 @@ public class FightInfo : ScriptableObject
     private readonly int _evolutionEnemyCount = 4;
     void AutoFillEvolution(FightMembers target, string type)
     {
+        if (target == null)
+        {
+            return;
+        }
+
         var enemyRSet = EnemyForEvolutionTeamUnitSets.Random();
         var recordIds = Units.GetMonsterIDsAndNamesDic(type).Keys.ToList();
         for (var index = 0; index < _evolutionEnemyCount; index++)
@@ -130,7 +135,7 @@ public class FightInfo : ScriptableObject
             var unitInfo = new UnitInfo
             {
                 id = index.ToString(),
-                r_id = enemyRSet.Count > index ? enemyRSet[index].ToString() : recordIds.Random()
+                r_id = enemyRSet != null && enemyRSet.Count > index ? enemyRSet[index].ToString() : recordIds.Random()
             };
             target.EnemySets.Set(0, index, unitInfo);
             SaveDicToData();

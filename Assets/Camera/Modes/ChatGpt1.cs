@@ -10,17 +10,22 @@ class ChatGptFix : CameraMode
     Vector2 enemyScreenPos;
     Vector3 xzOff;
     Vector3 lookPoint;
-    Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoChangeAngleLimit = 30f;
     float autoRotateSpeed = 10;
     float _changeSpeed;
     float _transitionSpeedPara = 10f;
-    readonly float _lookPointHeight = 2f;
+    readonly float _lookPointHeight = 2.2f;
     readonly float _minXZ;
     readonly float _minY;
-    float fieldOfView;
-    private float screenDifferForRotate = 150;
+    readonly float fieldOfView;
+    const float LookPointEnemyBias = 0.55f;
+    const float FocusSmoothTime = 0.08f;
+    const float EnemySmoothTime = 0.1f;
+    Vector3 _smoothedMePos;
+    Vector3 _smoothedEnemyCenter;
+    Vector3 _mePosVelocity;
+    Vector3 _enemyCenterVelocity;
+    bool _followStateInitialized;
     
     public bool AutoRotateCamera
     {
@@ -62,13 +67,27 @@ class ChatGptFix : CameraMode
     public override void Enter(Camera _camera)
     {
         CanSetH = true;
+        _followStateInitialized = false;
+        _mePosVelocity = Vector3.zero;
+        _enemyCenterVelocity = Vector3.zero;
         _camera.fieldOfView = this.fieldOfView;
         CameraManager._subCamera.fieldOfView = this.fieldOfView;
         LocalUpdate(_camera);
         xzOff = _camera.transform.position - lookPoint;
         xzOff.y = 0;
+        if (xzOff.sqrMagnitude <= 0.001f)
+        {
+            xzOff = GetDesiredOrbitDirection(mePos, enemiesCenter, -Vector3.forward);
+        }
         TransitionSpeedPara = 5f;
         DOTween.To(()=> TransitionSpeedPara, (x) => TransitionSpeedPara = x, 0.001f, 1f);
+    }
+
+    public override void Exit(Camera _camera)
+    {
+        _followStateInitialized = false;
+        _mePosVelocity = Vector3.zero;
+        _enemyCenterVelocity = Vector3.zero;
     }
 
     float h;
@@ -90,34 +109,36 @@ class ChatGptFix : CameraMode
     }
 
     private Vector3 mePos;
-    private float _autoRotateTimer;
-    private bool _currentRotateClockWiseDirection;
     
     public override void LocalUpdate(Camera camera)
     {
-        if (meCenter != null)
+        if (meCenter == null)
         {
-            mePos = meCenter.position;
+            return;
         }
+        var rawMePos = meCenter.position;
         
         _changeSpeed = 2 * Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        bool hasTargets = targets != null && targets.Count > 0;
-        if (hasTargets)
+        bool hasTargets = TryGetAveragePosition(targets, out var rawEnemiesCenter);
+        if (!hasTargets)
         {
-            enemiesCenter = Vector3.zero;
-            foreach (var o in targets)
-            {
-                if (o != null)
-                {
-                    enemiesCenter += o.transform.position;
-                }
-            }
-            enemiesCenter /= targets.Count;
+            rawEnemiesCenter = rawMePos + meCenter.forward * 10f;
+        }
+
+        if (!_followStateInitialized)
+        {
+            _smoothedMePos = rawMePos;
+            _smoothedEnemyCenter = rawEnemiesCenter;
+            _followStateInitialized = true;
         }
         else
         {
-            enemiesCenter = mePos + meCenter.forward * 10f;
+            _smoothedMePos = Vector3.SmoothDamp(_smoothedMePos, rawMePos, ref _mePosVelocity, FocusSmoothTime);
+            _smoothedEnemyCenter = Vector3.SmoothDamp(_smoothedEnemyCenter, rawEnemiesCenter, ref _enemyCenterVelocity, EnemySmoothTime);
         }
+
+        mePos = _smoothedMePos;
+        enemiesCenter = _smoothedEnemyCenter;
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
         meScreenPos = camera.WorldToScreenPoint(mePos);
@@ -129,48 +150,21 @@ class ChatGptFix : CameraMode
         
         if (h != 0)
         {
-            xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
+            xzOff = Quaternion.AngleAxis(h * 2f, Vector3.up) * xzOff;
             xzOff.y = 0;
         }
-        else
+        else if (AutoRotateCamera && hasTargets)
         {
-            if (AutoRotateCamera && hasTargets && meCenter != null && Vector2.Distance(meScreenPos, enemyScreenPos) > screenDifferForRotate)
+            var desiredOrbit = GetDesiredOrbitDirection(mePos, enemiesCenter, xzOff);
+            if (xzOff.sqrMagnitude <= 0.001f)
             {
-                //float angleToHorizontal = 0;
-                float CheckNeedForAutoRotate()
-                {
-                    if (meScreenPos.x < enemyScreenPos.x)
-                    {
-                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, Vector2.right));
-                    }
-                    else
-                    {
-                        return Mathf.Abs(Vector2.Angle(enemyScreenPos - meScreenPos, -Vector2.right));
-                    }
-                }
-                
-                //angleToHorizontal = CheckNeedForAutoRotate();
-                if (//angleToHorizontal > autoChangeAngleLimit &&
-                    Mathf.Abs(enemyScreenPos.y - meScreenPos.y) > ((float)Screen.height / 10) &&
-                    Mathf.Abs(enemyScreenPos.x - meScreenPos.x) < ((float)Screen.width / 3) &&
-                    Mathf.Abs(enemyScreenPos.x - meScreenPos.x) >  ((float)Screen.width / 10))
-                {
-                    bool Clock()
-                    {
-                        if (meScreenPos.y < enemyScreenPos.y)
-                        {
-                            return meScreenPos.x > enemyScreenPos.x;
-                        }
-                        else
-                        {
-                            return meScreenPos.x < enemyScreenPos.x;
-                        }
-                    }
-                    _currentRotateClockWiseDirection = Clock();
-                    // 如果夹角大于限制，则缓慢调整相机角度
-                    xzOff = Quaternion.Euler(0f, autoRotateSpeed * Time.deltaTime * (_currentRotateClockWiseDirection ? 1f : -1f), 0f) * xzOff;
-                }
+                xzOff = desiredOrbit;
             }
+            else
+            {
+                xzOff = Vector3.Slerp(xzOff.normalized, desiredOrbit, autoRotateSpeed * 0.15f * Time.deltaTime);
+            }
+            xzOff.y = 0;
         }
         
         ePosX = enemyScreenPos.x / Screen.width;
@@ -195,24 +189,12 @@ class ChatGptFix : CameraMode
             YDistance += _changeSpeed;
         }
         
-        // 判断我与敌人哪个更接近相机位置
-        if (enemyScreenPos.y >= meScreenPos.y)
-        {
-            frontWPos = mePos;
-            backWPos = enemiesCenter;
-        }
-        else
-        {
-            frontWPos = enemiesCenter;
-            backWPos = mePos;
-        }
-        
-        lookPoint = (backWPos + frontWPos) * 0.5f;
+        lookPoint = Vector3.Lerp(mePos, enemiesCenter, hasTargets ? LookPointEnemyBias : 0.5f);
         cameraTargetPos = lookPoint + xzOff.normalized * XZDistance;
         cameraTargetPos.y = YDistance;
-        lookPoint.y = _lookPointHeight;
+        lookPoint.y = Mathf.Lerp(mePos.y, enemiesCenter.y, hasTargets ? 0.5f : 0f) + _lookPointHeight;
         
-        if ((hasTargets && meCenter != null) || h != 0)
+        if (hasTargets || h != 0)
         {
             camera.transform.position = Vector3.Lerp(camera.transform.position, cameraTargetPos, _changeSpeed);
             rotateToDirection = lookPoint - cameraTargetPos;

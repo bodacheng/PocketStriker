@@ -29,11 +29,11 @@ namespace dataAccess
                     form.r = Origin.GetInstanceIdOnPos(2);
                     break;
                 case "arena":
-                    return; // arena模式的队伍编辑不再和arcade相同
-                    form.f = Arena3V3.GetInstanceIdOnPos(0);
-                    form.l = Arena3V3.GetInstanceIdOnPos(1);
-                    form.r = Arena3V3.GetInstanceIdOnPos(2);
-                    break;
+                    success?.Invoke(false); // arena模式的队伍编辑不再走这个接口
+                    return;
+                default:
+                    success?.Invoke(false);
+                    return;
             }
             
             PlayFabReadClient.UpdateUserData(

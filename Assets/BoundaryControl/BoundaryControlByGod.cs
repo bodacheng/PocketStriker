@@ -23,15 +23,20 @@ public class BoundaryControlByGod : MonoBehaviour {
     
     void Start()
     {
-        int choose = Random.Range(0, BattleRingPSs.Count);
-        for (int i = 0; i < BattleRingPSs.Count; i++)
+        if (BattleRingPSs != null && BattleRingPSs.Count > 0)
         {
-            if (i == choose)
+            int choose = Random.Range(0, BattleRingPSs.Count);
+            for (int i = 0; i < BattleRingPSs.Count; i++)
             {
-                BattleRingPS = BattleRingPSs[i];
-                BattleRingPS.gameObject.SetActive(true);
-            }else{
-                BattleRingPSs[i].gameObject.SetActive(false);
+                if (i == choose)
+                {
+                    BattleRingPS = BattleRingPSs[i];
+                    BattleRingPS.gameObject.SetActive(true);
+                }
+                else
+                {
+                    BattleRingPSs[i].gameObject.SetActive(false);
+                }
             }
         }
 
@@ -59,7 +64,7 @@ public class BoundaryControlByGod : MonoBehaviour {
         SensorUnity.Setup(BattleRingRadius, Vector3.zero, detectColliderCount);
     }
     
-    private readonly int _currentBackGroundNum = -1;
+    private int _currentBackGroundNum = -1;
     public async UniTask ChangeBackGround(int number)
     {
         if (_currentBackGroundNum != number)
@@ -71,6 +76,7 @@ public class BoundaryControlByGod : MonoBehaviour {
             if (battleGround != null)
             {
                 battleGround.GetComponent<BattleGround>().Set();
+                _currentBackGroundNum = number;
             }
         }
     }
