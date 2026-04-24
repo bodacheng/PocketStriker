@@ -18,6 +18,7 @@ public static class MCombatResourceOrganizer
     private const string SkillConfigCsvPath = "Assets/ExternalAssets/Config/mst_skill.csv";
     private const string SkillNameCsvPath = "Assets/ExternalAssets/Config/skill_name.csv";
     private const string SkillIconRoot = "Assets/ExternalAssets/SkillIcon";
+    private const string UsedSkillIconRoot = "Assets/OrganizedResources/InUse/ExternalAssets/SkillIcon";
     private const string SkillAnimationRoot = "Assets/ExternalAssets/Animations";
     private const string SkillIconGroupName = "SkillIcon";
     private const string SkillIconLabel = "skill_icon";
@@ -246,7 +247,11 @@ public static class MCombatResourceOrganizer
     private static Dictionary<string, string> CollectSkillIconAssetPaths()
     {
         var result = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var guid in AssetDatabase.FindAssets(string.Empty, new[] { SkillIconRoot }))
+        var roots = new[] { SkillIconRoot, UsedSkillIconRoot }
+            .Where(AssetDatabase.IsValidFolder)
+            .ToArray();
+
+        foreach (var guid in AssetDatabase.FindAssets(string.Empty, roots))
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             if (AssetDatabase.IsValidFolder(assetPath))
