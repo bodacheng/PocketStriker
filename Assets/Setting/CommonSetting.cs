@@ -7,19 +7,22 @@ public class CommonSetting : ScriptableObject
 {
     [SerializeField] bool devMode;
     [SerializeField] int maxStoneCount = 30;
-    [SerializeField] int gangbangModeMaxUnitPerTeam = 30;
+    [SerializeField] int gangbangModeMaxUnitPerTeam = 24;
+    [SerializeField] int gangbangModeMaxUnitPerTeam1 = 24;
+    [SerializeField] int gangbangModeMaxUnitPerTeam2 = 72;
+    [SerializeField] int gangbangModeMaxUnitPerTeam3 = 100;
 
-    [Tooltip("技能组初始权重上限")] 
+    [Tooltip("技能组初始权重上限")]
     [SerializeField] int skillSetCostLimit = 15;
-    [Tooltip("sp0 cost")] 
+    [Tooltip("sp0 cost")]
     [SerializeField] int sp0Cost = 1;
-    [Tooltip("sp1 cost")] 
+    [Tooltip("sp1 cost")]
     [SerializeField] int sp1Cost = 2;
-    [Tooltip("sp2 cost")] 
+    [Tooltip("sp2 cost")]
     [SerializeField] int sp2Cost = 3;
-    [Tooltip("sp3 cost")] 
+    [Tooltip("sp3 cost")]
     [SerializeField] int sp3Cost = 4;
-    
+
     [Tooltip("unit定义文件")]
     [SerializeField] string unitConfigFile = "mst_unit";
     [Tooltip("skill定义文件")]
@@ -32,71 +35,71 @@ public class CommonSetting : ScriptableObject
     [SerializeField] string passiveSKillFile = "unit_passive";
     [Tooltip("关卡模式记录文件")]
     [SerializeField] string stageModeFile = "stage_mode";
-    
+
     [Tooltip("SkillStaticAnalysis后不加.csv")]
     [SerializeField] string skillStaticAnalysis = "SkillStaticAnalysis";
     [Tooltip("SkillDynamicAnalysis后加.csv")]
     [SerializeField] string skillDynamicAnalysis = "SkillDynamicAnalysis.csv";
-    
+
     [Tooltip("语言code文件")]
     [SerializeField] string languageCodeFile = "LanguageCode";
-    
+
     [Tooltip("短故事文件")]
     [SerializeField] string shortStoryFile = "short_story";
-        
+
     [Tooltip("GB短故事文件")]
     [SerializeField] string gbShortStoryFile = "gb_short_story";
 
-    [Tooltip("admob interstitial ios Key")] 
+    [Tooltip("admob interstitial ios Key")]
     [SerializeField] string admob_interstitial_iosKey;
-    [Tooltip("admob rewarded ios Key")] 
+    [Tooltip("admob rewarded ios Key")]
     [SerializeField] string admob_rewarded_iosKey;
-    [Tooltip("admob interstitial android Key")] 
+    [Tooltip("admob interstitial android Key")]
     [SerializeField] string admob_interstitial_androidKey;
-    [Tooltip("admob rewarded android Key")] 
+    [Tooltip("admob rewarded android Key")]
     [SerializeField] string admob_rewarded_androidKey;
-    
-    [Tooltip("admob banner ios Key")] 
+
+    [Tooltip("admob banner ios Key")]
     [SerializeField] string admob_banner_iosKey;
-    [Tooltip("admob banner android Key")] 
+    [Tooltip("admob banner android Key")]
     [SerializeField] string admob_banner_androidKey;
-    
+
     [Tooltip("audio source key")]
     [SerializeField] string startThemeAddressKey = "music/start";
     [SerializeField] string lobbyThemeAddressKey = "music/lobby";
     [SerializeField] string fightThemeAddressKey1 = "music/fight1";
     [SerializeField] string fightThemeAddressKey2 = "music/fight2";
 
-    [Tooltip("essential effects")] 
+    [Tooltip("essential effects")]
     [SerializeField] private string hitGroundEffectCode = "hitGround";
     [SerializeField] private string wallCrackEffectCode = "wallCrack";
     [SerializeField] private string breakFreeEffectCode = "breakFree";
     [SerializeField] private string memberShiftEffectCode = "memberShift";
 
-    [Tooltip("sound effects")] 
+    [Tooltip("sound effects")]
     [SerializeField] AudioClip btnTapSound;
     [SerializeField] AudioClip btnConfirmSound;
     [SerializeField] AudioClip exTabSound;
 
-    [Tooltip("AI检测帧数间隔")] 
+    [Tooltip("AI检测帧数间隔")]
     [SerializeField] private int aiDetectInterval = 1;
 
-    [Tooltip("角色动画平滑区间")] 
+    [Tooltip("角色动画平滑区间")]
     [SerializeField] private float characterAnimDuration = 0.25f;
-    
-    [Tooltip("角色阴影材质")] 
+
+    [Tooltip("角色阴影材质")]
     [SerializeField] Material shadowMaterial;
 
-    [Tooltip("抵抗颜色")] 
+    [Tooltip("抵抗颜色")]
     [SerializeField] private Color resistColor;
-    
-    [Tooltip("加速颜色")] 
+
+    [Tooltip("加速颜色")]
     [SerializeField] private Color speedColor;
-    
-    [Tooltip("梦幻颜色")] 
+
+    [Tooltip("梦幻颜色")]
     [SerializeField] private Color dreamColor;
-    
-    [Tooltip("downLoad labels")] 
+
+    [Tooltip("downLoad labels")]
     [SerializeField] List<string> downLoadLabels;
 
     [Tooltip("unit icon colors")]
@@ -112,18 +115,21 @@ public class CommonSetting : ScriptableObject
     [SerializeField] private Color blueFrameColor;
     [SerializeField] private Color greenBgColor;
     [SerializeField] private Color greenFrameColor;
-    
+
     public List<string> DownLoadLabels => downLoadLabels;
-    
+
     public static bool DevMode;
     public static int GangbangModeMaxUnitPerTeam;
+    public static int GangbangModeMaxUnitPerTeam1;
+    public static int GangbangModeMaxUnitPerTeam2;
+    public static int GangbangModeMaxUnitPerTeam3;
     public static int MaxStoneCount;
     public static int SkillSetCostLimit = 15;
     public static int Sp0Cost = 1;
     public static int Sp1Cost = 2;
     public static int Sp2Cost = 3;
     public static int Sp3Cost = 4;
-    
+
     public static string UnitConfigFile;
     public static string SkillConfigFile;
     public static string SkillAIFile;
@@ -138,10 +144,10 @@ public class CommonSetting : ScriptableObject
 
     public static string Admob_interstitial_iosKey;
     public static string Admob_interstitial_androidKey;
-    
+
     public static string Admob_rewarded_iosKey;
     public static string Admob_rewarded_androidKey;
-    
+
     public static string Admob_banner_iosKey;
     public static string Admob_banner_androidKey;
 
@@ -149,20 +155,20 @@ public class CommonSetting : ScriptableObject
     public static string LobbyThemeAddressKey;
     public static string FightThemeAddressKey1;
     public static string FightThemeAddressKey2;
-    
+
     public static string HitGroundEffectCode;
     public static string WallCrackEffectCode;
     public static string BreakFreeEffectCode;
     public static string MemberShiftEffectCode;
-    
+
     public static int AIDetectInterval = 1;
-    
+
     public static float CharacterAnimDuration;
     public static Material ShadowMaterial;
     public static AudioClip BtnTapSound;
     public static AudioClip BtnConfirmSound;
     public static AudioClip ExTabSound;
-    
+
     public static Color _emptyBgColor;
     public static Color _emptyFrameColor;
     public static Color _lightBgColor;
@@ -175,11 +181,11 @@ public class CommonSetting : ScriptableObject
     public static Color _blueFrameColor;
     public static Color _greenBgColor;
     public static Color _greenFrameColor;
-    
+
     public static Color ResistColor;
     public static Color DreamColor;
     public static Color SpeedColor;
-    
+
     public void Initialise()
     {
         DevMode = devMode;
@@ -189,8 +195,11 @@ public class CommonSetting : ScriptableObject
         Sp1Cost = sp1Cost;
         Sp2Cost = sp2Cost;
         Sp3Cost = sp3Cost;
-        
-        GangbangModeMaxUnitPerTeam = gangbangModeMaxUnitPerTeam;
+
+        GangbangModeMaxUnitPerTeam = Mathf.Max(1, gangbangModeMaxUnitPerTeam);
+        GangbangModeMaxUnitPerTeam1 = Mathf.Max(1, gangbangModeMaxUnitPerTeam1);
+        GangbangModeMaxUnitPerTeam2 = Mathf.Max(GangbangModeMaxUnitPerTeam1, gangbangModeMaxUnitPerTeam2);
+        GangbangModeMaxUnitPerTeam3 = Mathf.Max(GangbangModeMaxUnitPerTeam2, gangbangModeMaxUnitPerTeam3);
         SkillStaticAnalysis = skillStaticAnalysis;
         SkillDynamicAnalysis = skillDynamicAnalysis;
         UnitConfigFile = unitConfigFile;
@@ -205,18 +214,18 @@ public class CommonSetting : ScriptableObject
 
         Admob_interstitial_iosKey = admob_interstitial_iosKey;
         Admob_interstitial_androidKey = admob_interstitial_androidKey;
-        
+
         Admob_rewarded_iosKey = admob_rewarded_iosKey;
         Admob_rewarded_androidKey = admob_rewarded_androidKey;
 
         Admob_banner_iosKey = admob_banner_iosKey;
         Admob_banner_androidKey = admob_banner_androidKey;
-        
+
         LobbyThemeAddressKey = lobbyThemeAddressKey;
         StartThemeAddressKey = startThemeAddressKey;
         FightThemeAddressKey1 = fightThemeAddressKey1;
         FightThemeAddressKey2 = fightThemeAddressKey2;
-        
+
         HitGroundEffectCode = hitGroundEffectCode;
         WallCrackEffectCode = wallCrackEffectCode;
         BreakFreeEffectCode = breakFreeEffectCode;
@@ -228,7 +237,7 @@ public class CommonSetting : ScriptableObject
         BtnTapSound = btnTapSound;
         BtnConfirmSound = btnConfirmSound;
         ExTabSound = exTabSound;
-        
+
         _emptyBgColor = emptyBgColor;
         _emptyFrameColor = emptyFrameColor;
         _lightBgColor = lightBgColor;
@@ -241,7 +250,7 @@ public class CommonSetting : ScriptableObject
         _blueFrameColor = blueFrameColor;
         _greenBgColor = greenBgColor;
         _greenFrameColor = greenFrameColor;
-        
+
         ResistColor = resistColor;
         DreamColor = dreamColor;
         SpeedColor = speedColor;

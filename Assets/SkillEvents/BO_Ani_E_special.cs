@@ -15,7 +15,7 @@ public partial class BO_Ani_E : MonoBehaviour
         {
             Ani_E = bae;
         }
-        
+
         public void SetBodyPartsTransform()
         {
             if (Ani_E._DATA_CENTER != null)
@@ -52,7 +52,7 @@ public partial class BO_Ani_E : MonoBehaviour
                 }
             }
         }
-        
+
         public void AddOnProcessEnergyFromBodyWeapons(Decomposition decomposition)
         {
             Ani_E.OnProcessEnergyFromBodyWeapons.Add(decomposition);
@@ -68,7 +68,7 @@ public partial class BO_Ani_E : MonoBehaviour
             );
             SingleAssignmentDisposableCleaner.Add(Disposable);
         }
-        
+
         public void BlastAttack_core(Vector3 pos, Quaternion qua , Transform parentTarget, int grade, string logForStateKey)
         {
             switch (grade)
@@ -86,7 +86,7 @@ public partial class BO_Ani_E : MonoBehaviour
                     Ani_E.target_pool = HurtObjectManager.GetHurtObjectPool("blast", Ani_E.magic_path);
                     break;
             }
-            
+
             Ani_E.processingHitBox = Ani_E.target_pool.Rent();
             Ani_E.processingHitBox._HitBox.SetOwnerFACR(Ani_E._DATA_CENTER.FightDataRef);
             Ani_E.processingHitBox.transform.position = pos;
@@ -114,14 +114,14 @@ public partial class BO_Ani_E : MonoBehaviour
                 Ani_E.processingHitBox._HitBox.SetTeamConfig(Ani_E._DATA_CENTER._TeamConfig);
                 Ani_E.processingHitBox._HitBox.MarkersEnablingStarts();
             }
-            
+
             if (FightGlobalSetting.HitBoxLogger)
             {
                 Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
                 Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }
-        
+
         public void Bullet_shoot_from_Core(Vector3 pos, Quaternion qua, int grade, float speed, string logForStateKey)
         {
             switch (grade)
@@ -145,7 +145,7 @@ public partial class BO_Ani_E : MonoBehaviour
                 Debug.Log("基本逻辑错误："+grade);
                 return;
             }
-            
+
             Ani_E.processingHitBox = Ani_E.target_pool.Rent();
             Ani_E.processingHitBox._HitBox.SetOwnerFACR(Ani_E._DATA_CENTER.FightDataRef);
             Ani_E.processingHitBox.transform.position = pos;
@@ -167,21 +167,21 @@ public partial class BO_Ani_E : MonoBehaviour
             {
                 Ani_E.processingHitBox.TrackControl.StartOff(Ani_E.processingHitBox.transform.position, Ani_E.processingHitBox.transform.rotation, speed);
             }
-            
+
             if (FightGlobalSetting.HitBoxLogger)
             {
                 Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
                 Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }
-        
+
         public void MagicForward_core(string objectName, Vector3 pos, Quaternion qua, int speedGrade, string logForStateKey, bool asFlyerWeapon = true)
         {
             if (string.IsNullOrEmpty(objectName))
             {
                 return;
             }
-            
+
             Ani_E.target_pool = HurtObjectManager.GetHurtObjectPool(objectName, Ani_E.magic_path);
             if (Ani_E.target_pool != null)
             {
@@ -223,7 +223,7 @@ public partial class BO_Ani_E : MonoBehaviour
                             break;
                     }
                 }
-                
+
                 if (FightGlobalSetting.HitBoxLogger)
                 {
                     Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
@@ -231,7 +231,7 @@ public partial class BO_Ani_E : MonoBehaviour
                 }
             }
         }
-        
+
         public void ReleasePreparedMagic_core(Vector3 pos, Quaternion qua, Transform parentT, float trackSpeed, string logForStateKey)
         {
             if (Ani_E.OnLoadMagic == null)
@@ -239,7 +239,7 @@ public partial class BO_Ani_E : MonoBehaviour
             Ani_E.target_pool = HurtObjectManager.GetHurtObjectPool(Ani_E.OnLoadMagic, Ani_E.magic_path);
             if (Ani_E.target_pool == null)
                 return;
-        
+
             Ani_E.processingHitBox = Ani_E.target_pool.Rent();
             Ani_E.processingHitBox._HitBox.SetOwnerFACR(Ani_E._DATA_CENTER.FightDataRef);
             Ani_E.processingHitBox.transform.position = pos;
@@ -274,7 +274,7 @@ public partial class BO_Ani_E : MonoBehaviour
             {
                 Ani_E.processingHitBox.TrackControl.StartOff(Ani_E.processingHitBox.transform.position, qua, trackSpeed);
             }
-            
+
             if (FightGlobalSetting.HitBoxLogger)
             {
                 Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
@@ -302,11 +302,18 @@ public partial class BO_Ani_E : MonoBehaviour
 
         public void Flash(Vector3 targetpos)
         {
+            if (Ani_E._DATA_CENTER != null && Ani_E._DATA_CENTER._BasicPhysicSupport != null)
+                targetpos = Ani_E._DATA_CENTER._BasicPhysicSupport.ClampPositionToBattleRange(targetpos);
+
             Vector3 StartToEnd = targetpos - Ani_E.transform.position;
             StartToEnd.y = 0;
-            EffectsManager.GenerateEffect("FlashStart", Ani_E.magic_path, Ani_E._DATA_CENTER.geometryCenter.position, Quaternion.LookRotation(StartToEnd, Vector3.up), null).Forget();
-            Ani_E.transform.position = targetpos;
-            EffectsManager.GenerateEffect("FlashEnd", Ani_E.magic_path, Ani_E._DATA_CENTER.geometryCenter.position, Quaternion.LookRotation(-StartToEnd, Vector3.up), null).Forget();
+            var effectDirection = StartToEnd.sqrMagnitude > Mathf.Epsilon ? StartToEnd : Ani_E.transform.forward;
+            EffectsManager.GenerateEffect("FlashStart", Ani_E.magic_path, Ani_E._DATA_CENTER.geometryCenter.position, Quaternion.LookRotation(effectDirection, Vector3.up), null).Forget();
+            if (Ani_E._DATA_CENTER != null && Ani_E._DATA_CENTER._BasicPhysicSupport != null)
+                Ani_E._DATA_CENTER._BasicPhysicSupport.SetPositionBySkill(targetpos);
+            else
+                Ani_E.transform.position = targetpos;
+            EffectsManager.GenerateEffect("FlashEnd", Ani_E.magic_path, Ani_E._DATA_CENTER.geometryCenter.position, Quaternion.LookRotation(-effectDirection, Vector3.up), null).Forget();
         }
     }
 }

@@ -6,7 +6,7 @@ using FightScene;
 public static class FightLoad
 {
     public static FightInfo Fight;
-    
+
     public static void Go(FightInfo fightInfo, bool inSceneLoad = false)
     {
         switch (fightInfo.EventType)
@@ -22,7 +22,7 @@ public static class FightLoad
                 fightInfo.Team2Auto = true;
                 break;
         }
-        
+
         if (fightInfo.ID == "1" && fightInfo.EventType == FightEventType.Quest)
         {
             fightInfo.RunTutorial = true;
@@ -33,8 +33,10 @@ public static class FightLoad
         {
             fightInfo.RunTutorial = false;
         }
-        
-        Fight =  FightInfo.Copy(fightInfo);
+
+        Fight = fightInfo is GangbangInfo gangbangInfo
+            ? GangbangInfo.Copy(gangbangInfo)
+            : FightInfo.Copy(fightInfo);
 
         if (!inSceneLoad)
         {
@@ -46,6 +48,6 @@ public static class FightLoad
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.Preparing);
         }
     }
-    
-    
+
+
 }

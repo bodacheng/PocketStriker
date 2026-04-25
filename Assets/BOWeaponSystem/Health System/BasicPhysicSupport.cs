@@ -13,15 +13,87 @@ public class BasicPhysicSupport : MonoBehaviour
     {
         get
         {
+            if (_DATA_CENTER == null || BoundaryControlByGod._BattleRingRadius <= 0f)
+                return false;
+
             var maxLimbDisFromCenter = _DATA_CENTER.GetFarthestPositionFromZero();
             return maxLimbDisFromCenter.magnitude > BoundaryControlByGod._BattleRingRadius;
         }
+    }
+
+    public static bool TryGetHorizontalDirection(Vector3 vector, out Vector3 direction)
+    {
+        vector.y = 0f;
+        if (vector.sqrMagnitude <= Mathf.Epsilon)
+        {
+            direction = Vector3.zero;
+            return false;
+        }
+
+        direction = vector.normalized;
+        return true;
+    }
+
+    public static bool IsNearParallelOnXZ(Vector3 dir1, Vector3 dir2)
+    {
+        if (!TryGetHorizontalDirection(dir1, out var n1) || !TryGetHorizontalDirection(dir2, out var n2))
+            return false;
+
+        return Vector3.Cross(n1, n2).sqrMagnitude < FightGlobalSetting.HurtAutoFixPosCrossLimit;
+    }
+
+    public static Vector3 FindClosestPointOnLine(Vector3 linePoint, Vector3 point, Vector3 lineDirection)
+    {
+        if (!TryGetHorizontalDirection(lineDirection, out var normalizedDirection))
+            return point;
+
+        var toPoint = point - linePoint;
+        var projectionLength = Vector3.Dot(toPoint, normalizedDirection);
+        return linePoint + normalizedDirection * projectionLength;
+    }
+
+    public Vector3 ClampPositionToBattleRange(Vector3 targetPosition)
+    {
+        if (FightGlobalSetting.SceneStep == 1 && BoundaryControlByGod._BattleRingRadius > 0f)
+        {
+            var groundPos = targetPosition;
+            groundPos.y = 0f;
+            if (groundPos.magnitude > BoundaryControlByGod._BattleRingRadius)
+            {
+                groundPos = groundPos.normalized * BoundaryControlByGod._BattleRingRadius;
+                targetPosition.x = groundPos.x;
+                targetPosition.z = groundPos.z;
+            }
+        }
+
+        if (targetPosition.y < 0f)
+            targetPosition.y = 0f;
+
+        return targetPosition;
+    }
+
+    public void SetPositionBySkill(Vector3 targetPosition)
+    {
+        targetPosition = ClampPositionToBattleRange(targetPosition);
+
+        if (Rigidbody != null)
+        {
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+            Rigidbody.position = targetPosition;
+        }
+
+        if (_DATA_CENTER != null && _DATA_CENTER.WholeT != null)
+            _DATA_CENTER.WholeT.position = targetPosition;
+        else
+            transform.position = targetPosition;
     }
 
     public class HiddenMethods
     {
         readonly BasicPhysicSupport _BasicPhysicSupport;
         public bool EnemyTouchingDrag;
+        Tween _attackPosFixTween;
         
         public HiddenMethods(BasicPhysicSupport _BasicPhysicSupport)
         {
@@ -132,6 +204,29 @@ public class BasicPhysicSupport : MonoBehaviour
             _BasicPhysicSupport.Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             _BasicPhysicSupport.Rigidbody.linearVelocity = Vector3.zero;
         }
+
+        public void AutoFixPosWhenAttackNearEnemy(Vector3 enemyPos, Vector3 mvDirection)
+        {
+            var dataCenter = _BasicPhysicSupport._DATA_CENTER;
+            if (dataCenter == null || dataCenter.geometryCenter == null || dataCenter.WholeT == null)
+                return;
+
+            var mePos = dataCenter.geometryCenter.position;
+            mePos.y = 0f;
+            enemyPos.y = 0f;
+
+            if (!BasicPhysicSupport.IsNearParallelOnXZ(mvDirection, enemyPos - mePos))
+                return;
+
+            var targetPos = BasicPhysicSupport.FindClosestPointOnLine(enemyPos, mePos, mvDirection);
+            targetPos.y = dataCenter.WholeT.position.y;
+            targetPos = _BasicPhysicSupport.ClampPositionToBattleRange(targetPos);
+
+            _attackPosFixTween?.Kill();
+            _attackPosFixTween = dataCenter.WholeT
+                .DOMove(targetPos, FightGlobalSetting.HurtAutoFixPosDuration)
+                .OnComplete(() => _attackPosFixTween = null);
+        }
     }
     
     void Awake()
@@ -167,19 +262,19 @@ public class BasicPhysicSupport : MonoBehaviour
     }
     
     private Vector3 pos;
-    private float pushIntoRingSpeed = 1;
     void LimitTargetToRange()
     {
         var maxLimbDisFromCenter = _DATA_CENTER.GetFarthestPositionFromZero();
         var originY = _DATA_CENTER.WholeT.position.y;
         pos = _DATA_CENTER.WholeT.position;
         pos.y = 0;
-        if (AtRing)
+        var disFromCenter = maxLimbDisFromCenter.magnitude;
+        if (BoundaryControlByGod._BattleRingRadius > 0f && disFromCenter > BoundaryControlByGod._BattleRingRadius)
         {
             var sa = maxLimbDisFromCenter - maxLimbDisFromCenter.normalized * BoundaryControlByGod._BattleRingRadius;
-            pos = pos - sa;
+            pos -= sa;
             pos.y = originY;
-            _DATA_CENTER.WholeT.position = Vector3.Lerp(_DATA_CENTER.WholeT.position, pos, pushIntoRingSpeed * Time.deltaTime);
+            _DATA_CENTER.WholeT.position = ClampPositionToBattleRange(pos);
         }
         
         if (originY < 0)

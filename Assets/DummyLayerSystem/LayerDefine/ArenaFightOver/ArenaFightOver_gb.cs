@@ -13,7 +13,7 @@ public partial class ArenaFightOver : UILayer
             {
                 var newFightInstance = GangbangInfo.Copy(nextFight);
                 newFightInstance.LoadMyTeam();
-                newFightInstance.Team1GroupSet = FightScene.FightScene.team1GroupSet;
+                newFightInstance.Team1GroupSet = GangbangInfo.CopyGroupSets(FightScene.FightScene.team1GroupSet);
                 newFightInstance.ConvertTeamToGangbang();
                 UILayerLoader.Remove<ArenaFightOver>();
                 FightLoad.Go(newFightInstance, true);

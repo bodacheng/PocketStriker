@@ -7,31 +7,20 @@ public class GangbangHeroIcon : HeroIcon
     [SerializeField] BOButton minusBtn;
     [SerializeField] BOButton plusBtn;
     [SerializeField] Text count;
-    
+
+    private Func<int> countGet;
+
     void SetUp(Func<int, int> countSet, Func<int> countGet, bool enableCountSet = true)
     {
-        count.text = countGet().ToString();
+        this.countGet = countGet;
+        RefreshCount();
         if (enableCountSet)
         {
-            void ShowActive(int newCount)
-            {
-                if (newCount > 0)
-                {
-                    LightOn();
-                }
-                else
-                {
-                    Grey();
-                }
-            }
-            
             void Plus()
             {
                 var currentCount = countGet();
                 countSet(currentCount + 1);
-                var newCount = countGet();
-                count.text = newCount.ToString();
-                ShowActive(newCount);
+                RefreshCount();
             }
             plusBtn.SetListener(Plus);
             plusBtn.onHold.AddListener(Plus);
@@ -40,14 +29,11 @@ public class GangbangHeroIcon : HeroIcon
             {
                 var currentCount = countGet();
                 countSet(currentCount - 1);
-                var newCount = countGet();
-                count.text = newCount.ToString();
-                ShowActive(newCount);
+                RefreshCount();
             }
-            
+
             minusBtn.SetListener(Minus);
             minusBtn.onHold.AddListener(Minus);
-            ShowActive(countGet());
         }
         else
         {
@@ -55,7 +41,26 @@ public class GangbangHeroIcon : HeroIcon
             minusBtn.gameObject.SetActive(false);
         }
     }
-    
+
+    public void RefreshCount()
+    {
+        if (countGet == null)
+        {
+            return;
+        }
+
+        var value = countGet();
+        count.text = value.ToString();
+        if (value > 0)
+        {
+            LightOn();
+        }
+        else
+        {
+            Grey();
+        }
+    }
+
     public static GangbangHeroIcon ArrangeGangbangHeroIconToParent(
         Func<int, int> teamCountSet, Func<int> teamCountGet,
         GangbangHeroIcon prefab, UnitInfo unitInfo, Action<string> iconBehaviour,
@@ -64,6 +69,7 @@ public class GangbangHeroIcon : HeroIcon
         var icon = Instantiate(prefab);
         var unitConfig = Units.GetUnitConfig(unitInfo.r_id);
         icon.unitConfig = unitConfig;
+        icon.InstanceID = unitInfo.id;
         icon.ChangeIcon(unitInfo, withSkillCheck, teamCountGet);
         icon.GetComponent<RectTransform>().sizeDelta = new Vector2(iconSize,iconSize);
         icon.SetUp(teamCountSet, teamCountGet, enableCountSet);

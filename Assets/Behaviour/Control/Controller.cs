@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MCombat.Shared.AI;
 using Skill;
 using Random = UnityEngine.Random;
 
@@ -189,24 +190,12 @@ namespace Soul
 
         string _condition;
         List<(string, string)> _finalConditionStateKeySet = new List<(string, string)>();
-        int _decisionDelayCount = 0;
-        private int DecisionDelayCount
-        {
-            set
-            {
-                _decisionDelayCount = value;
-                if (_decisionDelayCount > DecisionDelay)
-                {
-                    _decisionDelayCount = 0;
-                }
-            }
-            get => _decisionDelayCount;
-        }
+        readonly AiDecisionThrottle _decisionThrottle = new AiDecisionThrottle();
 
         public int DecisionDelay
         {
-            get;
-            set;
+            get => _decisionThrottle.DecisionDelay;
+            set => _decisionThrottle.DecisionDelay = value;
         }
         
         bool AI_RUNs(BehaviorRunner behaviorRunner, List<SkillEntity> options, Func<bool> AITriggerDreamComboRateCondition = null) // AI根据目前可作出的行为作出选择
@@ -243,15 +232,7 @@ namespace Soul
                 }
             }
             
-            bool Delay()
-            {
-                if (behaviorRunner.AIMode == AIMode.Aggressive)
-                    return true;
-                DecisionDelayCount++;
-                return DecisionDelayCount == 0;
-            }
-            
-            if (_triggered.Main.GetValues().Count > 0 && Delay())
+            if (_triggered.Main.GetValues().Count > 0 && _decisionThrottle.ShouldRun(behaviorRunner.AIMode))
             {
                 _finalConditionStateKeySet = _triggered.GiveOutMin();
                 if (_finalConditionStateKeySet.Count > 0)
@@ -304,4 +285,3 @@ namespace Soul
         }
     }
 }
-

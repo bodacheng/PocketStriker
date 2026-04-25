@@ -17,28 +17,61 @@ public class FightingStepLayer : UILayer
 
     [Header("Pause Button")]
     [SerializeField] BOButton pauseButton;
-    
+
     [Header("MobileInputsManager")]
     [SerializeField] MobileInputsManager inputsManager;
-    
+
     [Header("TeamUIManager")]
     [SerializeField] TeamUIManager team1UI;
     [SerializeField] TeamUIManager team2UI;
-    
+
     [Header("Tutorial")]
     [SerializeField] ClickNextTutorial clickNextTutorial;
-    
+
     [Header("DreamCombo Tutorial")]
     [SerializeField] GameObject clickTriggerDreamCombo;
 
-    [Header("教程强制点自动环节黑幕")] 
+    [Header("教程强制点自动环节黑幕")]
     [SerializeField] GameObject forceClickAutoBtnBlackMask;
-    
+
     public TeamUIManager Team1UI => team1UI;
     public TeamUIManager Team2UI => team2UI;
-    
+
+    private int _wholeLiveUnitCountNum = -1;
+    public void SetSensor()
+    {
+        if (FightLoad.Fight.EventType != FightEventType.Gangbang)
+        {
+            return;
+        }
+
+        var count = CountLiveUnits(RTFightManager.Target.team1.teamMembers) +
+                    CountLiveUnits(RTFightManager.Target.team2.teamMembers);
+        if (count <= 0 || count == _wholeLiveUnitCountNum)
+        {
+            return;
+        }
+
+        BoundaryControlByGod.target.SensorUnity.SensorSetting(BoundaryControlByGod._BattleRingRadius, count);
+        BoundaryControlByGod.target.SensorUnity.ForceImmediateDetection();
+        _wholeLiveUnitCountNum = count;
+    }
+
+    static int CountLiveUnits(MultiDic<int, int, Data_Center> members)
+    {
+        var count = 0;
+        foreach (var dc in members.GetValues())
+        {
+            if (dc != null && !dc.FightDataRef.IsDead.Value)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public MobileInputsManager InputsManager => inputsManager;
-    
+
     public static FightingStepLayer Open()
     {
         var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
@@ -46,7 +79,7 @@ public class FightingStepLayer : UILayer
         fightingLayer.InputsManager.FXCamera = FightScene.FightScene.target.fxCamera;
         return fightingLayer;
     }
-    
+
     public void PreparingMode(bool preparingMode)
     {
         if (team1UI.TeamMode == TeamMode.MultiRaid)
@@ -60,7 +93,7 @@ public class FightingStepLayer : UILayer
         inputsManager.PreparingMode(preparingMode);
         pauseButton.gameObject.SetActive(!preparingMode);
     }
-    
+
     public async UniTask Setup(bool active = true)
     {
         gameObject.SetActive(active && FightLoad.Fight.EventType != FightEventType.Screensaver);
@@ -91,7 +124,7 @@ public class FightingStepLayer : UILayer
                 );
             });
     }
-    
+
     public static void Close()
     {
         var layer = UILayerLoader.Get<FightingStepLayer>();
@@ -117,12 +150,12 @@ public class FightingStepLayer : UILayer
     {
         Initialized = false;
         ResetOverlayStates();
-        
+
         RTFightManager.Target.team1.InputsManager = inputsManager;
         RTFightManager.Target.team2.InputsManager = inputsManager;
-        
+
         pauseButton.SetListener(pauseAction.Invoke);
-        
+
         team1UI.TeamMode = FightLoad.Fight.team1Mode;
         team2UI.TeamMode = FightLoad.Fight.team2Mode;
         team1UI.TeamConfig = RTFightManager.Target.heroTeamConfig;
@@ -131,14 +164,14 @@ public class FightingStepLayer : UILayer
         team2UI.TeamConfig.playID = FightLoad.Fight.Team2ID;
         team1UI.TeamMembers = RTFightManager.Target.team1.teamMembers;
         team2UI.TeamMembers = RTFightManager.Target.team2.teamMembers;
-        
+
         // 角色第二次初始化在这之前已经结束
         team1UI.InsTeamUI(RTFightManager.Target.team1.ReadyForNextMember, (() => RTFightManager.Target.team1.Auto),switchTeam1Auto, RTFightManager.Target.team1.RMode_Unit);
         team2UI.InsTeamUI(RTFightManager.Target.team2.ReadyForNextMember, (() => RTFightManager.Target.team2.Auto),switchTeam2Auto, RTFightManager.Target.team2.RMode_Unit);
 
         team1UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
         team2UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
-        
+
         var members = RTFightManager.Target.team1.teamMembers.GetValues();
         var inputEffectsLoading = new List<UniTask>();
         foreach (var d in members)
@@ -149,7 +182,7 @@ public class FightingStepLayer : UILayer
         await UniTask.WhenAll(inputEffectsLoading);
         inputsManager.GroupSkillIcons();
         KeepTopButtonsClickable();
-        
+
         // foreach (var d in RTFightManager.Target.team2.teamMembers.GetValues())
         // {
         //     await inputsManager.ElementRegister(d.element, RTFightManager.Target.UnitInfoRef[d]);
@@ -255,7 +288,7 @@ public class FightingStepLayer : UILayer
     }
 
     bool preTeam1AIState;
-    
+
     public void TutorialModeForceOnClickDreamCombo()
     {
         clickTriggerDreamCombo.SetActive(false);
@@ -263,7 +296,7 @@ public class FightingStepLayer : UILayer
         Team1UI.AutoSwitch.ChangeAutoState(preTeam1AIState);
         Team2UI.AutoSwitch.ChangeAutoState(true);
     }
-    
+
     public void ForceClickDreamComboBtn()
     {
         preTeam1AIState = Team1UI.AutoSwitch.CurrentState();

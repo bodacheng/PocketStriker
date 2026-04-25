@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using MCombat.Shared.CombatHit;
 
 namespace HittingDetection
 {
@@ -11,7 +12,7 @@ namespace HittingDetection
         public Vector3 DamageEffectPoint;
         public Vector3 impactComingPoint;
         public Quaternion CutRotation;
-        
+
         public V_Damage() { }
         public V_Damage(HitBoxManager weapon, Marker weapon_marker, FightParamsReference _victim, FightParamsReference _attacker, Vector3 damageEffectPoint, Vector3 impactComingPoint,Quaternion _CutRotation)
         {
@@ -23,18 +24,17 @@ namespace HittingDetection
             this.impactComingPoint = impactComingPoint;
             CutRotation = _CutRotation;
         }
-    
+
         public V_Damage Clone()
         {
             return (V_Damage)MemberwiseClone();
         }
-    
+
         public static DamageType FormalIntToDamageType(int num)
         {
-            var damageType = (DamageType)num;
-            return damageType;
+            return HitDamageUtility.FormalIntToDamageType(num);
         }
-        
+
         /// <summary>
         /// heavyLevel是2的能量球，撞击1的能量球时，
         /// 自身HP只消耗0.5, 从而在HP都是1的情况下，
@@ -45,24 +45,7 @@ namespace HittingDetection
         /// <returns></returns>
         public static float WpHpCost(int meLevel, int counterLevel)
         {
-            if (meLevel > counterLevel)
-            {
-                switch (meLevel - counterLevel)
-                {
-                    case 1:
-                        return 0.5f;
-                    case 2:
-                        return 0.25f;
-                    case 3:
-                        return 0.2f;
-                }
-
-                if (meLevel - counterLevel > 3)
-                {
-                    return 0.1f;
-                }
-            }
-            return 1;
+            return HitDamageUtility.WeaponHpCost(meLevel, counterLevel);
         }
     }
 }

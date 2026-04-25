@@ -59,6 +59,10 @@ namespace FightScene
                     {
                         Sensor.AddOrRemoveSharedDeadUnitInfo(center, teamConfig.myTeam, true);
                         Sensor.AddOrRemoveSharedUnitInfo(center, teamConfig.myTeam, false);
+                        if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+                        {
+                            FightingStepLayer.Open()?.SetSensor();
+                        }
 
                         var disposable = new SerialDisposable();
 

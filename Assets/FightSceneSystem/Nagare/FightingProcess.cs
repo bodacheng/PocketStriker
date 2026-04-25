@@ -8,18 +8,18 @@ namespace FightScene
     public class FightingProcess : FSceneProcess
     {
         FightingStepLayer _layer;
-        
+
         public FightingProcess()
         {
             Step = SceneStep.Fighting;
             nextProcessStep = SceneStep.FightOver;
         }
-        
+
         public override bool CanEnterOtherProcess()
         {
             return FightLogger.value.GameOver.Value;
         }
-        
+
         public override void ProcessEnter()
         {
             UILayerLoader.Remove<InBattleEvolution>();
@@ -48,10 +48,11 @@ namespace FightScene
             if (FightLoad.Fight.RunTutorial)
                 _layer.OpenTutorial();
             RTFightManager.Target.ModeStart();
-            
+            _layer.SetSensor();
+
             BoundaryControlByGod.target.SensorUnity.DetectionStart(CommonSetting.AIDetectInterval, true);
         }
-        
+
         public override void ProcessEnd()
         {
             if (FightLoad.Fight.EventType == FightEventType.Screensaver)
@@ -62,7 +63,7 @@ namespace FightScene
             {
                 FightingStepLayer.Close();
             }
-            
+
             var dataCenters = new List<Data_Center>();
             dataCenters.AddRange(RTFightManager.Target.team1.teamMembers.GetValues());
             dataCenters.AddRange(RTFightManager.Target.team2.teamMembers.GetValues());
@@ -83,7 +84,7 @@ namespace FightScene
                 RTFightManager.Target.team1.LocalUpdate();
                 RTFightManager.Target.team2.LocalUpdate();
             }
-            
+
             if (FightLoad.Fight.EventType != FightEventType.Gangbang && FightLoad.Fight.team1Mode != TeamMode.MultiRaid)
                 RTFightManager.Target._CameraManager.VisibilityControl.LocalUpdate();
         }

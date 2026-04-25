@@ -9,14 +9,14 @@ public class SensorUnity : MonoBehaviour
     private Collider[] _hits;//What was hit in this frame?
     private Vector3 _centerPos;
     private float _sensorRadius;
-    
+
     int _detectionInterval = -1; // -1 会保持检测器停止
     int _detectionResultKeepFrames;
     bool _continuousDetection;
-    
+
     public readonly List<Action> SensorDetectionResultClearProcesses = new List<Action>();
     public readonly List<Action<Collider[]>> SensorDetectionResultSortProcesses = new List<Action<Collider[]>>();
-    
+
     int DetectionInterval
     {
         get => _detectionInterval;
@@ -27,7 +27,7 @@ public class SensorUnity : MonoBehaviour
             {
                 one.Invoke();
             }
-            
+
             if (_detectionInterval != -1)
             {
                 SensorDetectProcess();//检测
@@ -38,9 +38,9 @@ public class SensorUnity : MonoBehaviour
             }
         }
     }
-    
+
     // continuousDetectionStart(0) 的情况下。
-    // round 0: (一次检测) this.DetectionResultLastFrame == 0, DetectionInterval = 1 
+    // round 0: (一次检测) this.DetectionResultLastFrame == 0, DetectionInterval = 1
     // round 1: DetectionInterval = 0; (上次检测结果未被清空)
     // round 2: 一次检测，DetectionInterval++; (上次检测未被清空)
     // round 3: DetectionInterval == 1, DetectionInterval = 0,(上次检测未被清空)
@@ -60,7 +60,7 @@ public class SensorUnity : MonoBehaviour
         _continuousDetection = continuous;
         _detectionResultKeepFrames = detectionResultKeepFrames;
     }
-    
+
     public void SensorFixedUpdate()
     {
         if (DetectionInterval != -1)
@@ -77,7 +77,7 @@ public class SensorUnity : MonoBehaviour
             _detectionInterval++;
         }
     }
-    
+
     public void Stop()
     {
         DetectionInterval = -1;
@@ -85,14 +85,59 @@ public class SensorUnity : MonoBehaviour
         SensorDetectionResultClearProcesses.Clear();
         SensorDetectionResultSortProcesses.Clear();
     }
-    
+
+    public void ForceImmediateDetection()
+    {
+        if (_hits == null)
+        {
+            return;
+        }
+
+        foreach (var clearProcess in SensorDetectionResultClearProcesses)
+        {
+            clearProcess?.Invoke();
+        }
+
+        SensorDetectProcess();
+
+        foreach (var sortProcess in SensorDetectionResultSortProcesses)
+        {
+            sortProcess?.Invoke(_hits);
+        }
+
+        if (_detectionInterval != -1)
+        {
+            _detectionInterval = 0;
+        }
+    }
+
+    public void SensorSetting(float battleRingRadius, int groupFightRemainUnitCount)
+    {
+        int detectColliderCount;
+        if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+        {
+            detectColliderCount = Mathf.Max(1, groupFightRemainUnitCount) * 10;
+        }
+        else if (FightLoad.Fight.team1Mode == TeamMode.MultiRaid)
+        {
+            detectColliderCount = (FightLoad.Fight.FightMembers.HeroSets.GetValues().Count +
+                                   FightLoad.Fight.FightMembers.EnemySets.GetValues().Count) * 10;
+        }
+        else
+        {
+            detectColliderCount = 20;
+        }
+
+        Setup(battleRingRadius, Vector3.zero, detectColliderCount);
+    }
+
     public void Setup(float radius, Vector3 center, int detectColliderCount)
     {
         _sensorRadius = radius;
         _centerPos = center;
         _hits = new Collider[detectColliderCount] ; //What was hit in this frame?
     }
-    
+
     void SensorDetectProcess()
     {
         Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);// 这个东西消耗太大，起码可以考虑减少运行次数 // FIXUPDATE

@@ -11,10 +11,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a2fc58dd8a094ee2b1e75230d7aeca8, type: 3}
   m_Name: CommonSetting
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   devMode: 0
   maxStoneCount: 1000
   gangbangModeMaxUnitPerTeam: 24
+  gangbangModeMaxUnitPerTeam1: 24
+  gangbangModeMaxUnitPerTeam2: 72
+  gangbangModeMaxUnitPerTeam3: 100
   unitConfigFile: mst_unit
   skillConfigFile: mst_skill
   skillAIFile: skill_ai_attrs

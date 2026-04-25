@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using MCombat.Shared.Combat;
 using UnityEngine;
 using Log;
 using UnityEngine.Events;
@@ -28,7 +29,7 @@ namespace HittingDetection
                         {
                             for (int hit_target_index = 0; hit_target_index < _hits.Length; hit_target_index++)
                             {
-                                if (_markers[i].enemyShieldLayer == (_markers[i].enemyShieldLayer | 1 << _hits[hit_target_index].collider.gameObject.layer) && !_shieldsHit.Contains(_hits[hit_target_index].collider.transform))
+                                if (CombatLayerUtility.ContainsLayer(_markers[i].enemyShieldLayer, _hits[hit_target_index].collider.gameObject.layer) && !_shieldsHit.Contains(_hits[hit_target_index].collider.transform))
                                 {
                                     BO_Shield TheS = _hits[hit_target_index].collider.gameObject.GetComponent<BO_Shield>();
                                     if (TheS == null || TheS.OwnerFightParamsReference == null)
@@ -91,7 +92,7 @@ namespace HittingDetection
                             }
                             if (SpecificTarget != SpecificTarget.flesh)
                             {
-                                if ((teamConfig.enemyWeaponLayerMask == (teamConfig.enemyWeaponLayerMask | (1 << _hits[hit_target_index].collider.gameObject.layer))) && !_usedTargets.Contains(_hits[hit_target_index].collider.transform))
+                                if (CombatLayerUtility.ContainsLayer(teamConfig.enemyWeaponLayerMask, _hits[hit_target_index].collider.gameObject.layer) && !_usedTargets.Contains(_hits[hit_target_index].collider.transform))
                                 {
                                     HitBoxManager hit_hitbox = HitBoxesProcesser.Instance.GetHitBox(_hits[hit_target_index].collider);
                                     if (hit_hitbox != null && hit_hitbox._enabled)
@@ -184,7 +185,7 @@ namespace HittingDetection
                             {
                                 foreach (var Hit_C in _ballDetectHitPool)
                                 {
-                                    if (_markers[i].enemyShieldLayer == (_markers[i].enemyShieldLayer | 1 << Hit_C.Key.gameObject.layer)　&&　!_shieldsHit.Contains(Hit_C.Key.transform))
+                                    if (CombatLayerUtility.ContainsLayer(_markers[i].enemyShieldLayer, Hit_C.Key.gameObject.layer)　&&　!_shieldsHit.Contains(Hit_C.Key.transform))
                                     {
                                         BO_Shield TheS = Hit_C.Key.gameObject.GetComponent<BO_Shield>();
                                         if (TheS == null)
@@ -246,7 +247,7 @@ namespace HittingDetection
                                         Debug.Log("HitBox系统逻辑错误");
                                         continue;
                                     }
-                                    if ((teamConfig.enemyWeaponLayerMask == (teamConfig.enemyWeaponLayerMask | (1 << hitC.Key.gameObject.layer)))
+                                    if (CombatLayerUtility.ContainsLayer(teamConfig.enemyWeaponLayerMask, hitC.Key.gameObject.layer)
                                         && !_usedTargets.Contains(hitC.Key.transform))
                                     {
                                         var hitBox = HitBoxesProcesser.Instance.GetHitBox(hitC.Key);

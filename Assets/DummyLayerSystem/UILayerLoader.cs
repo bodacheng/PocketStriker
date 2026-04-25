@@ -38,6 +38,7 @@ namespace DummyLayerSystem
             {"UnitInstructionLayer", "DummyLayerSystem/UnitInstructionLayer"},
             {"SelfFightLayer", "DummyLayerSystem/SelfFightLayer"},
             {"FightPrepareLayer", "DummyLayerSystem/FightPrepareLayer"},
+            {"FightPrepareLayer_gb", "DummyLayerSystem/FightPrepareLayer/FightPrepareLayer_gb"},
             {"TeamEditLayer", "DummyLayerSystem/TeamEditLayer"},
             {"TeamSingleSelectLayer", "DummyLayerSystem/TeamSingleSelectLayer"},
             {"SkillShowLayer", "DummyLayerSystem/SkillShowLayer"},
@@ -79,7 +80,7 @@ namespace DummyLayerSystem
         }
 
         private static readonly List<UILayer> Queues = new List<UILayer>();
-        
+
         public static void Clear(string except = null)
         {
             PruneInvalidEntries();
@@ -91,7 +92,7 @@ namespace DummyLayerSystem
                     toRemove.Add(queue);
                 }
             }
-            
+
             foreach (var layer in toRemove)
             {
                 if (layer != null && layer.gameObject != null)
@@ -105,12 +106,12 @@ namespace DummyLayerSystem
             if (_fullScreenHanger != null)
                 EnsureMosakAtBottom(_fullScreenHanger);
         }
-    
+
         static UILayer _Get(string key)
         {
             return Queues.Find(x => x.Index == key);
         }
-        
+
         public static T Get<T>() where T : UILayer
         {
             PruneInvalidEntries();
@@ -161,7 +162,7 @@ namespace DummyLayerSystem
             Debug.LogWarning($"[UILayerLoader] Recovered untracked {DescribeLayer(selected)}.");
             return selected;
         }
-        
+
         public static T Load<T>(bool insertToTop = false, string key = null, bool loadToFullScreen = false) where T : UILayer
         {
             var targetHanger = loadToFullScreen ? _fullScreenHanger : _hanger;
@@ -183,7 +184,7 @@ namespace DummyLayerSystem
                 EnsureMosakAtBottom(targetHanger);
                 return existed;
             }
-            
+
             var path = Paths[layerName];
             var UILayerPrefab = Resources.Load<UILayer>(path);
             var t = GameObject.Instantiate(UILayerPrefab);
@@ -196,7 +197,7 @@ namespace DummyLayerSystem
             t.ResizeAreas();
             Queues.Add(t);
             var returnValue = t as T;
-            
+
             if (effectBg != null)
             {
                 effectBg.transform.SetParent(targetHanger);
@@ -204,10 +205,10 @@ namespace DummyLayerSystem
             }
 
             EnsureMosakAtBottom(targetHanger);
-            
+
             return returnValue;
         }
-        
+
         public static void Pop()
         {
             PruneInvalidEntries();
@@ -232,7 +233,7 @@ namespace DummyLayerSystem
             string layerName = typeof(T).Name;
             Remove(layerName);
         }
-    
+
         static void Remove(string index)
         {
             PruneInvalidEntries();
@@ -245,7 +246,7 @@ namespace DummyLayerSystem
                     toRemoveIndex = i;
                 }
             }
-            
+
             if (toRemoveIndex >= 0)
             {
                 var layer = Queues[toRemoveIndex];

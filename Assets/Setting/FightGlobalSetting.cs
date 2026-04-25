@@ -45,6 +45,9 @@ public class FightGlobalSetting : ScriptableObject
     [SerializeField] int arenaEnemyDreamComboAIRate;
     [SerializeField] int energyResolveAfterExtendBoundary = 5;
     [SerializeField] PhysicsMaterial _physicMaterial;
+    [SerializeField] float hurtAutoFixPosDis = 2f;
+    [SerializeField] float hurtAutoFixPosCrossLimit = 0.2f;
+    [SerializeField] float hurtAutoFixPosDuration = 0.1f;
 
     static string fightParamKey = "Config/fight_params";
     public static int SceneStep;//0 :mainmenu 1: fightscene
@@ -89,9 +92,16 @@ public class FightGlobalSetting : ScriptableObject
     public static int _defendHP;
     public static int _energyResolveAfterExtendBoundary;
     public static PhysicsMaterial PhysicMaterial;
-    
+    public static float HurtAutoFixPosDis = 2f;
+    public static float HurtAutoFixPosCrossLimit = 0.2f;
+    public static float HurtAutoFixPosDuration = 0.1f;
+
     public void Initialise()
     {
+        HurtAutoFixPosDis = hurtAutoFixPosDis;
+        HurtAutoFixPosCrossLimit = hurtAutoFixPosCrossLimit;
+        HurtAutoFixPosDuration = hurtAutoFixPosDuration;
+
         HasDefend = hasDefend;
         SkillStoneHasExp = skillStoneHasExp;
 
@@ -102,13 +112,13 @@ public class FightGlobalSetting : ScriptableObject
         FighterRigidMass = fighterRigidMass;
         OnTouchEnemyBodyRigidDrag = onTouchEnemyBodyRigidDrag;
         _Team1Invincible = Team1Invincible;
-        
+
         _NormalSkillExGet = NormalSkillExGet;
         _Sp1SkillExGet = Sp1SkillExGet;
         _Sp2SkillExGet = Sp2SkillExGet;
         _Sp3SkillExGet = Sp3SkillExGet;
         _getHurtExGet = getHurtExGet;
-        
+
         SlightHitLastingTime = slightHitLastingTime;
         LightHitLastingTime = lightHitLastingTime;
         HeavyHitLastingTime = heavyHitLastingTime;
@@ -117,12 +127,12 @@ public class FightGlobalSetting : ScriptableObject
         HurtFreezeInDuration = hurtFreezeInDuration;
         HurtFreezeOutDuration = hurtFreezeOutDuration;
         NormalAttackPosFixingTime = normalAttackPosFixingTime;
-        
+
         KnockOffExtent = knockOffExtent;
         _CanGetUpAfterKnockoffToGround = CanGetUpAfterKnockoffToGround;
         _MaxKnockoffLaidGroundTime = MaxKnockoffLaidGroundTime;
         _GetupTime = GetupTime;
-        
+
         KnockOffYAnimationCurve = knockOffYAnimationCurve;
         KnockOffZAnimationCurve = knockOffZAnimationCurve;
 
@@ -139,25 +149,25 @@ public class FightGlobalSetting : ScriptableObject
         _dreamComboResistTime = dreamComboResistTime;
         _dreamComboResistUpCount = dreamComboResistUpCount;
         ToEnemyNearestDis = toEnemyNearestDis;
-        
+
         _ResistanceMax = resistanceMax;
         _EXMax = eXMax;
         _DreamComboGaugeMax = dreamComboGaugeMax;
         DreamComboSpeed = dreamComboSpeed;
-        
+
         PhysicMaterial = _physicMaterial;
         _energyResolveAfterExtendBoundary = energyResolveAfterExtendBoundary;
-        
+
         _player1DreamComboAIRateNumM = player1DreamComboAIRateNumM;
         ArenaEnemyDreamComboAIRate = arenaEnemyDreamComboAIRate;
     }
-    
+
     // 900血，10攻击力，1打1的话接近40秒左右游戏结束。但如果存在大量远距离对火立回那么就不太好说这个时间。。
     // 那么level 是1的情况下，攻击力是1
     // 从而在技能定义表里，技能标准攻击值应该是1，存在超迅速多连击的情况多半应该少于1，而一些比较赌的重攻击则是大于1
-    // HP和攻击力等比缩放。攻击是从1涨到10，HP是从10涨到100        
+    // HP和攻击力等比缩放。攻击是从1涨到10，HP是从10涨到100
     // 1级的基准伤害
-    // n：1   
+    // n：1
     // ex1 ： 2
     // Ex2  ： 4
     // Ex3 ：  6
@@ -174,7 +184,7 @@ public class FightGlobalSetting : ScriptableObject
     {
         return HpCoefficient * originHP * level;
     }
-    
+
     public static string EffectPathDefine(Element element = Element.Null)
     {
         string personalEffectPath;

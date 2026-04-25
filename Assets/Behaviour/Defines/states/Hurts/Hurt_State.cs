@@ -13,8 +13,41 @@ namespace Soul
         V_Damage target;
         SingleAssignmentDisposable _physicMissionDisposable;
         private float hurtAnimDuration = 0.05f;
-        private Sequence mySequence;
-        
+        Tween _positionTween;
+        Data_Center _nearAttacker;
+        Vector3 _mvDirection;
+
+        void LockAttacker(V_Damage newValue)
+        {
+            if (newValue?.attacker?.Center == null || newValue.from_weapon == null)
+            {
+                _nearAttacker = null;
+                return;
+            }
+
+            var attackerCenter = newValue.attacker.Center;
+            var diff = _DATA_CENTER.geometryCenter.position - attackerCenter.geometryCenter.position;
+            diff.y = 0f;
+            if (!BasicPhysicSupport.TryGetHorizontalDirection(diff, out var currentDirection))
+            {
+                _nearAttacker = null;
+                return;
+            }
+
+            if (newValue.from_weapon._WeaponMode != WeaponMode.EnergyFromBodyWeapon ||
+                diff.sqrMagnitude > FightGlobalSetting.HurtAutoFixPosDis * FightGlobalSetting.HurtAutoFixPosDis)
+            {
+                _nearAttacker = null;
+                return;
+            }
+
+            if (_nearAttacker != attackerCenter || !BasicPhysicSupport.IsNearParallelOnXZ(_mvDirection, currentDirection))
+            {
+                _mvDirection = currentDirection;
+                _nearAttacker = attackerCenter;
+            }
+        }
+
         void PlayHurtAnim(V_Damage newValue)
         {
             if (_AIStateRunner.GetLastState().StateKey == "KnockOff" && _BasicPhysicSupport.hiddenMethods.Grounded)
@@ -24,7 +57,7 @@ namespace Soul
             }
             var point = newValue.DamageEffectPoint;
             point.y = 0;
-            
+
             string hurtAnimKey;
             var meToAttacker = Vector3.Distance(_DATA_CENTER.WholeT.position, newValue.attacker.Center.WholeT.position);
             var rotateToTarget = meToAttacker <= FightGlobalSetting._closeDis
@@ -39,8 +72,7 @@ namespace Soul
             }
             AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim(hurtAnimKey), true, hurtAnimDuration);
             AnimationManger.TriggerExpression(Facial.hit);
-            mySequence = DOTween.Sequence();
-            mySequence.Append(RotateToTargetTween(rotateToTarget, 0.1f));
+            RotateToTargetTween(rotateToTarget, 0.1f);
         }
 
         public override void AI_State_exit()
@@ -49,8 +81,9 @@ namespace Soul
             _Rigidbody.mass = FightGlobalSetting.FighterRigidMass;
             _BasicPhysicSupport.OpenEnemyTouchingDrag(0);
             FightParamsRef.GettingDamage = false;
-            if (mySequence != null && mySequence.active && mySequence.IsPlaying())
-                mySequence.Kill();
+            if (_positionTween != null && _positionTween.active && _positionTween.IsPlaying())
+                _positionTween.Kill();
+            _positionTween = null;
             _physicMissionDisposable?.Dispose();
             if (_BuffsRunner.Freezing)
             {
@@ -71,7 +104,7 @@ namespace Soul
                     _AIStateRunner.ChangeState("KnockOff", target);
                 return;
             }
-            
+
             _Animator.applyRootMotion = false;
             PlayHurtAnim(newValue);
             FightParamsRef.GettingDamage = true;
@@ -79,7 +112,7 @@ namespace Soul
             _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(true);
             TimeCounter = 0f;
             pEvents.CloseAllPersonalityEffects();
-            
+
             if (_BuffsRunner.Freezing)
                 return;
 
@@ -87,7 +120,7 @@ namespace Soul
             {
                 FightParamsRef.RunShaderChangeProcess(target.from_weapon.element, 0.1f);
             }
-            
+
             FightParamsRef.GetKnockOffCount().PlusGauge(1f);
             FightParamsRef.GetKnockOffCount().PlusTimeCounter(0.2f);
             if (FightParamsRef.GetKnockOffCount().GetGauge() >= FightGlobalSetting.KnockOffExtent
@@ -99,7 +132,7 @@ namespace Soul
                 _AIStateRunner.ChangeState("KnockOff", target);
                 return;
             }
-            
+
             switch (target.from_weapon.damage_type)
             {
                 case DamageType.slight_damage_forward:
@@ -112,7 +145,7 @@ namespace Soul
                     break;
                 case DamageType.pull_slight:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 1f);
+                    PushToMidStart(target, 0.001f, true, false);
                     break;
                 case DamageType.stable_damage:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
@@ -120,15 +153,15 @@ namespace Soul
                     break;
                 case DamageType.stable_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     break;
                 case DamageType.heavy_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     break;
                 case DamageType.supper_damage_forward:
                     _usedDizzyTime = FightGlobalSetting.SuperHitLastingTime;
-                    HeavyStart(target);
+                    NormalStart(target);
                     EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element), newValue.DamageEffectPoint, newValue.CutRotation, _DATA_CENTER.geometryCenter).Forget();
                     break;
                 case DamageType.draw:
@@ -140,15 +173,15 @@ namespace Soul
                     break;
                 case DamageType.push_to_mid:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 10f);
+                    PushToMidStart(target, 10f, true);
                     break;
                 case DamageType.push_to_mid_slight:
                     _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 4f);
+                    PushToMidStart(target, 4f, true);
                     break;
                 case DamageType.same_height_to_mid:
                     _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 4f);
+                    PushToMidStart(target, 4f, false);
                     break;
                 case DamageType.sekka:
                     SekkaStart(target.from_weapon.element);
@@ -161,7 +194,7 @@ namespace Soul
                     _AIStateRunner.ChangeState("KnockOff", target);//HighDamgeStart(target);
                     return;
             }
-            
+
             AnimationManger.TriggerExpression(Facial.hit);
         }
 

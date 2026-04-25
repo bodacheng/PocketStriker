@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using MCombat.Shared.Combat;
 
 namespace HittingDetection
 {
@@ -51,7 +52,7 @@ namespace HittingDetection
             //_hits = Physics.SphereCastAll(_tempPos, radius, _dir, _dist, _layers, QueryTriggerInteraction.Collide);// 如果有能力把这个句子去掉最好。会极大幅度提高整个程序速度，但对于相应的代价得有替代方案
             //实际上吧，做到现在我们意识到一个问题：伤害判定系统这东西你不动用分层机制的话不可能保证程序效率。如果在上面这个地方引入层的话，起码我们可以用的了sphereCast而不是消耗巨大的SphereCastAll
             //BallDetectHitPool = Physics.OverlapSphere(this.transform.position, radius, _layers, QueryTriggerInteraction.Collide);
-            if (_layers == (_layers | (1 << other.gameObject.layer)))
+            if (CombatLayerUtility.ContainsLayer(_layers, other.gameObject.layer))
             {
                 if (!_ballDetectHitPool.Keys.Contains(other))
                 {

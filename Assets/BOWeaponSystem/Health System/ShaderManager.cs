@@ -7,6 +7,9 @@ using UnityEngine.Rendering;
 
 public class ShaderManager : MonoBehaviour
 {
+    private const int UnitLayer = 3;
+    private const int ShadowLayer = 0;
+
     [SerializeField] List<DummyMesh> meshes;
     private List<TweenerCore<Color, Color, ColorOptions>> _tweenerCores = new List<TweenerCore<Color, Color, ColorOptions>>();
     
@@ -16,17 +19,35 @@ public class ShaderManager : MonoBehaviour
 
         foreach (var mesh in meshes)
         {
-            mesh.gameObject.layer = 3;
+            mesh.gameObject.layer = UnitLayer;
             mesh.EmissionColor = Color.clear;
+            if (CommonSetting.ShadowMaterial == null)
+            {
+                continue;
+            }
+
             var shadowMesh = Instantiate(mesh, mesh.transform, true);
             var transform1 = shadowMesh.transform;
             transform1.localPosition = Vector3.zero;
             transform1.localScale = Vector3.one * 0.9f;
             var o = shadowMesh.gameObject;
             o.name = "shadow_" + o.name;
-            o.layer = 0;
-            shadowMesh.Mesh.material = CommonSetting.ShadowMaterial;
-            shadowMesh.Mesh.shadowCastingMode = ShadowCastingMode.On;
+            SetLayerRecursively(o, ShadowLayer);
+
+            var shadowRenderer = shadowMesh.Mesh;
+            if (shadowRenderer == null)
+            {
+                Destroy(shadowMesh.gameObject);
+                continue;
+            }
+
+            shadowRenderer.sharedMaterial = CommonSetting.ShadowMaterial;
+            shadowRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            shadowRenderer.receiveShadows = false;
+            shadowRenderer.lightProbeUsage = LightProbeUsage.Off;
+            shadowRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            shadowRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
+            shadowMesh.enabled = false;
         }
         
         // for (int i = 0; i < pOFXes.Count; i++)
@@ -59,6 +80,15 @@ public class ShaderManager : MonoBehaviour
         // }
 
         #endregion
+    }
+
+    private static void SetLayerRecursively(GameObject target, int layer)
+    {
+        target.layer = layer;
+        foreach (Transform child in target.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 
     #region Rim

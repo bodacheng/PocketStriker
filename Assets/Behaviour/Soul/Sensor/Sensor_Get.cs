@@ -1,21 +1,37 @@
 using System.Collections.Generic;
-using System.Linq;
+using MCombat.Shared.Combat;
 using UnityEngine;
 
 public partial class Sensor
 {
+    readonly List<Collider> _targetRangeEnemies = new List<Collider>();
+    readonly List<GameObject> _deadEnemiesByDistance = new List<GameObject>();
+    
     public List<Collider> GetTargetRangeEnemyCollider(float min, float max)
     {
-        var returnValue = new List<Collider>();
+        _targetRangeEnemies.Clear();
+        if (_detectedEnemies == null || _detectedEnemies.Count == 0 || Center == null)
+            return _targetRangeEnemies;
+
+        var minSqr = min * min;
+        var maxSqr = max * max;
+        var center = Center.position;
         for (var i = 0; i < _detectedEnemies.Count; i++)
         {
-            var to_me = Vector3.Distance(Center.position, _detectedEnemies[i].transform.position);
-            if (to_me >= min && to_me <= max)
+            var enemy = _detectedEnemies[i];
+            if (enemy == null)
             {
-                returnValue.Add(_detectedEnemies[i]);
+                continue;
+            }
+
+            var sqr = CombatSpatialUtility.HorizontalDistanceSqr(enemy.transform.position, center);
+            if (sqr >= minSqr && sqr <= maxSqr)
+            {
+                _targetRangeEnemies.Add(enemy);
             }
         }
-        return returnValue;
+
+        return _targetRangeEnemies;
     }
     
     public Collider GetClosestEnemyColliderInSensorRange()
@@ -26,12 +42,15 @@ public partial class Sensor
     public Collider GetSuddenThreatInRange(float min,float max)
     {
         var threat = GetClosestEnemyHitBoxColliderInSensorRange();
-        if (threat == null)
+        if (threat == null || Center == null)
         {
             return null;
         }
-        var toMe = Vector3.Distance(Center.position, threat.transform.position);
-        if (toMe >= min && toMe <= max)
+
+        var sqr = CombatSpatialUtility.HorizontalDistanceSqr(threat.transform.position, Center.position);
+        var minSqr = min * min;
+        var maxSqr = max * max;
+        if (sqr >= minSqr && sqr <= maxSqr)
         {
             return threat;
         }
@@ -63,7 +82,7 @@ public partial class Sensor
             return _enemiesByDistance;
         }
         if (refresh)
-            _enemiesByDistance = FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedUnitDic);
+            FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedUnitRegistry, _enemiesByDistance);
         return _enemiesByDistance;
     }
     
@@ -76,34 +95,30 @@ public partial class Sensor
             return _alliesByDistance;
         }
         if (refresh)
-            _alliesByDistance = this.FindTargetsByDistance(new Team[] { this._teamConfig.myTeam }, SharedUnitDic);
+            FindTargetsByDistance(new [] { this._teamConfig.myTeam }, SharedUnitRegistry, _alliesByDistance);
         return _alliesByDistance;
     }
     
     public GameObject GetLastDeadEnemies()
     {
-        var _enemiesByDistance = FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedDeadUnitDic);
-        return _enemiesByDistance.LastOrDefault();
-    }
-    
-    Collider FindNearestCollider(List<Collider> list)
-    {
-        if (list.Count == 0 || list[0] == null)
+        if (_teamConfig == null)
         {
             return null;
         }
-        
-        Collider target = list[0];
-        for (var i = 1; i < list.Count; i++)
-        {
-            if (list[i] == null)
-                continue;
-            if (HorizontalDistanceCompare(target.transform.position, list[i].transform.position) == 1)
-            {
-                target = list[i];
-            }
-        }
-        return target;
+
+        FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedDeadUnitRegistry, _deadEnemiesByDistance);
+        return _deadEnemiesByDistance.Count > 0 ? _deadEnemiesByDistance[_deadEnemiesByDistance.Count - 1] : null;
+    }
+    
+    Collider FindNearestCollider(List<Collider> colliderList)
+    {
+        if (colliderList == null || colliderList.Count == 0 || Center == null)
+            return null;
+
+        return CombatSpatialUtility.FindNearest(
+            colliderList,
+            Center.position,
+            collider => collider != null ? collider.transform.position : (Vector3?)null);
     }
     
     public bool AllyBetweenSelfAndEnemy(float judgmentRange)
@@ -112,8 +127,8 @@ public partial class Sensor
         GetAlliesAndSelfByDistance(true);
         if (_enemiesByDistance.Count > 0 && _alliesByDistance.Count > 1)
         {
-            float disToNearestEnemy2j = HorizontalDistanceSqrToCenter(_enemiesByDistance[0].transform.position);
-            float disToNearestAlly2j = HorizontalDistanceSqrToCenter(_alliesByDistance[1].transform.position);
+            float disToNearestEnemy2j = CombatSpatialUtility.HorizontalDistanceSqr(_enemiesByDistance[0].transform.position, Center.position);
+            float disToNearestAlly2j = CombatSpatialUtility.HorizontalDistanceSqr(_alliesByDistance[1].transform.position, Center.position);
             return disToNearestEnemy2j >= disToNearestAlly2j && disToNearestEnemy2j < Mathf.Pow(judgmentRange, 2) && 
                    Vector3.Angle((_enemiesByDistance[0].transform.position - Center.position), (_alliesByDistance[1].transform.position - Center.position)) < 40;
         }
