@@ -2,13 +2,6 @@
 
 namespace Skill
 {
-    public class AIAttrs
-    {
-        public float AI_MIN_DIS;
-        public float AI_MAX_DIS;
-        public int height = 1; // 0:低 1:中 2:高
-    }
-
     [System.Serializable]
     public class SkillEntity
     {
