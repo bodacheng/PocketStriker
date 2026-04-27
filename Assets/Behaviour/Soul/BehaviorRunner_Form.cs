@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using MCombat.Shared.AI;
 using Skill;
 
 namespace Soul
@@ -12,98 +13,24 @@ namespace Soul
         public readonly IDictionary<string, string> BehaviourAndStrategicExitCondition = new Dictionary<string, string>();
         public List<string> AllConditionCodes;
 
-        void RegisterConditionToRespond(KeyValuePair<string, string> conditionAndBehaviourCode)//string target_beheviour,string condition_code
+        static readonly AiConditionResponseProfile PocketAiConditionProfile = new AiConditionResponseProfile
         {
-            if (ConditionAndRespond.ContainsKey(conditionAndBehaviourCode.Key))
-            {
-                ConditionAndRespond[conditionAndBehaviourCode.Key].Add(conditionAndBehaviourCode.Value);
-            }
-            else{
-                ConditionAndRespond.Add(conditionAndBehaviourCode.Key,new List<string>() { conditionAndBehaviourCode.Value});
-            }
-        }
+            MovePriority = 10,
+            IncludeRushBackWithApproach = false,
+            ApproachDangerousVeryClosePriority = 3,
+            AddApproachEnemyClose = false,
+            IncludeGangbangMeleeAttack = false
+        };
 
         void AddAITriggerConditionToBehavior(SkillEntity behaviorDefine)
         {
-            switch(behaviorDefine.StateType)
-            {
-                case BehaviorType.MV: //移动状态的触发条件。不添加的话移动状态不触发的。
-                    var fdsgfg = new KeyValuePair<string, string>("SpareOption", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(fdsgfg);
-                    ConditionAndRespondPriority.Set(fdsgfg.Key, fdsgfg.Value, 10);
-                    
-                    break;
-                case BehaviorType.AC:
-                    //KeyValuePair<string, string> keyValuePair1 = new KeyValuePair<string, string>("LosingDefendStrength", behavior_define.REAL_NAME);
-                    //RegisterConditionToRespond(keyValuePair1);
-                    //ConditionAndRespondPriority.Set(keyValuePair1.Key, keyValuePair1.Value, 1);
-
-                    //KeyValuePair<string, string> keyValuePair2 = new KeyValuePair<string, string>("DangerousNearby", behavior_define.REAL_NAME);
-                    //RegisterConditionToRespond(keyValuePair2);
-                    //ConditionAndRespondPriority.Set(keyValuePair2.Key,keyValuePair2.Value, 3);
-
-                    //KeyValuePair<string, string> keyValuePair3 = new KeyValuePair<string, string>("DangerousClose", behavior_define.REAL_NAME);
-                    //RegisterConditionToRespond(keyValuePair3);
-                    //ConditionAndRespondPriority.Set(keyValuePair3.Key, keyValuePair3.Value, 3);
-
-                    var keyValuePair4 = new KeyValuePair<string, string>("DangerousVeryClose", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePair4);
-                    ConditionAndRespondPriority.Set(keyValuePair4.Key, keyValuePair4.Value, 3);
-                    
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, null);
-                    break;
-                case BehaviorType.CT:
-                    var keyValuePair_ct = new KeyValuePair<string, string>("CT", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePair_ct);
-                    ConditionAndRespondPriority.Set(keyValuePair_ct.Key, keyValuePair_ct.Value, 1);
-                    
-                    var keyValuePair_ct2 = new KeyValuePair<string, string>("EnemyClose", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePair_ct2);
-                    ConditionAndRespondPriority.Set(keyValuePair_ct2.Key, keyValuePair_ct.Value, 3);
-                    
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, null);
-                    break;
-                case BehaviorType.Def:
-                    var keyValuePair_def1 = new KeyValuePair<string, string>("DangerousVeryClose", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePair_def1);
-                    ConditionAndRespondPriority.Set(keyValuePair_def1.Key, keyValuePair_def1.Value, 2);
-                    
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, "TimeToRespond");
-                    break;
-                case BehaviorType.GR:
-                    var keyValuePair = new KeyValuePair<string, string>("TimeToAttack", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePair);
-                    ConditionAndRespondPriority.Set(keyValuePair.Key, keyValuePair.Value, 2);
-
-                    KeyValuePair<string, string> eretet = new KeyValuePair<string, string>("TimeToAttack_Reluctant", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(eretet);
-                    ConditionAndRespondPriority.Set(eretet.Key, eretet.Value, 3);
-
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, null);
-                    break;
-                case BehaviorType.GI:
-                    var keyValuePairuu = new KeyValuePair<string, string>("TimeToAttack", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePairuu);
-                    ConditionAndRespondPriority.Set(keyValuePairuu.Key, keyValuePairuu.Value, 2);
-                    
-                    var fgerte = new KeyValuePair<string, string>("TimeToAttack_Reluctant", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(fgerte);
-                    ConditionAndRespondPriority.Set(fgerte.Key, fgerte.Value, 3);
-                    
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, null);
-                    break;
-                case BehaviorType.GM:
-                    var keyValuePairqq = new KeyValuePair<string, string>("TimeToAttack", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(keyValuePairqq);
-                    ConditionAndRespondPriority.Set(keyValuePairqq.Key, keyValuePairqq.Value, 2);
-                    
-                    var fdsfr = new KeyValuePair<string, string>("TimeToAttack_Reluctant", behaviorDefine.REAL_NAME);
-                    RegisterConditionToRespond(fdsfr);
-                    ConditionAndRespondPriority.Set(fdsfr.Key, fdsfr.Value, 3);
-
-                    BehaviourAndStrategicExitCondition.Add(behaviorDefine.REAL_NAME, null);
-                    break;
-            }
+            AiConditionResponseUtility.AddTriggerCondition(
+                behaviorDefine.StateType,
+                behaviorDefine.REAL_NAME,
+                ConditionAndRespond,
+                ConditionAndRespondPriority,
+                BehaviourAndStrategicExitCondition,
+                PocketAiConditionProfile);
         }
 
         public void FormFightingSetsByNineAndTwo(SkillSet nineAndTwo)

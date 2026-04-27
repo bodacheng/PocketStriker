@@ -239,8 +239,7 @@ namespace Soul
                 {
                     var random = Random.Range(0, _finalConditionStateKeySet.Count);//这里虽然是随机但是毕竟随机的这几个选项在优先级上是相同的。
                     var se = behaviorRunner.SkillEntityDic[_finalConditionStateKeySet[random].Item2];
-                    if (se.StateType == BehaviorType.AC || se.StateType == BehaviorType.CT || se.StateType == BehaviorType.Def
-                        || se.StateType == BehaviorType.GI || se.StateType == BehaviorType.GM || se.StateType == BehaviorType.GR)
+                    if (AiConditionResponseUtility.ShouldWriteBehaviorDecisionLog(se.StateType))
                     {
                         behaviorRunner.SingleFightLog.WriteLog(
                             new SingleFightLog.BehaviourFightRecord
