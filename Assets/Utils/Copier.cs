@@ -1,1 +1,0 @@
-// Copier lives in MCombatShared.

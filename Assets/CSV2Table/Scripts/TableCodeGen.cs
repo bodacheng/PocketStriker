@@ -1,1 +1,0 @@
-// TableCodeGen lives in MCombatShared.

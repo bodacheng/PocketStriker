@@ -1,1 +1,0 @@
-// GetDefault lives in MCombatShared.

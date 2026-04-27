@@ -35,7 +35,7 @@ namespace Log
             
             if (FightGlobalSetting.HitBoxLogger)
             {
-                Instance.Load(HitBoxLogger.Instance.LoadCurrentToString());
+                Instance.Load(LoadCurrentToString());
                 HitBoxLogger.Instance.LogSummit();
                 foreach (var t in singleFightLogs)
                 {
@@ -48,6 +48,36 @@ namespace Log
                 }
                 HitBoxLogger.Instance.Clear();
             }
+        }
+
+        static string LoadCurrentToString()
+        {
+            var path = Application.persistentDataPath + "/" + CommonSetting.SkillDynamicAnalysis;
+            return HitBoxLogger.LoadOrCreateLogFile(path, () =>
+            {
+                Instance.rowList = new List<Row>();
+                for (var i = 0; i < SkillConfigTable.rowList.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(SkillConfigTable.rowList[i].RECORD_ID))
+                    {
+                        continue;
+                    }
+
+                    Instance.rowList.Add(new Row
+                    {
+                        RECORD_ID = SkillConfigTable.rowList[i].RECORD_ID,
+                        REAL_NAME = SkillConfigTable.rowList[i].REAL_NAME,
+                        MONSTER_TYPE = SkillConfigTable.rowList[i].TYPE,
+                        Untouched = "0",
+                        Touched = "0",
+                        Succeeded = "0",
+                        TriggeredTimes = "0",
+                        InterruptedTimes = "0"
+                    });
+                }
+
+                Instance.SaveByCurrentRows_HitBoxLog(path, null, null);
+            });
         }
 
         public class Row
