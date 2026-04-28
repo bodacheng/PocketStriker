@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using UnityEditor.AddressableAssets;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -7,11 +5,6 @@ using UnityEditor;
 
 public static class MyEditorWindow
 {
-    readonly static Dictionary<int,string> menuPath = new Dictionary<int,string>(){
-        {0, "P3/AddressableAssets/PlayMode/Use Local"},
-        {2, "P3/AddressableAssets/PlayMode/Use Remote"}
-    };
-    
     [MenuItem("MCombat/StageManager", priority = 1)]
     static void StageManager()
     {
@@ -46,22 +39,12 @@ public static class MyEditorWindow
     
     static MyEditorWindow()
     {
-        EditorApplication.delayCall += () => ChangePlayMode(AddressableAssetSettingsDefaultObject.Settings.ActivePlayModeDataBuilderIndex);
+        EditorApplication.delayCall += AddressablesPlayModeMenuUtility.RefreshMenuChecks;
     }
     
     [MenuItem("MCombat/AddressableAssets/PlayMode/Use Local")]
-    static void PlayModeUseLocal() => ChangePlayMode(0);
+    static void PlayModeUseLocal() => AddressablesPlayModeMenuUtility.SetActivePlayMode(0);
     [MenuItem("MCombat/AddressableAssets/PlayMode/Use Remote")]
-    static void PlayModeUseRemote() => ChangePlayMode(2);
-    
-    static void ChangePlayMode(int mode)
-    {
-        foreach ( var kv in menuPath)
-        {
-            Menu.SetChecked(kv.Value, mode==kv.Key);
-        }
-
-        AddressableAssetSettingsDefaultObject.Settings.ActivePlayModeDataBuilderIndex = mode;
-    }
+    static void PlayModeUseRemote() => AddressablesPlayModeMenuUtility.SetActivePlayMode(2);
 }
 #endif
