@@ -143,12 +143,7 @@ public class PowerEstimateTable
         for (int i = 0; i < clip.events.Length; i++)
         {
             #region 拳脚攻击
-            if (SKillAnalyzer.AttackFrameStartMethodNames.Contains(clip.events[i].functionName) && clip.events[i].intParameter != 0)
-            {
-                amount += skillATRef;
-                attackCount++;
-            }
-            if (clip.events[i].functionName == "SetAllBodyMarkerManagersIn")
+            if (SKillAnalyzer.IsNormalAttackStartEvent(clip.events[i]))
             {
                 amount += skillATRef;
                 attackCount++;
