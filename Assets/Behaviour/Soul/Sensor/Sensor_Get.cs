@@ -120,18 +120,4 @@ public partial class Sensor
             Center.position,
             collider => collider != null ? collider.transform.position : (Vector3?)null);
     }
-    
-    public bool AllyBetweenSelfAndEnemy(float judgmentRange)
-    {
-        GetEnemiesByDistance(true);
-        GetAlliesAndSelfByDistance(true);
-        if (_enemiesByDistance.Count > 0 && _alliesByDistance.Count > 1)
-        {
-            float disToNearestEnemy2j = CombatSpatialUtility.HorizontalDistanceSqr(_enemiesByDistance[0].transform.position, Center.position);
-            float disToNearestAlly2j = CombatSpatialUtility.HorizontalDistanceSqr(_alliesByDistance[1].transform.position, Center.position);
-            return disToNearestEnemy2j >= disToNearestAlly2j && disToNearestEnemy2j < Mathf.Pow(judgmentRange, 2) && 
-                   Vector3.Angle((_enemiesByDistance[0].transform.position - Center.position), (_alliesByDistance[1].transform.position - Center.position)) < 40;
-        }
-        return false;
-    }
 }

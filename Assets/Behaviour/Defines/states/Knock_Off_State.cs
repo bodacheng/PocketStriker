@@ -15,46 +15,50 @@ namespace Soul
         AnimationCurve _usedYCurve;
         AnimationCurve _usedZCurve;
         float _temp;
-        private Tweener rotateTween;
+        Tweener rotateTween;
+        float curveEndTime;
 
         public Knock_Off_State()
         {
             StateType = BehaviorType.KnockOff;
         }
-        
+
         public override void AI_State_enter(V_Damage value)
         {
+            if (_DATA_CENTER.TryChangeToSub(StateKey, value))
+            {
+                return;
+            }
+
             base.AI_State_enter();
-            //FightParamsRef.ChangeLayerForLimbs(14);
-            
             FlyingStep = 0;
             _timeCounter = 0;
+            _canWakeUp = false;
             _touchedBoundary = false;
             FightParamsRef.GettingDamage = true;
             _BasicPhysicSupport.SetUsingGravity(false);
             _BasicPhysicSupport.OpenEnemyTouchingDrag(0);
-            _Animator.SetFloat("speed", 0f);
+            HaltMotion();
             _Animator.applyRootMotion = false;
             _Weapon_Animation_Events.ClearMarkerManagers();
             pEvents.CloseAllPersonalityEffects();
-            _Rigidbody.linearVelocity = Vector3.zero;
-            AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.05f);
+            AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), 0.05f);
             //_xz = newValue.attacker._Center.WholeT.forward;
             var position = gameObject.transform.position;
-            _xz = CalFixPushVector(value.impactComingPoint,  value.attacker.Center.WholeT.position, position, 
-                value.from_weapon.damage_type, value.from_weapon._WeaponMode);
+            _xz = CalFixPushVector(value, position);
             rotateTween = RotateToTargetTween(position - _xz, 0f);
             _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(true);
             EffectsManager.GenerateEffect("super_hit", FightGlobalSetting.EffectPathDefine(value.from_weapon.element), value.DamageEffectPoint, value.CutRotation, null).Forget();
             _usedYCurve = value.from_weapon.damage_type == DamageType.high ? FightGlobalSetting.HDamageYAnimationCurve : FightGlobalSetting.KnockOffYAnimationCurve;
             _usedZCurve = value.from_weapon.damage_type == DamageType.high ? FightGlobalSetting.HDamageZAnimationCurve : FightGlobalSetting.KnockOffZAnimationCurve;
+            curveEndTime = _usedZCurve.keys[_usedZCurve.length - 1].time;
         }
 
         public override bool Capacity_Exit_Condition()
         {
             return false;
         }
-        
+
         public override void AI_State_exit()
         {
             base.AI_State_exit();
@@ -66,7 +70,7 @@ namespace Soul
             if (rotateTween != null && rotateTween.active && rotateTween.IsPlaying())
                 rotateTween.Kill();
         }
-        
+
         Vector3 _effectP, _quaV;
         public int FlyingStep;// 0 拔地 1 曲线 2 落地以及躺地昏迷
         public override void _State_Update()
@@ -87,14 +91,14 @@ namespace Soul
                         EffectsManager.GenerateEffect(CommonSetting.WallCrackEffectCode, null, _effectP, Quaternion.LookRotation(_quaV, Vector3.up), null).Forget();
                 }
             }
-            
+
             switch (FlyingStep)
             {
                 case 0:
                     var yDiffer = _usedYCurve.Evaluate(_timeCounter + Time.deltaTime) - _usedYCurve.Evaluate(_timeCounter);
                     gameObject.transform.position +=
                         _xz * (_usedZCurve.Evaluate(_timeCounter + Time.deltaTime) - _usedZCurve.Evaluate(_timeCounter)) + Vector3.up * yDiffer;
-                    if (_BasicPhysicSupport.hiddenMethods.Grounded && yDiffer < 0)
+                    if ((_BasicPhysicSupport.hiddenMethods.Grounded && yDiffer < 0) || _timeCounter >= curveEndTime)
                     {
                         FlyingStep = 1;
                     }
@@ -105,7 +109,7 @@ namespace Soul
                     _effectP = gameObject.transform.position;
                     _effectP.y = 0;
                     EffectsManager.GenerateEffect(CommonSetting.HitGroundEffectCode, null, _effectP, Quaternion.LookRotation(Vector3.right), null).Forget();
-                    _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+                    _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
                     FlyingStep = 2;
                     break;
                 case 2:
@@ -123,7 +127,16 @@ namespace Soul
                     }
                     break;
             }
-            _Rigidbody.linearVelocity = Vector3.zero; //如果没有这一行的话会出现个非常意外的问题，就是产生一个向上的固定velocity，超过了角色自身下坠，导致FlyingStep一直为0
+            if (FlyingStep < 2)
+            {
+                _Rigidbody.linearVelocity = Vector3.zero; //防止空中保持一个向上的固定velocity，超过了角色自身下坠，导致FlyingStep一直为0
+            }
+            else
+            {
+                var planarVelocity = _Rigidbody.linearVelocity;
+                planarVelocity.y = 0f;
+                _Rigidbody.linearVelocity = planarVelocity;
+            }
             _timeCounter += Time.deltaTime;
         }
     }
@@ -146,8 +159,8 @@ namespace Soul
 //}else{
 //    touchedBoundary = _DATA_CENTER.onBattleGroundBundary;
 //}
-//gameObject.transform.position = Matrix.MultiplyPoint3x4(new Vector3(0, 
-//FightGlobalSetting._knockOffyAnimationCurve.Evaluate( time_counter ) * 1f - alreadyFinishedYTranslation, 
+//gameObject.transform.position = Matrix.MultiplyPoint3x4(new Vector3(0,
+//FightGlobalSetting._knockOffyAnimationCurve.Evaluate( time_counter ) * 1f - alreadyFinishedYTranslation,
 //FightGlobalSetting._knockOffzAnimationCurve.Evaluate( time_counter ) * 1f - alreadyFinishedZTranslation));
 
 // Knock_off_state should not be super_canceled to revive state,here is the reason:

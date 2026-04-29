@@ -1,63 +1,34 @@
 ﻿using UnityEngine;
 using HittingDetection;
-using UniRx;
 using DG.Tweening;
 
 namespace Soul
 {
     public partial class Hurt_State : Behavior
     {
-        void PushToMidStart(V_Damage newValue, float dis, bool grounded, bool push = true)
+        void PushToMidStart(V_Damage newValue, float dis)
         {
-            var attackerCenter = newValue.attacker.Center;
-            var direction = attackerCenter.WholeT.transform.forward;
-            if (!BasicPhysicSupport.TryGetHorizontalDirection(direction, out direction))
-                direction = Vector3.forward;
-
-            var destination = attackerCenter.geometryCenter.transform.position + (push ? 1f : -1f) * direction * dis;
-            if (grounded)
+            _BasicPhysicSupport.OpenEnemyTouchingDrag(1);
+            Vector3 midDistanceFromMe = newValue.attacker.Center.geometryCenter.transform.position +
+                                        newValue.attacker.Center.WholeT.transform.forward * dis;
+            float originY = _DATA_CENTER.WholeT.position.y;
+            Vector3 temp = midDistanceFromMe;
+            temp.y = 0;
+            if (temp.magnitude > BoundaryControlByGod._BattleRingRadius)
             {
-                destination.y = 0f;
+                midDistanceFromMe = temp.normalized * BoundaryControlByGod._BattleRingRadius;
+            }
+            if (originY < 0)
+            {
+                midDistanceFromMe.y = 0;
             }
             else
             {
-                AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.1f);
+                midDistanceFromMe.y = originY;
             }
 
-            destination = _BasicPhysicSupport.ClampPositionToBattleRange(destination);
-
-            void FinishPushToMid()
-            {
-                if (_BasicPhysicSupport.hiddenMethods.Grounded)
-                    _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-                else
-                    _Rigidbody.linearVelocity = Vector3.zero;
-
-                _positionTween = null;
-                _physicMissionDisposable?.Dispose();
-            }
-
-            _positionTween?.Kill();
-            _positionTween = _DATA_CENTER.WholeT.DOMove(destination, 0.3f).OnComplete(FinishPushToMid);
-
-            _physicMissionDisposable = new SingleAssignmentDisposable();
-            _physicMissionDisposable.Disposable = Observable.EveryUpdate().Subscribe(_ =>
-                {
-                    if (gameObject == null)
-                    {
-                        _positionTween?.Kill(false);
-                        _positionTween = null;
-                        _physicMissionDisposable.Dispose();
-                        return;
-                    }
-
-                    if (Vector3.Distance(destination, gameObject.transform.position) < 0.3f || _BasicPhysicSupport.AtRing)
-                    {
-                        _positionTween?.Kill(false);
-                        FinishPushToMid();
-                    }
-                }
-            ).AddTo(gameObject);
+            var targetPos = ClampPositionToBattleRing(midDistanceFromMe);
+            mySequence.Append(StartFixedPlanarMoveTween(_DATA_CENTER.WholeT, _Rigidbody, targetPos, 0.3f));
         }
     }
 }

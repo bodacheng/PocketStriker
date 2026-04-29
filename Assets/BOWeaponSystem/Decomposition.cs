@@ -65,6 +65,11 @@ public partial class Decomposition : MonoBehaviour {
     {
         return BO_Ani_E;
     }
+
+    public bool IsFromDefaultHitBoxPool()
+    {
+        return pool != null && pool == HurtObjectManager.GetDPool();
+    }
     
     // Local_OnEnable和Local_OnDisable，最大的一个区别是，
     // 前者没有打开marker的处理，marker的开启由各个与攻击相关的模块自行处理，因为在那之前涉及一些不太统一的参数设置

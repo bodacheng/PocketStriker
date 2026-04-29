@@ -11,12 +11,11 @@ namespace Soul
         void HighDamgeStart(V_Damage newValue)
         {
             dropped = false;
-            _Animator.SetFloat("speed", 0f);
-            _Rigidbody.linearVelocity = Vector3.zero;
+            HaltMotion();
             _usedDizzyTime = FightGlobalSetting.HighHitLastingTime;
             _xz = newValue.attacker.Center.WholeT.forward;
             FightParamsRef.GetKnockOffCount().PlusTimeCounter(0.2f);
-            AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), true, 0.1f);
+            AnimationManger.AnimationTrigger(AnimationManger.GetRandomKnockOffAnim(), 0.1f);
         }
 
         void HighDamageUpdate()

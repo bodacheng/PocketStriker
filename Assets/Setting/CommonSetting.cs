@@ -163,7 +163,18 @@ public class CommonSetting : ScriptableObject
 
     public static int AIDetectInterval = 1;
 
-    public static float CharacterAnimDuration;
+    public class AnimationDurationMap : Dictionary<string, float>
+    {
+        public float DefaultDuration = 0.25f;
+
+        public new float this[string key]
+        {
+            get => key != null && TryGetValue(key, out var duration) ? duration : DefaultDuration;
+            set => base[key] = value;
+        }
+    }
+
+    public static readonly AnimationDurationMap CharacterAnimDuration = new AnimationDurationMap();
     public static Material ShadowMaterial;
     public static AudioClip BtnTapSound;
     public static AudioClip BtnConfirmSound;
@@ -185,6 +196,7 @@ public class CommonSetting : ScriptableObject
     public static Color ResistColor;
     public static Color DreamColor;
     public static Color SpeedColor;
+    public static bool PcMode;
 
     public void Initialise()
     {
@@ -232,7 +244,8 @@ public class CommonSetting : ScriptableObject
         MemberShiftEffectCode = memberShiftEffectCode;
 
         AIDetectInterval = aiDetectInterval;
-        CharacterAnimDuration = characterAnimDuration;
+        CharacterAnimDuration.DefaultDuration = characterAnimDuration;
+        CharacterAnimDuration["human"] = characterAnimDuration;
         ShadowMaterial = shadowMaterial;
         BtnTapSound = btnTapSound;
         BtnConfirmSound = btnConfirmSound;

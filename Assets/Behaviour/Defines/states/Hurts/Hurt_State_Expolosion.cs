@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using HittingDetection;
 using UniRx;
 
@@ -20,9 +21,12 @@ namespace Soul
                 }
             ).AddTo(gameObject);
 
-            _Rigidbody.linearVelocity = CalFixPushVector(newValue.DamageEffectPoint, newValue.attacker.Center.WholeT.position,
-                gameObject.transform.position,
-                newValue.from_weapon.damage_type, newValue.from_weapon._WeaponMode);
+            var startPos = gameObject.transform.position;
+            var pushDir = CalFixPushVector(newValue, startPos);
+            var targetPos = CalcFixedPlanarMoveTarget(startPos, pushDir, FightGlobalSetting.NormalAttackPosFixingTime);
+            _fixedDisplacementTweener?.Kill();
+            _fixedDisplacementTweener = StartFixedPlanarMoveTween(_DATA_CENTER.WholeT, _Rigidbody, targetPos,
+                FightGlobalSetting.NormalAttackPosFixingTime);
         }
     }
 }

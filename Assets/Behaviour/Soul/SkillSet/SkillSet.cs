@@ -10,7 +10,6 @@ public partial class SkillSet {
     
     private bool _def;
     private MoveType _moveType;
-    private RushType _rushType;
     
     public bool GetD()
     {
@@ -24,7 +23,7 @@ public partial class SkillSet {
 
     public RushType GetR()
     {
-        return _rushType;
+        return RushType.None;
     }
     
     public SkillSet()
@@ -33,12 +32,11 @@ public partial class SkillSet {
         b1 = null; b2 = null; b3 = null;
         c1 = null; c2 = null; c3 = null;
         
-        _moveType = MoveType.Move_normal;
+        _moveType = MoveType.normal;
         _def = false;
-        _rushType = RushType.Rush;
     }
 
-    public SkillSet(MoveType moveType, bool canDefend, RushType rushType)
+    public SkillSet(MoveType moveType, bool canDefend)
     {
         a1 = null; a2 = null; a3 = null;
         b1 = null; b2 = null; b3 = null;
@@ -46,7 +44,11 @@ public partial class SkillSet {
 
         this._moveType = moveType;
         this._def = canDefend;
-        this._rushType = rushType;
+    }
+
+    public SkillSet(MoveType moveType, bool canDefend, RushType rushType)
+        : this(moveType, canDefend)
+    {
     }
 
     public SkillSet DeepCopy()
@@ -54,11 +56,15 @@ public partial class SkillSet {
         return (SkillSet)MemberwiseClone();
     }
 
-    public void SetPassive(bool _Def, MoveType _MoveType, RushType _RushType)
+    public void SetPassive(bool _Def, MoveType _MoveType)
     {
         _def = _Def;
         _moveType = _MoveType;
-        _rushType = _RushType;
+    }
+
+    public void SetPassive(bool _Def, MoveType _MoveType, RushType _RushType)
+    {
+        SetPassive(_Def, _MoveType);
     }
 
     public SkillEditError CheckEdit()

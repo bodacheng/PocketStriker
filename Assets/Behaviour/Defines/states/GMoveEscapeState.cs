@@ -7,11 +7,11 @@ namespace Soul
         Transform mainCam;
         Quaternion screenMovementSpace;
         Vector3 screenMovementForward, screenMovementRight, use_direction;
-        
+
         readonly UnityEngine.Events.UnityAction _breakFreeStart;
         readonly UnityEngine.Events.UnityAction _breakFreeEnd;
         readonly CustomCoroutine _breakFreeCoroutine;
-        
+
         public GMoveEscapeState(string _clip_name)
         {
             clip_name = _clip_name;
@@ -32,7 +32,7 @@ namespace Soul
             if (BehaviorFrameCounter == 5)
                 _BuffsRunner.RunSubCoroutineOfState(_breakFreeCoroutine);
         }
-        
+
         public override bool Capacity_enter_condition()
         {
             return _BasicPhysicSupport.hiddenMethods.Grounded && base.Capacity_enter_condition();
@@ -46,12 +46,11 @@ namespace Soul
         void CommonEnter()
         {
             base.AI_State_enter();
-            _Animator.SetFloat("speed", 0f);
+            HaltMotion();
             _SkillCancelFlag.turn_off_flag();
-            _Rigidbody.linearVelocity = Vector3.zero;
             pEvents.CloseAllPersonalityEffects();
             _Animator.applyRootMotion = true;
-            AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
+            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
         }
 
         Vector3 damagingWeaponComingDirection;
@@ -62,11 +61,14 @@ namespace Soul
             CommonEnter();
             use_direction = gameObject.transform.forward;
             threat = Sensor.GetSuddenThreatInRange(0, 5);
-            
-            if (_BasicPhysicSupport.AtRing)
+
+            use_direction = Vector3.zero - gameObject.transform.position;
+            use_direction.y = 0;
+
+            if (use_direction.magnitude + 4f > BoundaryControlByGod._BattleRingRadius)
             {
-                use_direction = Vector3.zero - gameObject.transform.position;
-                use_direction.y = 0;
+                // use_direction = Vector3.zero - gameObject.transform.position;
+                // use_direction.y = 0;
             }
             else
             {
@@ -102,7 +104,7 @@ namespace Soul
 
             RotateToTargetTween(gameObject.transform.position + use_direction, 0.1f);
         }
-        
+
         float h;
         float v;
         public override void C_State_enter()
@@ -113,8 +115,12 @@ namespace Soul
             screenMovementForward = screenMovementSpace * Vector3.forward;
             screenMovementRight = screenMovementSpace * Vector3.right;
 
-            h = UnityEngine.Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("joystick");
-            v = UnityEngine.Input.GetAxis("Vertical") + UltimateJoystick.GetVerticalAxis("joystick");
+            h = (Input.GetKey(AppSetting.Value.LeftKeyCode) ? -1f : 0f) +
+                    (Input.GetKey(AppSetting.Value.RightKeyCode) ? 1f : 0f) +
+                    UltimateJoystick.GetHorizontalAxis("joystick");
+            v = (Input.GetKey(AppSetting.Value.UpKeyCode) ? 1f : 0f) +
+                    (Input.GetKey(AppSetting.Value.DownKeyCode) ? -1f : 0f) +
+                    UltimateJoystick.GetVerticalAxis("joystick");
 
             if (System.Math.Abs(h) < 0.001f && System.Math.Abs(v) < 0.001f)
             {
@@ -124,7 +130,7 @@ namespace Soul
             {
                 use_direction = (screenMovementForward * v) + (screenMovementRight * h);
             }
-            
+
             RotateToTargetTween(gameObject.transform.position + use_direction, 0.1f);
         }
     }

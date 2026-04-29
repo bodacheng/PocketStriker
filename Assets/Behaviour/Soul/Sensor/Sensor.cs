@@ -11,7 +11,7 @@ public partial class Sensor
     readonly List<Collider> _detectedEnemies = new List<Collider>();
     Collider _nearestEnemyCollider;
     readonly List<Collider> _damagingWeaponAround = new List<Collider>();
-    Collider _nearestDamagingWeapon;    
+    Collider _nearestDamagingWeapon;
     Data_Center _selfDataCenter;
     Collider _jiaMateAmMate, _nearestEnemy;
     public float SensorRadius
@@ -19,7 +19,7 @@ public partial class Sensor
         get;
         set;
     }
-    
+
     public Transform Center
     {
         get;
@@ -32,29 +32,29 @@ public partial class Sensor
         _meAndEnemyLayerMask = teamConfig.myTeamAndMyEnemy;
         _selfDataCenter = self;
     }
-    
+
     public static void ClearFightingMember()
     {
         SharedUnitRegistry.Clear();
         SharedDeadUnitRegistry.Clear();
     }
-    
+
     public static void AddOrRemoveSharedUnitInfo(Data_Center member, Team team, bool add) // add:true remove: false
     {
         SharedUnitRegistry.AddOrRemove(member, team, add);
     }
-    
+
     public static void AddOrRemoveSharedDeadUnitInfo(Data_Center member, Team team, bool add) // add:true remove: false
     {
         SharedDeadUnitRegistry.AddOrRemove(member, team, add);
     }
-    
+
     public void SensorDetectionResultClearProcess()
     {
         _detectedEnemies.Clear();
         _damagingWeaponAround.Clear();
     }
-    
+
     List<GameObject> FindTargetsByDistance(Team[] tags, CombatUnitRegistry<Data_Center> targetRegistry)
     {
         var targetList = new List<GameObject>();
@@ -80,9 +80,10 @@ public partial class Sensor
 
             for (var k = 0; k < searchingMembers.Count; k++)
             {
-                if (searchingMembers[k] != null && searchingMembers[k].WholeT != null)
+                var member = searchingMembers[k];
+                if (member != null && member.WholeT != null)
                 {
-                    targetList.Add(searchingMembers[k].WholeT.gameObject);
+                    targetList.Add(member.WholeT.gameObject);
                 }
                 else
                 {
@@ -106,7 +107,7 @@ public partial class Sensor
             Center.position,
             target => target != null ? target.transform.position : (Vector3?)null);
     }
-    
+
     public void SensorDetectionResultSortProcess(Collider[] hits) //这个函数的调用必须要确保每次都在update函数之后
     {
         float sensorRadiusSqr = SensorRadius * SensorRadius;  // 预计算半径的平方
@@ -131,7 +132,7 @@ public partial class Sensor
         _nearestEnemyCollider = FindNearestCollider(_detectedEnemies);
         _nearestDamagingWeapon = FindNearestCollider(_damagingWeaponAround);
     }
-    
+
     //void OnDrawGizmosSelected()
     //{
     //    Gizmos.color = Color.white;

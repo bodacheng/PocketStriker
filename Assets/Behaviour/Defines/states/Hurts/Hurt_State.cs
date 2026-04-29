@@ -13,50 +13,30 @@ namespace Soul
         V_Damage target;
         SingleAssignmentDisposable _physicMissionDisposable;
         private float hurtAnimDuration = 0.05f;
-        Tween _positionTween;
-        Data_Center _nearAttacker;
-        Vector3 _mvDirection;
+        private Sequence mySequence;
+        private Tweener _fixedDisplacementTweener;
 
-        void LockAttacker(V_Damage newValue)
+        #region Shake
+        private Tweener _shakeTweener;
+        private readonly float duration   = 0.3f;
+        private readonly float magnitude  = 0.6f;   // 位移幅度（米）
+        private readonly int   vibrato    = 80;       // 抖动次数
+        private readonly float randomness = 20f;     // 抖动方向离散度
+        #endregion
+
+        void Shake()
         {
-            if (newValue?.attacker?.Center == null || newValue.from_weapon == null)
-            {
-                _nearAttacker = null;
-                return;
-            }
-
-            var attackerCenter = newValue.attacker.Center;
-            var diff = _DATA_CENTER.geometryCenter.position - attackerCenter.geometryCenter.position;
-            diff.y = 0f;
-            if (!BasicPhysicSupport.TryGetHorizontalDirection(diff, out var currentDirection))
-            {
-                _nearAttacker = null;
-                return;
-            }
-
-            if (newValue.from_weapon._WeaponMode != WeaponMode.EnergyFromBodyWeapon ||
-                diff.sqrMagnitude > FightGlobalSetting.HurtAutoFixPosDis * FightGlobalSetting.HurtAutoFixPosDis)
-            {
-                _nearAttacker = null;
-                return;
-            }
-
-            if (_nearAttacker != attackerCenter || !BasicPhysicSupport.IsNearParallelOnXZ(_mvDirection, currentDirection))
-            {
-                _mvDirection = currentDirection;
-                _nearAttacker = attackerCenter;
-            }
+            _shakeTweener = _DATA_CENTER.WholeT.DOPunchPosition(-_DATA_CENTER.WholeT.forward * magnitude, duration,
+                vibrato, randomness);
         }
 
         void PlayHurtAnim(V_Damage newValue)
         {
             if (_AIStateRunner.GetLastState().StateKey == "KnockOff" && _BasicPhysicSupport.hiddenMethods.Grounded)
             {
-                AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim("lay"), true, hurtAnimDuration);
+                AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim("lay"), hurtAnimDuration);
                 return;
             }
-            var point = newValue.DamageEffectPoint;
-            point.y = 0;
 
             string hurtAnimKey;
             var meToAttacker = Vector3.Distance(_DATA_CENTER.WholeT.position, newValue.attacker.Center.WholeT.position);
@@ -70,20 +50,24 @@ namespace Soul
             {
                 hurtAnimKey = newValue.DamageEffectPoint.y > _DATA_CENTER.geometryCenter.position.y ? "high" : "low";
             }
-            AnimationManger.AnimationTrigger(AnimationManger.GetRandomHurtAnim(hurtAnimKey), true, hurtAnimDuration);
+
+            var obj = AnimationManger.GetRandomHurtAnim(hurtAnimKey);
+            AnimationManger.AnimationTrigger(obj, hurtAnimDuration);
             AnimationManger.TriggerExpression(Facial.hit);
-            RotateToTargetTween(rotateToTarget, 0.1f);
+            mySequence = DOTween.Sequence();
+            mySequence.Append(RotateToTargetTween(rotateToTarget, 0.1f));
         }
 
         public override void AI_State_exit()
         {
             base.AI_State_exit();
+            _shakeTweener?.Kill();
             _Rigidbody.mass = FightGlobalSetting.FighterRigidMass;
             _BasicPhysicSupport.OpenEnemyTouchingDrag(0);
             FightParamsRef.GettingDamage = false;
-            if (_positionTween != null && _positionTween.active && _positionTween.IsPlaying())
-                _positionTween.Kill();
-            _positionTween = null;
+            if (mySequence != null && mySequence.active && mySequence.IsPlaying())
+                mySequence.Kill();
+            _fixedDisplacementTweener?.Kill();
             _physicMissionDisposable?.Dispose();
             if (_BuffsRunner.Freezing)
             {
@@ -95,9 +79,19 @@ namespace Soul
 
         public override void AI_State_enter(V_Damage newValue)
         {
+            _shakeTweener?.Kill();
+
+            if (_DATA_CENTER.TryChangeToSub(StateKey, newValue))
+            {
+                return;
+            }
+
             target = newValue;
             base.AI_State_enter();
-            if (_AIStateRunner.GetLastState().StateKey == "KnockOff")
+            _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(true);
+            _BO_Ani_E.CloseOnProcessEnergyFromBodyWeapons();
+            if ((newValue.from_weapon.damage_type == DamageType.stable_draw && _BasicPhysicSupport.AtRing) ||
+                (_AIStateRunner.GetLastState().StateKey == "KnockOff" && _BasicPhysicSupport.Weight == Weight.normal))
             {
                 //var knockOffState = (Knock_Off_State)_AIStateRunner.GetLastState();
                 //if (knockOffState.FlyingStep == 0 || knockOffState.FlyingStep == 1)
@@ -105,11 +99,10 @@ namespace Soul
                 return;
             }
 
-            _Animator.applyRootMotion = false;
+            //_Animator.applyRootMotion = false;
             PlayHurtAnim(newValue);
             FightParamsRef.GettingDamage = true;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(true);
             TimeCounter = 0f;
             pEvents.CloseAllPersonalityEffects();
 
@@ -133,66 +126,96 @@ namespace Soul
                 return;
             }
 
-            switch (target.from_weapon.damage_type)
+            if (_BasicPhysicSupport.Weight == Weight.heavy)
             {
-                case DamageType.slight_damage_forward:
-                    _usedDizzyTime = FightGlobalSetting.SlightHitLastingTime;
-                    NormalStart(target);
-                    break;
-                case DamageType.light_damage_forward:
-                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    NormalStart(target);
-                    break;
-                case DamageType.pull_slight:
-                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 0.001f, true, false);
-                    break;
-                case DamageType.stable_damage:
-                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    NormalStart(target);
-                    break;
-                case DamageType.stable_damage_forward:
-                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    NormalStart(target);
-                    break;
-                case DamageType.heavy_damage_forward:
-                    _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    NormalStart(target);
-                    break;
-                case DamageType.supper_damage_forward:
-                    _usedDizzyTime = FightGlobalSetting.SuperHitLastingTime;
-                    NormalStart(target);
-                    EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element), newValue.DamageEffectPoint, newValue.CutRotation, _DATA_CENTER.geometryCenter).Forget();
-                    break;
-                case DamageType.draw:
-                case DamageType.stable_draw:
-                    DrawDamageStart(target);
-                    break;
-                case DamageType.explosion:
-                    ExplosionDamageStart(target);
-                    break;
-                case DamageType.push_to_mid:
-                    _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 10f, true);
-                    break;
-                case DamageType.push_to_mid_slight:
-                    _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
-                    PushToMidStart(target, 4f, true);
-                    break;
-                case DamageType.same_height_to_mid:
-                    _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
-                    PushToMidStart(target, 4f, false);
-                    break;
-                case DamageType.sekka:
-                    SekkaStart(target.from_weapon.element);
-                    break;
-                case DamageType.time_pause:
-                    TimePauseStart();
-                    return;
-                case DamageType.high:
-                    // 20201008 修改。high攻击不外乎是直接让对手被击飞，那么击飞状态里确实有相应的一切。
-                    _AIStateRunner.ChangeState("KnockOff", target);//HighDamgeStart(target);
-                    return;
+                _usedDizzyTime = FightGlobalSetting.SlightHitLastingTime;
+                switch (target.from_weapon.damage_type)
+                {
+                    case DamageType.supper_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.SuperHitLastingTime;
+                        HeavyStart(target);
+                        Shake();
+                        EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element), newValue.DamageEffectPoint, newValue.CutRotation, _DATA_CENTER.geometryCenter).Forget();
+                        break;
+                    default:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        NormalStart(target);
+                        Shake();
+                        break;
+                }
+            }
+            else
+            {
+                switch (target.from_weapon.damage_type)
+                {
+                    case DamageType.slight_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.SlightHitLastingTime;
+                        NormalStart(target);
+                        Shake();
+                        break;
+                    case DamageType.light_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        NormalStart(target);
+                        Shake();
+                        break;
+                    case DamageType.pull_slight:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        PushToMidStart(target, 1f);
+                        break;
+                    case DamageType.stable_damage:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        NormalStart(target);
+                        Shake();
+                        break;
+                    case DamageType.stable_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        HeavyStart(target);
+                        Shake();
+                        break;
+                    case DamageType.heavy_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
+                        HeavyStart(target);
+                        Shake();
+                        break;
+                    case DamageType.supper_damage_forward:
+                        _usedDizzyTime = FightGlobalSetting.SuperHitLastingTime;
+                        HeavyStart(target);
+                        Shake();
+                        EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element), newValue.DamageEffectPoint, newValue.CutRotation, _DATA_CENTER.geometryCenter).Forget();
+                        break;
+                    case DamageType.draw:
+                    case DamageType.stable_draw:
+                        DrawDamageStart(target);
+                        break;
+                    case DamageType.explosion:
+                        ExplosionDamageStart(target);
+                        Shake();
+                        break;
+                    case DamageType.push_to_mid:
+                        _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
+                        PushToMidStart(target, 10f);
+                        break;
+                    case DamageType.push_to_mid_slight:
+                        _usedDizzyTime = FightGlobalSetting.LightHitLastingTime;
+                        PushToMidStart(target, 4f);
+                        break;
+                    case DamageType.same_height_to_mid:
+                        _usedDizzyTime = FightGlobalSetting.HeavyHitLastingTime;
+                        PushToMidStart(target, 4f);
+                        break;
+                    case DamageType.sekka:
+                        SekkaStart(target.from_weapon.element);
+                        Shake();
+                        break;
+                    case DamageType.time_pause:
+                        TimePauseStart();
+                        Shake();
+                        return;
+                    case DamageType.high:
+                        // 20201008 修改。high攻击不外乎是直接让对手被击飞，那么击飞状态里确实有相应的一切。
+                        _AIStateRunner.ChangeState("KnockOff", target);//HighDamgeStart(target);
+                        return;
+                }
             }
 
             AnimationManger.TriggerExpression(Facial.hit);
@@ -201,16 +224,22 @@ namespace Soul
         public override void _State_FixedUpdate1()
         {
             TimeCounter += Time.fixedDeltaTime;
-            switch (target.from_weapon.damage_type)
+            if (_BasicPhysicSupport.Weight == Weight.normal)
             {
-                case DamageType.high:
-                    HighDamageUpdate();
-                    break;
-                case DamageType.draw:
-                case DamageType.stable_draw:
-                    DrawDamageUpdate(target);
-                    break;
+                switch (target.from_weapon.damage_type)
+                {
+                    case DamageType.high:
+                        HighDamageUpdate();
+                        break;
+                    case DamageType.draw:
+                    case DamageType.stable_draw:
+                        if (target.from_weapon.CurrentHP == 0 && target.from_weapon.weaponHP > 0)
+                            return;
+                        DrawDamageUpdate(target);
+                        break;
+                }
             }
+            PreventUnitOverlap();
         }
 
         public override bool Capacity_Exit_Condition()

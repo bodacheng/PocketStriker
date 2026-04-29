@@ -10,19 +10,6 @@ using Skill;
 using UniRx;
 using RengeGames.HealthBars;
 
-public enum InputKey
-{
-    Null = -1,
-    Attack1 = 0,
-    Attack2 = 1,
-    Attack3 = 2,
-    Acc = 5,
-    Defend = 3,
-    Defend_Cancel = 4,
-    DreamCombo = 6,
-    Any = 6
-}
-
 public class MobileInputsManager : MonoBehaviour {
 
     [SerializeField] BOButton a1Btn;
@@ -183,7 +170,7 @@ public class MobileInputsManager : MonoBehaviour {
         if (!_elementEffects.ContainsKey(element))
         {
             var elementEffect = new ElementEffectsGroup();
-            await elementEffect.InitializeCommon(effectsParent, element, a1Btn, a2Btn, a3Btn);
+            await elementEffect.InitializeCommon(effectsParent, element, a1Btn, a2Btn, a3Btn, dreamComboBtn);
             DicAdd<Element,ElementEffectsGroup>.Add(_elementEffects, element, elementEffect);
         }
         

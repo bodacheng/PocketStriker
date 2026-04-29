@@ -28,9 +28,9 @@ namespace HittingDetection
         {
             if (HitShield && _traditionalDefendMode)//其实由上面的分析可以知道，对于来自一把武器的攻击，hitshield和hitflesh是不会同时为true的。但如果多把武器同时来攻击，如果被攻击方同时有被击中以及防御住的情况发生，肯定要先处理所受伤害，立刻转入受伤状态才对
             {
-                for (int i1 = 0; i1 < _shieldsHit.Count; i1++)
+                foreach (var shieldTransform in _shieldsHit)
                 {
-                    if (!_usedTargets.Contains(_shieldsHit[i1])) //无论对墙壁，盾牌，还是伤害对象，每一轮攻击只会造成一次影响
+                    if (!_usedTargets.Contains(shieldTransform)) //无论对墙壁，盾牌，还是伤害对象，每一轮攻击只会造成一次影响
                     {
                         //collision = Attack_And_Shield_Specification.Instance.Attack_On_Shield_Cal(damage_type, TheS.damage_type);
                         //_MyOwnerCalReference._Center._BasicPhysicSupport.hiddenMethods.ITouchedThisCollider(1);
@@ -67,7 +67,7 @@ namespace HittingDetection
                         //            break;
                         //    }
                         //}
-                        _usedTargets.Add(_shieldsHit[i1]);
+                        _usedTargets.Add(shieldTransform);
                     }
                 }
             }

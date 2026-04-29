@@ -7,6 +7,11 @@ using Json;
 public class AppSetting
 {
     public static AppSetting Value = new AppSetting();
+    public KeyCode UpKeyCode = KeyCode.W;
+    public KeyCode DownKeyCode = KeyCode.S;
+    public KeyCode LeftKeyCode = KeyCode.A;
+    public KeyCode RightKeyCode = KeyCode.D;
+
     float _bgmVolume = 0.5f, _effectsVolume = 0.5f;
     bool _autoRotateCamera;
     

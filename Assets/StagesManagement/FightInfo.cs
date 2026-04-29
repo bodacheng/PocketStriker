@@ -58,6 +58,37 @@ public class FightInfo : ScriptableObject
     public int dumbAIDecisionDelay = 20;
     public int dreamComboAIRateNum = 5;
 
+    public FightMode FightMode
+    {
+        get
+        {
+            if (EventType == FightEventType.Gangbang)
+                return FightMode.Group;
+            if (EvolutionMode)
+                return FightMode.Evolve;
+            if (team1Mode == TeamMode.MultiRaid || team2Mode == TeamMode.MultiRaid)
+                return FightMode.Multi;
+            return FightMode.Rotate;
+        }
+        set
+        {
+            evolutionMode = value == FightMode.Evolve;
+            if (value == FightMode.Multi)
+            {
+                team1Mode = TeamMode.MultiRaid;
+                team2Mode = TeamMode.MultiRaid;
+            }
+            else if (value is FightMode.Rotate or FightMode.Group)
+            {
+                team1Mode = TeamMode.Rotation;
+                team2Mode = TeamMode.Rotation;
+            }
+
+            if (value == FightMode.Group)
+                EventType = FightEventType.Gangbang;
+        }
+    }
+
     public float stageRefLevel;
 
     public void SetUnitLevelByRefLevel()

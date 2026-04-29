@@ -7,16 +7,16 @@ namespace Soul
         void _f_State_Update_SP()
         {
             _timeCounter += Time.fixedDeltaTime;
-            if (_BasicPhysicSupport.AtRing)
+            if (_BasicPhysicSupport.NearRing)
             {
                 DecideDirection();
             }
-            
+
             if (Finished())
             {
                 DecideDirection();
             }
-            
+
             switch (_moveDirection)
             {
                 case AIMoveDirection.Stay:
@@ -40,20 +40,21 @@ namespace Soul
                     //use_direction = (EnemiesByDistance[0].transform.position - gameObject.transform.position).normalized;
                     break;
             }
-            
-            // var enemyAndTeammateBetweenMeAndEnemy = Sensor.EnemyAndTeammateBetweenMeAndEnemy();
-            // if (enemyAndTeammateBetweenMeAndEnemy != null)
-            // {
-            //     var temp = (enemyAndTeammateBetweenMeAndEnemy[1].transform.position - this.gameObject.transform.position).normalized +
-            //                (gameObject.transform.position - enemyAndTeammateBetweenMeAndEnemy[0].transform.position).normalized;
-            //     temp.y = 0;
-            //     _useDirection = Vector3.RotateTowards(_useDirection, temp, 10 * Time.fixedDeltaTime, 0).normalized;//里面的参数都是些很微妙的东西
-            // }
-            
+
+            var enemyAndTeammateBetweenMeAndEnemy = Sensor.EnemyAndTeammateBetweenMeAndEnemy();
+            if (enemyAndTeammateBetweenMeAndEnemy != null)
+            {
+                var temp = (enemyAndTeammateBetweenMeAndEnemy[1].transform.position - this.gameObject.transform.position).normalized +
+                           (gameObject.transform.position - enemyAndTeammateBetweenMeAndEnemy[0].transform.position).normalized;
+                temp.y = 0;
+                _useDirection = Vector3.RotateTowards(_useDirection, temp, 10 * Time.fixedDeltaTime, 0).normalized;//里面的参数都是些很微妙的东西
+            }
+
             _useDirection.y = 0;
             _useDirection = _useDirection.normalized;
         }
-        
+
+        private float h, v;
         void _c_State_Update_SP()
         {
             //get movement axis relative to camera
@@ -61,14 +62,29 @@ namespace Soul
             _screenMovementForward = _screenMovementSpace * Vector3.forward;
             _screenMovementRight = _screenMovementSpace * Vector3.right;
             //get movement input, set direction to move in
-                
-            var h = Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("joystick");
-            var v = Input.GetAxis("Vertical") + UltimateJoystick.GetVerticalAxis("joystick");
+
+            if (!CommonSetting.PcMode)
+            {
+                h = (Input.GetKey(AppSetting.Value.LeftKeyCode) ? -1f : 0f) +
+                        (Input.GetKey(AppSetting.Value.RightKeyCode) ? 1f : 0f) +
+                        UltimateJoystick.GetHorizontalAxis("joystick");
+                v = (Input.GetKey(AppSetting.Value.UpKeyCode) ? 1f : 0f) +
+                        (Input.GetKey(AppSetting.Value.DownKeyCode) ? -1f : 0f) +
+                        UltimateJoystick.GetVerticalAxis("joystick");
+            }
+            else
+            {
+                h = (Input.GetKey(AppSetting.Value.LeftKeyCode) ? -1f : 0f) +
+                    (Input.GetKey(AppSetting.Value.RightKeyCode) ? 1f : 0f);
+                v = (Input.GetKey(AppSetting.Value.UpKeyCode) ? 1f : 0f) +
+                    (Input.GetKey(AppSetting.Value.DownKeyCode) ? -1f : 0f);
+            }
+
             _useDirection = (_screenMovementForward * v) + (_screenMovementRight * h);
             _useDirection.y = 0;
             _useDirection = _useDirection.normalized;
         }
-        
+
         public override void _c_State_FixedUpdate1()
         {
             _c_State_Update_SP();
@@ -76,33 +92,15 @@ namespace Soul
             {
                 _useDirection = Vector3.zero;
             }
-            if (_useDirection.magnitude > 0f)
-            {
-                _Animator.SetFloat("speed", 10f);
-                Move(_useDirection, speed, true);
-                RotateToDirection(_useDirection, 20f, true);
-            }
-            else
-            {
-                _Animator.SetFloat("speed", 0f);
-                _Rigidbody.linearVelocity = Vector3.zero;
-            }
+            ApplyMovementIntent(_useDirection, speed, 20f);
+
+            PreventUnitOverlap();
         }
-        
+
         public override void _State_FixedUpdate1()
         {
             _f_State_Update_SP();
-            if (_useDirection.magnitude > 0f)
-            {
-                _Animator.SetFloat("speed", 10f);
-                Move(_useDirection, speed, true);
-                RotateToDirection(_useDirection, 20f, true);
-            }
-            else
-            {
-                _Animator.SetFloat("speed", 0f);
-                _Rigidbody.linearVelocity = Vector3.zero;
-            }
+            ApplyMovementIntent(_useDirection, speed, 20f);
         }
     }
 }

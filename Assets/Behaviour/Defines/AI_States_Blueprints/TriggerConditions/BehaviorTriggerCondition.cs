@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace Soul
@@ -16,29 +18,29 @@ namespace Soul
         {
             return _AIStateRunner.GetNowState().StateKey == "Defend" && FightParamsRef.Resistance.Value < 2;
         }
-        
+
         public bool DangerousNearby() // Dash_Back_State G_Ani_MoveEscape_State 2
         {
             return Sensor.GetSuddenThreatInRange(0 , 5) != null && FightParamsRef.Resistance.Value == 0;
         }
-        
+
         public bool DangerousClose() //Counter_State 1 2 3
         {
             return Sensor.GetSuddenThreatInRange(0, 3) != null;
         }
-        
+
         public bool CounterComingEnergy()
         {
             var nearestEnemyMeat = Sensor.GetTargetRangeEnemyCollider(0, 5);
             var threat = Sensor.GetSuddenThreatInRange(5, 15);
             return nearestEnemyMeat.Count == 0 && (threat != null);
         }
-        
+
         public bool CT()
         {
             return !OnBuff() && DangerousVeryClose();
         }
-        
+
         public bool OnBuff()
         {
             return _DATA_CENTER.buffsRunner.MySubMissions.Count > 0;
@@ -53,7 +55,7 @@ namespace Soul
             }
             tempCollider1 = Sensor.GetSuddenThreatInRange(0, 5);
             //tempCollider2 = Sensor.GetClosestEnemyColliderInSensorRange();
-            
+
             // if (tempCollider2 != null && tempCollider1 != null)
             // {
             //     if (Vector3.Distance(tempCollider2.transform.position, _DATA_CENTER.geometryCenter.position) >  Vector3.Distance(tempCollider1.transform.position, _DATA_CENTER.geometryCenter.position))
@@ -84,7 +86,7 @@ namespace Soul
             // {
             //     return false;
             // }
-            
+
             // 从移动状态到攻击的话技能释放范围要求精准，但连招情况明明敌人在眼前但因为按技能最好范围而言“不够远”而不释放的话，会很奇怪
             //if (_AIStateRunner.GetNowState() == _AIStateRunner.commandWaitingState)
                 var targetRangeEnemyColliders = Sensor.GetTargetRangeEnemyCollider(triggerAttackRangeMin, triggerAttackRangeMax);
@@ -103,38 +105,59 @@ namespace Soul
                     return targetRangeEnemyColliders.Count > 0;
             }
         }
-        
+
         bool HasLowCollider(List<Collider> inColliders)
         {
-            var finds = inColliders.FindAll(x=> x.transform.position.y < 0.5f);
-            return finds.Count > 0;
+            for (var i = 0; i < inColliders.Count; i++)
+            {
+                var collider = inColliders[i];
+                if (collider != null && collider.transform.position.y < 0.5f)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        
+
         bool HasMidCollider(List<Collider> inColliders)
         {
-            var finds = inColliders.FindAll(x=> x.transform.position.y >= 0.8f);
-            return finds.Count > 0;
+            for (var i = 0; i < inColliders.Count; i++)
+            {
+                var collider = inColliders[i];
+                if (collider != null && collider.transform.position.y >= 0.8f)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        
+
         bool HasHighCollider(List<Collider> inColliders)
         {
-            var finds = inColliders.FindAll(x=> x.transform.position.y >= 1f);
-            return finds.Count > 0;
+            for (var i = 0; i < inColliders.Count; i++)
+            {
+                var collider = inColliders[i];
+                if (collider != null && collider.transform.position.y >= 1f)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        
+
         public bool TimeToAttack_Reluctant()
         {
             // if (Sensor.EnemyAndTeammateBetweenMeAndEnemy() != null)
             // {
             //     return false;
             // }
-            
+
             // 从移动状态到攻击的话技能释放范围要求精准，但连招情况明明敌人在眼前但因为按技能最好范围而言“不够远”而不释放的话，会很奇怪
             //if (_AIStateRunner.GetNowState() == _AIStateRunner.commandWaitingState)
             var targetRangeEnemyColliders = Sensor.GetTargetRangeEnemyCollider(0, triggerAttackRangeMax);
             //else
                 //tar = Sensor.GetTargetRangeEnemyCollider(Mathf.Clamp(triggerAtttackRangeMin - 3f, 0, triggerAtttackRangeMin - 3f), triggerAtttackRangeMax);
-            
+
             switch (TriggerAttackHeight)
             {
                 case -1:// 只适合砸地
@@ -154,18 +177,34 @@ namespace Soul
             Collider threat = Sensor.GetSuddenThreatInRange(0, 5);
             return threat == null;
         }
-        
-        public bool TimeToStopRunning() //没有意义的条件。 
+
+        public bool TimeToStopRunning() //没有意义的条件。
         {
             Collider nearestEnemyMeat = Sensor.GetClosestEnemyColliderInSensorRange();
             return (nearestEnemyMeat != null && Vector3.Distance(nearestEnemyMeat.transform.position, this._DATA_CENTER.WholeT.position) < 5f) || Sensor.GetSuddenThreatInRange(0,8) != null;
         }
-        
+
+        // 缓存方法名与委托的映射
+        private static readonly Dictionary<string, Func<Behavior, bool>> _methodCache = new Dictionary<string, Func<Behavior, bool>>();
         public bool CheckTriggerCondition(string conditionFunctionName)
         {
-            var T = typeof(Behavior);
-            var theMethod = T.GetMethod(conditionFunctionName); //激活同名函数
-            return theMethod != null && (bool)theMethod.Invoke(this, null);
+            if (!_methodCache.TryGetValue(conditionFunctionName, out var methodDelegate))
+            {
+                // 获取方法信息
+                var methodInfo = typeof(Behavior).GetMethod(conditionFunctionName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                if (methodInfo == null)
+                {
+                    throw new InvalidOperationException($"方法 '{conditionFunctionName}' 未找到。");
+                }
+
+                // 创建委托并添加到缓存
+                methodDelegate = (Func<Behavior, bool>)Delegate.CreateDelegate(typeof(Func<Behavior, bool>), null, methodInfo);
+                _methodCache[conditionFunctionName] = methodDelegate;
+            }
+
+            // 调用委托
+            return methodDelegate(this);
         }
 
         public bool CheckExitCondition(string stateKey)

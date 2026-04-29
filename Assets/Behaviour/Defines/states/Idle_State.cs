@@ -6,14 +6,7 @@ namespace Soul
 {
     public class Idle_State : Behavior
     {
-        private bool showVictoryMotion;
         private bool motionReset = false;
-        
-        private readonly List<string> hasVictoryAnimUnit = new List<string>()
-        {
-            "1","2","3","4","5","6","7"
-        };
-        
         public Idle_State(string clipName)
         {
             this.clip_name = clipName;
@@ -22,13 +15,9 @@ namespace Soul
         public override void AI_State_enter()
         {
             base.AI_State_enter();
-            var r_id = this._DATA_CENTER.UnitInfo.r_id;
-            showVictoryMotion = hasVictoryAnimUnit.Contains(r_id);
             motionReset = false;
-            this._Animator.SetFloat("speed", 0f);
-            // if (showVictoryMotion)
-                AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
-            this._Rigidbody.linearVelocity = Vector3.zero;
+            HaltMotion();
+            AnimationManger.AnimationTrigger(clip_name,  CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
             this._Rigidbody.linearDamping = FightGlobalSetting.OnTouchEnemyBodyRigidDrag;
             
             if (clip_name == "victory")
@@ -56,9 +45,9 @@ namespace Soul
         
         public override void _State_Update()
         {
-            if (showVictoryMotion && !motionReset && clip_name == "victory" && !AnimationManger._toUse.isLooping && AnimationCasualFinishedFlag())
+            if (!motionReset && clip_name == "victory" && !AnimationManger._toUse.isLooping && AnimationCasualFinishedFlag())
             {
-                AnimationManger.PlayLayerAnim(null, true, 0.05f);
+                AnimationManger.AnimationTrigger(string.Empty,  0.05f);
                 motionReset = true;
             }
         }

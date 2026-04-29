@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using HittingDetection;
 
 namespace Soul
@@ -30,7 +31,7 @@ namespace Soul
                 {
                     if (time_counter < 0f)
                     {
-                        AnimationManger.AnimationTrigger(defend_clip_name, true, CommonSetting.CharacterAnimDuration);
+                        AnimationManger.AnimationTrigger(defend_clip_name,  CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                     }
                 }
             }
@@ -47,6 +48,8 @@ namespace Soul
         Collider threat;
         Collider nearbyenemymeat;
         Vector3 fixDesV3;
+        Tweener _blockDisplacementTweener;
+        const float BlockPushMoveRatio = 0.2f;
 
         public Defend_State(string defend_clip_name, string block_break_name)
         {
@@ -91,12 +94,13 @@ namespace Soul
         {
             //defendHP = FightGlobalSetting._defendHP;
             base.AI_State_enter();
+            _blockDisplacementTweener?.Kill();
             freezed = false;
+            FightParamsRef.GettingDamage = false;
             FightParamsRef.Resistance.Value = DefendHP > 0 ? 10 : 0;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            _Animator.SetFloat("speed", 0f);
-            AnimationManger.AnimationTrigger(defend_clip_name, false, CommonSetting.CharacterAnimDuration);
-            _Rigidbody.linearVelocity = Vector3.zero;
+            HaltMotion();
+            AnimationManger.AnimationTrigger(defend_clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
             used_block_least_time = FightGlobalSetting.LightBlockLastingTime;
             TimeCounter = used_block_least_time;
             _SkillCancelFlag.turn_off_flag();
@@ -106,44 +110,40 @@ namespace Soul
         public override void AI_State_enter(V_Damage newValue)
         {
             base.AI_State_enter();
+            _blockDisplacementTweener?.Kill();
             freezed = false;
+            FightParamsRef.GettingDamage = true;
             FightParamsRef.Resistance.Value = DefendHP > 0 ? 10 : 0;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            _Animator.SetFloat("speed", 0f);
+            HaltMotion();
             _SkillCancelFlag.turn_off_flag();
             //this.AI_DATA_CENTER.turnShield(true);
 
-            fixDesV3 = CalFixPushVector(newValue.DamageEffectPoint,
-                newValue.attacker.Center.WholeT.position,
-                                               gameObject.transform.position,
-                                                   newValue.from_weapon.damage_type, newValue.from_weapon._WeaponMode);
+            fixDesV3 = CalFixPushVector(newValue, gameObject.transform.position);
             switch (newValue.from_weapon.damage_type)
             {
                 case DamageType.light_damage_forward:
-                    AnimationManger.AnimationTrigger(block_break_name, true, 0.05f);
-                    _Rigidbody.linearVelocity = fixDesV3;
+                    AnimationManger.AnimationTrigger(block_break_name,  0.05f);
                     used_block_least_time = FightGlobalSetting.LightBlockLastingTime;
                     DefendHPfade(newValue);
                     break;
                 case DamageType.heavy_damage_forward:
-                    AnimationManger.AnimationTrigger(block_break_name, true, 0.05f);
-                    _Rigidbody.linearVelocity = fixDesV3;
+                    AnimationManger.AnimationTrigger(block_break_name, 0.05f);
                     used_block_least_time = FightGlobalSetting.HeavyBlockLastingTime;
                     DefendHPfade(newValue);
                     break;
                 case DamageType.supper_damage_forward:
-                    AnimationManger.AnimationTrigger(block_break_name, true, 0.05f);
-                    _Rigidbody.linearVelocity = fixDesV3 - gameObject.transform.position;
+                    AnimationManger.AnimationTrigger(block_break_name,  0.05f);
                     used_block_least_time = FightGlobalSetting.HeavyBlockLastingTime;
                     DefendHPfade(newValue);
                     break;
                 default:
-                    AnimationManger.AnimationTrigger(block_break_name, true, 0.05f);
-                    _Rigidbody.linearVelocity = fixDesV3;
+                    AnimationManger.AnimationTrigger(block_break_name,  0.05f);
                     used_block_least_time = FightGlobalSetting.LightBlockLastingTime;
                     DefendHPfade(newValue);
                     break;
             }
+            StartFixedBlockPush(fixDesV3);
             TimeCounter = used_block_least_time;
         }
 
@@ -158,10 +158,20 @@ namespace Soul
             // 我们把defend状态exit中的PlayLayerAnim(_animator_layer_index, null)删除了后就不再产生对应bug。
             // 关于动画模块的“技能动作清空”，我们是把它放在了move状态的开头，从而避免了清空函数与触发动画函数在同一帧执行。
             base.AI_State_exit();
+            _blockDisplacementTweener?.Kill();
+            FightParamsRef.GettingDamage = false;
             _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
             lastExitTime = Time.time;
             _ResistanceManager.ResistanceClear();
             //AI_DATA_CENTER.turnShield(false);
+        }
+
+        void StartFixedBlockPush(Vector3 pushDirection)
+        {
+            var moveDuration = used_block_least_time * BlockPushMoveRatio;
+            var targetPos = CalcFixedPlanarMoveTarget(gameObject.transform.position, pushDirection, moveDuration);
+            _blockDisplacementTweener = StartFixedPlanarMoveTween(_DATA_CENTER.WholeT, _Rigidbody, targetPos,
+                moveDuration);
         }
 
         public override void _State_FixedUpdate1()

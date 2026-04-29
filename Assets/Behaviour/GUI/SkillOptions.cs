@@ -20,8 +20,7 @@ public partial class BehaviorRunnerGUI : Editor {
             "Move",
             "Victory",
             "Death",
-            "RushBack",
-            "Rush",
+            "rush",
             "Hit",
             "KnockOff",
             "getUp"
@@ -53,22 +52,7 @@ public partial class BehaviorRunnerGUI : Editor {
         {
             if (!returnValue.Contains(_set.REAL_NAME))
             {
-                BehaviorType _attackType = _set.StateType;
-                switch (_attackType)
-                {
-                    case BehaviorType.GI:
-                        returnValue.Add(_set.REAL_NAME);
-                        break;
-                    case BehaviorType.GM:
-                        returnValue.Add(_set.REAL_NAME);
-                        break;
-                    case BehaviorType.GR:
-                        returnValue.Add(_set.REAL_NAME);
-                        break;
-                    default:
-                        returnValue.Add(_set.REAL_NAME);
-                        break;
-                }
+                returnValue.Add(_set.REAL_NAME);
             }
             else
             {

@@ -95,6 +95,12 @@ public class FightGlobalSetting : ScriptableObject
     public static float HurtAutoFixPosDis = 2f;
     public static float HurtAutoFixPosCrossLimit = 0.2f;
     public static float HurtAutoFixPosDuration = 0.1f;
+    public static bool AutoTuneSkillAIDistance = true;
+    public static int SkillAIAutoTuneMinTriggeredTimes = 12;
+    public static int SkillAIAutoTuneRetuneTriggerStep = 6;
+    public static float SkillAIAutoTuneStepMin = 0.15f;
+    public static float SkillAIAutoTuneStepMax = 0.6f;
+    public static float SkillAIAutoTuneMaxDistance = 18f;
 
     public void Initialise()
     {

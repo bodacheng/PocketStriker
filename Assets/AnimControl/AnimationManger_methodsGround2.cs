@@ -6,24 +6,25 @@ public partial class AnimationManger
     List<AnimationClip> _hurtClipsBack, _hurtClipsLow, _hurtClipsHigh, _hurtClipsPress, _hurtClipsLay;
     List<AnimationClip> knockoffAnimations;
     
-    void PlayLayerAnim_clip(AnimationClip clip, bool in_transition , float Duration)
+    void PlayLayerAnim_clip(AnimationClip clip, float returnDuration)
     {
         AnimatorStateInfo = Animator.GetCurrentAnimatorStateInfo(1);
         if (Animator.GetBool("in_transition"))
         {
-            Animator.SetBool("in_transition", in_transition);
+            Animator.SetBool("in_transition", clip != null);
             Animator.Play("null", 1);//Animator.GetNextAnimatorStateInfo(1).fullPathHash
             Animator.Update(0);
             if (clip != null)
             {
                 to_be_override_anim_name = "fullbody_empty1";
                 animatorOverride[to_be_override_anim_name] = clip;
-                Animator.CrossFade("full_body_state1", Duration);
+                Animator.SetTrigger("fullbody_trigger1");
+                //Animator.CrossFade("full_body_state1", Duration);
             }
         }
         else
         {
-            Animator.SetBool("in_transition", in_transition);
+            Animator.SetBool("in_transition", clip != null);
             if (AnimatorStateInfo.IsName("Full Body.null"))
             {
                 if (clip != null)
@@ -32,7 +33,8 @@ public partial class AnimationManger
                 }
                 else
                 {
-                    Animator.SetBool("in_transition", false);
+                    Animator.CrossFade("null", returnDuration);//?
+                    //Animator.SetBool("in_transition", false);//?
                     return;
                 }
             }
@@ -44,21 +46,22 @@ public partial class AnimationManger
             {
                 to_be_override_anim_name = clip != null ? "fullbody_empty1" : null;
             }
-            
             if (clip != null)
             {
                 animatorOverride[to_be_override_anim_name] = clip;                    
                 if (to_be_override_anim_name == "fullbody_empty2")
                 {
-                    Animator.CrossFade("full_body_state2", Duration);
+                    Animator.SetTrigger("fullbody_trigger2");
+                    //Animator.CrossFade("full_body_state2", Duration);
                 }
                 if (to_be_override_anim_name == "fullbody_empty1")
                 {
-                    Animator.CrossFade("full_body_state1", Duration);
+                    Animator.SetTrigger("fullbody_trigger1");
+                    //Animator.CrossFade("full_body_state1", Duration);
                 }
             }else{
-                Animator.CrossFade("null", Duration);
-            }       
+                Animator.CrossFade("null", returnDuration);
+            }
         }
     }
     
@@ -86,21 +89,13 @@ public partial class AnimationManger
                 target = _hurtClipsHigh;
             break;
         }
-        if (target == null || target.Count == 0)
-        {
-            return null;
-        }
-        int ranDom = Random.Range(0, target.Count);
+        var ranDom = Random.Range(0, target.Count);
         return target[ranDom];
     }
     
     public AnimationClip GetRandomKnockOffAnim()
     {
-        if (knockoffAnimations == null || knockoffAnimations.Count == 0)
-        {
-            return null;
-        }
-        int ranDom = Random.Range(0, knockoffAnimations.Count);
+        var ranDom = Random.Range(0, knockoffAnimations.Count);
         return knockoffAnimations[ranDom];
     }
 }

@@ -113,19 +113,23 @@ public class SensorUnity : MonoBehaviour
 
     public void SensorSetting(float battleRingRadius, int groupFightRemainUnitCount)
     {
-        int detectColliderCount;
-        if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+        var detectColliderCount = 0;
+
+        if (FightLoad.Fight.FightMode == FightMode.Group)
         {
-            detectColliderCount = Mathf.Max(1, groupFightRemainUnitCount) * 10;
-        }
-        else if (FightLoad.Fight.team1Mode == TeamMode.MultiRaid)
-        {
-            detectColliderCount = (FightLoad.Fight.FightMembers.HeroSets.GetValues().Count +
-                                   FightLoad.Fight.FightMembers.EnemySets.GetValues().Count) * 10;
+            detectColliderCount = groupFightRemainUnitCount * 2;
         }
         else
         {
-            detectColliderCount = 20;
+            if (FightLoad.Fight.FightMode == FightMode.Multi)
+            {
+                detectColliderCount = (FightLoad.Fight.FightMembers.HeroSets.GetValues().Count +
+                                       FightLoad.Fight.FightMembers.EnemySets.GetValues().Count) * 10;
+            }
+            else
+            {
+                detectColliderCount = 15;
+            }
         }
 
         Setup(battleRingRadius, Vector3.zero, detectColliderCount);
@@ -140,6 +144,6 @@ public class SensorUnity : MonoBehaviour
 
     void SensorDetectProcess()
     {
-        Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);// 这个东西消耗太大，起码可以考虑减少运行次数 // FIXUPDATE
+        Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);
     }
 }

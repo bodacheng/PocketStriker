@@ -1,294 +1,475 @@
 ﻿#if UNITY_EDITOR
-using System.Collections.Generic;
 using System;
-using UnityEngine;
-using UnityEditor;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 using Soul;
 using Skill;
 
 [CustomEditor(typeof(BehaviorRunner))]
-public partial class BehaviorRunnerGUI : Editor {
+public partial class BehaviorRunnerGUI : Editor
+{
+    static readonly string[] DefaultStateNames = { "Death", "Empty", "Hit", "KnockOff", "Move", "Victory", "getUp", "rush" };
+    static readonly int[] SpLevelValues = { 0, 1, 2, 3 };
+    static readonly string[] SpLevelLabels = { "normal", "ex1", "ex2", "ex3" };
+    static readonly int[] HeightValues = { 0, 1, 2 };
+    static readonly string[] HeightLabels = { "Low", "Mid", "High" };
 
-    BehaviorRunner myScript;
+    BehaviorRunner runner;
+    SerializedProperty skillListProp;
+    SerializedProperty skillConfigTypeProp;
+    SerializedProperty aiStatesPathProp;
+    SerializedProperty usingScriptProp;
 
-    bool GUIIniDone;
-    GUIStyle ButtonStyle;
-    GUIStyle addCasualToButtonStyle,deleteCasualToButtonStyle;
-    GUIStyle stateKeyGUI;
-    GUIStyle attackRangeToggleGUI;
+    readonly List<bool> stateFoldouts = new List<bool>();
+    readonly List<bool> casualFoldouts = new List<bool>();
+    readonly List<bool> forcedFoldouts = new List<bool>();
 
-    
-    string[] StateIndexListOptions;
-    string[] casualToStateKeyOptions;
+    bool useLocalResourceReference;
+    Vector2 scrollPosition;
 
-    string targetType;
-    List<string> casualToStateKeyOptionsList;
-    
-    bool LocalResourceReferenceMode;
-    readonly int[] exoptions = { 0, 1, 2, 3 };
-    readonly string[] exoptions_display = {"normal","ex1","ex2","ex3"};
+    void OnEnable()
+    {
+        runner = (BehaviorRunner)target;
+        EnsureSkillList();
+
+        serializedObject.Update();
+        CacheSerializedProperties();
+        SyncFoldoutCaches(skillListProp?.arraySize ?? 0);
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    void EnsureSkillList()
+    {
+        if (runner != null && runner.skillEntityList == null)
+        {
+            runner.skillEntityList = new List<SkillEntity>();
+            EditorUtility.SetDirty(runner);
+        }
+    }
+
+    void CacheSerializedProperties()
+    {
+        skillListProp = serializedObject.FindProperty("skillEntityList");
+        skillConfigTypeProp = serializedObject.FindProperty("skillConfigType");
+        aiStatesPathProp = serializedObject.FindProperty("AI_States_path");
+        usingScriptProp = serializedObject.FindProperty("usingScript");
+    }
+
+    void SyncFoldoutCaches(int count)
+    {
+        SyncFoldoutList(stateFoldouts, count, true);
+        SyncFoldoutList(casualFoldouts, count, false);
+        SyncFoldoutList(forcedFoldouts, count, false);
+    }
+
+    static void SyncFoldoutList(List<bool> list, int targetCount, bool defaultValue)
+    {
+        while (list.Count < targetCount) list.Add(defaultValue);
+        if (list.Count > targetCount) list.RemoveRange(targetCount, list.Count - targetCount);
+    }
 
     public override void OnInspectorGUI()
     {
-        if (GUIIniDone)
-        {
-            ButtonStyle = new GUIStyle(GUI.skin.button);
-            ButtonStyle.normal.textColor = Color.white;
-            ButtonStyle.fixedWidth = 100f;
-            
-            addCasualToButtonStyle = new GUIStyle(GUI.skin.box);
-            addCasualToButtonStyle.normal.textColor = Color.red;
-            addCasualToButtonStyle.alignment = TextAnchor.MiddleCenter;
-            addCasualToButtonStyle.margin = new RectOffset(100, 22, 11, 11);
-            
-            deleteCasualToButtonStyle = new GUIStyle(GUI.skin.box);
-            deleteCasualToButtonStyle.normal.textColor = Color.blue;
-            deleteCasualToButtonStyle.alignment = TextAnchor.MiddleCenter;
-            deleteCasualToButtonStyle.margin = new RectOffset(50, 22, 11, 11);
-            
-            GUIIniDone = true;
-        }
-      
-        LocalResourceReferenceMode = EditorGUILayout.Toggle("本地资源参照模式",LocalResourceReferenceMode);
-        
-		myScript = (BehaviorRunner)target;
-        
-        targetType = EditorGUILayout.TextField("targetType: ", targetType);
-        
-        if (myScript.GetNowState() != null)
-        {
-            EditorGUILayout.TextField("current: ", myScript.GetNowState().StateKey);
-        }
-        
-        if (GUILayout.Button(" refresh skill define "))
-        {
-            StateIndexListOptions = LocalResourceReferenceMode ? 
-            GetBeheviourOptions(targetType).ToArray() : GetBeheviourOptions(targetType, myScript.skillEntityList).ToArray();
-        }
-        
-        EditorGUILayout.BeginVertical();
-        myScript.AI_States_path = EditorGUILayout.TextField("AI_States_path", myScript.AI_States_path);
-        EditorGUILayout.EndVertical();
+        runner = (BehaviorRunner)target;
+        EnsureSkillList();
 
-        // --追加--
-        if (myScript.skillEntityList != null)
-        {
-            if (!isInitialized) InitializeList(myScript.skillEntityList.Count);
-        }else{
-            myScript.skillEntityList = new List<SkillEntity>();
-            if (!isInitialized) InitializeList(myScript.skillEntityList.Count);
-        }
-        // --ここまで--
+        serializedObject.Update();
+        CacheSerializedProperties();
+        SyncFoldoutCaches(skillListProp?.arraySize ?? 0);
 
-        if (state_folding_list = EditorGUILayout.Foldout(state_folding_list, "States"))
+        DrawHeader();
+
+        EditorGUILayout.Space();
+
+        var stateOptions = BuildStateOptions();
+
+        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+        DrawSkillEntityList(stateOptions);
+        EditorGUILayout.EndScrollView();
+
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    void DrawHeader()
+    {
+        EditorGUILayout.LabelField("Behavior Runner", EditorStyles.boldLabel);
+
+        useLocalResourceReference = EditorGUILayout.Toggle("本地资源参照模式", useLocalResourceReference);
+
+        if (skillConfigTypeProp != null)
         {
-            casualToStateKeyOptionsList = new List<string>();
-            EditorGUI.indentLevel++;
-            EditorGUILayout.BeginVertical();
-            for (int i = 0; i < myScript.skillEntityList.Count; i++)
+            EditorGUILayout.PropertyField(skillConfigTypeProp, new GUIContent("技能类型标识"));
+        }
+
+        if (aiStatesPathProp != null)
+        {
+            EditorGUILayout.PropertyField(aiStatesPathProp, new GUIContent("AI States Path"));
+        }
+
+        if (usingScriptProp != null)
+        {
+            EditorGUILayout.PropertyField(usingScriptProp, new GUIContent("Using Script"));
+        }
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            GUILayout.FlexibleSpace();
+            using (new EditorGUI.DisabledGroupScope(string.IsNullOrEmpty(skillConfigTypeProp?.stringValue)))
             {
-                if (!casualToStateKeyOptionsList.Contains(myScript.skillEntityList[i].REAL_NAME))
-                    casualToStateKeyOptionsList.Add(myScript.skillEntityList[i].REAL_NAME);
+                if (GUILayout.Button("保存状态迁移"))
+                {
+                    serializedObject.ApplyModifiedProperties();
+
+                    if (string.IsNullOrEmpty(runner.SkillConfigType))
+                    {
+                        Debug.LogWarning("SkillConfigType 未设置，无法保存状态迁移。");
+                    }
+                    else
+                    {
+                        runner.SaveTrans(runner.SkillConfigType);
+                        EditorUtility.SetDirty(runner);
+                    }
+
+                    serializedObject.Update();
+                }
+            }
+        }
+
+        if (useLocalResourceReference && string.IsNullOrEmpty(skillConfigTypeProp?.stringValue))
+        {
+            EditorGUILayout.HelpBox("启用本地资源参照模式时需要指定技能类型标识，用于从技能配置表加载状态列表。", MessageType.Info);
+        }
+    }
+
+    List<string> BuildStateOptions()
+    {
+        var options = new HashSet<string>(DefaultStateNames);
+
+        if (!useLocalResourceReference)
+        {
+            if (skillListProp != null)
+            {
+                for (var i = 0; i < skillListProp.arraySize; i++)
+                {
+                    var element = skillListProp.GetArrayElementAtIndex(i);
+                    var realNameProp = element.FindPropertyRelative("REAL_NAME");
+                    if (!string.IsNullOrEmpty(realNameProp.stringValue))
+                    {
+                        options.Add(realNameProp.stringValue);
+                    }
+                }
+            }
+        }
+        else if (!string.IsNullOrEmpty(skillConfigTypeProp?.stringValue))
+        {
+            var fromConfig = GetBeheviourOptions(skillConfigTypeProp.stringValue);
+            if (fromConfig != null)
+            {
+                foreach (var name in fromConfig)
+                {
+                    if (!string.IsNullOrEmpty(name))
+                        options.Add(name);
+                }
+            }
+        }
+
+        return options.OrderBy(x => x).ToList();
+    }
+
+    void DrawSkillEntityList(IReadOnlyList<string> stateOptions)
+    {
+        if (skillListProp == null)
+        {
+            EditorGUILayout.HelpBox("skillEntityList 未初始化。", MessageType.Error);
+            return;
+        }
+
+        for (var i = 0; i < skillListProp.arraySize; i++)
+        {
+            var skillProp = skillListProp.GetArrayElementAtIndex(i);
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                DrawSkillHeader(skillProp, i);
+                if (!stateFoldouts[i])
+                {
+                    continue;
+                }
 
                 EditorGUI.indentLevel++;
 
-                if (stateKeyGUI == null)
-                    stateKeyGUI = new GUIStyle(GUI.skin.label);
-                stateKeyGUI.normal.textColor = new Color(0.6f, 0.3f, 0.4f);
-                myScript.skillEntityList[i].REAL_NAME =
-                StateIndexListOptions.Contains(myScript.skillEntityList[i].REAL_NAME) ?
-                StateIndexListOptions[EditorGUILayout.Popup("State Key", Array.IndexOf(StateIndexListOptions, myScript.skillEntityList[i].REAL_NAME), StateIndexListOptions, stateKeyGUI)] :
-                StateIndexListOptions.Length > 0 ? StateIndexListOptions[0] : null;
+                DrawSkillBasics(skillProp, stateOptions);
+                EditorGUILayout.Space();
+                DrawAIAttributes(skillProp);
+                EditorGUILayout.Space();
+                DrawCasualTransitions(skillProp, i, stateOptions);
+                EditorGUILayout.Space();
+                DrawForcedTransitions(skillProp, i);
 
-                myScript.skillEntityList[i].StateType =
-                (BehaviorType)EditorGUILayout.EnumPopup("Attack Type", myScript.skillEntityList[i].StateType);
-
-                if (myScript.skillEntityList[i].StateType != BehaviorType.NONE || myScript.skillEntityList[i].StateType != BehaviorType.MV ||
-                        myScript.skillEntityList[i].StateType != BehaviorType.Def || myScript.skillEntityList[i].StateType != BehaviorType.Hit ||
-                            myScript.skillEntityList[i].StateType != BehaviorType.KnockOff)
-                {
-                    GUI.backgroundColor = new Color(1f, 0.7f, 0.5f);
-                    if (attackRangeToggleGUI == null)
-                    {
-                        attackRangeToggleGUI = new GUIStyle(GUI.skin.toggle)
-                        {
-                            margin = new RectOffset(50, 22, 11, 11)
-                        };
-                        attackRangeToggleGUI.alignment = TextAnchor.MiddleLeft;
-                        attackRangeToggleGUI.stretchWidth = false;
-                    }
-
-                    myScript.skillEntityList[i].AIAttrs.AI_MIN_DIS = EditorGUILayout.FloatField("Distance Min",myScript.skillEntityList[i].AIAttrs.AI_MIN_DIS);
-                    myScript.skillEntityList[i].AIAttrs.AI_MAX_DIS = EditorGUILayout.FloatField("Distance Max",myScript.skillEntityList[i].AIAttrs.AI_MAX_DIS);
-                    
-                    GUI.backgroundColor = Color.white;
-                }
-                EditorGUILayout.BeginVertical();
-                if (casualToFoldings[i] = EditorGUILayout.Foldout(casualToFoldings[i], " ****************** Casual To States ******************"))
-                {
-                    for (int y = 0; y < myScript.skillEntityList[i].CasualTo.Length; y++)
-                    {
-                        EditorGUI.indentLevel++;
-                        if (casualToStateKeyOptions.Contains(myScript.skillEntityList[i].CasualTo[y]))
-                        {
-                            stateKeyGUI.normal.textColor = new Color(0.2f, 0.7f, 0.5f);                        
-                            myScript.skillEntityList[i].CasualTo[y] =
-                            casualToStateKeyOptions[EditorGUILayout.Popup(
-                            "Casual To State Key",
-                            Array.IndexOf(casualToStateKeyOptions, myScript.skillEntityList[i].CasualTo[y]),
-                            casualToStateKeyOptions,
-                            stateKeyGUI)];
-                        }
-                        else
-                        {
-                            myScript.skillEntityList[i].CasualTo[y] = casualToStateKeyOptions[0];
-                        }
-                        
-                        stateKeyGUI.normal.textColor = new Color(0.6f, 0.3f, 0.4f);
-                        deleteCasualToButtonStyle = new GUIStyle(GUI.skin.box);
-                        deleteCasualToButtonStyle.normal.textColor = Color.blue;
-                        deleteCasualToButtonStyle.alignment = TextAnchor.MiddleCenter;
-                        deleteCasualToButtonStyle.margin = new RectOffset(50, 22, 11, 11);
-                        if (GUILayout.Button("DeleteThis", deleteCasualToButtonStyle))
-                        {
-                            List<string> casualStateList = myScript.skillEntityList[i].CasualTo.ToList();
-                            casualStateList.RemoveAt(y);
-                            myScript.skillEntityList[i].CasualTo = casualStateList.ToArray();
-                            EditorGUI.indentLevel--;
-                            break;
-                        }
-                        EditorGUI.indentLevel--;
-                    }
-                    
-                    addCasualToButtonStyle = new GUIStyle(GUI.skin.box);
-                    addCasualToButtonStyle.normal.textColor = Color.red;
-                    addCasualToButtonStyle.alignment = TextAnchor.MiddleCenter;
-                    addCasualToButtonStyle.margin = new RectOffset(100, 22, 11, 11);
-
-                    for (int z = 0; z < myScript.skillEntityList.Count;z++)
-                    {
-                        if (myScript.skillEntityList[z] != myScript.skillEntityList[i])
-                        {
-                            EditorGUI.indentLevel++;
-                            if (GUILayout.Button("  +  " + myScript.skillEntityList[z].REAL_NAME, addCasualToButtonStyle))
-                            {
-                                List<string> casualStateList = myScript.skillEntityList[i].CasualTo.ToList();
-                                casualStateList.Add(myScript.skillEntityList[z].REAL_NAME);
-                                myScript.skillEntityList[i].CasualTo = casualStateList.ToArray();
-                            }
-                            EditorGUI.indentLevel--;
-                        }
-                    }
-                }
-                EditorGUILayout.EndVertical();
-                
-                // 强制Force迁移
-                EditorGUILayout.BeginVertical();
-                if (forceToFoldings[i] = EditorGUILayout.Foldout(forceToFoldings[i], " !!! Force To States !!!"))
-                {
-                    try {
-                        for (int y = 0; y < myScript.skillEntityList[i].ForcedTransitions.Length; y++)
-                        {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.TextField("forceTo: ", myScript.skillEntityList[i].ForcedTransitions[y]);
-                        EditorGUI.indentLevel--;
-                        }
-                    }
-                    catch(Exception e)
-                    {
-                        Debug.Log(e);
-                    }
-                }
-                EditorGUILayout.EndVertical();
-                
-                myScript.skillEntityList[i].CAN_BE_CANCELLED_TO = EditorGUILayout.Toggle("superCancel", myScript.skillEntityList[i].CAN_BE_CANCELLED_TO);
-                myScript.skillEntityList[i].EnterInput = (InputKey)EditorGUILayout.EnumPopup("enter input", myScript.skillEntityList[i].EnterInput);
-                myScript.skillEntityList[i].ExitInput = (InputKey)EditorGUILayout.EnumPopup("exit input", myScript.skillEntityList[i].ExitInput);
-                myScript.skillEntityList[i].SP_LEVEL = EditorGUILayout.IntPopup("SPLevel", myScript.skillEntityList[i].SP_LEVEL,exoptions_display,exoptions);
-                GUI.backgroundColor = Color.blue;
-                
-                ButtonStyle = new GUIStyle(GUI.skin.button)
-                {
-                    normal = { textColor = Color.white },
-                    fixedWidth = 100f
-                };
-                if (GUILayout.Button("Delete",ButtonStyle))
-                {
-                    myScript.skillEntityList.RemoveAt(i);
-                    InitializeList(i, myScript.skillEntityList.Count);
-                }
-                GUI.backgroundColor = Color.white;
                 EditorGUI.indentLevel--;
-                GUILayout.Space(1f);
             }
-            EditorGUILayout.EndVertical();
-                    
-            casualToStateKeyOptions = casualToStateKeyOptionsList.ToArray();
-            
-            if (GUILayout.Button("Add"))
-            {
-                GUI.color = Color.green;
-                myScript.skillEntityList.Add(new SkillEntity("Empty", 0, new AIAttrs(), null, null, InputKey.Null, InputKey.Null, 0));
-                InitializeList(-1, myScript.skillEntityList.Count);
-            }
+
+            EditorGUILayout.Space();
         }
-        
-        GUI.backgroundColor = Color.green; 
-		if(GUILayout.Button("saveTrans"))
-		{
-			myScript.SaveTrans(targetType);
-		}
-        GUI.backgroundColor = Color.white; 
-	}
 
-    bool isInitialized;
-    bool state_folding_list;
-    bool[] casualToFoldings;
-    bool[] forceToFoldings;
-    bool[] foldings;
-
-    // Listの長さを初期化
-    void InitializeList(int count)
-    {
-        foldings = new bool[count];
-        casualToFoldings = new bool[count];
-        forceToFoldings = new bool[count];
-        isInitialized = true;
+        if (GUILayout.Button("添加状态"))
+        {
+            AddNewSkillEntity();
+        }
     }
 
-    // 指定した番号以外をキャッシュして初期化 (i = -1の時は全てキャッシュして初期化)
-    void InitializeList(int i, int count)
+    void DrawSkillHeader(SerializedProperty skillProp, int index)
     {
-        bool[] foldings_temp = foldings;
-        foldings = new bool[count];
+        var realNameProp = skillProp.FindPropertyRelative("REAL_NAME");
+        var displayName = string.IsNullOrEmpty(realNameProp.stringValue)
+            ? $"State {index + 1}"
+            : realNameProp.stringValue;
 
-        for (int k = 0, j = 0; k < count; k++)
+        using (new EditorGUILayout.HorizontalScope())
         {
-            if (i == j) j++;
-            if (foldings_temp.Length - 1 < j) break;
-            foldings[k] = foldings_temp[j++];
+            stateFoldouts[index] = EditorGUILayout.Foldout(stateFoldouts[index], displayName, true);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("删除", GUILayout.Width(56f)))
+            {
+                RemoveSkillEntityAt(index);
+                GUIUtility.ExitGUI();
+            }
         }
-        ////////////////////////////////////////////
-        bool[] foldings_temp2 = casualToFoldings;
-        casualToFoldings = new bool[count];
+    }
 
-        for (int k = 0, j = 0; k < count; k++)
-        {
-            if (i == j) j++;
-            if (foldings_temp2.Length - 1 < j) break;
-            casualToFoldings[k] = foldings_temp2[j++];
-        }
-        ////////////////////////////////////////////
-        bool[] foldings_temp3 = forceToFoldings;
-        forceToFoldings = new bool[count];
+    void DrawSkillBasics(SerializedProperty skillProp, IReadOnlyList<string> stateOptions)
+    {
+        EditorGUILayout.PropertyField(skillProp.FindPropertyRelative("SkillID"), new GUIContent("Skill ID"));
+        DrawStateKeyField(skillProp.FindPropertyRelative("REAL_NAME"), stateOptions);
+        EditorGUILayout.PropertyField(skillProp.FindPropertyRelative("StateType"), new GUIContent("State Type"));
+        EditorGUILayout.PropertyField(skillProp.FindPropertyRelative("CAN_BE_CANCELLED_TO"), new GUIContent("Super Cancel"));
+        EditorGUILayout.PropertyField(skillProp.FindPropertyRelative("EnterInput"), new GUIContent("Enter Input"));
+        EditorGUILayout.PropertyField(skillProp.FindPropertyRelative("ExitInput"), new GUIContent("Exit Input"));
 
-        for (int k = 0, j = 0; k < count; k++)
+        var spLevelProp = skillProp.FindPropertyRelative("SP_LEVEL");
+        var spSelected = EditorGUILayout.IntPopup("SP Level", spLevelProp.intValue, SpLevelLabels, SpLevelValues);
+        if (spSelected != spLevelProp.intValue)
         {
-            if (i == j) j++;
-            if (foldings_temp3.Length - 1 < j) break;
-            forceToFoldings[k] = foldings_temp3[j++];
+            spLevelProp.intValue = spSelected;
         }
+    }
+
+    void DrawAIAttributes(SerializedProperty skillProp)
+    {
+        var aiAttrsProp = skillProp.FindPropertyRelative("AIAttrs");
+        if (aiAttrsProp == null)
+        {
+            EditorGUILayout.HelpBox("AIAttrs 数据为空。", MessageType.Warning);
+            return;
+        }
+
+        EditorGUILayout.LabelField("AI 属性", EditorStyles.boldLabel);
+        EditorGUI.indentLevel++;
+        var minProp = aiAttrsProp.FindPropertyRelative("AI_MIN_DIS");
+        var maxProp = aiAttrsProp.FindPropertyRelative("AI_MAX_DIS");
+        var heightProp = aiAttrsProp.FindPropertyRelative("height");
+
+        if (minProp != null)
+        {
+            EditorGUILayout.PropertyField(minProp, new GUIContent("Distance Min"));
+        }
+        if (maxProp != null)
+        {
+            EditorGUILayout.PropertyField(maxProp, new GUIContent("Distance Max"));
+        }
+        if (heightProp != null)
+        {
+            var selectedHeight = EditorGUILayout.IntPopup("Trigger Height", heightProp.intValue, HeightLabels, HeightValues);
+            if (selectedHeight != heightProp.intValue)
+            {
+                heightProp.intValue = selectedHeight;
+            }
+        }
+        EditorGUI.indentLevel--;
+    }
+
+    void DrawCasualTransitions(SerializedProperty skillProp, int index, IReadOnlyList<string> stateOptions)
+    {
+        var casualProp = skillProp.FindPropertyRelative("CasualTo");
+        if (casualProp == null)
+        {
+            EditorGUILayout.HelpBox("CasualTo 数据为空。", MessageType.Warning);
+            return;
+        }
+
+        casualFoldouts[index] = EditorGUILayout.Foldout(casualFoldouts[index], "自然迁移", true);
+        if (!casualFoldouts[index])
+        {
+            return;
+        }
+
+        EditorGUI.indentLevel++;
+        for (var i = 0; i < casualProp.arraySize; i++)
+        {
+            var element = casualProp.GetArrayElementAtIndex(i);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                DrawStateKeyField(element, stateOptions, $"迁移 {i + 1}");
+                if (GUILayout.Button("删除", GUILayout.Width(56f)))
+                {
+                    casualProp.DeleteArrayElementAtIndex(i);
+                    break;
+                }
+            }
+        }
+
+        if (GUILayout.Button("添加自然迁移"))
+        {
+            AddTransition(casualProp, stateOptions, skillProp.FindPropertyRelative("REAL_NAME")?.stringValue);
+        }
+        EditorGUI.indentLevel--;
+    }
+
+    void DrawForcedTransitions(SerializedProperty skillProp, int index)
+    {
+        var forcedProp = skillProp.FindPropertyRelative("ForcedTransitions");
+        if (forcedProp == null)
+        {
+            EditorGUILayout.HelpBox("ForcedTransitions 数据为空。", MessageType.Warning);
+            return;
+        }
+
+        forcedFoldouts[index] = EditorGUILayout.Foldout(forcedFoldouts[index], "强制迁移", true);
+        if (!forcedFoldouts[index])
+        {
+            return;
+        }
+
+        EditorGUI.indentLevel++;
+        for (var i = 0; i < forcedProp.arraySize; i++)
+        {
+            var element = forcedProp.GetArrayElementAtIndex(i);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                element.stringValue = EditorGUILayout.DelayedTextField($"目标 {i + 1}", element.stringValue);
+                if (GUILayout.Button("删除", GUILayout.Width(56f)))
+                {
+                    forcedProp.DeleteArrayElementAtIndex(i);
+                    break;
+                }
+            }
+        }
+
+        if (GUILayout.Button("添加强制迁移"))
+        {
+            var newIndex = forcedProp.arraySize;
+            forcedProp.arraySize++;
+            forcedProp.GetArrayElementAtIndex(newIndex).stringValue = string.Empty;
+        }
+        EditorGUI.indentLevel--;
+    }
+
+    void DrawStateKeyField(SerializedProperty stringProp, IReadOnlyList<string> stateOptions, string labelOverride = null)
+    {
+        if (stringProp == null)
+        {
+            return;
+        }
+
+        var current = stringProp.stringValue;
+        var popupOptions = new List<string> { "<保持当前>" };
+
+        if (!string.IsNullOrEmpty(current) && !popupOptions.Contains(current))
+        {
+            popupOptions.Add(current);
+        }
+
+        foreach (var option in stateOptions)
+        {
+            if (!popupOptions.Contains(option))
+            {
+                popupOptions.Add(option);
+            }
+        }
+
+        var currentIndex = popupOptions.IndexOf(current);
+        if (currentIndex < 0)
+        {
+            currentIndex = 0;
+        }
+
+        var selected = EditorGUILayout.Popup(string.IsNullOrEmpty(labelOverride) ? "State Key" : labelOverride, currentIndex, popupOptions.ToArray());
+        if (selected > 0 && selected < popupOptions.Count)
+        {
+            current = popupOptions[selected];
+        }
+
+        current = EditorGUILayout.DelayedTextField("State Key(手动)", current);
+        stringProp.stringValue = current;
+    }
+
+    void AddTransition(SerializedProperty arrayProp, IReadOnlyList<string> stateOptions, string ownerState)
+    {
+        var candidate = stateOptions.FirstOrDefault(option =>
+            !string.IsNullOrEmpty(option) &&
+            option != ownerState &&
+            !PropertyContains(arrayProp, option));
+
+        var newIndex = arrayProp.arraySize;
+        arrayProp.arraySize++;
+        arrayProp.GetArrayElementAtIndex(newIndex).stringValue = candidate ?? string.Empty;
+    }
+
+    static bool PropertyContains(SerializedProperty arrayProp, string value)
+    {
+        for (var i = 0; i < arrayProp.arraySize; i++)
+        {
+            if (arrayProp.GetArrayElementAtIndex(i).stringValue == value)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void AddNewSkillEntity()
+    {
+        serializedObject.ApplyModifiedProperties();
+
+        Undo.RecordObject(runner, "Add Behavior State");
+        runner.skillEntityList.Add(new SkillEntity
+        {
+            SkillID = string.Empty,
+            REAL_NAME = string.Empty,
+            StateType = BehaviorType.NONE,
+            AIAttrs = new AIAttrs(),
+            CasualTo = Array.Empty<string>(),
+            ForcedTransitions = Array.Empty<string>(),
+            CAN_BE_CANCELLED_TO = true,
+            EnterInput = InputKey.Null,
+            ExitInput = InputKey.Null,
+            SP_LEVEL = 0
+        });
+        EditorUtility.SetDirty(runner);
+
+        serializedObject.Update();
+        CacheSerializedProperties();
+        SyncFoldoutCaches(skillListProp?.arraySize ?? 0);
+    }
+
+    void RemoveSkillEntityAt(int index)
+    {
+        serializedObject.ApplyModifiedProperties();
+
+        if (runner.skillEntityList == null || index < 0 || index >= runner.skillEntityList.Count)
+        {
+            return;
+        }
+
+        Undo.RecordObject(runner, "Remove Behavior State");
+        runner.skillEntityList.RemoveAt(index);
+        EditorUtility.SetDirty(runner);
+
+        serializedObject.Update();
+        CacheSerializedProperties();
+        SyncFoldoutCaches(skillListProp?.arraySize ?? 0);
     }
 }
 #endif

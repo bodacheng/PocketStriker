@@ -17,7 +17,7 @@ namespace HittingDetection
         [Tooltip("damageTypeOfTheWeapon")]
         public WeaponMode _WeaponMode;
         [Tooltip("AT Weights")]
-        public float AT_weight = 1;
+        public float AT_weight = 1;//这个是计算到自动估算伤害工具里去的
         [Tooltip("weaponHP, when below 0, is not an energy")]
         public int weaponHP = -1;
         [Tooltip("heavyLevel 关系对其他武器形成的损耗力。详见WpHpCost")]
@@ -45,14 +45,16 @@ namespace HittingDetection
         public bool Enabled => _enabled;
         public float CurrentHP { get; set; }
         FightParamsReference _attackerRef;
+        Decomposition _decomposition;
         TeamConfig teamConfig = TeamConfig.DefaultSet;
         Transform _WeaponHolderCenter;//角色几何中心，如果是能量道具则为能量道具的几何中心，用于防御判断。
         bool HitFlesh;
         bool HitShield;
         private List<Marker> _markers = new List<Marker>();
-        List<Transform> _usedTargets = new List<Transform>(); // 就是每一帧所碰撞到的所有collider的母体。所有collider。不论是否包含mainhealth什么的。是以武器启动周期为处理单位。处理过的单位才会加入至其中
-        readonly List<Transform> _Targets_Raw_Hit = new List<Transform>(); //Targets initialy hit by the blade (pre-check 这个是以一帧为单位处理，为了避免多个marker重复处理击中的bodyhealth。
-        private readonly List<Transform> _shieldsHit = new List<Transform>();
+        readonly HashSet<Transform> _localUsedTargets = new HashSet<Transform>();
+        HashSet<Transform> _usedTargets; // 就是每一帧所碰撞到的所有collider的母体。所有collider。不论是否包含mainhealth什么的。是以武器启动周期为处理单位。处理过的单位才会加入至其中
+        readonly HashSet<Transform> _Targets_Raw_Hit = new HashSet<Transform>(); //Targets initialy hit by the blade (pre-check 这个是以一帧为单位处理，为了避免多个marker重复处理击中的bodyhealth。
+        private readonly HashSet<Transform> _shieldsHit = new HashSet<Transform>();
         private readonly List<Vector3> _shieldHitPos = new List<Vector3>();
         private readonly List<V_Damage> hitsOnHealthBody = new List<V_Damage>();
         readonly bool _traditionalDefendMode = false;
@@ -85,11 +87,26 @@ namespace HittingDetection
             return weaponHP > 0 ? AT / weaponHP : AT;
         }
 
+        public bool ShouldPreferAttackerLinePush()
+        {
+            switch (damage_type)
+            {
+                case DamageType.draw:
+                case DamageType.explosion:
+                case DamageType.time_pause:
+                case DamageType.sekka:
+                    return false;
+                default:
+                    return _decomposition != null && _decomposition.IsFromDefaultHitBoxPool();
+            }
+        }
+
         void Awake()
         {
+            _usedTargets = _localUsedTargets;
             Transform _MarkersParent = transform;
             Transform[] children = new Transform[_MarkersParent.childCount];
-            var bms = new List<Marker>();
+            var bms = new List<Marker>(children.Length);
             for (var i = 0; i < children.Length; i++)
             {
                 var bO_Marker = _MarkersParent.GetChild(i).gameObject.GetComponent<BO_Marker>();
@@ -103,6 +120,7 @@ namespace HittingDetection
                 }
             }
             _markers = bms;
+            TryGetComponent(out _decomposition);
         }
         
         Coroutine _delayEnableMarkers;
@@ -140,16 +158,30 @@ namespace HittingDetection
 
         public void SetOwnerFACR(FightParamsReference value)
         {
-            _attackerRef = value;
-            AT = _attackerRef == null ? 0 : _attackerRef.AT * AT_weight;
+            if (_decomposition == null)
+            {
+                _attackerRef = value;
+                AT = _attackerRef == null ? 0 : _attackerRef.AT * AT_weight;
+                return;
+            }
+
+            if (_attackerRef != value)
+            {
+                _attackerRef?.UnregisterDecomposition(_decomposition);
+                value?.RegisterDecomposition(_decomposition);
+                _attackerRef = value;
+            }
+
+            var owner = _attackerRef;
+            AT = owner == null ? 0 : owner.AT * AT_weight;
         }
         public FightParamsReference GetOwnerFACR()
         {
             return _attackerRef;
         }
-        public void SetDetectionTargetsUnion(List<Transform> usedTargets)
+        public void SetDetectionTargetsUnion(HashSet<Transform> usedTargets)
         {
-            _usedTargets = usedTargets;
+            _usedTargets = usedTargets ?? _localUsedTargets;
         }
 
         public void SetTeamConfig(TeamConfig teamConfig)

@@ -13,19 +13,16 @@ namespace Soul
 
         void DrawDamageUpdate(V_Damage newValue)
         {
-            Vector3 destination()
+            if (newValue.from_weapon.weaponHP > 0 && newValue.from_weapon.CurrentHP <= 0)
+                return;
+
+            Vector3 Destination()
             {
                 var vector3 = newValue.from_weapon_marker.transform.position;
-                vector3.y = 0;
-                if (vector3.magnitude > BoundaryControlByGod._BattleRingRadius)
-                {
-                    vector3 = vector3.normalized * BoundaryControlByGod._BattleRingRadius;
-                }
                 vector3.y = gameObject.transform.position.y;
                 return vector3;
             }
-            
-            _Rigidbody.MovePosition(destination());
+            _Rigidbody.MovePosition(Destination());
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Soul
                 {
                     toFormAttackStateList.Add(list[i].REAL_NAME, list[i]);
                 }
-                _statesIncubator = new BehaviorsIncubator(_emptyState, toFormAttackStateList);
+                _statesIncubator = new BehaviorsIncubator(_emptyState, new SkillEntity() ,toFormAttackStateList);
                 List<SkillEntity> after_list = new List<SkillEntity>();
                 List<string> alreadyInList = new List<string>();
                 foreach (SkillEntity s in list)
@@ -218,7 +218,7 @@ namespace Soul
             {
                 toFormAttackStateList.Add(list[i].REAL_NAME, list[i]);
             }
-            _statesIncubator = new BehaviorsIncubator(_emptyState,toFormAttackStateList);
+            _statesIncubator = new BehaviorsIncubator(_emptyState, new SkillEntity(),toFormAttackStateList);
             IDictionary<string, SkillEntity> stateTransitionSetDictionary = new Dictionary<string, SkillEntity>();
             List<SkillEntity> setsHaveInitialInput = new List<SkillEntity>();
             

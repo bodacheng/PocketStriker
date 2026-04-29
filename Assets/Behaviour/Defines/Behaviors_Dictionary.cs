@@ -9,7 +9,7 @@ namespace Soul
         // 技能动画列表（不包括基础动画）
         public readonly List<string> SkillTypeKeys;
 
-        public BehaviorsIncubator(Empty_State empty_State, IDictionary<string, SkillEntity> toFormAttackStateList)
+        public BehaviorsIncubator(Empty_State empty_State, SkillEntity moveState, IDictionary<string, SkillEntity> toFormAttackStateList)
         {
             BehaviorDic = new Dictionary<string, Behavior>
             {
@@ -19,12 +19,6 @@ namespace Soul
             var death = new Death_State();
             BehaviorDic.Add("Victory", victory);
             BehaviorDic.Add("Death", death);
-            var move = new Move_State(Move_State.AIMoveMode.Normal, FightGlobalSetting._fighterMoveSpeed, 1f)
-            {
-                StateType = BehaviorType.MV,
-                nextAttackCanRushFirst = false
-            };
-            BehaviorDic.Add("Move", move);
 
             if (FightGlobalSetting.HasDefend)
             {
@@ -35,6 +29,27 @@ namespace Soul
                 };
                 BehaviorDic.Add("Defend", defend);
             }
+
+            MoveType moveType;
+            switch (moveState.SkillID)
+            {
+                case "slow":
+                    moveType = MoveType.slow;
+                    break;
+                case "fast":
+                    moveType = MoveType.fast;
+                    break;
+                default:
+                    moveType = MoveType.normal;
+                    break;
+            }
+
+            var move = new Move_State(moveType)
+            {
+                StateType = BehaviorType.MV,
+                nextAttackCanRushFirst = false
+            };
+            BehaviorDic.Add("Move", move);
 
             var hit = new Hurt_State()
             {
@@ -63,31 +78,18 @@ namespace Soul
                     continue;
 
                 SkillConfig skillConfig = SkillConfigTable.GetSkillConfigByRecordId(_set.SkillID);
-                
+
                 if (!BehaviorDic.Keys.Contains(_set.REAL_NAME))
                 {
                     switch (_set.StateType)
                     {
                         case BehaviorType.AC:
-                            switch (_set.REAL_NAME)
+                            GMoveEscapeState rush = new GMoveEscapeState(_set.REAL_NAME)
                             {
-                                case "RushBack":
-                                    Dash_Back_State RushBack = new Dash_Back_State
-                                    {
-                                        nextAttackCanRushFirst = false,
-                                        StateType = BehaviorType.AC
-                                    };
-                                    BehaviorDic.Add("RushBack", RushBack);
-                                    break;
-                                case "Rush":
-                                    GMoveEscapeState Rush = new GMoveEscapeState("rush")
-                                    {
-                                        nextAttackCanRushFirst = true,
-                                        StateType = BehaviorType.AC
-                                    };
-                                    BehaviorDic.Add("Rush", Rush);
-                                    break;
-                            }
+                                nextAttackCanRushFirst = true,
+                                StateType = BehaviorType.AC
+                            };
+                            BehaviorDic.Add("rush", rush);
                             break;
                         case BehaviorType.GI:
                             G_Attack_State _GI_Attack = new G_Attack_State(null, 0f, 0f, 10f, _set.REAL_NAME)
@@ -109,6 +111,16 @@ namespace Soul
                             BehaviorDic.Add(_set.REAL_NAME, _GM_Attack);
                             if (!SkillTypeKeys.Contains(_set.REAL_NAME)) SkillTypeKeys.Add(_set.REAL_NAME);
                             break;
+                        case BehaviorType.GMB:
+                            G_M_B_State _GMB_Attack = new G_M_B_State(_set.REAL_NAME)
+                            {
+                                StateType = BehaviorType.GMB,
+                                nextAttackCanRushFirst = false,
+                                SkillConfig = skillConfig
+                            };
+                            BehaviorDic.Add(_set.REAL_NAME, _GMB_Attack);
+                            if (!SkillTypeKeys.Contains(_set.REAL_NAME)) SkillTypeKeys.Add(_set.REAL_NAME);
+                            break;
                         case BehaviorType.GR:
                             G_Attack_State _GR_Attack = new G_Attack_State("dash", 40f, 1.4f, 10f, _set.REAL_NAME)
                             {
@@ -127,6 +139,16 @@ namespace Soul
                                 SkillConfig = skillConfig
                             };
                             BehaviorDic.Add(_set.REAL_NAME, counter);
+                            if (!SkillTypeKeys.Contains(_set.REAL_NAME)) SkillTypeKeys.Add(_set.REAL_NAME);
+                            break;
+                        case BehaviorType.RB:
+                            Dash_Back_State dashBackState = new Dash_Back_State(_set.REAL_NAME)
+                            {
+                                StateType = BehaviorType.RB,
+                                nextAttackCanRushFirst = false,
+                                SkillConfig = skillConfig
+                            };
+                            BehaviorDic.Add(_set.REAL_NAME, dashBackState);
                             if (!SkillTypeKeys.Contains(_set.REAL_NAME)) SkillTypeKeys.Add(_set.REAL_NAME);
                             break;
                         case BehaviorType.NONE:

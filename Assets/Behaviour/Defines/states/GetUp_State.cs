@@ -21,9 +21,9 @@ namespace Soul
             base.AI_State_enter();
             _SkillCancelFlag.turn_on_flag();
             counter = 0f;
-            _Animator.SetFloat("speed", 0f);
-            _Rigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-            AnimationManger.AnimationTrigger(clip_name, true, CommonSetting.CharacterAnimDuration);
+            HaltMotion();
+            _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
         }
 
         public override void C_State_enter()

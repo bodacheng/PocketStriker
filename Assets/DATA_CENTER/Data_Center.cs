@@ -46,6 +46,11 @@ public partial class Data_Center : MonoBehaviour
     
     private UnitInfo unitInfo;
     public UnitInfo UnitInfo => unitInfo;
+
+    public UnitConfig UnitConfig()
+    {
+        return Units.GetUnitConfig(UnitInfo.r_id);
+    }
     
     public bool IfPreparedForBattle()
     {

@@ -14,28 +14,28 @@ public partial class SkillSet
     public List<string> SkillIDList()
     {
         var ids = new List<string>();
-        
+
         if (a1 != null)
             ids.Add(a1);
         if (a2 != null)
             ids.Add(a2);
         if (a3 != null)
             ids.Add(a3);
-            
+
         if (b1 != null)
             ids.Add(b1);
         if (b2 != null)
             ids.Add(b2);
         if (b3 != null)
             ids.Add(b3);
-            
+
         if (c1 != null)
             ids.Add(c1);
         if (c2 != null)
             ids.Add(c2);
         if (c3 != null)
             ids.Add(c3);
-        
+
         return ids;
     }
 
@@ -49,14 +49,10 @@ public partial class SkillSet
 
         return instanceIds;
     }
-    
+
     // 获取平均技能等级
     public float GetAerLevel(List<float> levels)
     {
-        if (levels == null || levels.Count == 0)
-        {
-            return 1f;
-        }
         float aver = 0;
         foreach (var t in levels)
         {
@@ -64,48 +60,44 @@ public partial class SkillSet
         }
         return (float)Math.Round(aver / levels.Count, 1);
     }
-    
+
     public static float INI_Hp(List<string> skillIds, float lv)
     {
         float wholeHp = 0;
         foreach (var skillId in skillIds)
         {
             var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillId);
-            if (skillConfig == null)
-            {
-                continue;
-            }
             wholeHp += FightGlobalSetting.StoneHpCal(skillConfig.HP_WEIGHT, lv);
         }
         return wholeHp;
     }
-    
+
     // 获取技能实体列表，调用必须在SortNineAndTwo之后
     public List<SkillEntity> SkillEntityList()
     {
         var behaviorTransitionSets = new List<SkillEntity>();
-        
+
         if (A1 != null)
             behaviorTransitionSets.Add(A1);
         if (A2 != null)
             behaviorTransitionSets.Add(A2);
         if (A3 != null)
             behaviorTransitionSets.Add(A3);
-        
+
         if (B1 != null)
             behaviorTransitionSets.Add(B1);
         if (B2 != null)
             behaviorTransitionSets.Add(B2);
         if (B3 != null)
             behaviorTransitionSets.Add(B3);
-        
+
         if (C1 != null)
             behaviorTransitionSets.Add(C1);
         if (C2 != null)
             behaviorTransitionSets.Add(C2);
         if (C3 != null)
             behaviorTransitionSets.Add(C3);
-            
+
         if (D != null)
             behaviorTransitionSets.Add(D);
         if (M != null)
@@ -115,7 +107,7 @@ public partial class SkillSet
         if (_empty != null)
             behaviorTransitionSets.Add(_empty);
         if (_victory != null)
-            behaviorTransitionSets.Add(_victory);    
+            behaviorTransitionSets.Add(_victory);
         if (_death != null)
             behaviorTransitionSets.Add(_death);
         if (_hit != null)
@@ -124,10 +116,10 @@ public partial class SkillSet
             behaviorTransitionSets.Add(_getUp);
         if (_knockOff != null)
             behaviorTransitionSets.Add(_knockOff);
-            
+
         return behaviorTransitionSets;
     }
-    
+
     //下面的环节纯粹是针对SkillPrintOut的一些处理
     public IDictionary<int, SkillEntity> GetAttack1Chan()
     {
@@ -159,7 +151,7 @@ public partial class SkillSet
         };
         return chain;
     }
-    
+
     public SkillConfig GetA1Config()
     {
         return SkillConfigTable.GetSkillConfigByRecordId(a1);
@@ -196,29 +188,29 @@ public partial class SkillSet
     {
         return SkillConfigTable.GetSkillConfigByRecordId(c3);
     }
-        
+
     public SkillEntity GetM_STS()
     {
         return M;
     }
-    
+
     public int GetLowestSpLevel()
     {
         var sp = new List<int>()
         {
-            GetA1Config() != null ? GetA1Config().SP_LEVEL : 0, 
+            GetA1Config() != null ? GetA1Config().SP_LEVEL : 0,
             GetA2Config() != null ? GetA2Config().SP_LEVEL : 0,
             GetA3Config() != null ? GetA3Config().SP_LEVEL : 0,
-            
-            GetB1Config() != null ? GetB1Config().SP_LEVEL : 0, 
+
+            GetB1Config() != null ? GetB1Config().SP_LEVEL : 0,
             GetB2Config() != null ? GetB2Config().SP_LEVEL : 0,
             GetB3Config() != null ? GetB3Config().SP_LEVEL : 0,
-            
-            GetC1Config() != null ? GetC1Config().SP_LEVEL : 0, 
+
+            GetC1Config() != null ? GetC1Config().SP_LEVEL : 0,
             GetC2Config() != null ? GetC2Config().SP_LEVEL : 0,
             GetC3Config() != null ? GetC3Config().SP_LEVEL : 0,
         };
-        
+
         return sp.Min();
     }
 
@@ -239,11 +231,11 @@ public partial class SkillSet
                 normalSkillCountAtFirstRow += 1;
             }
         }
-        
+
         temp(A1Config.SP_LEVEL);
         temp(B1Config.SP_LEVEL);
         temp(C1Config.SP_LEVEL);
-        
+
         List<int> hopeSearchOrder = new List<int>()
         {
             0,3,6,1,4,7,2,5,8

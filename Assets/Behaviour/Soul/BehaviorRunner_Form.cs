@@ -13,15 +13,6 @@ namespace Soul
         public readonly IDictionary<string, string> BehaviourAndStrategicExitCondition = new Dictionary<string, string>();
         public List<string> AllConditionCodes;
 
-        static readonly AiConditionResponseProfile PocketAiConditionProfile = new AiConditionResponseProfile
-        {
-            MovePriority = 10,
-            IncludeRushBackWithApproach = false,
-            ApproachDangerousVeryClosePriority = 3,
-            AddApproachEnemyClose = false,
-            IncludeGangbangMeleeAttack = false
-        };
-
         void AddAITriggerConditionToBehavior(SkillEntity behaviorDefine)
         {
             AiConditionResponseUtility.AddTriggerCondition(
@@ -29,8 +20,7 @@ namespace Soul
                 behaviorDefine.REAL_NAME,
                 ConditionAndRespond,
                 ConditionAndRespondPriority,
-                BehaviourAndStrategicExitCondition,
-                PocketAiConditionProfile);
+                BehaviourAndStrategicExitCondition);
         }
 
         public void FormFightingSetsByNineAndTwo(SkillSet nineAndTwo)
@@ -39,7 +29,7 @@ namespace Soul
             //这上下两个函数之间存在一个chuanEndCasualT0的问题，从而必须一前一后紧密连接，下次review时候可以看看代码能不能整更利索一些。
             SkillEntityDic = nineAndTwo.GenerateBehaviourSets();
             skillEntityList = nineAndTwo.SkillEntityList();
-            _statesIncubator = new BehaviorsIncubator(_emptyState, SkillEntityDic);
+            _statesIncubator = new BehaviorsIncubator(_emptyState, nineAndTwo.MSkillEntity, SkillEntityDic);
             var behaviorDic = _statesIncubator.BehaviorDic; // 理解整个系统的关键
             BehaviourDic.Clear();
             ConditionAndRespondPriority.Clear();
@@ -55,7 +45,6 @@ namespace Soul
                     s.Value.TriggerAttackHeight = SkillEntityDic[s.Key].AIAttrs.height;
                     AddAITriggerConditionToBehavior(SkillEntityDic[s.Key]);
                     BehaviourDic.Add(new KeyValuePair<string, Behavior>(s.Key, s.Value));
-
                 }
             }
             
@@ -70,7 +59,7 @@ namespace Soul
             }
             
             AllConditionCodes = ConditionAndRespond.Keys.ToList();
-            _commandWaitingState = BehaviourDic[nineAndTwo.GetM_STS().REAL_NAME];
+            _commandWaitingState = BehaviourDic[nineAndTwo.MSkillEntity.REAL_NAME];
         }
         
         public void SetAt(float level)

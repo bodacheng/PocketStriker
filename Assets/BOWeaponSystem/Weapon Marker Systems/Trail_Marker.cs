@@ -4,7 +4,9 @@ namespace HittingDetection
 {
     public class Trail_Marker : Marker
     {
-        public RaycastHit[] _hits = new RaycastHit[0];
+        RaycastHit[] _hitBuffer = new RaycastHit[8];
+        public RaycastHit[] _hits => _hitBuffer;
+        public int HitCount { get; private set; }
         
         // trail detect
         Vector3 _lastFramePos; //Temporary position of the marker from the last frame
@@ -23,13 +25,24 @@ namespace HittingDetection
         {
             _dir = transform.position - _lastFramePos;
             _dist = Vector3.Distance(transform.position, _lastFramePos);
-            //Debug.DrawRay(_tempPos, _dir, Color.white, 0.3f);
-            _hits = Physics.RaycastAll(_lastFramePos, _dir, _dist, _layers, QueryTriggerInteraction.Collide);
-            if (_hits.Length == 0)
+            if (_dist <= Mathf.Epsilon)
+            {
+                HitCount = 0;
+                return false;
+            }
+
+            var rayDirection = _dir / _dist;
+            HitCount = Physics.RaycastNonAlloc(_lastFramePos, rayDirection, _hitBuffer, _dist, _layers, QueryTriggerInteraction.Collide);
+            if (HitCount == _hitBuffer.Length)
+            {
+                _hitBuffer = new RaycastHit[_hitBuffer.Length * 2];
+                HitCount = Physics.RaycastNonAlloc(_lastFramePos, rayDirection, _hitBuffer, _dist, _layers, QueryTriggerInteraction.Collide);
+            }
+            if (HitCount == 0)
             {
                 _lastFramePos = transform.position;
             }
-            return _hits.Length > 0;
+            return HitCount > 0;
         }
         
         public override void EnableMarkerProcess(int weaponLayer)
@@ -52,8 +65,7 @@ namespace HittingDetection
         
         protected override void ClearDetection()
         {
-            _hits = new RaycastHit[0];
+            HitCount = 0;
         }
     }
 }
-

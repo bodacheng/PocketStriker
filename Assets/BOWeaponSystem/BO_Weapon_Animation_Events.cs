@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
 using HittingDetection;
 using UnityEngine.Animations;
@@ -10,7 +9,7 @@ public class BO_Weapon_Animation_Events : MonoBehaviour
     public HiddenMethods hiddenMethods;
     
     TeamConfig _TeamConfig = TeamConfig.DefaultSet;
-    readonly List<Transform> _Used_Targets = new List<Transform>();
+    readonly HashSet<Transform> _Used_Targets = new HashSet<Transform>();
     IDictionary<Transform, Decomposition> bodyPartsHitBoxRegisterDic;
     Transform right_hand, left_hand, right_foot, left_foot, head, tail;
     Transform geometryCenter;
@@ -100,7 +99,7 @@ public class BO_Weapon_Animation_Events : MonoBehaviour
             
             if (FightGlobalSetting.HitBoxLogger)
             {
-                decomposition._HitBox.GeneratedByStateKey = BEs.myownheath.Center._MyBehaviorRunner.GetNowState().StateKey;
+                decomposition._HitBox.GeneratedByStateKey = SkillLogIdentity.ResolveCurrentSkillKey(BEs.myownheath.Center._MyBehaviorRunner);
                 decomposition._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }
@@ -164,10 +163,14 @@ public class BO_Weapon_Animation_Events : MonoBehaviour
         }
     }
 
-    List<Transform> bodyparts;
+    readonly List<Transform> bodyparts = new List<Transform>();
     public void ClearMarkerManagers()
     {
-        bodyparts = bodyPartsHitBoxRegisterDic.Keys.ToList();
+        bodyparts.Clear();
+        foreach (var key in bodyPartsHitBoxRegisterDic.Keys)
+        {
+            bodyparts.Add(key);
+        }
         for (int i = 0; i < bodyparts.Count; i++)
         {
             if (bodyparts[i] != null)
@@ -225,7 +228,11 @@ public class BO_Weapon_Animation_Events : MonoBehaviour
         
     public void SetAllBodyMarkerManagersIn()
     {
-        bodyparts = bodyPartsHitBoxRegisterDic.Keys.ToList();
+        bodyparts.Clear();
+        foreach (var key in bodyPartsHitBoxRegisterDic.Keys)
+        {
+            bodyparts.Add(key);
+        }
         for (int i = 0; i < bodyparts.Count;i++)
         {
             if (bodyparts[i] !=null)

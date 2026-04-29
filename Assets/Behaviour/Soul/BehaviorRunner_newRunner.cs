@@ -19,10 +19,6 @@ namespace Soul
                 for (var i = 0; i < currentSKillEntity.ForcedTransitions.Length; i++)
                 {
                     BehaviourDic.TryGetValue(currentSKillEntity.ForcedTransitions[i], out _tryBehavior);
-                    if (_tryBehavior == null)
-                    {
-                        continue;
-                    }
                     if (_tryBehavior.Force_enter_condition())
                     {
                         _forcedTransitions.Add(currentSKillEntity.ForcedTransitions[i]);
@@ -40,27 +36,15 @@ namespace Soul
         void BehaviourTransitionEngine()
         {
             _canTranTo.Clear();
-            if (currentSKillEntity.CasualTo == null)
-            {
-                return;
-            }
             #region 查找已经可以触发的后续技能
             foreach (var key in currentSKillEntity.CasualTo)
             {
                 BehaviourDic.TryGetValue(key, out _tryBehavior);
-                if (_tryBehavior == null)
-                {
-                    continue;
-                }
                 if (!_tryBehavior.Capacity_enter_condition())
                 {
                     continue;
                 }
                 SkillEntityDic.TryGetValue(key, out _tempSKillEntity);
-                if (_tempSKillEntity == null)
-                {
-                    continue;
-                }
                 optionsForButtonRefresh.Add(_tempSKillEntity);
                 if ((_tempSKillEntity.CAN_BE_CANCELLED_TO && _SkillCancelFlag.Cancel_Flag) || _nowBehavior.Capacity_Exit_Condition())
                 {
@@ -110,25 +94,15 @@ namespace Soul
             }
             if (currentSKillEntity == null)
                 return List;
-            if (currentSKillEntity.CasualTo == null)
-                return List;
             
             foreach (var _Key in currentSKillEntity.CasualTo)
             {
                 BehaviourDic.TryGetValue(_Key, out _tryBehavior);
-                if (_tryBehavior == null)
-                {
-                    continue;
-                }
                 if (!_tryBehavior.Capacity_enter_condition())
                 {
                     continue;
                 }
                 SkillEntityDic.TryGetValue(_Key, out _tempSKillEntity);
-                if (_tempSKillEntity == null)
-                {
-                    continue;
-                }
                 List.Add(_tempSKillEntity);
             }
             return List;
@@ -138,19 +112,11 @@ namespace Soul
         {
             float min = 9999f;
             float max = 0f;
-            if (currentSKillEntity == null || currentSKillEntity.CasualTo == null)
-            {
-                return (min, max);
-            }
             for (var index = 0; index < currentSKillEntity.CasualTo.Length; index++)
             {
                 BehaviourDic.TryGetValue(currentSKillEntity.CasualTo[index], out var state);
-                if (state == null)
-                {
-                    continue;
-                }
                 
-                if (state.StateType == BehaviorType.CT || state.StateType == BehaviorType.GM ||
+                if (state.StateType == BehaviorType.CT || state.StateType == BehaviorType.GM || state.StateType == BehaviorType.GMB ||
                     state.StateType == BehaviorType.GI || state.StateType == BehaviorType.GR)
                 {
                     if (min > state.triggerAttackRangeMin)

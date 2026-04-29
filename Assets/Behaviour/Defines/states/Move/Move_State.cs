@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NoSuchStudio.Common;
+using Skill;
 using UnityEngine;
 
 namespace Soul
@@ -8,7 +10,6 @@ namespace Soul
     {
         readonly float speed;
         readonly float timeLimit;
-        public AIMoveMode AIMoveStyle;
         float _timeCounter;
         Vector3 _useDirection;
         AIMoveDirection _moveDirection;
@@ -17,11 +18,6 @@ namespace Soul
         Vector3 _screenMovementForward, _screenMovementRight;
         List<GameObject> _enemiesByDistance = new List<GameObject>();
         
-        public enum AIMoveMode
-        {
-            Test = 0,
-            Normal = 1
-        }
         enum AIMoveDirection
         {
             Stay,
@@ -32,11 +28,23 @@ namespace Soul
             RunToBattleGroundCenter
         }
         
-        public Move_State(AIMoveMode aiMoveStyle, float speed, float timeLimit)
+        public Move_State(MoveType moveType)
         {
-            AIMoveStyle = aiMoveStyle;
-            this.speed = speed;
-            this.timeLimit = timeLimit;
+            switch (moveType)
+            {
+                case MoveType.slow:
+                    this.speed = FightGlobalSetting._fighterMoveSpeed / 2;
+                    this.timeLimit = 3;
+                    break;
+                case MoveType.fast:
+                    this.speed = FightGlobalSetting._fighterMoveSpeed * 2;
+                    this.timeLimit = 1;
+                    break;
+                default:
+                    this.speed = FightGlobalSetting._fighterMoveSpeed;
+                    this.timeLimit = 1;
+                    break;
+            }
         }
 
         public override bool Capacity_enter_condition()
@@ -47,9 +55,8 @@ namespace Soul
         void CommonEnter()
         {
             _timeCounter = 0f;
-            _Animator.applyRootMotion = false;
             _Weapon_Animation_Events.ClearMarkerManagers();
-            AnimationManger.PlayLayerAnim(null, true, 0.05f);
+            AnimationManger.AnimationTrigger(String.Empty,  0.1f);
             pEvents.CloseAllPersonalityEffects();
             _mainCam = CameraManager._camera.transform;
             _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
@@ -119,14 +126,7 @@ namespace Soul
         private GameObject closestEnemy;
         void DecideDirection()
         {
-            if (AIMoveStyle == AIMoveMode.Test)
-            {
-                _moveDirection = AIMoveDirection.Stay;
-                _useDirection = Vector3.zero;
-                return;
-            }
-            
-            if (_BasicPhysicSupport.AtRing)
+            if (_BasicPhysicSupport.NearRing)
             {
                 _moveDirection = AIMoveDirection.RunToBattleGroundCenter;
                 _useDirection = Vector3.zero - gameObject.transform.position;
