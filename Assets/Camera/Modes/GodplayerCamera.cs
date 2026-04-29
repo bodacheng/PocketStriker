@@ -1,1 +1,0 @@
-// GodplayerCamera lives in MCombatShared.

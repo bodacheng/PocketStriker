@@ -1,1 +1,0 @@
-// GodPlayerCertainY lives in MCombatShared.

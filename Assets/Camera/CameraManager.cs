@@ -1,87 +1,20 @@
 ﻿using System.Collections.Generic;
 using MCombat.Shared.Camera;
-using UnityEngine;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : CameraManagerCore
 {
-    public static Camera _camera;
-    public static Camera _subCamera;
-    [SerializeField] Camera mainCamera;
-    [SerializeField] Camera subCamera; // unit camera
-    [SerializeField] Transform StartPosRef;
-    [SerializeField] Transform topDownModeEndRef;
-    [SerializeField] VisibilityControl visibilityControl;
-    
-    CameraModeCore CurrentMode;
-    public Transform TopDownModeEndRef => topDownModeEndRef;
-    public VisibilityControl VisibilityControl => visibilityControl;
-
-    readonly IDictionary<C_Mode, CameraModeCore> CModeDic = new Dictionary<C_Mode, CameraModeCore>()
+    protected override IDictionary<C_Mode, CameraModeCore> CreateModeDictionary()
     {
-        {C_Mode.CertainYAntiVibration, new ChatGptFix(20f, 10f, 45f)},
-        //{C_Mode.CertainYAntiVibration, new New2023(8.8f, 5f)},
-        {C_Mode.ApproachToCertainDis,  new LerpToCertainDistance(5f, 1f)},
-        {C_Mode.keepTargetLeft, new keepTargetLeftCamera()},
-        {C_Mode.WatchOver, new MCamera(35f, 15f, 30f,20,5)},
-        {C_Mode.StartAndEnd, new StartToEndMode()},
-        {C_Mode.RoundBoundary, new CenterSurroundCamera(25f, 10f)},
-        {C_Mode.TopDown, new GangV(32,23)},
-        {C_Mode.ScreenSaver, new New2023(8.8f, 5f)}//new ScreenSaverC(8.8f, 8.8f)}
-    };
-    
-    public CameraModeCore GetMode(C_Mode mode)
-    {
-        CModeDic.TryGetValue(mode, out var c);
-        return c;
-    }
-
-    public void SetPosToStart()
-    {
-        _camera.transform.position = StartPosRef.position;
-        _camera.transform.rotation = StartPosRef.rotation;
-    }
-    
-    void Awake()
-    {
-        _camera = mainCamera;
-        _subCamera = subCamera;
-        _camera.depthTextureMode = DepthTextureMode.Depth;
-
-        foreach (var kv in CModeDic)
+        return new Dictionary<C_Mode, CameraModeCore>
         {
-            if (kv.Value is CameraMode mode)
-            {
-                mode.cameraManager = this;
-            }
-        }
-    }
-    
-    void LateUpdate()
-    {
-        if (CurrentMode != null)
-        {
-            CurrentMode.LocalUpdate(_camera);
-        }
-    }
-    
-    public void Assign_Camera(C_Mode num, Transform me, List<Transform> targets, List<Transform> mes = null)
-    {
-        CModeDic.TryGetValue(num, out var nextMode);
-        var modeChanged = CurrentMode != nextMode;
-        if (modeChanged)
-        {
-            CurrentMode?.Exit(_camera);
-        }
-        CurrentMode = nextMode;
-        if (CurrentMode != null)
-        {
-            CurrentMode.SetMeCenter(me);
-            CurrentMode.targets = targets;
-            CurrentMode.myTeamTargets = mes;
-            if (modeChanged)
-            {
-                CurrentMode.Enter(_camera);
-            }
-        }
+            {C_Mode.CertainYAntiVibration, new ChatGptFix(20f, 10f, 45f)},
+            {C_Mode.ApproachToCertainDis, new LerpToCertainDistance(5f, 1f)},
+            {C_Mode.keepTargetLeft, new keepTargetLeftCamera()},
+            {C_Mode.WatchOver, new MCamera(35f, 15f, 30f, 20, 5)},
+            {C_Mode.StartAndEnd, new StartToEndMode()},
+            {C_Mode.RoundBoundary, new CenterSurroundCamera(25f, 10f)},
+            {C_Mode.TopDown, new GangV(32, 23)},
+            {C_Mode.ScreenSaver, new New2023(8.8f, 5f)}
+        };
     }
 }
