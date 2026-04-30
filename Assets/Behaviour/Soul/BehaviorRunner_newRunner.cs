@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using MCombat.Shared.Behaviour;
 using UnityEngine;
 using Skill;
 
@@ -81,9 +81,7 @@ namespace Soul
         // 获取接下来等待释放的技能，并非是真正可触发技能，但反应了是否够气
         public List<SkillEntity> GetNextSkills()
         {
-            var List = new List<SkillEntity>();
-            var currentSKillEntity = new SkillEntity();
-            
+            SkillEntity currentSKillEntity = null;
             if (_nowBehavior != null)
             {
                 if (_nowBehavior.StateKey == "Empty")
@@ -92,40 +90,36 @@ namespace Soul
                 }else
                     SkillEntityDic.TryGetValue(_nowBehavior.StateKey, out currentSKillEntity);
             }
-            if (currentSKillEntity == null)
-                return List;
-            
-            foreach (var _Key in currentSKillEntity.CasualTo)
-            {
-                BehaviourDic.TryGetValue(_Key, out _tryBehavior);
-                if (!_tryBehavior.Capacity_enter_condition())
-                {
-                    continue;
-                }
-                SkillEntityDic.TryGetValue(_Key, out _tempSKillEntity);
-                List.Add(_tempSKillEntity);
-            }
-            return List;
+
+            return BehaviorTransitionQueryUtility.GetAvailableNextSkills(
+                currentSKillEntity,
+                SkillEntityDic.TryGetValue,
+                CanEnterBehavior);
         }
         
         public (float, float) CalAdviceDistanceFromEnemy()
         {
-            float min = 9999f;
-            float max = 0f;
-            for (var index = 0; index < currentSKillEntity.CasualTo.Length; index++)
+            return BehaviorTransitionQueryUtility.CalculateAdviceDistance(currentSKillEntity, TryResolveBehaviorRange);
+        }
+
+        bool CanEnterBehavior(string key)
+        {
+            return BehaviourDic.TryGetValue(key, out var behavior) && behavior.Capacity_enter_condition();
+        }
+
+        bool TryResolveBehaviorRange(string key, out BehaviorRangeInfo rangeInfo)
+        {
+            if (BehaviourDic.TryGetValue(key, out var state))
             {
-                BehaviourDic.TryGetValue(currentSKillEntity.CasualTo[index], out var state);
-                
-                if (state.StateType == BehaviorType.CT || state.StateType == BehaviorType.GM || state.StateType == BehaviorType.GMB ||
-                    state.StateType == BehaviorType.GI || state.StateType == BehaviorType.GR)
-                {
-                    if (min > state.triggerAttackRangeMin)
-                        min = state.triggerAttackRangeMin;
-                    if (max < state.triggerAttackRangeMax)
-                        max = state.triggerAttackRangeMax;
-                }
+                rangeInfo = new BehaviorRangeInfo(
+                    state.StateType,
+                    state.triggerAttackRangeMin,
+                    state.triggerAttackRangeMax);
+                return true;
             }
-            return (min, max);
+
+            rangeInfo = default;
+            return false;
         }
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using Skill;
 using mainMenu;
 using System;
+using MCombat.Shared.Behaviour;
 using Random = System.Random;
 
 public partial class SkillSet
@@ -61,16 +62,9 @@ public partial class SkillSet
             return form;
         }
 
-        var currentStartSkills = new List<string>();
-        if (skillSet.a1 != null)
-            currentStartSkills.Add(skillSet.a1);
-        if (skillSet.b1 != null)
-            currentStartSkills.Add(skillSet.b1);
-        if (skillSet.c1 != null)
-            currentStartSkills.Add(skillSet.c1);
+        var currentStartSkills = SkillSetSlotUtility.StartSkillIds(skillSet.a1, skillSet.b1, skillSet.c1);
 
-        var startSlots = new List<int>() { 1, 4, 7 };
-        if (currentStartSkills.Count == 2 && startSlots.Contains(targetSlot))
+        if (currentStartSkills.Count == 2 && SkillSetSlotUtility.IsStartSlot(targetSlot))
         {
             bool hasNormal = false;
             foreach (var skillId in currentStartSkills)
@@ -184,36 +178,18 @@ public partial class SkillSet
             }
         }
 
-        switch (targetSlot)
-        {
-            case 1:
-                skillSet.a1 = skillId;
-                break;
-            case 2:
-                skillSet.a2 = skillId;
-                break;
-            case 3:
-                skillSet.a3 = skillId;
-                break;
-            case 4:
-                skillSet.b1 = skillId;
-                break;
-            case 5:
-                skillSet.b2 = skillId;
-                break;
-            case 6:
-                skillSet.b3 = skillId;
-                break;
-            case 7:
-                skillSet.c1 = skillId;
-                break;
-            case 8:
-                skillSet.c2 = skillId;
-                break;
-            case 9:
-                skillSet.c3 = skillId;
-                break;
-        }
+        SkillSetSlotUtility.SetSlot(
+            targetSlot,
+            skillId,
+            ref skillSet.a1,
+            ref skillSet.a2,
+            ref skillSet.a3,
+            ref skillSet.b1,
+            ref skillSet.b2,
+            ref skillSet.b3,
+            ref skillSet.c1,
+            ref skillSet.c2,
+            ref skillSet.c3);
         if (remainSlots.Count == 0)
         {
             return skillSet;

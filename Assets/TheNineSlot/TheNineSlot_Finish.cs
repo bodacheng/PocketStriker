@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using dataAccess;
+﻿using dataAccess;
 using UnityEngine;
 using mainMenu;
+using System.Collections.Generic;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 public partial class SkillSet
@@ -26,37 +27,17 @@ public partial class SkillSet
             return _skillSet;
         }
         
-        string skillId = null;
-        switch (targetSlot)
-        {
-            case 1:
-                skillId = _skillSet.a1;
-                break;
-            case 2:
-                skillId = _skillSet.a2;
-                break;
-            case 3:
-                skillId = _skillSet.a3;
-                break;
-            case 4:
-                skillId = _skillSet.b1;
-                break;
-            case 5:
-                skillId = _skillSet.b2;
-                break;
-            case 6:
-                skillId = _skillSet.b3;
-                break;
-            case 7:
-                skillId = _skillSet.c1;
-                break;
-            case 8:
-                skillId = _skillSet.c2;
-                break;
-            case 9:
-                skillId = _skillSet.c3;
-                break;
-        }
+        string skillId = SkillSetSlotUtility.GetSlot(
+            targetSlot,
+            _skillSet.a1,
+            _skillSet.a2,
+            _skillSet.a3,
+            _skillSet.b1,
+            _skillSet.b2,
+            _skillSet.b3,
+            _skillSet.c1,
+            _skillSet.c2,
+            _skillSet.c3);
         
         // 已经有技能石的格子不做修改
         if (SkillConfigTable.GetSkillConfigByRecordId(skillId) != null)
@@ -68,21 +49,18 @@ public partial class SkillSet
 
         bool CheckLastFirstColumnSkill()
         {
-            List<SkillConfig> list = new List<SkillConfig>();
-            var a1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.a1);
-            var b1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.b1);
-            var c1SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(_skillSet.c1);
-            if (a1SkillConfig != null)
-                list.Add(a1SkillConfig);
-            if (b1SkillConfig != null)
-                list.Add(b1SkillConfig);
-            if (c1SkillConfig != null)
-                list.Add(c1SkillConfig);
+            var list = new List<SkillConfig>();
+            foreach (var startSkillId in SkillSetSlotUtility.StartSkillIds(_skillSet.a1, _skillSet.b1, _skillSet.c1))
+            {
+                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(startSkillId);
+                if (skillConfig != null)
+                    list.Add(skillConfig);
+            }
             
             return list.Count == 2 && list.TrueForAll(x=> x.SP_LEVEL != 0);
         }
         
-        if (CheckLastFirstColumnSkill() &&  targetSlot is 1 or 4 or 7)
+        if (CheckLastFirstColumnSkill() && SkillSetSlotUtility.IsStartSlot(targetSlot))
         {
             filterForm = new SkillStonesBox.StoneFilterForm
             {
@@ -140,36 +118,18 @@ public partial class SkillSet
             skillId = found;
         }
 
-        switch (targetSlot)
-        {
-            case 1:
-                _skillSet.a1 = skillId;
-                break;
-            case 2:
-                _skillSet.a2 = skillId;
-                break;
-            case 3:
-                _skillSet.a3 = skillId;
-                break;
-            case 4:
-                _skillSet.b1 = skillId;
-                break;
-            case 5:
-                _skillSet.b2 = skillId;
-                break;
-            case 6:
-                _skillSet.b3 = skillId;
-                break;
-            case 7:
-                _skillSet.c1 = skillId;
-                break;
-            case 8:
-                _skillSet.c2 = skillId;
-                break;
-            case 9:
-                _skillSet.c3 = skillId;
-                break;
-        }
+        SkillSetSlotUtility.SetSlot(
+            targetSlot,
+            skillId,
+            ref _skillSet.a1,
+            ref _skillSet.a2,
+            ref _skillSet.a3,
+            ref _skillSet.b1,
+            ref _skillSet.b2,
+            ref _skillSet.b3,
+            ref _skillSet.c1,
+            ref _skillSet.c2,
+            ref _skillSet.c3);
         
         if (targetSlot == 0)
         {

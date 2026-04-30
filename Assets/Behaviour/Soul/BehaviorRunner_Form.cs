@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
-using MCombat.Shared.AI;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 namespace Soul
@@ -13,16 +12,6 @@ namespace Soul
         public readonly IDictionary<string, string> BehaviourAndStrategicExitCondition = new Dictionary<string, string>();
         public List<string> AllConditionCodes;
 
-        void AddAITriggerConditionToBehavior(SkillEntity behaviorDefine)
-        {
-            AiConditionResponseUtility.AddTriggerCondition(
-                behaviorDefine.StateType,
-                behaviorDefine.REAL_NAME,
-                ConditionAndRespond,
-                ConditionAndRespondPriority,
-                BehaviourAndStrategicExitCondition);
-        }
-
         public void FormFightingSetsByNineAndTwo(SkillSet nineAndTwo)
         {
             nineAndTwo.SortNineAndTwo();
@@ -31,35 +20,26 @@ namespace Soul
             skillEntityList = nineAndTwo.SkillEntityList();
             _statesIncubator = new BehaviorsIncubator(_emptyState, nineAndTwo.MSkillEntity, SkillEntityDic);
             var behaviorDic = _statesIncubator.BehaviorDic; // 理解整个系统的关键
-            BehaviourDic.Clear();
-            ConditionAndRespondPriority.Clear();
-            BehaviourAndStrategicExitCondition.Clear();
-            foreach (var s in behaviorDic)
-            {
-                if (SkillEntityDic.ContainsKey(s.Key))
-                {
-                    s.Value.StateKey = SkillEntityDic[s.Key].REAL_NAME;
-                    s.Value.spLevel = SkillEntityDic[s.Key].SP_LEVEL;
-                    s.Value.triggerAttackRangeMin = SkillEntityDic[s.Key].AIAttrs.AI_MIN_DIS;
-                    s.Value.triggerAttackRangeMax = SkillEntityDic[s.Key].AIAttrs.AI_MAX_DIS;
-                    s.Value.TriggerAttackHeight = SkillEntityDic[s.Key].AIAttrs.height;
-                    AddAITriggerConditionToBehavior(SkillEntityDic[s.Key]);
-                    BehaviourDic.Add(new KeyValuePair<string, Behavior>(s.Key, s.Value));
-                }
-            }
-            
-            fixedSkillSequence.Clear();
-            for (var index = 0; index < skillEntityList.Count; index++)
-            {
-                var skill = skillEntityList[index];
-                if (skill.SP_LEVEL > 0)
-                {
-                    fixedSkillSequence.Add(skill);
-                }
-            }
-            
-            AllConditionCodes = ConditionAndRespond.Keys.ToList();
+            AllConditionCodes = BehaviorRunnerBuildUtility.BindBehaviors(
+                behaviorDic,
+                SkillEntityDic,
+                skillEntityList,
+                BehaviourDic,
+                fixedSkillSequence,
+                ConditionAndRespond,
+                ConditionAndRespondPriority,
+                BehaviourAndStrategicExitCondition,
+                ApplySkillEntityToBehavior);
             _commandWaitingState = BehaviourDic[nineAndTwo.MSkillEntity.REAL_NAME];
+        }
+
+        static void ApplySkillEntityToBehavior(Behavior behavior, SkillEntity skillEntity)
+        {
+            behavior.StateKey = skillEntity.REAL_NAME;
+            behavior.spLevel = skillEntity.SP_LEVEL;
+            behavior.triggerAttackRangeMin = skillEntity.AIAttrs.AI_MIN_DIS;
+            behavior.triggerAttackRangeMax = skillEntity.AIAttrs.AI_MAX_DIS;
+            behavior.TriggerAttackHeight = skillEntity.AIAttrs.height;
         }
         
         public void SetAt(float level)
