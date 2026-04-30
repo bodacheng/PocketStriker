@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 //本状态是最复杂的一个攻击种类状态，牵扯到攻击前冲刺
@@ -22,19 +23,10 @@ namespace Soul
         readonly float _approachSpeed;
         readonly float _maxRushTime;
         float _rushTimeCounter;
-        Phase _phase;
+        GeneralAttackPhase _phase;
         UnityEngine.Events.UnityAction _rushStart;
         UnityEngine.Events.UnityAction _rushEnd;
         CustomCoroutine _rushCoroutine;
-        
-        enum Phase
-        {
-            noRushState = 0,
-            farFromReach = 1,
-            needToRush = 2,
-            reached = 3,
-            reachedFromBeginning = 4
-        }
 
         #region Constructor
         public G_Attack_State(string dashClipName, float rushSpeed, float maxRushTime, float approachingSpeed, string clipName)
@@ -105,20 +97,12 @@ namespace Soul
         {
             base.AI_State_enter();
             collider = null;
-            AnimationManger.TriggerExpression(Facial.aggressive);
-            _BasicPhysicSupport.OpenEnemyTouchingDrag(1);
-            HaltMotion();
-            _SkillCancelFlag.turn_off_flag();
-            if (StateType == BehaviorType.GR)
-                _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
-            if (StateType == BehaviorType.GI)
-                _SkillCancelFlag.TurnRotationAdjustmentStartFlagWithoutstepfoward(1);
+            SkillStateRuntimeUtility.EnterGeneralAttackStart(this);
             _rushTimeCounter = 0f;
-            _Animator.applyRootMotion = true;
             if (Sensor.GetEnemiesByDistance(false).Count == 0)
             {
                 //一般来说下面这些情况不跑？
-                _phase = Phase.noRushState;
+                _phase = GeneralAttackPhase.NoRushState;
                 AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                 return;
             }
@@ -127,13 +111,18 @@ namespace Soul
             if (collider == null)
             {
                 AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
-                _phase = Phase.farFromReach;
+                _phase = GeneralAttackPhase.FarFromReach;
                 return;
             }
             float distance = Vector3.Distance(gameObject.transform.position, collider.transform.position);
-            if (distance < Sensor.SensorRadius / 3)//内环检测结果
+            _phase = SkillStateRuntimeUtility.ResolveGeneralAttackInitialPhase(
+                true,
+                true,
+                distance,
+                Sensor.SensorRadius);
+
+            if (_phase == GeneralAttackPhase.ReachedFromBeginning && distance < Sensor.SensorRadius / 3)//内环检测结果
             {
-                _phase = Phase.reachedFromBeginning;
                 AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                 if (Sensor.GetEnemiesByDistance(false).Count > 0)
                 {
@@ -145,7 +134,7 @@ namespace Soul
                 return;
             }
 
-            if (distance < Sensor.SensorRadius * 2 / 3)
+            if (_phase == GeneralAttackPhase.ReachedFromBeginning)
             {
                 if (Sensor.GetEnemiesByDistance(false).Count > 0)
                 {
@@ -168,14 +157,14 @@ namespace Soul
                 // }
                 // else
                 {
-                    _phase = Phase.reachedFromBeginning;//这个环节最绕脑子，大概指的是如果外环也有敌人，就当“已经到达”。但其实从出发点将，一般的普通近距离攻击在中距离下也不会触发才对
+                    //这个环节最绕脑子，大概指的是如果外环也有敌人，就当“已经到达”。但其实从出发点将，一般的普通近距离攻击在中距离下也不会触发才对
                     AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                     return;
                 }
             }
 
             AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
-            _phase = Phase.farFromReach;
+            _phase = GeneralAttackPhase.FarFromReach;
             return;
         }
 
@@ -183,24 +172,24 @@ namespace Soul
         {
             switch (_phase)
             {
-                case Phase.noRushState://这里面可能还有一些远距离攻击什么的。哦。。。除非都没敌人了现在才可能会进入noRushState
+                case GeneralAttackPhase.NoRushState://这里面可能还有一些远距离攻击什么的。哦。。。除非都没敌人了现在才可能会进入noRushState
                     break;
-                case Phase.farFromReach:
+                case GeneralAttackPhase.FarFromReach:
                     break;
-                case Phase.needToRush://也就是说冲刺中。
+                case GeneralAttackPhase.NeedToRush://也就是说冲刺中。
                     if (collider == null)
                     {
                         _Rigidbody.linearVelocity = Vector3.zero;
-                        _phase = Phase.reached;
+                        _phase = GeneralAttackPhase.Reached;
                     }
                     else
                     {
                         Move(collider.transform.position - gameObject.transform.position, _rushSpeed, true);
                         if (Vector3.Distance(gameObject.transform.position, collider.transform.position) < 2f)
                         {
-                            _phase = Phase.reached;
+                            _phase = GeneralAttackPhase.Reached;
                         }
-                        if (_phase == Phase.reached)
+                        if (_phase == GeneralAttackPhase.Reached)
                         {
                             AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                             _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
@@ -217,9 +206,9 @@ namespace Soul
                     }
                     if (_rushTimeCounter > _maxRushTime)
                     {
-                        _phase = Phase.reached;
+                        _phase = GeneralAttackPhase.Reached;
                     }
-                    if (_phase == Phase.reached)
+                    if (_phase == GeneralAttackPhase.Reached)
                     {
                         AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
                         _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
@@ -227,14 +216,14 @@ namespace Soul
                         _BuffsRunner.EndSubCoroutineOfState(_rushCoroutine);
                     }
                     break;
-                case Phase.reached:
+                case GeneralAttackPhase.Reached:
                     if (Sensor.GetEnemiesByDistance(false).Count > 0)
                     {
                         if (Sensor.GetEnemiesByDistance(false)[0] != null)
                             AttackApproach(Sensor.GetEnemiesByDistance(false)[0].transform.position, _approachSpeed);
                     }
                     break;
-                case Phase.reachedFromBeginning://reachedFromThebeginning现在其实是两种情况：1. 冲刺状态一开始内环就有敌人 2.非冲刺状态一开始外环有敌人
+                case GeneralAttackPhase.ReachedFromBeginning://reachedFromThebeginning现在其实是两种情况：1. 冲刺状态一开始内环就有敌人 2.非冲刺状态一开始外环有敌人
                     if (Sensor.GetEnemiesByDistance(false).Count > 0)
                     {
                         if (Sensor.GetEnemiesByDistance(false)[0] != null)
@@ -245,17 +234,7 @@ namespace Soul
                     break;
             }
 
-            if (_BasicPhysicSupport.hiddenMethods.TouchingEnemy() && _BasicPhysicSupport.hiddenMethods.Grounded)
-            {
-                if (_BasicPhysicSupport.ToNearestEnemyXZ() >= FightGlobalSetting.ToEnemyNearestDis)
-                {
-                    _Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                }
-            }
-            else
-            {
-                _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            }
+            BehaviorMotionUtility.UpdateTouchingEnemyConstraints(this, FightGlobalSetting.ToEnemyNearestDis);
 
             PreventUnitOverlap();
 

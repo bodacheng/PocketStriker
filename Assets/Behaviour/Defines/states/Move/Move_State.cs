@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MCombat.Shared.Behaviour;
 using NoSuchStudio.Common;
 using Skill;
 using UnityEngine;
@@ -30,21 +31,9 @@ namespace Soul
         
         public Move_State(MoveType moveType)
         {
-            switch (moveType)
-            {
-                case MoveType.slow:
-                    this.speed = FightGlobalSetting._fighterMoveSpeed / 2;
-                    this.timeLimit = 3;
-                    break;
-                case MoveType.fast:
-                    this.speed = FightGlobalSetting._fighterMoveSpeed * 2;
-                    this.timeLimit = 1;
-                    break;
-                default:
-                    this.speed = FightGlobalSetting._fighterMoveSpeed;
-                    this.timeLimit = 1;
-                    break;
-            }
+            var settings = BehaviorMotionUtility.ResolveMoveStateSettings(moveType, FightGlobalSetting._fighterMoveSpeed);
+            this.speed = settings.Speed;
+            this.timeLimit = settings.TimeLimit;
         }
 
         public override bool Capacity_enter_condition()
@@ -55,13 +44,8 @@ namespace Soul
         void CommonEnter()
         {
             _timeCounter = 0f;
-            _Weapon_Animation_Events.ClearMarkerManagers();
-            AnimationManger.AnimationTrigger(String.Empty,  0.1f);
-            pEvents.CloseAllPersonalityEffects();
+            SkillStateRuntimeUtility.EnterMove(this);
             _mainCam = CameraManager._camera.transform;
-            _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            _BasicPhysicSupport.Rigidbody.interpolation = RigidbodyInterpolation.None;
-            AnimationManger.CasualFace();
         }
 
         public override void C_State_enter()
@@ -80,7 +64,7 @@ namespace Soul
         public override void AI_State_exit()
         {
             base.AI_State_exit();
-            _BasicPhysicSupport.Rigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
+            SkillStateRuntimeUtility.ExitMove(this);
         }
         
         bool Finished()

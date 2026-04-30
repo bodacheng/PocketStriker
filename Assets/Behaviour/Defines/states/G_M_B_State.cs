@@ -1,4 +1,5 @@
 ﻿using System;
+using MCombat.Shared.Behaviour;
 using UniRx;
 using UnityEngine;
 
@@ -34,31 +35,20 @@ namespace Soul
             disposable = this.FightParamsRef._comboHitCount.HitCount.
                 ObserveEveryValueChanged(x => x.Value).
                 Subscribe(CheckDamage);
-            
-            _BasicPhysicSupport.OpenEnemyTouchingDrag(1);
-            HaltMotion();
-            AnimationManger.TriggerExpression(Facial.aggressive);
-            _SkillCancelFlag.turn_off_flag();
-            _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
-            pEvents.CloseAllPersonalityEffects();
-            if (Sensor.GetEnemiesByDistance(false).Count > 0)
-            {
-                if (Sensor.GetEnemiesByDistance(false)[0] != null)
-                    RotateToTargetTween(Sensor.GetEnemiesByDistance(false)[0].transform.position, 0.01f);
-            }
-            _Animator.applyRootMotion = true;
-            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
+
+            SkillStateRuntimeUtility.EnterAggressiveRootMotionAttack(
+                this,
+                clip_name,
+                CombatRotationAdjustment.StepForward,
+                true);
         }
 
         public override void AI_State_exit()
         {
             base.AI_State_exit();
             hasCausedDamege = false;
-            _BO_Ani_E.CloseOnProcessEnergyFromBodyWeapons();
-            _BasicPhysicSupport.OpenEnemyTouchingDrag(0);
-            _BasicPhysicSupport.hiddenMethods.ClearTouchedEnemyBody();
-            _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(false);
-            disposable.Dispose();
+            SkillStateRuntimeUtility.ExitMovingAttack(this, true, false);
+            disposable?.Dispose();
         }
         #endregion
 
@@ -71,7 +61,7 @@ namespace Soul
 
         public override void _State_Update()
         {
-            _BasicPhysicSupport.hiddenMethods.RecoverRootPosChange();
+            ((ICombatBehaviorRuntime)this).RecoverRootPositionChange();
         }
     }
 }

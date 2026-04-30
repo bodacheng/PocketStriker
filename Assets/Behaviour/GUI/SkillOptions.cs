@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using System.Collections.Generic;
+using MCombat.Shared.Behaviour;
 using UnityEngine;
 using Skill;
 
@@ -14,21 +15,7 @@ public partial class BehaviorRunnerGUI : Editor {
         }
         
         List<SkillConfig> SkillConfigs = SkillConfigTable.GetSkillConfigsOfType(anim_path);
-        List<string> returnValue = new List<string>
-        {
-            "Empty",
-            "Move",
-            "Victory",
-            "Death",
-            "rush",
-            "Hit",
-            "KnockOff",
-            "getUp"
-        };
-        if (FightGlobalSetting.HasDefend)
-        {
-            returnValue.Add("Defend");
-        }
+        List<string> returnValue = BehaviorStateDefinitionUtility.CreateEditorBehaviorOptions(FightGlobalSetting.HasDefend, true);
         
         foreach (SkillConfig skillConfig in SkillConfigs)
         {

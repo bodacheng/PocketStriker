@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
+using MCombat.Shared.Behaviour;
 
 namespace Soul
 {
     public class GMoveEscapeState : Behavior
     {
         Transform mainCam;
-        Quaternion screenMovementSpace;
-        Vector3 screenMovementForward, screenMovementRight, use_direction;
+        Vector3 use_direction;
 
         readonly UnityEngine.Events.UnityAction _breakFreeStart;
         readonly UnityEngine.Events.UnityAction _breakFreeEnd;
@@ -46,62 +46,13 @@ namespace Soul
         void CommonEnter()
         {
             base.AI_State_enter();
-            HaltMotion();
-            _SkillCancelFlag.turn_off_flag();
-            pEvents.CloseAllPersonalityEffects();
-            _Animator.applyRootMotion = true;
-            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
+            SkillStateRuntimeUtility.EnterEscapeCommon(this, clip_name);
         }
 
-        Vector3 damagingWeaponComingDirection;
-        Collider threat;
-        Collider ECollider;
         public override void AI_State_enter()
         {
             CommonEnter();
-            use_direction = gameObject.transform.forward;
-            threat = Sensor.GetSuddenThreatInRange(0, 5);
-
-            use_direction = Vector3.zero - gameObject.transform.position;
-            use_direction.y = 0;
-
-            if (use_direction.magnitude + 4f > BoundaryControlByGod._BattleRingRadius)
-            {
-                // use_direction = Vector3.zero - gameObject.transform.position;
-                // use_direction.y = 0;
-            }
-            else
-            {
-                if (threat != null)
-                {
-                    damagingWeaponComingDirection = gameObject.transform.position - threat.transform.position;
-                    switch (Random.Range(0, 2))
-                    {
-                        case 0:
-                            use_direction = Quaternion.Euler(0, -135, 0) * damagingWeaponComingDirection;
-                            break;
-                        case 1:
-                            use_direction = Quaternion.Euler(0, 135, 0) * damagingWeaponComingDirection;
-                            break;
-                    }
-                }
-                else
-                {
-                    ECollider = Sensor.GetClosestEnemyColliderInSensorRange();
-                    if (ECollider != null)
-                        use_direction = -gameObject.transform.position + ECollider.transform.position;
-                    switch (Random.Range(0, 2))
-                    {
-                        case 0:
-                            use_direction = Quaternion.Euler(0, -90, 0) * use_direction;
-                            break;
-                        case 1:
-                            use_direction = Quaternion.Euler(0, 90, 0) * use_direction;
-                            break;
-                    }
-                }
-            }
-
+            use_direction = SkillStateRuntimeUtility.ResolveAiEscapeDirection(this);
             RotateToTargetTween(gameObject.transform.position + use_direction, 0.1f);
         }
 
@@ -111,10 +62,6 @@ namespace Soul
         {
             CommonEnter();
             mainCam = CameraManager._camera.transform;
-            screenMovementSpace = Quaternion.Euler(0, mainCam.eulerAngles.y, 0);
-            screenMovementForward = screenMovementSpace * Vector3.forward;
-            screenMovementRight = screenMovementSpace * Vector3.right;
-
             h = (Input.GetKey(AppSetting.Value.LeftKeyCode) ? -1f : 0f) +
                     (Input.GetKey(AppSetting.Value.RightKeyCode) ? 1f : 0f) +
                     UltimateJoystick.GetHorizontalAxis("joystick");
@@ -122,15 +69,11 @@ namespace Soul
                     (Input.GetKey(AppSetting.Value.DownKeyCode) ? -1f : 0f) +
                     UltimateJoystick.GetVerticalAxis("joystick");
 
-            if (System.Math.Abs(h) < 0.001f && System.Math.Abs(v) < 0.001f)
-            {
-                use_direction = gameObject.transform.forward;
-            }
-            else
-            {
-                use_direction = (screenMovementForward * v) + (screenMovementRight * h);
-            }
-
+            use_direction = SkillStateRuntimeUtility.ResolveCameraRelativeDirection(
+                gameObject.transform.forward,
+                mainCam.eulerAngles.y,
+                h,
+                v);
             RotateToTargetTween(gameObject.transform.position + use_direction, 0.1f);
         }
     }

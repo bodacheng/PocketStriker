@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using dataAccess;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 namespace mainMenu
@@ -147,8 +148,8 @@ namespace mainMenu
             
             ShowSkillStoneExType(ex1Icon, ex2Icon, ex3Icon, config.SP_LEVEL);
             ShowSKillRanges(close, near, far, config.AIAttrs.AI_MIN_DIS, config.AIAttrs.AI_MAX_DIS);
-            atIcon.SetActive(config.STATE_TYPE is BehaviorType.GI or BehaviorType.GM or BehaviorType.GR);
-            defenceIcon.SetActive(config.STATE_TYPE is BehaviorType.CT or BehaviorType.Def);
+            atIcon.SetActive(BehaviorTypeUtility.IsAttackIconState(config.STATE_TYPE));
+            defenceIcon.SetActive(BehaviorTypeUtility.IsDefenceIconState(config.STATE_TYPE));
             
             var intro = SkillNameTable.GetSkillIntro(config.RECORD_ID);
             skillIntro.text = intro;

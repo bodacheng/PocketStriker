@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using MCombat.Shared.Behaviour;
 
 namespace Soul
 {
@@ -15,35 +16,15 @@ namespace Soul
             nextAttackCanRushFirst = true;
         }
 
-        Collider threat;
         public override void AI_State_enter()
         {
             base.AI_State_enter();
-            _SkillCancelFlag.turn_off_flag();
-            HaltMotion();
-            _SkillCancelFlag.TurnRotationAdjustmentStartFlagWithoutstepfoward(1);
-            pEvents.CloseAllPersonalityEffects();
-            _Animator.applyRootMotion = true;
-            AnimationManger.AnimationTrigger(clip_name,  CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
-            if (threat != null)
-            {
-                RotateToTargetTween(threat.transform.position, 0.02f);
-            }
+            SkillStateRuntimeUtility.EnterCounter(this, clip_name);
         }
 
         public override void _State_FixedUpdate1()
         {
-            if (_BasicPhysicSupport.hiddenMethods.TouchingEnemy() && _BasicPhysicSupport.hiddenMethods.Grounded)
-            {
-                if (_BasicPhysicSupport.ToNearestEnemyXZ() >= FightGlobalSetting.ToEnemyNearestDis)
-                {
-                    _Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                }
-            }
-            else
-            {
-                _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            }
+            BehaviorMotionUtility.UpdateTouchingEnemyConstraints(this, FightGlobalSetting.ToEnemyNearestDis);
         }
 
         public override bool Capacity_Exit_Condition()

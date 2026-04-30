@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using MCombat.Shared.Behaviour;
 
 namespace Soul
 {
@@ -19,11 +20,8 @@ namespace Soul
         public override void AI_State_enter()
         {
             base.AI_State_enter();
-            _SkillCancelFlag.turn_on_flag();
             counter = 0f;
-            HaltMotion();
-            _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
-            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
+            SkillStateRuntimeUtility.EnterGetUp(this, clip_name);
         }
 
         public override void C_State_enter()
@@ -39,8 +37,7 @@ namespace Soul
         public override void AI_State_exit()
         {
             base.AI_State_exit();
-            _Rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            _SkillCancelFlag.turn_off_flag();
+            SkillStateRuntimeUtility.ExitGetUp(this);
         }
     }
 }

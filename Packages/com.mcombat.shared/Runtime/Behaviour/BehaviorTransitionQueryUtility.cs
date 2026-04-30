@@ -83,11 +83,7 @@ namespace MCombat.Shared.Behaviour
 
         public static bool IsAdviceAttackState(BehaviorType stateType)
         {
-            return stateType == BehaviorType.CT
-                   || stateType == BehaviorType.GM
-                   || stateType == BehaviorType.GMB
-                   || stateType == BehaviorType.GI
-                   || stateType == BehaviorType.GR;
+            return BehaviorTypeUtility.IsAdviceAttackState(stateType);
         }
     }
 }

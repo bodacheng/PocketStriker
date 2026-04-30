@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Log;
+using MCombat.Shared.Behaviour;
 using Skill;
 using UnityEngine;
 
@@ -99,7 +100,7 @@ public static class SkillAIDistanceAutoTuner
                 continue;
 
             var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(logRow.RECORD_ID);
-            if (skillConfig == null || !IsTunableState(skillConfig.STATE_TYPE))
+            if (skillConfig == null || !BehaviorTypeUtility.IsTunableSkillState(skillConfig.STATE_TYPE))
                 continue;
 
             var aiRow = SkillAIAttrs.Find_RECORD_ID(logRow.RECORD_ID);
@@ -255,8 +256,8 @@ public static class SkillAIDistanceAutoTuner
         var width = Mathf.Max(MinRangeWidth, currentMax - currentMin);
         var stepBase = Mathf.Clamp(width * 0.08f, FightGlobalSetting.SkillAIAutoTuneStepMin, FightGlobalSetting.SkillAIAutoTuneStepMax);
         var stepStrong = Mathf.Clamp(width * 0.12f, FightGlobalSetting.SkillAIAutoTuneStepMin, FightGlobalSetting.SkillAIAutoTuneStepMax);
-        var isCloseRange = stateType is BehaviorType.GI or BehaviorType.GR or BehaviorType.CT;
-        var isRanged = stateType is BehaviorType.GM or BehaviorType.GMB or BehaviorType.RB;
+        var isCloseRange = BehaviorTypeUtility.IsCloseRangeSkillState(stateType);
+        var isRanged = BehaviorTypeUtility.IsRangedSkillState(stateType);
 
         if (metrics.InterruptRate >= 0.5f)
         {
@@ -296,22 +297,6 @@ public static class SkillAIDistanceAutoTuner
         max = Mathf.Clamp(max, min + MinRangeWidth, FightGlobalSetting.SkillAIAutoTuneMaxDistance);
         if (max - min < MinRangeWidth)
             max = Mathf.Min(FightGlobalSetting.SkillAIAutoTuneMaxDistance, min + MinRangeWidth);
-    }
-
-    static bool IsTunableState(BehaviorType stateType)
-    {
-        switch (stateType)
-        {
-            case BehaviorType.GI:
-            case BehaviorType.GM:
-            case BehaviorType.GMB:
-            case BehaviorType.GR:
-            case BehaviorType.CT:
-            case BehaviorType.RB:
-                return true;
-            default:
-                return false;
-        }
     }
 
     static Dictionary<string, TuneStateRow> LoadStateMap()

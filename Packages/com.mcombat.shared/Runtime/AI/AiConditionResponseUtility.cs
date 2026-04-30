@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 namespace MCombat.Shared.AI
@@ -79,13 +80,7 @@ namespace MCombat.Shared.AI
 
         public static bool ShouldWriteBehaviorDecisionLog(BehaviorType stateType)
         {
-            return stateType == BehaviorType.AC
-                   || stateType == BehaviorType.CT
-                   || stateType == BehaviorType.Def
-                   || stateType == BehaviorType.GI
-                   || stateType == BehaviorType.GM
-                   || stateType == BehaviorType.GMB
-                   || stateType == BehaviorType.GR;
+            return BehaviorTypeUtility.ShouldWriteBehaviorDecisionLog(stateType);
         }
 
         static void AddApproachConditions(

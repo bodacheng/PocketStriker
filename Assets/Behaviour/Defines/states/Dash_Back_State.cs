@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using MCombat.Shared.Behaviour;
 
 namespace Soul
 {
@@ -34,38 +35,7 @@ namespace Soul
         public override void AI_State_enter()
         {
             base.AI_State_enter();
-            _Animator.applyRootMotion = true;
-            HaltMotion();
-            _SkillCancelFlag.turn_off_flag();
-            pEvents.CloseAllPersonalityEffects();
-            Vector3 threatsComingPosition = Vector3.zero;
-
-            if (_BasicPhysicSupport.NearRing)
-            {
-                threatsComingPosition = gameObject.transform.position * 2;
-                threatsComingPosition.y = 0;
-            }
-            else
-            {
-                if (Sensor.GetEnemiesByDistance(false).Count > 0)
-                    threatsComingPosition = Sensor.GetEnemiesByDistance(false)[0].transform.position;
-
-                Collider threat = Sensor.GetSuddenThreatInRange(0, 5);
-                if (threat != null)
-                {
-                    threatsComingPosition = threat.transform.position;
-                }
-                else
-                {
-                    Collider temp = Sensor.GetClosestEnemyColliderInSensorRange();
-                    if (temp != null)
-                        threatsComingPosition = temp.transform.position;
-                }
-            }
-
-            RotateToTargetTween(threatsComingPosition, 0.01f);
-
-            AnimationManger.AnimationTrigger(clip_name, CommonSetting.CharacterAnimDuration[this._DATA_CENTER.UnitConfig().TYPE]);
+            SkillStateRuntimeUtility.EnterDashBack(this, clip_name);
         }
 
         public override bool Capacity_Exit_Condition()

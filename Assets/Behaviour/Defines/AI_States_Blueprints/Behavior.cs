@@ -1,11 +1,12 @@
 ﻿using DG.Tweening;
 using HittingDetection;
+using MCombat.Shared.Behaviour;
 using UnityEngine;
 using Skill;
 
 namespace Soul
 {
-    public abstract partial class Behavior
+    public abstract partial class Behavior : ICombatBehaviorRuntime
     {
         protected GameObject gameObject;
         protected Rigidbody _Rigidbody;
@@ -37,6 +38,108 @@ namespace Soul
         bool AbsorbEnergyFinished;
         int temp;
         const float MovementEpsilon = 0.0001f;
+
+        BehaviorType ICombatBehaviorRuntime.StateType => StateType;
+        Vector3 ICombatBehaviorRuntime.Position => gameObject.transform.position;
+        Vector3 ICombatBehaviorRuntime.Forward => gameObject.transform.forward;
+        float ICombatBehaviorRuntime.SensorRadius => Sensor.SensorRadius;
+        float ICombatBehaviorRuntime.BattleRingRadius => BoundaryControlByGod._BattleRingRadius;
+        float ICombatBehaviorRuntime.AnimationDuration => CommonSetting.CharacterAnimDuration[_DATA_CENTER.UnitConfig().TYPE];
+        bool ICombatBehaviorRuntime.NearRing => _BasicPhysicSupport.NearRing;
+
+        void ICombatBehaviorRuntime.HaltMotion(bool resetAnimatorSpeed) => HaltMotion(resetAnimatorSpeed);
+        void ICombatBehaviorRuntime.StopVelocity() => BehaviorMotionUtility.StopVelocity(_Rigidbody);
+        void ICombatBehaviorRuntime.SetRootMotion(bool enabled) => _Animator.applyRootMotion = enabled;
+        void ICombatBehaviorRuntime.SetConstraints(RigidbodyConstraints constraints) => _Rigidbody.constraints = constraints;
+        void ICombatBehaviorRuntime.SetRigidbodyInterpolation(RigidbodyInterpolation interpolation) => _BasicPhysicSupport.Rigidbody.interpolation = interpolation;
+        void ICombatBehaviorRuntime.SetLinearDamping(float value) => _Rigidbody.linearDamping = value;
+        void ICombatBehaviorRuntime.TriggerAnimation(string clipName, float duration) => AnimationManger.AnimationTrigger(clipName, duration);
+        void ICombatBehaviorRuntime.TriggerAggressiveExpression() => AnimationManger.TriggerExpression(Facial.aggressive);
+        void ICombatBehaviorRuntime.TriggerCasualFace() => AnimationManger.CasualFace();
+        void ICombatBehaviorRuntime.TurnCancelOff() => _SkillCancelFlag.turn_off_flag();
+        void ICombatBehaviorRuntime.TurnCancelOn() => _SkillCancelFlag.turn_on_flag();
+        void ICombatBehaviorRuntime.TurnRotationAdjustmentStart() => _SkillCancelFlag.TurnRotationAdjustmentStartFlag(1);
+        void ICombatBehaviorRuntime.TurnRotationAdjustmentStartWithoutStepForward() => _SkillCancelFlag.TurnRotationAdjustmentStartFlagWithoutstepfoward(1);
+        void ICombatBehaviorRuntime.OpenEnemyTouchingDrag(int mode) => _BasicPhysicSupport.OpenEnemyTouchingDrag(mode);
+        void ICombatBehaviorRuntime.ClearTouchedEnemyBody() => _BasicPhysicSupport.hiddenMethods.ClearTouchedEnemyBody();
+        void ICombatBehaviorRuntime.ClearMarkerManagers() => _Weapon_Animation_Events.ClearMarkerManagers();
+        void ICombatBehaviorRuntime.ClosePersonalityEffects() => pEvents.CloseAllPersonalityEffects();
+        void ICombatBehaviorRuntime.CloseEffectsOnBodyParts(bool includeBodyParts) => _BO_Ani_E.hiddenMethods.CloseEffectsOnBodyParts(includeBodyParts);
+        void ICombatBehaviorRuntime.CloseOnProcessEnergyFromBodyWeapons() => _BO_Ani_E.CloseOnProcessEnergyFromBodyWeapons();
+        void ICombatBehaviorRuntime.RecoverRootPositionChange() => _BasicPhysicSupport.hiddenMethods.RecoverRootPosChange();
+        void ICombatBehaviorRuntime.CleanClear() => _DATA_CENTER.CleanClear();
+        void ICombatBehaviorRuntime.SetUsingGravity(bool enabled) => _BasicPhysicSupport.SetUsingGravity(enabled);
+        void ICombatBehaviorRuntime.RotateToTargetTween(Vector3 target, float duration) => RotateToTargetTween(target, duration);
+        void ICombatBehaviorRuntime.RotateToTarget(Vector3 target, float turnSpeed, bool ignoreY) => RotateToTarget(target, turnSpeed, ignoreY);
+        void ICombatBehaviorRuntime.Move(Vector3 relativePos, float acceleration, bool ignoreY) => Move(relativePos, acceleration, ignoreY);
+        void ICombatBehaviorRuntime.AttackApproach(Vector3 target, float speed) => AttackApproach(target, speed);
+        void ICombatBehaviorRuntime.PreventUnitOverlap() => PreventUnitOverlap();
+        void ICombatBehaviorRuntime.RunStateSubCoroutine(object coroutine)
+        {
+            if (coroutine is CustomCoroutine customCoroutine)
+            {
+                _BuffsRunner.RunSubCoroutineOfState(customCoroutine);
+            }
+        }
+
+        bool ICombatBehaviorRuntime.IsTouchingEnemy() => _BasicPhysicSupport.hiddenMethods.TouchingEnemy();
+        bool ICombatBehaviorRuntime.IsGrounded() => _BasicPhysicSupport.hiddenMethods.Grounded;
+        bool ICombatBehaviorRuntime.IsCurrentAnimationLooping() => AnimationManger._toUse.isLooping;
+        bool ICombatBehaviorRuntime.AnimationCasualFinished() => AnimationCasualFinishedFlag();
+        float ICombatBehaviorRuntime.DistanceToNearestEnemyXZ() => _BasicPhysicSupport.ToNearestEnemyXZ();
+        bool ICombatBehaviorRuntime.IsAttackApproaching() => _SkillCancelFlag.hiddenMethods.GetAttackApproachingFlag();
+
+        bool ICombatBehaviorRuntime.TryGetFirstEnemyPosition(bool includeDead, out Vector3 position)
+        {
+            var enemiesByDistance = Sensor.GetEnemiesByDistance(includeDead);
+            if (enemiesByDistance.Count > 0 && enemiesByDistance[0] != null)
+            {
+                position = enemiesByDistance[0].transform.position;
+                return true;
+            }
+
+            position = Vector3.zero;
+            return false;
+        }
+
+        bool ICombatBehaviorRuntime.TryGetClosestEnemyColliderPosition(out Vector3 position)
+        {
+            var enemyCollider = Sensor.GetClosestEnemyColliderInSensorRange();
+            if (enemyCollider != null)
+            {
+                position = enemyCollider.transform.position;
+                return true;
+            }
+
+            position = Vector3.zero;
+            return false;
+        }
+
+        bool ICombatBehaviorRuntime.TryGetSuddenThreatPosition(float minDistance, float maxDistance, out Vector3 position)
+        {
+            var threat = Sensor.GetSuddenThreatInRange(minDistance, maxDistance);
+            if (threat != null)
+            {
+                position = threat.transform.position;
+                return true;
+            }
+
+            position = Vector3.zero;
+            return false;
+        }
+
+        bool ICombatBehaviorRuntime.TryGetLastDeadEnemyPosition(out Vector3 position)
+        {
+            var deadEnemy = Sensor.GetLastDeadEnemies();
+            if (deadEnemy != null)
+            {
+                position = deadEnemy.transform.position;
+                return true;
+            }
+
+            position = Vector3.zero;
+            return false;
+        }
 
         public void EnergyAbsorb(CriticalGaugeMode gaugeMode, FightParamsReference victim)
         {
@@ -214,34 +317,12 @@ namespace Soul
 
         protected bool TryGetPlanarDirection(ref Vector3 direction, bool ignoreY, out Vector3 planarDirection)
         {
-            if (ignoreY)
-            {
-                direction.y = 0f;
-            }
-
-            var sqrMagnitude = direction.sqrMagnitude;
-            if (sqrMagnitude < MovementEpsilon)
-            {
-                planarDirection = Vector3.zero;
-                return false;
-            }
-
-            var magnitude = Mathf.Sqrt(sqrMagnitude);
-            planarDirection = direction / magnitude;
-            return true;
+            return BehaviorMotionUtility.TryGetPlanarDirection(direction, ignoreY, out planarDirection);
         }
 
         protected void HaltMotion(bool resetAnimatorSpeed = true)
         {
-            if (resetAnimatorSpeed && _Animator != null)
-            {
-                _Animator.SetFloat("speed", 0f);
-            }
-
-            if (_Rigidbody != null)
-            {
-                _Rigidbody.linearVelocity = Vector3.zero;
-            }
+            BehaviorMotionUtility.HaltMotion(_Animator, _Rigidbody, resetAnimatorSpeed);
         }
 
         protected void ApplyMovementIntent(
@@ -252,26 +333,16 @@ namespace Soul
             bool ignoreY = true,
             bool keepAnimatorOnIdle = false)
         {
-            if (!TryGetPlanarDirection(ref direction, ignoreY, out var planarDirection))
-            {
-                if (keepAnimatorOnIdle)
-                {
-                    HaltMotion(false);
-                }
-                else
-                {
-                    HaltMotion();
-                }
-                return;
-            }
-
-            if (_Animator != null)
-            {
-                _Animator.SetFloat("speed", animatorSpeed);
-            }
-
-            Move(planarDirection, moveSpeed, false);
-            RotateToDirection(planarDirection, rotateSpeed, false);
+            BehaviorMotionUtility.ApplyMovementIntent(
+                _Animator,
+                gameObject.transform,
+                _Rigidbody,
+                direction,
+                moveSpeed,
+                rotateSpeed,
+                animatorSpeed,
+                ignoreY,
+                keepAnimatorOnIdle);
         }
         
         // Rotate to a target
@@ -280,16 +351,7 @@ namespace Soul
         //返回带符号角度，用以判断往哪个方向摆头。
         protected float RotateToTarget(Vector3 target, float turnSpeed, bool ignoreY)
         {
-            _lookDir = target - gameObject.transform.position;
-            if (ignoreY)
-            {
-                _lookDir.y = 0;
-            }
-            _dirQ = Quaternion.LookRotation(_lookDir);
-            _dirQ = Quaternion.Slerp(gameObject.transform.rotation, _dirQ, turnSpeed * Quaternion.Angle(_dirQ, gameObject.transform.rotation) * Time.fixedDeltaTime);
-            _Rigidbody.MoveRotation(_dirQ);
-            //gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, dirQ, turnSpeed * Quaternion.Angle(dirQ, gameObject.transform.rotation) * Time.fixedDeltaTime);
-            return Vector3.SignedAngle(_Rigidbody.transform.forward, _lookDir, Vector3.up);
+            return BehaviorMotionUtility.RotateToTarget(gameObject.transform, _Rigidbody, target, turnSpeed, ignoreY);
         }
         
         public Tweener RotateToTargetTween(Vector3 target, float duration)
@@ -309,28 +371,7 @@ namespace Soul
         // Rotate to a direction
         protected bool RotateToDirection(Vector3 direction, float turnSpeed, bool ignoreY)
         {
-            if (ignoreY)
-            {
-                direction.y = 0f;
-            }
-
-            if (direction.sqrMagnitude < MovementEpsilon)
-            {
-                return false;
-            }
-
-            var normalizedDirection = direction.normalized;
-            var targetRotation = Quaternion.LookRotation(normalizedDirection, Vector3.up);
-            var currentRotation = gameObject.transform.rotation;
-            var angle = Quaternion.Angle(currentRotation, targetRotation);
-            if (angle < 0.1f)
-                return true;
-
-            var speed = Mathf.Max(turnSpeed, 0f);
-            var step = Mathf.Clamp01((speed + angle) * Time.fixedDeltaTime);
-            var nextRotation = Quaternion.Slerp(currentRotation, targetRotation, step);
-            _Rigidbody.MoveRotation(nextRotation);
-            return Quaternion.Angle(nextRotation, targetRotation) < 0.1f;
+            return BehaviorMotionUtility.RotateToDirection(gameObject.transform, _Rigidbody, direction, turnSpeed, ignoreY);
         }
 
         // Move to direction
@@ -343,29 +384,19 @@ namespace Soul
 
         protected void PreventUnitOverlap()
         {
-            if (_BasicPhysicSupport.hiddenMethods.TouchingEnemy() && !_BasicPhysicSupport.hiddenMethods.Grounded && _BasicPhysicSupport.hiddenMethods.OverrideOnEnemyDrag < 0)
-            {
-                var touchingECenter = _BasicPhysicSupport.hiddenMethods.GetCenterOfTouchingEnemies();
-                if (touchingECenter != Vector3.zero)
-                {
-                    _Rigidbody.AddForce(_DATA_CENTER.WholeT.position - touchingECenter, ForceMode.VelocityChange);
-                }
-            }
+            BehaviorMotionUtility.PreventUnitOverlap(
+                _BasicPhysicSupport.hiddenMethods.TouchingEnemy(),
+                _BasicPhysicSupport.hiddenMethods.Grounded,
+                _BasicPhysicSupport.hiddenMethods.OverrideOnEnemyDrag,
+                _BasicPhysicSupport.hiddenMethods.GetCenterOfTouchingEnemies(),
+                _DATA_CENTER.WholeT,
+                _Rigidbody);
         }
 
         Vector3 _v;
         protected float Move(Vector3 relativePos, float acceleration, bool ignoreY)
         {
-            if (_Rigidbody == null)
-                return 0;
-            if (ignoreY)
-            {
-                relativePos.y = 0;
-            }
-            _v = relativePos.normalized * acceleration;
-            //_Rigidbody.AddForce(v, ForceMode.VelocityChange);
-            _Rigidbody.linearVelocity = _v;
-            return _Rigidbody.linearVelocity.magnitude;
+            return BehaviorMotionUtility.Move(_Rigidbody, relativePos, acceleration, ignoreY);
         }
 
         float use_acc;
@@ -395,31 +426,16 @@ namespace Soul
 
         protected Vector3 ClampPositionToBattleRing(Vector3 worldPos)
         {
-            var clampedPos = worldPos;
-            var originY = clampedPos.y;
-            clampedPos.y = 0f;
-            var battleRingRadius = BoundaryControlByGod._BattleRingRadius;
-            if (battleRingRadius > 0f && clampedPos.sqrMagnitude > battleRingRadius * battleRingRadius)
-            {
-                clampedPos = clampedPos.normalized * battleRingRadius;
-            }
-
-            clampedPos.y = originY < 0f ? 0f : originY;
-            return clampedPos;
+            return BehaviorMotionUtility.ClampPositionToBattleRing(worldPos, BoundaryControlByGod._BattleRingRadius);
         }
 
         protected Vector3 CalcFixedPlanarMoveTarget(Vector3 startPos, Vector3 direction, float distance)
         {
-            var planarDirection = direction;
-            planarDirection.y = 0f;
-            if (planarDirection.sqrMagnitude <= MovementEpsilon * MovementEpsilon || distance <= 0f)
-            {
-                return ClampPositionToBattleRing(startPos);
-            }
-
-            var targetPos = startPos + planarDirection.normalized * distance;
-            targetPos.y = startPos.y;
-            return ClampPositionToBattleRing(targetPos);
+            return BehaviorMotionUtility.CalcFixedPlanarMoveTarget(
+                startPos,
+                direction,
+                distance,
+                BoundaryControlByGod._BattleRingRadius);
         }
 
         protected Tweener StartFixedPlanarMoveTween(Transform mover, Rigidbody rigidbody, Vector3 targetPos, float duration)
@@ -451,29 +467,7 @@ namespace Soul
         // apply friction to rigidbody, and make sure it doesn't exceed its max speed
         public void ManageSpeed(Rigidbody rigidbody, float maxSpeed, bool ignoreY)
         {
-            if (rigidbody == null)
-                return;
-            if (maxSpeed <= 0f)
-                return;
-
-            var velocity = rigidbody.linearVelocity;
-            var planarVelocity = ignoreY ? new Vector3(velocity.x, 0f, velocity.z) : velocity;
-            var clampedPlanar = Vector3.ClampMagnitude(planarVelocity, maxSpeed);
-
-            if ((planarVelocity - clampedPlanar).sqrMagnitude < MovementEpsilon)
-                return;
-
-            if (ignoreY)
-            {
-                velocity.x = clampedPlanar.x;
-                velocity.z = clampedPlanar.z;
-            }
-            else
-            {
-                velocity = clampedPlanar;
-            }
-
-            rigidbody.linearVelocity = velocity;
+            BehaviorMotionUtility.ManageSpeed(rigidbody, maxSpeed, ignoreY);
         }
 
         float current_speed;
@@ -539,22 +533,12 @@ namespace Soul
         protected Vector3 CalFixPushVector(Vector3 damageHappenPoint, Vector3 attackerTPos, Vector3 victimTPos, 
             DamageType damageType, WeaponMode weaponMode)
         {
-            var resolvedDir = victimTPos - damageHappenPoint;
-            resolvedDir.y = 0f;
-            if (resolvedDir.sqrMagnitude > MovementEpsilon * MovementEpsilon)
-                return resolvedDir.normalized;
-
-            resolvedDir = victimTPos - attackerTPos;
-            resolvedDir.y = 0f;
-            if (resolvedDir.sqrMagnitude > MovementEpsilon * MovementEpsilon)
-                return resolvedDir.normalized;
-
-            resolvedDir = gameObject.transform.forward;
-            resolvedDir.y = 0f;
-            if (resolvedDir.sqrMagnitude > MovementEpsilon * MovementEpsilon)
-                return resolvedDir.normalized;
-
-            return damageType == DamageType.explosion ? Vector3.back : Vector3.forward;
+            return BehaviorMotionUtility.ResolvePushDirection(
+                damageHappenPoint,
+                attackerTPos,
+                victimTPos,
+                gameObject.transform.forward,
+                damageType);
         }
 
         Vector3 use_direction;
@@ -577,8 +561,7 @@ namespace Soul
         /// </summary>
         protected Vector3 GetVerticalDir(Vector3 _dir)
         {
-            //（_dir.x,_dir.z）与（？，1）垂直，则_dir.x * ？ + _dir.z * 1 = 0
-            return Mathf.Approximately(_dir.z, 0) ? new Vector3(0, 0, -1) : new Vector3(-_dir.z / _dir.x, 0, 1).normalized;
+            return BehaviorMotionUtility.GetVerticalDir(_dir);
         }
         
         #endregion
