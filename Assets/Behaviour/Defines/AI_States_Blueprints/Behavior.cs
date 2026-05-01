@@ -46,14 +46,26 @@ namespace Soul
         float ICombatBehaviorRuntime.BattleRingRadius => BoundaryControlByGod._BattleRingRadius;
         float ICombatBehaviorRuntime.AnimationDuration => CommonSetting.CharacterAnimDuration[_DATA_CENTER.UnitConfig().TYPE];
         bool ICombatBehaviorRuntime.NearRing => _BasicPhysicSupport.NearRing;
+        bool ICombatBehaviorRuntime.AtRing => _BasicPhysicSupport.AtRing;
+        Vector3 ICombatBehaviorRuntime.GeometryCenterPosition => _DATA_CENTER.geometryCenter.position;
 
         void ICombatBehaviorRuntime.HaltMotion(bool resetAnimatorSpeed) => HaltMotion(resetAnimatorSpeed);
         void ICombatBehaviorRuntime.StopVelocity() => BehaviorMotionUtility.StopVelocity(_Rigidbody);
+        void ICombatBehaviorRuntime.SetPlanarVelocityOnly()
+        {
+            var planarVelocity = _Rigidbody.linearVelocity;
+            planarVelocity.y = 0f;
+            _Rigidbody.linearVelocity = planarVelocity;
+        }
+        void ICombatBehaviorRuntime.AddPosition(Vector3 delta) => gameObject.transform.position += delta;
+        void ICombatBehaviorRuntime.SetMass(float value) => _Rigidbody.mass = value;
         void ICombatBehaviorRuntime.SetRootMotion(bool enabled) => _Animator.applyRootMotion = enabled;
+        void ICombatBehaviorRuntime.SetAnimatorSpeed(float value) => _Animator.SetFloat("speed", value);
         void ICombatBehaviorRuntime.SetConstraints(RigidbodyConstraints constraints) => _Rigidbody.constraints = constraints;
         void ICombatBehaviorRuntime.SetRigidbodyInterpolation(RigidbodyInterpolation interpolation) => _BasicPhysicSupport.Rigidbody.interpolation = interpolation;
         void ICombatBehaviorRuntime.SetLinearDamping(float value) => _Rigidbody.linearDamping = value;
         void ICombatBehaviorRuntime.TriggerAnimation(string clipName, float duration) => AnimationManger.AnimationTrigger(clipName, duration);
+        void ICombatBehaviorRuntime.TriggerAnimationClip(AnimationClip clip, float duration) => AnimationManger.AnimationTrigger(clip, duration);
         void ICombatBehaviorRuntime.TriggerAggressiveExpression() => AnimationManger.TriggerExpression(Facial.aggressive);
         void ICombatBehaviorRuntime.TriggerCasualFace() => AnimationManger.CasualFace();
         void ICombatBehaviorRuntime.TurnCancelOff() => _SkillCancelFlag.turn_off_flag();
@@ -69,6 +81,15 @@ namespace Soul
         void ICombatBehaviorRuntime.RecoverRootPositionChange() => _BasicPhysicSupport.hiddenMethods.RecoverRootPosChange();
         void ICombatBehaviorRuntime.CleanClear() => _DATA_CENTER.CleanClear();
         void ICombatBehaviorRuntime.SetUsingGravity(bool enabled) => _BasicPhysicSupport.SetUsingGravity(enabled);
+        void ICombatBehaviorRuntime.SetGettingDamage(bool value) => FightParamsRef.GettingDamage = value;
+        void ICombatBehaviorRuntime.SetResistanceValue(int value) => FightParamsRef.Resistance.Value = value;
+        void ICombatBehaviorRuntime.ClearResistance() => _ResistanceManager.ResistanceClear();
+        void ICombatBehaviorRuntime.MarkDead() => _DATA_CENTER.FightDataRef.IsDead.Value = true;
+        void ICombatBehaviorRuntime.ChangeLayerForLimbs(int layer) => FightParamsRef.ChangeLayerForLimbs(layer);
+        void ICombatBehaviorRuntime.ResolveAllDecompositions() => FightParamsRef.ResolveAllDecompositions();
+        void ICombatBehaviorRuntime.EnableAllLimbs(bool enabled) => FightParamsRef.EnableAllLimbs(enabled);
+        AnimationClip ICombatBehaviorRuntime.GetRandomKnockOffAnimation() => AnimationManger.GetRandomKnockOffAnim();
+        void ICombatBehaviorRuntime.ChangeState(string stateKey) => _AIStateRunner.ChangeState(stateKey);
         void ICombatBehaviorRuntime.RotateToTargetTween(Vector3 target, float duration) => RotateToTargetTween(target, duration);
         void ICombatBehaviorRuntime.RotateToTarget(Vector3 target, float turnSpeed, bool ignoreY) => RotateToTarget(target, turnSpeed, ignoreY);
         void ICombatBehaviorRuntime.Move(Vector3 relativePos, float acceleration, bool ignoreY) => Move(relativePos, acceleration, ignoreY);
@@ -81,9 +102,22 @@ namespace Soul
                 _BuffsRunner.RunSubCoroutineOfState(customCoroutine);
             }
         }
+        void ICombatBehaviorRuntime.EndStateSubCoroutine(object coroutine)
+        {
+            if (coroutine is CustomCoroutine customCoroutine)
+            {
+                _BuffsRunner.EndSubCoroutineOfState(customCoroutine);
+            }
+        }
+        void ICombatBehaviorRuntime.ClearApprovedEventAttackAttempts()
+        {
+            FightParamsRef?.ReturnApprovedEventAttackAttempts().Clear();
+        }
+        void ICombatBehaviorRuntime.FinishManagingEventAttack() => EventAttackEnterProcess();
 
         bool ICombatBehaviorRuntime.IsTouchingEnemy() => _BasicPhysicSupport.hiddenMethods.TouchingEnemy();
         bool ICombatBehaviorRuntime.IsGrounded() => _BasicPhysicSupport.hiddenMethods.Grounded;
+        bool ICombatBehaviorRuntime.IsFreezing() => _BuffsRunner.Freezing;
         bool ICombatBehaviorRuntime.IsCurrentAnimationLooping() => AnimationManger._toUse.isLooping;
         bool ICombatBehaviorRuntime.AnimationCasualFinished() => AnimationCasualFinishedFlag();
         float ICombatBehaviorRuntime.DistanceToNearestEnemyXZ() => _BasicPhysicSupport.ToNearestEnemyXZ();
