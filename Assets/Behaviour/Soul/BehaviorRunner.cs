@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using HittingDetection;
+using MCombat.Shared.Behaviour;
 using Skill;
 
 namespace Soul
@@ -27,6 +28,10 @@ namespace Soul
 
         public readonly List<SkillEntity> fixedSkillSequence = new List<SkillEntity>();
         public Func<bool> AITriggerDreamComboRateCondition;
+        public readonly IDictionary<string, List<string>> ConditionAndRespond = new Dictionary<string, List<string>>();
+        public readonly MultiDic<string, string, int> ConditionAndRespondPriority = new MultiDic<string, string, int>();// 注意，这个字典是value越小代表有限度越高
+        public readonly IDictionary<string, string> BehaviourAndStrategicExitCondition = new Dictionary<string, string>();
+        public List<string> AllConditionCodes;
 
         #region 辅助模块：控制器
 
@@ -48,6 +53,15 @@ namespace Soul
         {
             get;
             set;
+        }
+
+        [SerializeField]
+        string skillConfigType;
+
+        public string SkillConfigType
+        {
+            get => skillConfigType;
+            set => skillConfigType = value;
         }
 
         public bool BeingControl()
@@ -80,6 +94,46 @@ namespace Soul
         {
             BehaviourDic.TryGetValue(key, out var state);
             return state;
+        }
+
+        public void FormFightingSetsByNineAndTwo(SkillSet nineAndTwo)
+        {
+            nineAndTwo.SortNineAndTwo();
+            //这上下两个函数之间存在一个chuanEndCasualT0的问题，从而必须一前一后紧密连接，下次review时候可以看看代码能不能整更利索一些。
+            SkillEntityDic = nineAndTwo.GenerateBehaviourSets();
+            skillEntityList = nineAndTwo.SkillEntityList();
+            _statesIncubator = new BehaviorsIncubator(_emptyState, nineAndTwo.MSkillEntity, SkillEntityDic);
+            var behaviorDic = _statesIncubator.BehaviorDic; // 理解整个系统的关键
+            AllConditionCodes = BehaviorRunnerBuildUtility.BindBehaviors(
+                behaviorDic,
+                SkillEntityDic,
+                skillEntityList,
+                BehaviourDic,
+                fixedSkillSequence,
+                ConditionAndRespond,
+                ConditionAndRespondPriority,
+                BehaviourAndStrategicExitCondition,
+                ApplySkillEntityToBehavior);
+            _commandWaitingState = BehaviourDic[nineAndTwo.MSkillEntity.REAL_NAME];
+        }
+
+        static void ApplySkillEntityToBehavior(Behavior behavior, SkillEntity skillEntity)
+        {
+            behavior.StateKey = skillEntity.REAL_NAME;
+            behavior.spLevel = skillEntity.SP_LEVEL;
+            behavior.triggerAttackRangeMin = skillEntity.AIAttrs.AI_MIN_DIS;
+            behavior.triggerAttackRangeMax = skillEntity.AIAttrs.AI_MAX_DIS;
+            behavior.TriggerAttackHeight = skillEntity.AIAttrs.height;
+        }
+
+        public void SetAt(float level)
+        {
+            foreach (var kv in BehaviourDic)
+            {
+                if (kv.Value.SkillConfig == null)
+                    continue;
+                kv.Value.Attack = FightGlobalSetting.ATCal(kv.Value.SkillConfig.ATTACK_WEIGHT, level);
+            }
         }
 
         public bool OnFixedSequence => onFixedSequence;

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using MCombat.Shared.Behaviour;
 using Soul;
 using Skill;
 
 [CustomEditor(typeof(BehaviorRunner))]
-public partial class BehaviorRunnerGUI : Editor
+public class BehaviorRunnerGUI : Editor
 {
     static readonly string[] DefaultStateNames = { "Death", "Empty", "Hit", "KnockOff", "Move", "Victory", "getUp", "rush" };
     static readonly int[] SpLevelValues = { 0, 1, 2, 3 };
@@ -470,6 +471,49 @@ public partial class BehaviorRunnerGUI : Editor
         serializedObject.Update();
         CacheSerializedProperties();
         SyncFoldoutCaches(skillListProp?.arraySize ?? 0);
+    }
+
+    public List<string> GetBeheviourOptions(string anim_path)
+    {
+        if (anim_path == null)
+        {
+            return null;
+        }
+
+        List<SkillConfig> SkillConfigs = SkillConfigTable.GetSkillConfigsOfType(anim_path);
+        List<string> returnValue = BehaviorStateDefinitionUtility.CreateEditorBehaviorOptions(FightGlobalSetting.HasDefend, true);
+
+        foreach (SkillConfig skillConfig in SkillConfigs)
+        {
+            if (!returnValue.Contains(skillConfig.REAL_NAME))
+                returnValue.Add(skillConfig.REAL_NAME);
+            else
+                Debug.Log("重复的片段名，请检查资源");
+        }
+        return returnValue;
+    }
+
+    public List<string> GetBeheviourOptions(string anim_path, List<SkillEntity> toFormAttackStateList)
+    {
+        if (anim_path == null)
+        {
+            return null;
+        }
+
+        List<string> returnValue = new List<string>();
+        foreach (SkillEntity _set in toFormAttackStateList)
+        {
+            if (!returnValue.Contains(_set.REAL_NAME))
+            {
+                returnValue.Add(_set.REAL_NAME);
+            }
+            else
+            {
+                Debug.Log("正在回避状态重复定义："+ _set.REAL_NAME);
+            }
+        }
+
+        return returnValue;
     }
 }
 #endif
