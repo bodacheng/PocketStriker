@@ -53,11 +53,6 @@ class New2023 : CameraMode
     
     public override void LocalUpdate(Camera _camera)
     {
-        if (meCenter == null)
-        {
-            return;
-        }
-
         h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         if (h != 0)
         {
@@ -66,10 +61,23 @@ class New2023 : CameraMode
         }
         
         _changeSpeed = Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        if (!TryGetAveragePosition(targets, out enemiesCenter))
+        enemiesCenter = Vector3.zero;
+        if (targets != null && targets.Count > 0)
+        {
+            foreach (var o in targets)
+            {
+                if (o != null)
+                {
+                    enemiesCenter += o.transform.position;
+                }
+            }
+        }
+        else
         {
             enemiesCenter = meCenter.position;
         }
+
+        enemiesCenter /= targets.Count;
 
         enemyScreenPos = _camera.WorldToScreenPoint(enemiesCenter);
         meScreenPos = _camera.WorldToScreenPoint(meCenter.position);

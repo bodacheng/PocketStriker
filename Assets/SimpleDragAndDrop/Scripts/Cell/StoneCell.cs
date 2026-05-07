@@ -18,7 +18,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         SKLevelUpMSlot,
         StoneMergeSlot
     }
-    
+
     public BOButton btn;
     [Tooltip("using Stone Unit Icon")]
     [SerializeField] HeroIcon unitIcon;
@@ -26,9 +26,9 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
     public GameObject _selected;
     [Tooltip("Functional type of this cell")]
     public CellPhase cellPhase = CellPhase.SkillStoneBoxCell;
-    
+
     SKStoneItem _myDadItem;
-    
+
     /// <summary>
     /// Put item into this cell.(Keep old item in that cell safe)
     /// </summary>
@@ -50,16 +50,11 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         }
         item.transform.SetParent(transform, false);
         item.transform.SetAsLastSibling();
-        item.transform.localScale = Vector3.one;
-        var childRectTransform = item.transform.GetComponent<RectTransform>();
-        childRectTransform.anchorMin = Vector2.zero; // 设置锚点为左下角
-        childRectTransform.anchorMax = Vector2.one; // 设置锚点为右上角
-        childRectTransform.offsetMin = Vector2.zero; // 设置左边和下边的边缘
-        childRectTransform.offsetMax = Vector2.zero;
+        item.transform.localScale = Vector3.one * 1.2f;
         item.transform.localPosition = Vector3.zero;
         item.MakeRaycast(true);
     }
-    
+
     /// <summary>
     /// Updates my item
     /// </summary>
@@ -74,7 +69,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
             }
         }
     }
-    
+
     // Show Character icon using this SkillStone
     void ShowUsingUnit(SKStoneItem item, HeroIcon targetIcon)
     {
@@ -83,14 +78,14 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
             targetIcon.gameObject.SetActive(false);
             return;
         }
-        var ssInfo = Stones.Get(item.instanceId);
-        if (ssInfo == null || ssInfo.unitInstanceId == null)
+        var unitInstanceId = Stones.GetUnitInstanceIdForDisplay(item.instanceId);
+        if (string.IsNullOrEmpty(unitInstanceId))
         {
             targetIcon.gameObject.SetActive(false);
             return;
         }
-        
-        var unitInfo = dataAccess.Units.Get(ssInfo.unitInstanceId);
+
+        var unitInfo = dataAccess.Units.Get(unitInstanceId);
         if (unitInfo == null)
         {
             targetIcon.gameObject.SetActive(false);
@@ -99,9 +94,14 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         targetIcon.transform.SetAsLastSibling();
         targetIcon.gameObject.SetActive(true);
         targetIcon.ChangeIcon(unitInfo);
-        targetIcon.iconButton.interactable = false;
     }
-    
+
+    public void ClearUsingUnitIcon()
+    {
+        if (unitIcon != null)
+            unitIcon.gameObject.SetActive(false);
+    }
+
     /// <summary>
     /// Manualy add item into this cell
     /// </summary>
@@ -114,7 +114,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
             UpdateMyItem();
         }
     }
-    
+
     /// <summary>
     /// Swap items between two cells
     /// </summary>
@@ -144,7 +144,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
             }
         }
     }
-    
+
     /// <summary>
     /// Get item from this cell
     /// </summary>

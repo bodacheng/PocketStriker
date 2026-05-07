@@ -11,7 +11,7 @@ namespace dataAccess
         {
             DicAdd<string, StoneOfPlayerInfo>.Add(Dic, one.InstanceId, one);
         }
-        
+
         public static async UniTask RenderAll()
         {
             var stoneLoadTasks = new List<UniTask>();
@@ -21,7 +21,7 @@ namespace dataAccess
             }
             await UniTask.WhenAll(stoneLoadTasks);
         }
-        
+
         /// <summary>
         /// 生成账户用技能石图标，生成的模型会加入统一技能石字典作为备用
         /// </summary>
@@ -41,7 +41,7 @@ namespace dataAccess
                 Debug.Log("info.SkillId："+ info.SkillId + " skill stone info not found？");
                 return;
             }
-            
+
             item.Inherent = info.Born == "true";
             item._SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(Dic[instanceId].SkillId);
             item.gameObject.name = "stone_" + item._SkillConfig.TYPE + "_" + item._SkillConfig.REAL_NAME;
@@ -59,7 +59,7 @@ namespace dataAccess
             {
                 return null;
             }
-            
+
             var ob = await SkillIcon.FindSkillIcon(skillID);
             if (ob == null)
                 return null;

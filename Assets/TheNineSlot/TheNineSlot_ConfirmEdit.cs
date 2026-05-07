@@ -86,6 +86,7 @@ namespace mainMenu
             
             void Success(IDictionary<string, Tuple<string, string>> changedStoneDic)
             {
+                Stones.ClearTempUnitUsage();
                 Stones.RefreshLocalStoneParams(changedStoneDic);
                 var skillEditLayer = UILayerLoader.Get<SkillEditLayer>();
                 if (skillEditLayer != null)

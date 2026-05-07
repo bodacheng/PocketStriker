@@ -5,12 +5,12 @@ using UnityEngine.EventSystems;
 public partial class StoneCell : MonoBehaviour, IDropHandler
 {
     private Action<StoneCell, StoneCell> OnDropAction;
-    
+
     public void SetOnDropAction(Action<StoneCell, StoneCell> action)
     {
         OnDropAction = action;
     }
-    
+
     /// <summary>
     /// Item is dropped in this cell
     /// </summary>

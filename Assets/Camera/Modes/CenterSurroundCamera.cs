@@ -19,7 +19,7 @@ public class CenterSurroundCamera : CameraMode
     
     public override void LocalUpdate(Camera _camera)
     {
-        h = UnityEngine.Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("RotateCamera");
+        h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;                
         xzOff.y = 0;
         

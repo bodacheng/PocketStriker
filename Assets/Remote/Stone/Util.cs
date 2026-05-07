@@ -19,7 +19,7 @@ namespace dataAccess
                 keyValuePair.Value.RenderStoneLevel(on);
             }
         }
-        
+
         public static void ShowAllStonesLevel()
         {
             foreach (var keyValuePair in RenderModelDic)
@@ -52,10 +52,10 @@ namespace dataAccess
                 {
                     continue;
                 }
-                
+
                 var exs = filterForm.ExType.ToList();
-                if (skillConfig.TYPE == filterForm.Type 
-                    && exs.Contains(skillConfig.SP_LEVEL) 
+                if (skillConfig.TYPE == filterForm.Type
+                    && exs.Contains(skillConfig.SP_LEVEL)
                     && SkillConfig.RangeLimit(skillConfig.AIAttrs.AI_MIN_DIS, skillConfig.AIAttrs.AI_MAX_DIS, filterForm.Close, filterForm.Near, filterForm.Far))
                 {
                     skillStonesOfTypeAndExType.Add(pair.Value.InstanceId);
@@ -63,7 +63,7 @@ namespace dataAccess
             }
             return skillStonesOfTypeAndExType;
         }
-        
+
         // exceptList ： 除了这些 技能石账户ID
         // extraList ：额外添加这些 技能石账户ID
         public static List<string> TargetStonesFromAccount_except(string skillEditFocusing, SkillStonesBox.StoneFilterForm filterForm, List<string> exceptList, List<string> extraList, bool notUsing)
@@ -93,23 +93,25 @@ namespace dataAccess
             }
             return returnValue;
         }
-        
+
         // 从账户随机抽取符合要求的技能石
         // exceptSkIDs : 除了这些技能ID。切记是技能ID
         public static StoneOfPlayerInfo SearchStoneForRandomSetFromAccount(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIds = null)
         {
             var exceptStones = new List<string>();
             if (exceptSkIds != null)
-            for (var i = 0; i < exceptSkIds.Count; i++)
             {
-                var exceptAccIds = GetMyStonesBySkillID(exceptSkIds[i]);
-                exceptStones.AddRange(exceptAccIds);
+                for (var i = 0; i < exceptSkIds.Count; i++)
+                {
+                    var exceptAccIds = GetMyStonesBySkillID(exceptSkIds[i]);
+                    exceptStones.AddRange(exceptAccIds);
+                }
             }
-            
+
             string focusingUnitInstanceId = null;
             if (ProcessesRunner.Main.currentProcess.Step == MainSceneStep.UnitSkillEdit)
                 focusingUnitInstanceId = PreScene.target.Focusing.id;
-            
+
             var stoneAccIDs = TargetStonesFromAccount_except(focusingUnitInstanceId, filterForm, exceptStones, null, true);
             if (stoneAccIDs.Count == 0)
                 return null;
@@ -123,7 +125,7 @@ namespace dataAccess
         {
             if (Units.Get(instanceId) == null)
                 return new List<StoneOfPlayerInfo>();
-            
+
             var targetStones = new List<StoneOfPlayerInfo>();
             foreach(var pair in Dic)
             {
@@ -134,7 +136,7 @@ namespace dataAccess
             }
             return targetStones;
         }
-        
+
         // 获取一个角色的原生技能的对应技能石信息
         public static StoneOfPlayerInfo GetOriginSkillOfUnit(string instanceId)
         {

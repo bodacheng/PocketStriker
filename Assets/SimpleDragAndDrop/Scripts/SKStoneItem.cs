@@ -12,7 +12,8 @@ public partial class SKStoneItem : MonoBehaviour, IBeginDragHandler, IDragHandle
 	public static SKStoneItem draggedItem;                                      // Item that is dragged now
 	public static GameObject dragging;                                          // Icon of dragged item
 	public static StoneCell sourceCell;                                         // From this cell dragged item is
-    
+    public static bool DragBlocked { get; set; }                                // 全局开关：某些模式下禁用拖拽
+
     static Canvas canvas;                                                       // Canvas for item drag operation
     static readonly string canvasName = "DragAndDropCanvas";                    // Name of canvas
     static readonly int canvasSortOrder = 100;                                  // Sort order for canvas
@@ -70,12 +71,12 @@ public partial class SKStoneItem : MonoBehaviour, IBeginDragHandler, IDragHandle
 	/// <summary>
 	/// This item started to drag.
 	/// </summary>
-	/// <param name="eventData"></param>
+    /// <param name="eventData"></param>
 	public void OnBeginDrag(PointerEventData eventData)
 	{
-		if (dragging != null)
+		if (dragging != null || DragBlocked)
 			return;
-		
+
         sourceCell = GetCell();                       							// Remember source cell
         draggedItem = this;                                                     // Set as dragged item
                                                                                 // Create item's icon

@@ -319,7 +319,7 @@ public partial class FightPrepareLayer : UILayer
                 continue;
             }
 
-            preloadTasks.Add(DedicatedCameraConnector.PrepareModel(recordId));
+            preloadTasks.Add(targetConnector.PrepareModel(recordId));
         }
 
         if (preloadTasks.Count == 0)

@@ -117,7 +117,7 @@ public class FrontLayer : UILayer
         {
             try
             {
-                await DedicatedCameraConnector.PrepareModel(recordID);
+                await camConnector.PrepareModel(recordID);
             }
             catch (OperationCanceledException)
             {

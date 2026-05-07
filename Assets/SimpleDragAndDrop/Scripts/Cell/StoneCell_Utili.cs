@@ -21,7 +21,7 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         _selected.transform.localPosition = Vector3.zero;
 
         var rect = _selected.GetComponent<RectTransform>();
-        
+
         rect.localPosition = new Vector3(0, 0, 0);
         rect.localScale = Vector3.one;
         rect.anchoredPosition = Vector3.zero;

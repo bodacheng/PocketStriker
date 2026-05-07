@@ -35,6 +35,7 @@ namespace mainMenu
         // 撤销编辑
         public void ResetNineSlot()
         {
+            Stones.ClearTempUnitUsage();
             ReadANineAndTwo(PreScene.target.Focusing.id);
             ValidateWarn();
         }

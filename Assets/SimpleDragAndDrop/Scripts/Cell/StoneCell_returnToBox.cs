@@ -13,5 +13,6 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
             _myDadItem.gameObject.transform.SetParent(PreScene.target.stonesTempContainer);
         }
         UpdateMyItem();
+        ClearUsingUnitIcon();
     }
 }

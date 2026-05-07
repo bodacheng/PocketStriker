@@ -14,3 +14,9 @@ Current modules:
 - `Log`: shared fight-log aggregation and hitbox outcome counters.
 - `Skill`: shared skill config models, attack-type mapping, and skill-set validation rules.
 - `Utility`: shared lightweight container/reflection helpers and CSV table parsing utilities.
+
+SourceSync asset roots:
+
+- `Behaviour`, `P3`, `Camera`, `TheNineSlot`, `SkillStoneBox`, `Remote/Stone`,
+  `SimpleDragAndDrop/Scripts`, shared `UnitBox` stone detail/effects/upgrade logic,
+  and selected stone-related layer files.

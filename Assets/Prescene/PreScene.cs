@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using UnityEngine;
 using DummyLayerSystem;
-using ModelView;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -162,27 +160,12 @@ namespace mainMenu
             ToInitialPhase();
         }
 
-        async UniTask PrepareModelOftenUse()
-        {
-            await UniTask.WhenAll(new List<UniTask>()
-            {
-                DedicatedCameraConnector.PrepareModel("1"),
-                DedicatedCameraConnector.PrepareModel("2"),
-                DedicatedCameraConnector.PrepareModel("3"),
-                DedicatedCameraConnector.PrepareModel("4"),
-                DedicatedCameraConnector.PrepareModel("5"),
-                DedicatedCameraConnector.PrepareModel("6"),
-                DedicatedCameraConnector.PrepareModel("7")
-            });
-        }
-
         public static void CashClear()
         {
             Stones.ClearRender();
             HurtObjectManager.Clear();
             EffectsManager.Clear();
             AnimationResourceLoader.Instance.Clear();
-            DedicatedCameraConnector.ClearBackUpModels();
             AddressablesLogic.ReleaseAsyncOperationHandles();
         }
         

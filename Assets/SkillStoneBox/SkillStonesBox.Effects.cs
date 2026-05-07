@@ -18,13 +18,14 @@ namespace mainMenu
                 _tabEffects.SetSelectedTabPos(focusingExType);
             }
         }
-        
+
         public void IniExTabs()
         {
             void Temp(Button btn, int exLevel)
             {
                 btn.onClick.AddListener(() =>
                 {
+                    ExTabPressed?.Invoke();
                     FocusingExType = exLevel;
                     RestFilter();
                 });
@@ -34,14 +35,14 @@ namespace mainMenu
             Temp(EX2Tab,2);
             Temp(EX3Tab,3);
         }
-        
-        public async UniTask IniExTabsEffects(Camera fxCamera, CancellationToken token)
+
+        public async UniTask IniExTabsEffects(Camera fxCamera, CancellationToken token = default)
         {
             if (token.IsCancellationRequested)
             {
                 return;
             }
-            
+
             void IniExTab(Button btn, int exLevel)
             {
                 var worldPos = PosCal.GetWorldPos(fxCamera, btn.GetComponent<RectTransform>(), 5f);
@@ -52,17 +53,18 @@ namespace mainMenu
                     _tabEffects.SkillButtonExplosion(exLevel, worldPos, _tabEffects.transform);
                 });
             }
-            
+
             await Observable.TimerFrame(5);
             if (token.IsCancellationRequested)
             {
                 return;
             }
+
             IniExTab(NormalTab,0);
             IniExTab(EX1Tab,1);
             IniExTab(EX2Tab,2);
             IniExTab(EX3Tab,3);
-            
+
             _tabEffects.SetSelectedTabPos(focusingExType);
         }
 

@@ -57,7 +57,7 @@ public partial class NineForShow : MonoBehaviour
                 C1SkillID, C2SkillID, C3SkillID
             ),
             SkillSetStateRender(
-                PreScene.target.postProcessCamera,
+                PreScene.target.noPostProcessCamera,
                 A1SkillID, A2SkillID, A3SkillID,
                 B1SkillID, B2SkillID, B3SkillID,
                 C1SkillID, C2SkillID, C3SkillID,

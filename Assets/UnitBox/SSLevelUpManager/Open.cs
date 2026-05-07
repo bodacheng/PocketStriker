@@ -9,7 +9,7 @@ public partial class SSLevelUpManager : MonoBehaviour
     {
         var renderModel = Stones.GetRenderModel(_stoneListLayer.TargetStoneID);
         renderModel._using = true;
-        
+
         var layer = UILayerLoader.Get<StoneListLayer>();
         layer.TargetStoneID = _stoneListLayer.TargetStoneID;
         layer.box.AddFeatureToCells(layer.CellFeature_MAdd);
@@ -17,7 +17,7 @@ public partial class SSLevelUpManager : MonoBehaviour
         Stones.HighLight(renderModel._SkillConfig.RECORD_ID);
         gameObject.SetActive(true);
     }
-    
+
     public void CloseLevelUpPage()
     {
         if (!gameObject.activeSelf)
@@ -29,11 +29,12 @@ public partial class SSLevelUpManager : MonoBehaviour
             Debug.Log("Logic Error:"+ _stoneListLayer.TargetStoneID);
             return;
         }
-        
+
         renderModel._using = false;
         SKStoneItem.SelectedRender(renderModel, SkillStonesBox.Selected);
         _stoneListLayer.TargetStoneID = renderModel.instanceId;
-        _stoneListLayer.SkillStoneDetail.SkillIntro.gameObject.SetActive(true);
+        OnCloseLevelUpPageTargetSelected();
+
         foreach (var t in _materialSlots)
         {
             if (t.GetItem() != null)
@@ -41,10 +42,12 @@ public partial class SSLevelUpManager : MonoBehaviour
                 layer.box.ReturnStoneToBox(t.GetItem());
             }
         }
-        
+
         layer.box.AddFeatureToCells(layer.CellFeature_StoneShow);
         RefreshSkillLevelUpModule(_stoneListLayer.TargetStoneID);
         Stones.ResetHighLight();
         gameObject.SetActive(false);
     }
+
+    partial void OnCloseLevelUpPageTargetSelected();
 }

@@ -9,17 +9,19 @@ namespace dataAccess
     {
         static readonly IDictionary<string, StoneOfPlayerInfo> Dic = new Dictionary<string, StoneOfPlayerInfo>();
         static readonly IDictionary<string, SKStoneItem> RenderModelDic = new Dictionary<string, SKStoneItem>();
-        
+        static readonly IDictionary<string, string> TempUnitUsageDic = new Dictionary<string, string>();
+
         public static void ClearData()
         {
             Dic.Clear();
+            TempUnitUsageDic.Clear();
         }
 
         public static bool TooManyStones()
         {
             return Dic.Count > CommonSetting.MaxStoneCount;
         }
-        
+
         public static void ClearRender()
         {
             foreach (var kv in RenderModelDic)
@@ -28,7 +30,33 @@ namespace dataAccess
             }
             RenderModelDic.Clear();
         }
-        
+
+        public static void SetTempUnitUsage(string stoneInstanceId, string unitInstanceId)
+        {
+            if (string.IsNullOrEmpty(stoneInstanceId))
+                return;
+
+            if (unitInstanceId == null)
+            {
+                TempUnitUsageDic.Remove(stoneInstanceId);
+                return;
+            }
+
+            TempUnitUsageDic[stoneInstanceId] = unitInstanceId;
+        }
+
+        public static void ClearTempUnitUsage()
+        {
+            TempUnitUsageDic.Clear();
+        }
+
+        public static string GetUnitInstanceIdForDisplay(string stoneInstanceId)
+        {
+            if (stoneInstanceId != null && TempUnitUsageDic.TryGetValue(stoneInstanceId, out var tempUnit))
+                return tempUnit;
+            return Get(stoneInstanceId)?.unitInstanceId;
+        }
+
         public static void TempRemoveAllStoneModel()
         {
             foreach (var kv in RenderModelDic)
@@ -37,12 +65,12 @@ namespace dataAccess
                 kv.Value.gameObject.transform.SetParent(PreScene.target.stonesTempContainer);
             }
         }
-        
+
         public static StoneOfPlayerInfo Get(string id)
         {
             return id == null ? null : Dic.ContainsKey(id) ? Dic[id] : null;
         }
-        
+
         public static List<string> GetMyStonesBySkillID(string skillID)
         {
             var infoModels = new List<string>();
@@ -65,12 +93,12 @@ namespace dataAccess
             var form = StoneLevelUpProccessor.DecideForm(stoneInfo.SkillId, stoneInfo.InstanceId);
             return form != null;
         }
-        
+
         public static SKStoneItem GetRenderModel(string itemId)
         {
             return itemId == null ? null : RenderModelDic.ContainsKey(itemId) ? RenderModelDic[itemId] : null;
         }
-        
+
         public static void HighLight(string skillId)
         {
             foreach (var kv in RenderModelDic)

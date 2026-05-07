@@ -10,22 +10,22 @@ class ChatGptFix : CameraMode
     Vector2 enemyScreenPos;
     Vector3 xzOff;
     Vector3 lookPoint;
+    Vector3 frontWPos, backWPos;
     Quaternion ToRotation;
-    float autoRotateSpeed = 10;
+    float autoChangeAngleLimit = 15f;
+    float autoRotateSpeed = 360f;
     float _changeSpeed;
-    float _transitionSpeedPara = 10f;
-    readonly float _lookPointHeight = 2.2f;
+    readonly float _lookPointHeight = 1.5f;
     readonly float _minXZ;
     readonly float _minY;
-    readonly float fieldOfView;
-    const float LookPointEnemyBias = 0.55f;
-    const float FocusSmoothTime = 0.08f;
-    const float EnemySmoothTime = 0.1f;
-    Vector3 _smoothedMePos;
-    Vector3 _smoothedEnemyCenter;
-    Vector3 _mePosVelocity;
-    Vector3 _enemyCenterVelocity;
-    bool _followStateInitialized;
+    float fieldOfView;
+    private float _transitionSpeedPara;
+    private const float ScreenDiffThresholdSqr = 100f * 100f;
+    private const float VerticalAlignmentMinYDiff = 0.03f;
+    private const float VerticalAlignmentMaxXDiff = 0.25f;
+    private const float AutoRotateMinSmoothTime = 0.05f;
+    private const float AutoRotateMaxSmoothTime = 0.18f;
+    private float _autoRotateVelocity;
     
     public bool AutoRotateCamera
     {
@@ -35,12 +35,6 @@ class ChatGptFix : CameraMode
             PlayerPrefs.SetInt("AutoRotateCamera", value ? 1 : 0);
             PlayerPrefs.Save();
         }
-    }
-
-    float TransitionSpeedPara
-    {
-        get => _transitionSpeedPara;
-        set => _transitionSpeedPara = Mathf.Clamp(value, 0.2f, 2f);
     }
     
     public ChatGptFix(float XZDis, float YDis, float fieldOfView)
@@ -58,7 +52,7 @@ class ChatGptFix : CameraMode
         set => XZDis = Mathf.Clamp(value, _minXZ , _minXZ + 20f);
     }
     
-    private float YDistance
+    private float UsedHeight
     {
         get => YDis;
         set => YDis = Mathf.Clamp(value, _minY , _minY + 20f);
@@ -67,35 +61,17 @@ class ChatGptFix : CameraMode
     public override void Enter(Camera _camera)
     {
         CanSetH = true;
-        _followStateInitialized = false;
-        _mePosVelocity = Vector3.zero;
-        _enemyCenterVelocity = Vector3.zero;
         _camera.fieldOfView = this.fieldOfView;
         CameraManager._subCamera.fieldOfView = this.fieldOfView;
+        CameraManager._centerCamera.fieldOfView = this.fieldOfView;
         LocalUpdate(_camera);
         xzOff = _camera.transform.position - lookPoint;
         xzOff.y = 0;
-        if (xzOff.sqrMagnitude <= 0.001f)
-        {
-            xzOff = GetDesiredOrbitDirection(mePos, enemiesCenter, -Vector3.forward);
-        }
-        TransitionSpeedPara = 5f;
-        DOTween.To(()=> TransitionSpeedPara, (x) => TransitionSpeedPara = x, 0.001f, 1f);
-    }
-
-    public override void Exit(Camera _camera)
-    {
-        _followStateInitialized = false;
-        _mePosVelocity = Vector3.zero;
-        _enemyCenterVelocity = Vector3.zero;
+        _transitionSpeedPara = 0f;
+        DOTween.To(()=> _transitionSpeedPara, (x) => _transitionSpeedPara = x, CommonSetting.CameraSpeed, 1f);
     }
 
     float h;
-    float ePosX;
-    float ePosY;
-    float mPosX;
-    float mPosY;
-
     private bool _canSetH;
     public bool CanSetH
     {
@@ -103,45 +79,50 @@ class ChatGptFix : CameraMode
         set
         {
             _canSetH = value;
-            if (!_canSetH)
-                h = 0;
-        }   
+            h = 0;
+        }
     }
 
     private Vector3 mePos;
     
     public override void LocalUpdate(Camera camera)
     {
-        if (meCenter == null)
+        if (meCenter != null)
         {
-            return;
-        }
-        var rawMePos = meCenter.position;
-        
-        _changeSpeed = 2 * Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        bool hasTargets = TryGetAveragePosition(targets, out var rawEnemiesCenter);
-        if (!hasTargets)
-        {
-            rawEnemiesCenter = rawMePos + meCenter.forward * 10f;
+            mePos = meCenter.position;
         }
 
-        if (!_followStateInitialized)
+        _changeSpeed = _transitionSpeedPara * Time.deltaTime;
+        var hasTargets = targets != null && targets.Count > 0;
+        if (hasTargets)
         {
-            _smoothedMePos = rawMePos;
-            _smoothedEnemyCenter = rawEnemiesCenter;
-            _followStateInitialized = true;
+            enemiesCenter = Vector3.zero;
+            foreach (var o in targets)
+            {
+                if (o != null)
+                {
+                    enemiesCenter += o.transform.position;
+                }
+            }
+            enemiesCenter /= targets.Count;
         }
         else
         {
-            _smoothedMePos = Vector3.SmoothDamp(_smoothedMePos, rawMePos, ref _mePosVelocity, FocusSmoothTime);
-            _smoothedEnemyCenter = Vector3.SmoothDamp(_smoothedEnemyCenter, rawEnemiesCenter, ref _enemyCenterVelocity, EnemySmoothTime);
+            enemiesCenter = mePos + meCenter.forward * 10f;
         }
-
-        mePos = _smoothedMePos;
-        enemiesCenter = _smoothedEnemyCenter;
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
         meScreenPos = camera.WorldToScreenPoint(mePos);
+        float normalizedXDiff = Mathf.Abs(enemyScreenPos.x - meScreenPos.x) / Screen.width;
+        float normalizedYDiff = Mathf.Abs(enemyScreenPos.y - meScreenPos.y) / Screen.height;
+        Vector2 screenDiff = enemyScreenPos - meScreenPos;
+        float angleToHorizontal = Mathf.Abs(Vector2.SignedAngle(screenDiff, Vector2.right));
+        if (angleToHorizontal > 90f)
+        {
+            angleToHorizontal = 180f - angleToHorizontal;
+        }
+        float verticalityRatio = Mathf.Sqrt(Mathf.Clamp01(angleToHorizontal / 90f));
+        float dynamicAutoRotateSpeed = autoRotateSpeed * verticalityRatio;
         
         if (CanSetH)
         {
@@ -150,56 +131,137 @@ class ChatGptFix : CameraMode
         
         if (h != 0)
         {
-            xzOff = Quaternion.AngleAxis(h * 2f, Vector3.up) * xzOff;
+            xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
             xzOff.y = 0;
+            _autoRotateVelocity = 0f;
         }
-        else if (AutoRotateCamera && hasTargets)
+        else
         {
-            var desiredOrbit = GetDesiredOrbitDirection(mePos, enemiesCenter, xzOff);
-            if (xzOff.sqrMagnitude <= 0.001f)
+            if (AutoRotateCamera && hasTargets && meCenter != null && screenDiff.sqrMagnitude > ScreenDiffThresholdSqr)
             {
-                xzOff = desiredOrbit;
+                if (ShouldRotateForVerticalAlignment(normalizedXDiff, normalizedYDiff, angleToHorizontal))
+                {
+                    Vector3 planarDiff = enemiesCenter - mePos;
+                    planarDiff.y = 0f;
+                    if (planarDiff.sqrMagnitude > 0.0001f)
+                    {
+                        Vector3 currentForward = camera.transform.forward;
+                        currentForward.y = 0f;
+                        if (currentForward.sqrMagnitude < 0.0001f)
+                        {
+                            currentForward = -(xzOff.sqrMagnitude > 0.0001f ? xzOff : planarDiff.normalized);
+                        }
+                        currentForward.Normalize();
+
+                        Vector3 desiredForward = Vector3.Cross(Vector3.up, planarDiff).normalized;
+                        if (desiredForward.sqrMagnitude < 0.0001f)
+                        {
+                            desiredForward = currentForward;
+                        }
+                        else
+                        {
+                            var alternativeForward = -desiredForward;
+                            if (Vector3.Angle(currentForward, alternativeForward) < Vector3.Angle(currentForward, desiredForward))
+                            {
+                                desiredForward = alternativeForward;
+                            }
+                        }
+
+                        float currentYaw = Mathf.Atan2(currentForward.x, currentForward.z) * Mathf.Rad2Deg;
+                        float desiredYaw = Mathf.Atan2(desiredForward.x, desiredForward.z) * Mathf.Rad2Deg;
+                        float smoothTime = Mathf.Lerp(AutoRotateMaxSmoothTime, AutoRotateMinSmoothTime, verticalityRatio);
+                        float maxSpeed = Mathf.Max(dynamicAutoRotateSpeed, 0.01f);
+                        float newYaw = Mathf.SmoothDampAngle(currentYaw, desiredYaw, ref _autoRotateVelocity, smoothTime, maxSpeed, Time.deltaTime);
+                        Vector3 smoothedForward = new Vector3(Mathf.Sin(newYaw * Mathf.Deg2Rad), 0f, Mathf.Cos(newYaw * Mathf.Deg2Rad));
+                        if (smoothedForward.sqrMagnitude > 0.0001f)
+                        {
+                            smoothedForward.Normalize();
+                            var newXZ = -smoothedForward;
+                            newXZ.y = 0f;
+                            if (newXZ.sqrMagnitude > 0.0001f)
+                            {
+                                xzOff = newXZ.normalized;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _autoRotateVelocity = 0f;
+                    }
+                }
+                else
+                {
+                    _autoRotateVelocity = 0f;
+                }
             }
             else
             {
-                xzOff = Vector3.Slerp(xzOff.normalized, desiredOrbit, autoRotateSpeed * 0.15f * Time.deltaTime);
+                _autoRotateVelocity = 0f;
             }
-            xzOff.y = 0;
         }
         
-        ePosX = enemyScreenPos.x / Screen.width;
-        ePosY = enemyScreenPos.y / Screen.height;
-        mPosX = meScreenPos.x / Screen.width;
-        mPosY = meScreenPos.y / Screen.height;
+        float ePosX = enemyScreenPos.x / Screen.width;
+        float ePosY = enemyScreenPos.y / Screen.height;
+        float mPosX = meScreenPos.x / Screen.width;
+        float mPosY = meScreenPos.y / Screen.height;
         
-        if (ePosX >= 0.3 && ePosX <= 0.7 &&
-            mPosX >= 0.3 && mPosX <= 0.7 &&
-            ePosY >= 0.3 && ePosY <= 0.7 &&
-            mPosY >= 0.3 && mPosY <= 0.7)
+        if (ePosX >= 0.3f && ePosX <= 0.7f &&
+            mPosX >= 0.3f && mPosX <= 0.7f &&
+            ePosY >= 0.3f && ePosY <= 0.7f &&
+            mPosY >= 0.3f && mPosY <= 0.7f)
         {
             XZDistance -= _changeSpeed;
-            YDistance -= _changeSpeed;
+            UsedHeight -= _changeSpeed;
         }
-        else if (ePosX <= 0.2 || ePosX >= 0.8 || 
-                 mPosX <= 0.2 || mPosX >= 0.8 || 
-                 ePosY <= 0.2 || ePosY >= 0.8 || 
-                 mPosY <= 0.2 || mPosY >= 0.8)
+        else if (ePosX <= 0.2f || ePosX >= 0.8f ||
+                 mPosX <= 0.2f || mPosX >= 0.8f ||
+                 ePosY <= 0.2f || ePosY >= 0.8f ||
+                 mPosY <= 0.2f || mPosY >= 0.8f)
         {
             XZDistance += _changeSpeed;
-            YDistance += _changeSpeed;
+            UsedHeight += _changeSpeed;
         }
         
-        lookPoint = Vector3.Lerp(mePos, enemiesCenter, hasTargets ? LookPointEnemyBias : 0.5f);
+        // 判断我与敌人哪个更接近相机位置
+        if (enemyScreenPos.y >= meScreenPos.y)
+        {
+            frontWPos = mePos;
+            backWPos = enemiesCenter;
+        }
+        else
+        {
+            frontWPos = enemiesCenter;
+            backWPos = mePos;
+        }
+
         cameraTargetPos = lookPoint + xzOff.normalized * XZDistance;
-        cameraTargetPos.y = YDistance;
-        lookPoint.y = Mathf.Lerp(mePos.y, enemiesCenter.y, hasTargets ? 0.5f : 0f) + _lookPointHeight;
+        cameraTargetPos.y = UsedHeight;
         
-        if (hasTargets || h != 0)
+        if (hasTargets || meCenter != null || h != 0)
         {
             camera.transform.position = Vector3.Lerp(camera.transform.position, cameraTargetPos, _changeSpeed);
+
+            lookPoint = (backWPos - frontWPos) * 0.5f + frontWPos;
+            lookPoint.y = _lookPointHeight;
+
             rotateToDirection = lookPoint - cameraTargetPos;
             ToRotation = Quaternion.LookRotation(rotateToDirection.normalized);
             camera.transform.rotation = Quaternion.Slerp(camera.transform.rotation, ToRotation, _changeSpeed);
         }
+    }
+
+    private bool ShouldRotateForVerticalAlignment(float normalizedXDiff, float normalizedYDiff, float angleToHorizontal)
+    {
+        if (normalizedYDiff < VerticalAlignmentMinYDiff)
+        {
+            return false;
+        }
+
+        if (normalizedXDiff > VerticalAlignmentMaxXDiff)
+        {
+            return false;
+        }
+
+        return angleToHorizontal >= autoChangeAngleLimit;
     }
 }

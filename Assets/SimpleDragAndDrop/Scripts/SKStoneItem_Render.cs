@@ -13,13 +13,13 @@ public partial class SKStoneItem : MonoBehaviour, IBeginDragHandler, IDragHandle
         slotEffect.gameObject.transform.position = worldPos;
         slotEffect.Play(true);
         slotEffect.transform.SetParent(transform);
-        
+
         Observable.Timer(TimeSpan.FromSeconds(3)).Subscribe(_ =>
         {
             Destroy(slotEffect.gameObject);
         }).AddTo(slotEffect.gameObject);
     }
-    
+
     public static void SelectedRender(SKStoneItem item, GameObject _Selected)
     {
         if (item != null)

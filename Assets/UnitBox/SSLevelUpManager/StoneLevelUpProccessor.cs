@@ -31,6 +31,7 @@ public static class StoneLevelUpProccessor
                 }
                 if (stoneInfo.Level > hightestLevel)
                 {
+                    hightestLevel = stoneInfo.Level;
                     targetStoneInstanceId = stoneInfo.InstanceId;
                 }
             }

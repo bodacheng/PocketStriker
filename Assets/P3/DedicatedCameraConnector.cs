@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using DG.Tweening;
+using DG.Tweening.Core;
+using DG.Tweening.Plugins.Options;
 using mainMenu;
 using UnityEngine;
 
@@ -127,7 +129,12 @@ namespace ModelView
                 SkillsPrintOutLateUpdate();
             }
         }
-        
+
+        private void OnDestroy()
+        {
+            _rotateTo?.Kill();
+        }
+
         private Renderer _parentNodeRenderer;
         private Bounds _targetBounds;
         private Renderer[] _renderers;
@@ -219,6 +226,7 @@ namespace ModelView
         
         public void OnPointerDown()
         {
+            _rotateTo?.Kill();
             left_right_old = left_right;
             up_down_old = up_down;
             sPos = Input.mousePosition;
@@ -233,9 +241,10 @@ namespace ModelView
             RotateTarget(left_right, up_down, _z);
         }
         
-        public void ItemDetailStartDirection(float x, float y, float z = 0)
+        TweenerCore<Vector3, Vector3, VectorOptions> _rotateTo;
+        void ItemDetailStartDirection(float x, float y, float z = 0)
         {
-            up_down = y;
+            // 更新上下旋转范围
             if (y < upDownRotateRangeMin)
             {
                 upDownRotateRangeMin = y;
@@ -244,10 +253,30 @@ namespace ModelView
             {
                 upDownRotateRangeMax = y;
             }
+
+            // 对y值进行夹取
+            float clampedY = Mathf.Clamp(y, upDownRotateRangeMin, upDownRotateRangeMax);
+
+            // 目标值
+            Vector3 endValue = new Vector3(x, clampedY, z);
+
+            this.left_right = 0;
+            this.up_down = 0;
+            this._z = 0;
             
-            up_down = Mathf.Clamp(up_down, upDownRotateRangeMin, upDownRotateRangeMax);
-            RotateTarget(x, up_down, z);
-            OnPointerDown();
+            // 使用DOTween进行平滑渐变，duration可根据需要调整（此处设为0.5秒）
+            _rotateTo = DOTween.To(
+                () => new Vector3(this.left_right, this.up_down, this._z),
+                value => {
+                    this.left_right = value.x;
+                    this.up_down = value.y;
+                    this._z = value.z;
+                    // 每次更新时调用RotateTarget刷新目标旋转
+                    RotateTarget(value.x, value.y, value.z);
+                },
+                endValue,
+                0.5f
+            ).OnComplete(OnPointerDown);
         }
         
         /// <summary>

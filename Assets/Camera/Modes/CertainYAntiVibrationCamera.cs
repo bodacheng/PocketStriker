@@ -65,7 +65,7 @@ class CertainYAntiVibrationCamera : CameraMode
         }
         else
         {
-            h = UnityEngine.Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("RotateCamera");
+            h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
             xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
             //if (Input.GetMouseButtonDown(0))//Input.GetTouch(0).phase == TouchPhase.Began
             //{

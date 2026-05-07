@@ -42,6 +42,7 @@ public class TouchTopDownCamera : CameraMode
     {
         _camera.fieldOfView = this.fieldOfView;
         CameraManager._subCamera.fieldOfView = this.fieldOfView;
+        CameraManager._centerCamera.fieldOfView = this.fieldOfView;
         
         Vector3 temp = Vector3.zero;
         Height = cameraManager.TopDownModeEndRef.position.y;

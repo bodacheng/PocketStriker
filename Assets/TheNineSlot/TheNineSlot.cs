@@ -313,7 +313,7 @@ namespace mainMenu
             
             ShowNineSlotExSurplus(wholePoint);
             RefreshCurrentHpBasedOnNineSlots();
-            RefreshEffects();
+            RefreshEffects().Forget();
             var valR = ValidateWarn();
             //ConfirmSkillChangeButton.gameObject.SetActive(valR == SkillSet.SkillEditError.Perfect);
             
@@ -321,18 +321,20 @@ namespace mainMenu
             return full;
         }
         
-         async void RefreshEffects()
-         {
+        async UniTask RefreshEffects()
+        {
             await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
+            var tasks = new List<UniTask>();
             foreach (var slot in AllSlot)
             {
                 var item = slot._cell.GetItem();
                 if (slot._cell != null)
                 {
-                    var worldPos = PosCal.GetWorldPos(PreScene.target.postProcessCamera, slot._cell.GetComponent<RectTransform>(), 5f);
-                    await NineForShow.RefreshSlotEffects(slot.num, item != null ? item._SkillConfig.SP_LEVEL : -1, worldPos, transform, _slotEffects);
+                    var worldPos = PosCal.GetWorldPos(PreScene.target.noPostProcessCamera, slot._cell.GetComponent<RectTransform>(), 5f);
+                    tasks.Add(NineForShow.RefreshSlotEffects(slot.num, item != null ? item._SkillConfig.SP_LEVEL : -1, worldPos, slot._cell.transform, _slotEffects));
                 }
             }
-         }
+            await UniTask.WhenAll(tasks);
+        }
     }
 }

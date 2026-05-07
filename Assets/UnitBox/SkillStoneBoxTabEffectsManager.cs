@@ -9,18 +9,16 @@ namespace mainMenu
     {
         readonly IDictionary<Element, ElementStoneTagsGroup> _btnEffects = new Dictionary<Element, ElementStoneTagsGroup>();
         ElementStoneTagsGroup _focusingEffectsGroup;
-        
+
         async UniTask StartUp(Element element, CancellationToken ct = default)
         {
             if (_btnEffects.ContainsKey(element))
                 return;
             var zt = new ElementStoneTagsGroup();
             await zt.IniForSkillStoneBox(element, transform);
-            if (ct.IsCancellationRequested)
-            {
-                return;
-            }
+            ct.ThrowIfCancellationRequested();
             _btnEffects.Add(element, zt);
+            ct.ThrowIfCancellationRequested();
         }
 
         public void TurnShowingTagEffects(bool on)
@@ -32,7 +30,7 @@ namespace mainMenu
                 _focusingEffectsGroup?.OpenTagEffects();
             }
         }
-        
+
         public void CloseShowingTagEffects()
         {
             _focusingEffectsGroup?.CloseTagEffects();
@@ -41,21 +39,17 @@ namespace mainMenu
                 kv.Value.Clear();
             }
         }
-        
+
         public void SetSelectedTabPos(int ex)
         {
             _focusingEffectsGroup?.SetSelectedTabPos(ex);
         }
-        
+
         public async UniTask SwitchElement(Element element, CancellationToken ct)
         {
             ProgressLayer.Loading(string.Empty);
             await StartUp(element, ct);
-            if (ct.IsCancellationRequested)
-            {
-                ProgressLayer.Close();
-                return;
-            }
+            ct.ThrowIfCancellationRequested();
             _focusingEffectsGroup?.CloseTagEffects();
             if (_btnEffects.ContainsKey(element))
             {
@@ -65,17 +59,17 @@ namespace mainMenu
             }
             ProgressLayer.Close();
         }
-        
+
         public void RefreshTagEffect(Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
         {
             _focusingEffectsGroup.RefreshBoxEffects(sp_level, pos);
         }
-        
-        // public void RefreshSlotEffect(int slotNum ,Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
-        // {
-        //     NineForShow.RefreshSlotEffects(slotNum, sp_level, pos, transform, _slotEffects);
-        // }
-        
+
+        public void RefreshSlotEffect(int slotNum ,Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
+        {
+            _focusingEffectsGroup.RefreshSlotEffects(slotNum, sp_level, pos, transform);
+        }
+
         public void SkillButtonExplosion(int spLevel, Vector3 targetPos, Transform parent)
         {
             _focusingEffectsGroup.SkillButtonExplosion(spLevel, targetPos, parent);

@@ -61,11 +61,10 @@ class TopDownWatchCamera : CameraMode
             screenMovementForward = screenMovementSpace * Vector3.forward;
             screenMovementRight = screenMovementSpace * Vector3.right;
             //get movement input, set direction to move in
-            h = UnityEngine.Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("RotateCamera");
-            v = UnityEngine.Input.GetAxis("Vertical") + UltimateJoystick.GetVerticalAxis("RotateCamera");
+            h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
+            v = UltimateJoystick.GetVerticalAxis("RotateCamera");
             
             use_direction = (screenMovementForward * v) + (screenMovementRight * h);
-            k += UltimateJoystick.GetHorizontalAxis("joystick") * speed * Time.deltaTime / (Time.deltaTime + 0.2f);
         }
         Vector3 to = pos + use_direction.normalized * speed;
         if (_camera.transform.position != to)

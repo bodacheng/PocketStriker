@@ -163,7 +163,7 @@ class OneVOneModeNew : CameraMode
             XZ_distance += ZoomAcc;
         }
 
-        h = Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("RotateCamera");
+        h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         xzOff = Quaternion.AngleAxis(h * 2f, Vector3.up) * xzOff;
         maxheight = Mathf.Max(meCenter.position.y, enemiesCenter.y);
 

@@ -20,7 +20,7 @@ class CertainYAntiVabration : CameraMode
     float fixy, h;
     public override void LocalUpdate(Camera _camera)
     {
-        h = Input.GetAxis("Horizontal") + UltimateJoystick.GetHorizontalAxis("RotateCamera");
+        h = UltimateJoystick.GetHorizontalAxis("RotateCamera");
         xzOff = Quaternion.AngleAxis(h * 1.5f, Vector3.up) * xzOff;
         xzOff.y = 0;
         if (auto)

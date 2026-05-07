@@ -11,48 +11,48 @@ namespace mainMenu
     {
         [Header("图标")]
         [SerializeField] RectTransform iconShowT;
-        
+
         [Header("技能名字")]
         [SerializeField] Text keyName;
         [SerializeField] Text showName;
 
-        [Header("技能类型图标")] 
+        [Header("技能类型图标")]
         [SerializeField] GameObject atIcon;
         [SerializeField] GameObject defenceIcon;
-        
+
         [Header("EXTypes")]
         [SerializeField] GameObject ex1Icon, ex2Icon, ex3Icon;
-        
+
         [Header("Range")]
         [SerializeField] GameObject close, near, far;
 
         [Header("property titles")] [SerializeField]
         private Text ATTitle, HPTitle, LevelTitle;
-        
+
         [Header("AT")]
         [SerializeField] Text AT;
-        
+
         [Header("HP")]
         [SerializeField] Text HP;
-        
+
         [Header("当前技能等级")]
         [SerializeField] Text stoneTargetLevel;
-        
+
         [Header("Intro")]
         [SerializeField] Text skillIntro;
-        
+
         [Header("tempT")]
         [SerializeField] Transform tempT;
-        
+
         public Text SkillIntro => skillIntro;
-        
+
         // 额外生成一个技能石图像
         public async void IconForShow(string skillID, float size)
         {
             var item = await Stones.GenerateStoneModel(skillID, false);
             if (iconShowT != null)
             {
-                foreach (Transform child in iconShowT) 
+                foreach (Transform child in iconShowT)
                 {
                     Destroy(child.gameObject);
                 }
@@ -67,7 +67,7 @@ namespace mainMenu
                 item.transform.SetParent(tempT);
             }
         }
-        
+
         public void Clear()
         {
             keyName.text = string.Empty;
@@ -77,7 +77,7 @@ namespace mainMenu
             ATTitle.text = string.Empty;
             HPTitle.text = string.Empty;
             LevelTitle.text = string.Empty;
-            
+
             stoneTargetLevel.text = string.Empty;
             AT.text = string.Empty;
             HP.text = string.Empty;
@@ -93,7 +93,7 @@ namespace mainMenu
                 }
             }
         }
-        
+
         public void RefreshInfo(string instanceID)
         {
             var currentStone = Stones.Get(instanceID);
@@ -107,11 +107,11 @@ namespace mainMenu
             var row = PowerEstimateTable.Find_RECORD_ID(skillConfig.RECORD_ID);
             float.TryParse(row.HP, out float hp);
             float.TryParse(row.EstimateDamage, out float at);
-            
+
             ATTitle.text = Translate.Get("at_title");
             HPTitle.text = Translate.Get("hp_title");
             LevelTitle.text = Translate.Get("level_title");
-            
+
             var passiveSkill = UnitPassiveTable.GetPassiveSKillRecordIds();
             if (passiveSkill.Contains(currentStone.SkillId))
             {
@@ -127,30 +127,30 @@ namespace mainMenu
                 HP.text = FightGlobalSetting.StoneHpCal(hp, currentStone.Level).ToString();
             }
         }
-        
+
         public void RefreshInfo(SkillConfig config)
         {
             if (iconShowT != null)
                 IconForShow(config.RECORD_ID, iconShowT.transform.GetComponent<RectTransform>().sizeDelta.x);
             keyName.text = config.REAL_NAME;
-            
+
             if (PlayerAccountInfo.Me.TitleDisplayName != null && PlayerAccountInfo.Me.TitleDisplayName.Contains("IconDev"))
             {
-                showName.text = config.RECORD_ID + "." + config.SHOW_NAME;
+                showName.text = config.RECORD_ID +"."+ SkillNameTable.GetSkillName(config.RECORD_ID);
             }
             else
             {
-                showName.text = config.SHOW_NAME;
+                showName.text = SkillNameTable.GetSkillName(config.RECORD_ID);
             }
-            
+
             ATTitle.text = Translate.Get("at_title");
             HPTitle.text = Translate.Get("hp_title");
-            
+
             ShowSkillStoneExType(ex1Icon, ex2Icon, ex3Icon, config.SP_LEVEL);
             ShowSKillRanges(close, near, far, config.AIAttrs.AI_MIN_DIS, config.AIAttrs.AI_MAX_DIS);
             atIcon.SetActive(BehaviorTypeUtility.IsAttackIconState(config.STATE_TYPE));
             defenceIcon.SetActive(BehaviorTypeUtility.IsDefenceIconState(config.STATE_TYPE));
-            
+
             var intro = SkillNameTable.GetSkillIntro(config.RECORD_ID);
             skillIntro.text = intro;
 
@@ -165,14 +165,14 @@ namespace mainMenu
             AT.text = FightGlobalSetting.ATCal(at, level).ToString();
             HP.text = FightGlobalSetting.StoneHpCal(hp, level).ToString();
         }
-        
+
         public static void ShowSKillRanges(GameObject close, GameObject near, GameObject far, float disMIN, float disMAX)
         {
             close.SetActive(SkillConfig.RangeLimit(disMIN, disMAX, true, false, false));
             near.SetActive(SkillConfig.RangeLimit(disMIN, disMAX, false, true, false));
             far.SetActive(SkillConfig.RangeLimit(disMIN, disMAX, false, false, true));
         }
-        
+
         public static void ShowSkillStoneExType(GameObject ex1Icon, GameObject ex2Icon, GameObject ex3Icon, int eX)
         {
             switch (eX)

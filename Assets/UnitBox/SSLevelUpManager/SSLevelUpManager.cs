@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using dataAccess;
 using mainMenu;
 using UnityEngine;
@@ -11,7 +11,7 @@ public partial class SSLevelUpManager : MonoBehaviour
     [SerializeField] BOButton autoAdd;
     [SerializeField] BOButton confirmLevelUp;
     [SerializeField] Text gdCount;
-    
+
     [Header("融合技能槽")]
     [SerializeField] StoneCell cell1;
     [SerializeField] StoneCell cell2;
@@ -33,7 +33,7 @@ public partial class SSLevelUpManager : MonoBehaviour
             var info = Stones.Get(_stoneListLayer.TargetStoneID);
             AutoAddMaterials(info.SkillId);
         });
-        
+
         _materialSlots = new List<StoneCell>
         {
             cell1,
@@ -41,19 +41,19 @@ public partial class SSLevelUpManager : MonoBehaviour
             cell3,
             cell4
         };
-        
+
         foreach (var cell in _materialSlots)
         {
             cell.SetOnDropAction(MSlotOnDropAction);
         }
-        
+
         levelUpAllStonesBtn.SetListener(
             () =>
             {
-                PreScene.target.trySwitchToStep(MainSceneStep.StoneUpdateConfirm);
+                OnLevelUpAllStonesRequested();
             });
     }
-    
+
     void MSlotOnDropAction(StoneCell source, StoneCell to)
     {
         if (SKStoneItem.dragging != null)
@@ -75,12 +75,12 @@ public partial class SSLevelUpManager : MonoBehaviour
                     PopupLayer.ArrangeWarnWindow("このストーンは装備中です");
                     return;
                 }
-                
+
                 StoneCell.Install(source, to);
             }
         }
     }
-    
+
     /// <summary>
     /// 技能石升级画面更新。
     /// </summary>
@@ -101,7 +101,7 @@ public partial class SSLevelUpManager : MonoBehaviour
             if (slot.GetItem() == null)
                 return; // 材料槽满的时候才可能弹出确认按钮
         }
-        
+
         confirmLevelUp.gameObject.SetActive(true);
         var needGD = 10;
         gdCount.text = needGD.ToString();
@@ -112,7 +112,7 @@ public partial class SSLevelUpManager : MonoBehaviour
             }
         );
     }
-    
+
     void Confirm(string instanceId, int needGD)
     {
         if (Currencies.CoinCount.Value < needGD)
@@ -120,7 +120,7 @@ public partial class SSLevelUpManager : MonoBehaviour
             PopupLayer.ArrangeWarnWindow(Translate.Get("NoEnoughGD"));
             return;
         }
-            
+
         List<string> mInstanceIds = new List<string>();
         var item1 = cell1.GetItem();
         var item2 = cell2.GetItem();
@@ -134,19 +134,21 @@ public partial class SSLevelUpManager : MonoBehaviour
             mInstanceIds.Add(item3.instanceId);
         if (item4 != null)
             mInstanceIds.Add(item4.instanceId);
-            
+
         PopupLayer.ArrangeConfirmWindow(
             ()=>
             {
-                StoneLevelUpProccessor.LevelUpStone(instanceId, mInstanceIds,
+                ExecuteLevelUpStone(instanceId, mInstanceIds,
                     x =>
                     {
                         StoneLevelUpProccessor.CalUpdateAllForms();
                         LevelUpAllStonesBtn.interactable = StoneLevelUpProccessor.HasStoneToBeUpdate();
                         LevelUpAllStonesBtnAnimator.SetBool("on", StoneLevelUpProccessor.HasStoneToBeUpdate());
                         // 具体待定。但不应该是RefreshSkillLevelUpModule，这个在CloseLevelUpPage会跑一次才对
-                    });
-            }, 
+                    }).Forget();
+            },
             Translate.Get("IfStoneLevelUp"));
     }
+
+    partial void OnLevelUpAllStonesRequested();
 }

@@ -13,17 +13,18 @@ namespace ModelView
     {
         [SerializeField] private Text unitName;
         [SerializeField] private Vector3 modelPos = new Vector3(999,0,0);
+        [SerializeField] private float directionY = -30;
         
-        static readonly IDictionary<string, Data_Center> Saves = new Dictionary<string, Data_Center>();
+        readonly IDictionary<string, Data_Center> _saves = new Dictionary<string, Data_Center>();
 
-        public static void ClearBackUpModels()
+        public void ClearBackUpModels()
         {
-            foreach (var save in Saves)
+            foreach (var save in _saves)
             {
                 if (save.Value != null)
                     Destroy(save.Value.WholeT.gameObject);
             }
-            Saves.Clear();
+            _saves.Clear();
         }
         
         public async UniTask ShowMyModel(string instanceID)
@@ -42,12 +43,12 @@ namespace ModelView
         public int TaskRunningCount => _singleThreadProcessor.TaskRunningCount;
         public async UniTask ShowModel(string recordID)
         {
-            await _singleThreadProcessor.RunAsQueued(_ShowModel(recordID));
+            await _singleThreadProcessor.RunAsQueued(() => _ShowModel(recordID));
         }
         
         async UniTask _ShowModel(string recordID)
         {
-            foreach (var save in Saves)
+            foreach (var save in _saves)
             {
                 if (save.Value != null)
                     save.Value.WholeT.gameObject.SetActive(false);
@@ -55,7 +56,7 @@ namespace ModelView
             
             Data_Center saveData = null;
             if (recordID != null)
-                Saves.TryGetValue(recordID, out saveData);
+                _saves.TryGetValue(recordID, out saveData);
 
             var config = Units.GetUnitConfig(recordID);
             unitName.text = Translate.Get(config?.REAL_NAME);
@@ -73,10 +74,9 @@ namespace ModelView
             {
                 ProgressLayer.Loading(string.Empty);
                 _focusingC = await GeneralModelPool.GetModel(recordID, transform, modelPos- new Vector3(0,0, 200));
-                await UniTask.DelayFrame(2);
-                if (Saves.ContainsKey(recordID))
+                if (_saves.ContainsKey(recordID))
                 {
-                    var oldModel = Saves[recordID];
+                    var oldModel = _saves[recordID];
                     if (oldModel != null)
                     {
                         Destroy(oldModel.WholeT.gameObject);
@@ -89,7 +89,7 @@ namespace ModelView
                     _focusRId = null;
                     return;
                 }
-                DicAdd<string, Data_Center>.Add(Saves, recordID, _focusingC);
+                DicAdd<string, Data_Center>.Add(_saves, recordID, _focusingC);
             }
 
             if (this == null)
@@ -114,22 +114,22 @@ namespace ModelView
             }
             if (_focusingC != null && _focusingC.WholeT != null)
             {
-                foreach (var save in Saves)
+                foreach (var save in _saves)
                 {
                     if (save.Value != null && save.Value != _focusingC)
                         save.Value.WholeT.gameObject.SetActive(false);
                 }
                 Initialize(false,_focusingC.WholeT.gameObject.transform, transform);
                 _focusingC.AnimationManger.CasualFace();
-                ItemDetailStartDirection(0,0,0);
+                ItemDetailStartDirection(directionY,0,0);
             }
         }
         
-        public static async UniTask PrepareModel(string recordID)
+        public async UniTask PrepareModel(string recordID)
         {
             Data_Center saveData = null;
             if (recordID != null)
-                Saves.TryGetValue(recordID, out saveData);
+                _saves.TryGetValue(recordID, out saveData);
 
             var config = Units.GetUnitConfig(recordID);
             if (config == null)
@@ -143,8 +143,18 @@ namespace ModelView
                 {
                     return;
                 }
+                if (this == null)
+                {
+                    if (saveData.WholeT != null)
+                    {
+                        Destroy(saveData.WholeT.gameObject);
+                    }
+                    return;
+                }
+                saveData.WholeT.SetParent(transform);
+                saveData.WholeT.position = modelPos;
                 saveData.WholeT.gameObject.SetActive(false);
-                DicAdd<string, Data_Center>.Add(Saves, recordID, saveData);
+                DicAdd<string, Data_Center>.Add(_saves, recordID, saveData);
             }
         }
         
@@ -167,7 +177,7 @@ namespace ModelView
                     return;
                 }
                 IfShowingSkill = true;
-                _focusingC.AnimationManger.AnimationTrigger(skillName, true,0.25f);
+                _focusingC.AnimationManger.AnimationTrigger(skillName, 0.25f);
                 _focusingC.AnimationManger.TriggerExpression(Facial.aggressive);
             }
         }
@@ -180,7 +190,7 @@ namespace ModelView
                 if (_focusingC.AnimationManger.GetBool("in_transition") == false && 
                     _focusingC.AnimationManger.GetCurrentAnimatorStateInfo(1).normalizedTime >= 1f)
                 {
-                    _focusingC.AnimationManger.PlayLayerAnim(null, true, 0.25f);
+                    _focusingC.AnimationManger.AnimationTrigger(string.Empty, 0.25f);
                     IfShowingSkill = false;
                     resetModelPosTween = _focusingC.WholeT.transform.DOMove(modelPos, 1);
                 }

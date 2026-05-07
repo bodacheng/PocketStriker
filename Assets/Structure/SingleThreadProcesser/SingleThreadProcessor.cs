@@ -1,57 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 
 public class SingleThreadProcessor
 {
-    public int TaskRunningCount => processList.Count;
-    
-    public async UniTask RunAsQueued(UniTask origin)
-    {
-        await WaitForTurn(origin);
-    }
+    private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+    private readonly object counterLock = new object();
+    private int pendingCount;
 
-    public async void RunAsQueued(UniTask origin, UnityAction afterToDo)
+    public int TaskRunningCount
     {
-        await WaitForTurn(origin);
-        afterToDo();
-    }
-    
-    private readonly List<UniTask> processList = new List<UniTask>();
-    private readonly object processListLock = new object();
-    private async UniTask WaitForTurn(UniTask origin)
-    {
-        await UniTask.WaitUntil(() =>
+        get
         {
-            lock (processListLock)
+            lock (counterLock)
             {
-                return processList.Count == 0;
+                return pendingCount;
             }
-        });
+        }
+    }
 
-        lock (processListLock)
+    public async UniTask RunAsQueued(Func<UniTask> originFactory)
+    {
+        if (originFactory == null)
+            throw new ArgumentNullException(nameof(originFactory));
+
+        lock (counterLock)
         {
-            processList.Add(origin);
+            pendingCount++;
         }
 
-        await UniTask.WaitUntil(() =>
-        {
-            lock (processListLock)
-            {
-                return processList.Contains(origin) && processList.IndexOf(origin) == 0;
-            }
-        });
-
+        await semaphore.WaitAsync();
         try
         {
-            await origin;
+            await originFactory();
         }
         finally
         {
-            lock (processListLock)
+            semaphore.Release();
+            lock (counterLock)
             {
-                processList.RemoveAt(0);
+                pendingCount--;
             }
         }
+    }
+
+    public async void RunAsQueued(Func<UniTask> originFactory, UnityAction afterToDo)
+    {
+        await RunAsQueued(originFactory);
+        afterToDo?.Invoke();
     }
 }

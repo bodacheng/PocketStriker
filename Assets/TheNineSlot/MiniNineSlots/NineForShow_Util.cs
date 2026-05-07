@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using mainMenu;
 using UnityEngine;
@@ -40,11 +41,11 @@ public partial class NineForShow : MonoBehaviour
     }
     
     public static async UniTask RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget, 
-        IDictionary<int, ParticleSystem> _slotEffects, float scale = 1, int targetLayer = 0)
+        IDictionary<int, ParticleSystem> slotEffects, float scale = 1, int targetLayer = 0)
     {
-        if (_slotEffects.ContainsKey(slotNum) && _slotEffects[slotNum] != null)
+        if (slotEffects.ContainsKey(slotNum) && slotEffects[slotNum] != null)
         {
-            Destroy(_slotEffects[slotNum].gameObject);
+            Destroy(slotEffects[slotNum].gameObject);
         }
         
         string effectName;
@@ -65,18 +66,20 @@ public partial class NineForShow : MonoBehaviour
                 effectName = "SlotEffects/normal";
                 break;
         }
-        var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, releaseTarget.gameObject);
-
+        var cts = new CancellationTokenSource();
+        ReturnLayer.AddUniTaskCancel(cts);
+        var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, releaseTarget.gameObject, cts);
+        if (slotEffect == null)
+            return;
         var slotT = slotEffect.transform;
-
         var oldScale = slotT.localScale;
         slotT.localScale = new Vector3(oldScale.x * PosCal.TempRate() * scale, oldScale.y * PosCal.TempRate() * scale, oldScale.z);
-        
-        //slotEffect.transform.SetParent(parent);
-        DicAdd<int, ParticleSystem>.Add(_slotEffects, slotNum, slotEffect);
+        DicAdd<int, ParticleSystem>.Add(slotEffects, slotNum, slotEffect);
         slotEffect.gameObject.name = "slotEffect"+ slotNum;
         slotEffect.gameObject.layer = targetLayer;
         slotT.position = pos;
+        if (releaseTarget != null)
+            slotT.SetParent(releaseTarget);
         slotEffect.Play(true);
     }
     
@@ -84,7 +87,7 @@ public partial class NineForShow : MonoBehaviour
     {
         await UniTask.WhenAll(
             SkillSetStateRender(
-                PreScene.target.postProcessCamera,
+                PreScene.target.noPostProcessCamera,
                 set.a1, set.a2, set.a3,
                 set.b1, set.b2, set.b3,
                 set.c1, set.c2, set.c3, 

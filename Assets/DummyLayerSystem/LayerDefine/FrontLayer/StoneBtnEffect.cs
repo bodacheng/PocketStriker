@@ -8,7 +8,7 @@ public class StoneBtnEffect : MonoBehaviour
 {
     [SerializeField] private RectTransform effectT1;
     [SerializeField] private RectTransform effectT2;
-    
+
     private readonly List<string> effect1List = new List<string>
     {
         "ButtonEffects/darkmagic/normal.prefab",
@@ -17,7 +17,7 @@ public class StoneBtnEffect : MonoBehaviour
         "ButtonEffects/greenmagic/normal.prefab",
         "ButtonEffects/lightmagic/normal.prefab",
     };
-    
+
     private readonly List<string> effect2List = new List<string>
     {
         "ButtonEffects/darkmagic/EX3.prefab",
@@ -26,7 +26,7 @@ public class StoneBtnEffect : MonoBehaviour
         "ButtonEffects/greenmagic/EX3.prefab",
         "ButtonEffects/lightmagic/EX3.prefab",
     };
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,7 +43,7 @@ public class StoneBtnEffect : MonoBehaviour
             return;
         }
         effect.transform.SetParent(t);
-        effect.transform.position = 
+        effect.transform.position =
             PosCal.GetWorldPos(PreScene.target.postProcessCamera, t.GetComponent<RectTransform>(), 20f);
         effect.gameObject.SetActive(true);
     }

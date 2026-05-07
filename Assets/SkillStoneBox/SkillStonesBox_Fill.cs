@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using dataAccess;
 using Skill;
 
@@ -8,7 +9,8 @@ namespace mainMenu
     {
         [SerializeField] private bool skillEditStep;
         private StoneFilterForm _form;
-        
+        readonly List<string> _currentStoneInstanceIds = new List<string>();
+
         public void RestFilter()
         {
             var filterForm = new StoneFilterForm
@@ -19,49 +21,74 @@ namespace mainMenu
                 Near = nearCheckBox.isOn,
                 Far = farCheckBox.isOn
             };
-            
+
             _form = filterForm;
-            PutSkillStonesToBox();
+            RefreshVisibleStones(true);
         }
-        
+
         public class StoneFilterForm
         {
             public string Type;
             public BehaviorType BType = BehaviorType.NONE;
             public int[] ExType = { 0, 1, 2, 3 };
+            public bool BossSkill = false;
             public bool Close;
             public bool Near;
             public bool Far;
-        }
-        
-        void PutSkillStonesToBox()
-        {
-            string focusingUnitInstanceId = null;
-            if (skillEditStep)
-                focusingUnitInstanceId = PreScene.target.Focusing.id;
-            
-            var targetSKs = Stones.TargetStonesFromAccount_except(focusingUnitInstanceId, _form, null, null, false);
-            targetSKs = Order(targetSKs);
-            
-            foreach (var cellPair in _cellsDic)
+
+            public StoneFilterForm()
             {
-                cellPair.Value.RemoveToTemp();
             }
-            
-            var key = 0;
-            foreach (var instanceId in targetSKs)
+
+            public StoneFilterForm(string type)
             {
-                _cellsDic.TryGetValue(key, out var cell);
-                if (cell == null)
+                Type = type;
+            }
+        }
+
+        void RefreshVisibleStones(bool refreshFromSource)
+        {
+            if (refreshFromSource)
+            {
+                string focusingUnitInstanceId = null;
+                if (skillEditStep && PreScene.target.Focusing != null)
+                    focusingUnitInstanceId = PreScene.target.Focusing.id;
+                var targetSKs = Stones.TargetStonesFromAccount_except(focusingUnitInstanceId, _form, null, null, false);
+                _currentStoneInstanceIds.Clear();
+                if (targetSKs != null)
+                    _currentStoneInstanceIds.AddRange(targetSKs);
+            }
+
+            UpdateVisibleCells(_currentStoneInstanceIds.Count);
+            Order(_currentStoneInstanceIds);
+            ApplyCurrentTargetsToCells();
+        }
+
+        void ApplyCurrentTargetsToCells()
+        {
+            foreach (var cell in _cells)
+            {
+                cell?.RemoveToTemp();
+            }
+
+            var key = 0;
+            foreach (var instanceId in _currentStoneInstanceIds)
+            {
+                if (key >= _activeCellCount)
                 {
                     Debug.Log("Stone box exceed："+ key);
-                    Debug.Log("此时技能石头盒子的总容量：" + _cellsDic.Count);
-                    continue;
+                    Debug.Log("此时技能石头盒子的总容量：" + _activeCellCount);
+                    break;
                 }
-                
-                if (!Stones.GetRenderModel(instanceId)._using)
+
+                var renderModel = Stones.GetRenderModel(instanceId);
+                var cell = _cells[key];
+                if (renderModel == null || cell == null)
+                    continue;
+
+                if (!renderModel._using)
                 {
-                    cell.AddItem(Stones.GetRenderModel(instanceId));
+                    cell.AddItem(renderModel);
                     key++;
                 }
                 else

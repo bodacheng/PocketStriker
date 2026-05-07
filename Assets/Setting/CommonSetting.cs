@@ -81,6 +81,9 @@ public class CommonSetting : ScriptableObject
     [SerializeField] AudioClip btnConfirmSound;
     [SerializeField] AudioClip exTabSound;
 
+    [Tooltip("1v1模式最大相机自动调节速度系数")]
+    [SerializeField] float cameraSpeed = 20;
+
     [Tooltip("AI检测帧数间隔")]
     [SerializeField] private int aiDetectInterval = 1;
 
@@ -129,6 +132,7 @@ public class CommonSetting : ScriptableObject
     public static int Sp1Cost = 2;
     public static int Sp2Cost = 3;
     public static int Sp3Cost = 4;
+    public static float CameraSpeed;
 
     public static string UnitConfigFile;
     public static string SkillConfigFile;
@@ -244,6 +248,7 @@ public class CommonSetting : ScriptableObject
         MemberShiftEffectCode = memberShiftEffectCode;
 
         AIDetectInterval = aiDetectInterval;
+        CameraSpeed = cameraSpeed;
         CharacterAnimDuration.DefaultDuration = characterAnimDuration;
         CharacterAnimDuration["human"] = characterAnimDuration;
         ShadowMaterial = shadowMaterial;
