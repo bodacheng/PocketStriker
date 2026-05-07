@@ -40,9 +40,12 @@ public class TouchTopDownCamera : CameraMode
     Vector3 sameHeightCenter;
     public override void Enter(Camera _camera)
     {
-        _camera.fieldOfView = this.fieldOfView;
-        CameraManager._subCamera.fieldOfView = this.fieldOfView;
-        CameraManager._centerCamera.fieldOfView = this.fieldOfView;
+        ApplyFieldOfView(_camera, this.fieldOfView);
+        if (_camera == null || cameraManager == null || cameraManager.TopDownModeEndRef == null)
+        {
+            canTouch = false;
+            return;
+        }
         
         Vector3 temp = Vector3.zero;
         Height = cameraManager.TopDownModeEndRef.position.y;
@@ -66,6 +69,11 @@ public class TouchTopDownCamera : CameraMode
     float startCameraHeight;
     public override void LocalUpdate(Camera camera)
     {
+        if (camera == null)
+        {
+            return;
+        }
+
         if (!canTouch)
         {
             return;

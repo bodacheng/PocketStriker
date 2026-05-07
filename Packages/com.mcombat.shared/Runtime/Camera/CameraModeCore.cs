@@ -34,6 +34,24 @@ namespace MCombat.Shared.Camera
         {
         }
 
+        protected void ApplyFieldOfView(UnityEngine.Camera camera, float fieldOfView)
+        {
+            if (camera != null)
+            {
+                camera.fieldOfView = fieldOfView;
+            }
+
+            if (CameraManagerCore._subCamera != null)
+            {
+                CameraManagerCore._subCamera.fieldOfView = fieldOfView;
+            }
+
+            if (CameraManagerCore._centerCamera != null)
+            {
+                CameraManagerCore._centerCamera.fieldOfView = fieldOfView;
+            }
+        }
+
         public static Vector3 GetDirection(Vector3 original, float offsetAngle, float verticalAngle)
         {
             var offsetRot = Quaternion.AngleAxis(offsetAngle, Vector3.up);

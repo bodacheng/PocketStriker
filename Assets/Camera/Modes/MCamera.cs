@@ -47,9 +47,12 @@ class MCamera : CameraMode
     public override void Enter(Camera _camera)
     {
         CanSetH = true;
-        _camera.fieldOfView = this.fieldOfView;
-        CameraManager._subCamera.fieldOfView = this.fieldOfView;
-        CameraManager._centerCamera.fieldOfView = this.fieldOfView;
+        ApplyFieldOfView(_camera, this.fieldOfView);
+        if (_camera == null)
+        {
+            return;
+        }
+
         LocalUpdate(_camera);
         xzOff = _camera.transform.position - lookPoint;
         xzOff.y = 0;
@@ -81,39 +84,31 @@ class MCamera : CameraMode
     
     public override void LocalUpdate(Camera camera)
     {
+        if (camera == null)
+        {
+            return;
+        }
+
         if (meCenter != null)
         {
             mePos = meCenter.position;
         }
-        else
+        else if (TryGetAveragePosition(myTeamTargets, out var teamCenter))
         {
-            if (myTeamTargets.Count > 0)
-            {
-                mePos = Vector3.zero;
-                foreach (var o in myTeamTargets)
-                {
-                    if (o != null)
-                    {
-                        mePos += o.transform.position;
-                    }
-                }
-                mePos /= myTeamTargets.Count;
-            }
+            mePos = teamCenter;
         }
         
         _changeSpeed = Time.deltaTime / (TransitionSpeedPara + Time.deltaTime); //分母里那个附加值越大，变得越慢。
-        bool hasTargets = targets != null && targets.Count > 0;
-        if (hasTargets)
+        bool hasTargets = TryGetAveragePosition(targets, out enemiesCenter);
+        if (!hasTargets)
         {
-            enemiesCenter = Vector3.zero;
-            foreach (var o in targets)
+            var fallbackForward = camera.transform.forward;
+            if (fallbackForward.sqrMagnitude <= 0.0001f)
             {
-                if (o != null)
-                {
-                    enemiesCenter += o.transform.position;
-                }
+                fallbackForward = Vector3.forward;
             }
-            enemiesCenter /= targets.Count;
+
+            enemiesCenter = mePos + fallbackForward.normalized * 10f;
         }
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
@@ -171,10 +166,20 @@ class MCamera : CameraMode
 
         void AdjustXZDis(List<Transform> targets)
         {
+            if (targets == null || targets.Count == 0)
+            {
+                return;
+            }
+
             bool shouldZoomOut = false;
             bool shouldZoomIn = true;
             foreach (var target in targets)
             {
+                if (target == null)
+                {
+                    continue;
+                }
+
                 var screenPos = camera.WorldToScreenPoint(target.position);
                 var ePosX = (float)((decimal)screenPos.x / Screen.width);
                 var ePosY = (float)((decimal)screenPos.y / Screen.height);
@@ -196,8 +201,8 @@ class MCamera : CameraMode
         }
         
         var wholeTargets = new List<Transform>() { };
-        wholeTargets.AddRange(myTeamTargets);
-        wholeTargets.AddRange(targets);
+        AddValidTargets(wholeTargets, myTeamTargets);
+        AddValidTargets(wholeTargets, targets);
         AdjustXZDis(wholeTargets);
 
         YDis = XZDistance * disToH;
@@ -225,6 +230,22 @@ class MCamera : CameraMode
             rotateToDirection = lookPoint - cameraTargetPos;
             ToRotation = Quaternion.LookRotation(rotateToDirection.normalized);
             camera.transform.rotation = Quaternion.Slerp(camera.transform.rotation, ToRotation, _changeSpeed);
+        }
+
+        void AddValidTargets(List<Transform> destination, List<Transform> source)
+        {
+            if (source == null)
+            {
+                return;
+            }
+
+            foreach (var oneTarget in source)
+            {
+                if (oneTarget != null)
+                {
+                    destination.Add(oneTarget);
+                }
+            }
         }
     }
 }

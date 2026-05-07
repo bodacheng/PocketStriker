@@ -61,9 +61,12 @@ class ChatGptFix : CameraMode
     public override void Enter(Camera _camera)
     {
         CanSetH = true;
-        _camera.fieldOfView = this.fieldOfView;
-        CameraManager._subCamera.fieldOfView = this.fieldOfView;
-        CameraManager._centerCamera.fieldOfView = this.fieldOfView;
+        ApplyFieldOfView(_camera, this.fieldOfView);
+        if (_camera == null)
+        {
+            return;
+        }
+
         LocalUpdate(_camera);
         xzOff = _camera.transform.position - lookPoint;
         xzOff.y = 0;
@@ -87,28 +90,27 @@ class ChatGptFix : CameraMode
     
     public override void LocalUpdate(Camera camera)
     {
+        if (camera == null)
+        {
+            return;
+        }
+
         if (meCenter != null)
         {
             mePos = meCenter.position;
         }
 
         _changeSpeed = _transitionSpeedPara * Time.deltaTime;
-        var hasTargets = targets != null && targets.Count > 0;
-        if (hasTargets)
+        var hasTargets = TryGetAveragePosition(targets, out enemiesCenter);
+        if (!hasTargets)
         {
-            enemiesCenter = Vector3.zero;
-            foreach (var o in targets)
+            var fallbackForward = meCenter != null ? meCenter.forward : camera.transform.forward;
+            if (fallbackForward.sqrMagnitude <= 0.0001f)
             {
-                if (o != null)
-                {
-                    enemiesCenter += o.transform.position;
-                }
+                fallbackForward = Vector3.forward;
             }
-            enemiesCenter /= targets.Count;
-        }
-        else
-        {
-            enemiesCenter = mePos + meCenter.forward * 10f;
+
+            enemiesCenter = mePos + fallbackForward.normalized * 10f;
         }
         
         enemyScreenPos = camera.WorldToScreenPoint(enemiesCenter);
