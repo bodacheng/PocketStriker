@@ -18,5 +18,5 @@ Current modules:
 SourceSync asset roots:
 
 - `Behaviour`, `P3`, `Camera`, `TheNineSlot`, `SkillStoneBox`, `Remote/Stone`,
-  `SimpleDragAndDrop/Scripts`, shared `UnitBox` stone detail/effects/upgrade logic,
-  and selected stone-related layer files.
+  `Remote/API/Dto`, `SimpleDragAndDrop/Scripts`, shared `UnitBox` stone detail/effects/upgrade logic,
+  selected `MainSceneSystem` processes, and selected reusable layer files.
