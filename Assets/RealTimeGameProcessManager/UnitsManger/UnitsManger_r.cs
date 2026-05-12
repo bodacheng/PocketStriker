@@ -13,20 +13,65 @@ namespace FightScene
         
         public void ToStartPosRotate()
         {
-            Data_Center unit = null;
-            for (int i = 0; i < 3; i++)
+            var unit = ResolveInitialRotationUnit();
+            foreach (var dataCenter in teamMembers.GetValues())
             {
-                var dataCenter = teamMembers.Get(0,i);
                 if (dataCenter == null)
                 {
                     continue;
                 }
-                if (unit == null)
-                    unit = dataCenter;
                 dataCenter.WholeT.parent = null;
                 dataCenter.WholeT.gameObject.SetActive(true);
             }
-            ChangeFightingUnit(unit, true, TeamStandPoints[0]);
+            ChangeFightingUnit(unit, true, InitialStandPoint());
+        }
+
+        Data_Center ResolveInitialRotationUnit()
+        {
+            Data_Center fallback = null;
+            int fallbackKey1 = int.MaxValue;
+            int fallbackKey2 = int.MaxValue;
+
+            for (var i = 0; i < 3; i++)
+            {
+                var dataCenter = teamMembers.Get(0, i);
+                if (IsAvailableRotationUnit(dataCenter))
+                {
+                    return dataCenter;
+                }
+            }
+
+            foreach (var pair in teamMembers.mDict)
+            {
+                var dataCenter = pair.Value;
+                if (!IsAvailableRotationUnit(dataCenter))
+                {
+                    continue;
+                }
+
+                var key1 = pair.Key.Item1;
+                var key2 = pair.Key.Item2;
+                if (fallback == null || key1 < fallbackKey1 || (key1 == fallbackKey1 && key2 < fallbackKey2))
+                {
+                    fallback = dataCenter;
+                    fallbackKey1 = key1;
+                    fallbackKey2 = key2;
+                }
+            }
+
+            return fallback;
+        }
+
+        bool IsAvailableRotationUnit(Data_Center dataCenter)
+        {
+            return dataCenter != null
+                   && dataCenter.FightDataRef != null
+                   && !dataCenter.FightDataRef.IsDead.Value;
+        }
+
+        Transform InitialStandPoint()
+        {
+            return TeamStandPoints != null && TeamStandPoints.Length > 0 ? TeamStandPoints[0] : null;
         }
         
         void ToNewUnit(int delayInSeconds)
@@ -241,7 +286,17 @@ namespace FightScene
 
         public void UnitStartOff()
         {
+            if (RMode_Unit.Value == null)
+            {
+                ChangeFightingUnit(ResolveInitialRotationUnit(), true, InitialStandPoint());
+            }
+
             RMode_Unit.Value?._MyBehaviorRunner?.ChangeToWaitingState();
+
+            if (teamConfig.myTeam == RTFightManager.playerTeam && InputsManager != null && RMode_Unit.Value != null)
+            {
+                InputsManager.FocusUnit(RMode_Unit.Value, true);
+            }
         }
         
         // 计算时间统计可上场角色，更新上场冷却图标UI
@@ -276,7 +331,7 @@ namespace FightScene
             {
                 if (waitingMember != null && RMode_Unit.Value != waitingMember)
                 {
-                    ChangeFightingUnit(waitingMember, true, TeamStandPoints[0]);
+                    ChangeFightingUnit(waitingMember, true, InitialStandPoint());
                 }
             }
         }

@@ -21,6 +21,7 @@ namespace MCombat.Shared.Behaviour
             where TBehavior : class
         {
             targetBehaviors.Clear();
+            conditionAndRespond.Clear();
             conditionAndRespondPriority.Clear();
             behaviourAndStrategicExitCondition.Clear();
 

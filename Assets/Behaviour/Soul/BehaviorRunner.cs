@@ -48,6 +48,7 @@ namespace Soul
         #endregion
 
         public AIMode AIMode { get; set; }
+        private Data_Center _dataCenter;
 
         public MobileInputsManager InputsManager
         {
@@ -64,9 +65,17 @@ namespace Soul
             set => skillConfigType = value;
         }
 
+        public bool HasInputFocus()
+        {
+            return InputsManager != null
+                   && _dataCenter != null
+                   && InputsManager.CurrentFocus != null
+                   && InputsManager.CurrentFocus.Value == _dataCenter;
+        }
+
         public bool BeingControl()
         {
-            return InputsManager!= null && InputsManager.Inputting;
+            return HasInputFocus() && InputsManager.Inputting;
         }
 
         void Awake()
@@ -175,7 +184,10 @@ namespace Soul
             {
                 onFixedSequence = true;
                 _SkillCancelFlag.Cancel_Flag = true;
-                InputsManager?.SkillExplosion(InputKey.DreamCombo, 3);
+                if (HasInputFocus())
+                {
+                    InputsManager.SkillExplosion(InputKey.DreamCombo, 3);
+                }
             }
         }
 
@@ -193,7 +205,10 @@ namespace Soul
                 }
 
                 #region 按钮技能刷新
-                InputsManager?.ButtonsFeatureLoad(optionsForButtonRefresh);
+                if (HasInputFocus())
+                {
+                    InputsManager.ButtonsFeatureLoad(optionsForButtonRefresh);
+                }
                 #endregion
 
                 #region 决策制定
@@ -310,6 +325,7 @@ namespace Soul
 
         public void INIStates(Data_Center data_Center)
         {
+            _dataCenter = data_Center;
             if (BehaviourDic == null)
             {
                 Debug.Log("严重错误");

@@ -23,20 +23,20 @@ public partial class AnimationManger
     public async UniTask PreloadBasicPersonalAnims(string type, string basicPackName, FacialAnimManager facialAnimManager = null)
     {
         var basicAnims = new List<AnimationClip>();
-        var basicPackKey = type + "/" + basicPackName;
+        var basicPackKey = AnimationResourceKeyUtility.BasicPackSeriesKey(type, basicPackName);
         if (AnimationResourceLoader.SeriesAnimationClipsDic.ContainsKey(basicPackKey))
         {
             AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(basicPackKey, out basicAnims);
         }
         else
         {
-            var loadPath = Addressables.LoadResourceLocationsAsync("basic_anim");
+            var loadPath = Addressables.LoadResourceLocationsAsync(AnimationResourceKeyUtility.BasicAnimationLabel);
             await loadPath;
             if (loadPath.Status == AsyncOperationStatus.Succeeded)
             {
                 foreach (var path in loadPath.Result)
                 {
-                    if (path.PrimaryKey.Contains(type + "/" + basicPackName))
+                    if (AnimationResourceKeyUtility.IsBasicAnimationLocation(path.PrimaryKey, type, basicPackName))
                     {
                         Object value = await AddressablesLogic.LoadT<AnimationClip>(path.PrimaryKey);
                         if (value != null)
@@ -102,7 +102,7 @@ public partial class AnimationManger
 
         async UniTask LoadHurtAnim(string type, string address, List<string> tags)
         {
-            var key = type + "/" + address;
+            var key = AnimationResourceKeyUtility.SeriesKey(type, address);
             if (!AnimationResourceLoader.SeriesAnimationClipsDic.ContainsKey(key))
             {
                 AnimationResourceLoader.SeriesAnimationClipsDic.Add(key, new List<AnimationClip>());
@@ -113,7 +113,7 @@ public partial class AnimationManger
                 {
                     foreach (var path in loadPath.Result)
                     {
-                        if (path.PrimaryKey.Contains(key))
+                        if (AnimationResourceKeyUtility.IsSeriesAnimationLocation(path.PrimaryKey, key))
                         {
                             Object value = await AddressablesLogic.LoadT<AnimationClip>(path.PrimaryKey);
                             if (value != null)
@@ -150,12 +150,12 @@ public partial class AnimationManger
             LoadHurtAnim(type, "basic_knockoffs", new List<string> { "knock_anim" })
         );
         
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_knockoffs", out knockoffAnimations);
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_hurts/back", out _hurtClipsBack);
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_hurts/low", out _hurtClipsLow);
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_hurts/high", out _hurtClipsHigh);
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_hurts/press", out _hurtClipsPress);
-        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(type + "/basic_hurts/lay", out _hurtClipsLay);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_knockoffs"), out knockoffAnimations);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_hurts/back"), out _hurtClipsBack);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_hurts/low"), out _hurtClipsLow);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_hurts/high"), out _hurtClipsHigh);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_hurts/press"), out _hurtClipsPress);
+        AnimationResourceLoader.SeriesAnimationClipsDic.TryGetValue(AnimationResourceKeyUtility.SeriesKey(type, "basic_hurts/lay"), out _hurtClipsLay);
 
         if (Animator == null || Animator.gameObject == null)
         {
@@ -215,7 +215,7 @@ public partial class AnimationManger
             await AnimationResourceLoader.LoadAnim(animPath, key);
         }
         
-        var clip = AnimationResourceLoader.Instance.GetAnimationClip(animPath + "/skill/" + key);
+        var clip = AnimationResourceLoader.Instance.GetAnimationClip(AnimationResourceKeyUtility.SkillClipKey(animPath, key));
         if (clip != null)
         {
             if (!toLoadAnims.ContainsKey(key))
@@ -280,7 +280,8 @@ public partial class AnimationManger
                 }
                 if (e.functionName == "PlaySoundOnce")
                 {
-                    AudioResourceLoading.Instance.LoadAudioClipFromResourceAndPutItIntoDic("effects", e.stringParameter);
+                    tasks.Add(AudioResourceLoading.Instance.LoadAudioClipFromResourceAndPutItIntoDic(
+                        AudioResourceLoaderCore.EffectAudioPath, e.stringParameter));
                 }
                 
                 // effects loading

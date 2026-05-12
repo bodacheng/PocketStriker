@@ -173,8 +173,31 @@ namespace FightScene
                 }
             ).AddTo(this.gameObject);
 
-            inputsManager.FocusUnit(null);
+            if (TeamConfig.myTeam == RTFightManager.playerTeam)
+            {
+                inputsManager.FocusUnit(ResolveDefaultFocus(), true);
+                switchTeamAuto(currentAutoState());
+            }
             SetLiveUnitCount();
+        }
+
+        Data_Center ResolveDefaultFocus()
+        {
+            var currentFocus = inputsManager.CurrentFocus.Value;
+            if (currentFocus != null && !currentFocus.FightDataRef.IsDead.Value)
+            {
+                return currentFocus;
+            }
+
+            foreach (var center in _teamMembers.GetValues())
+            {
+                if (center != null && !center.FightDataRef.IsDead.Value)
+                {
+                    return center;
+                }
+            }
+
+            return null;
         }
     }
 }

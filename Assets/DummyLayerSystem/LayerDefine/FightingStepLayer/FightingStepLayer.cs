@@ -75,7 +75,6 @@ public class FightingStepLayer : UILayer
     public static FightingStepLayer Open()
     {
         var fightingLayer = UILayerLoader.Load<FightingStepLayer>();
-        Debug.Log($"[FightingStepLayer] Open -> id={fightingLayer.GetInstanceID()} active={fightingLayer.gameObject.activeSelf} path={fightingLayer.transform.root.name}/{fightingLayer.transform.name}");
         fightingLayer.InputsManager.FXCamera = FightScene.FightScene.target.fxCamera;
         return fightingLayer;
     }
@@ -130,7 +129,6 @@ public class FightingStepLayer : UILayer
         var layer = UILayerLoader.Get<FightingStepLayer>();
         if (layer == null)
             return;
-        Debug.Log($"[FightingStepLayer] Close -> id={layer.GetInstanceID()}");
         layer.inputsManager.FocusUnit(null);
         layer.inputsManager.Clear();
         layer.team1UI.Clear();

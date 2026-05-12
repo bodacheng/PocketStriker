@@ -206,7 +206,7 @@ namespace Soul
         public override void C_State_enter()
         {
             CommonEnter();
-            mainCam = CameraManager._camera.transform;
+            mainCam = CameraManager._camera != null ? CameraManager._camera.transform : null;
             h = (Input.GetKey(AppSetting.Value.LeftKeyCode) ? -1f : 0f) +
                 (Input.GetKey(AppSetting.Value.RightKeyCode) ? 1f : 0f) +
                 UltimateJoystick.GetHorizontalAxis("joystick");
@@ -216,7 +216,7 @@ namespace Soul
 
             useDirection = SkillStateRuntimeUtility.ResolveCameraRelativeDirection(
                 gameObject.transform.forward,
-                mainCam.eulerAngles.y,
+                mainCam != null ? mainCam.eulerAngles.y : 0f,
                 h,
                 v);
             RotateToTargetTween(gameObject.transform.position + useDirection, 0.1f);
@@ -421,7 +421,7 @@ namespace Soul
         {
             timeCounter = 0f;
             SkillStateRuntimeUtility.EnterMove(this);
-            mainCam = CameraManager._camera.transform;
+            mainCam = CameraManager._camera != null ? CameraManager._camera.transform : null;
         }
 
         public override void C_State_enter()
@@ -533,7 +533,10 @@ namespace Soul
                     (Input.GetKey(AppSetting.Value.DownKeyCode) ? -1f : 0f);
             }
 
-            useDirection = MoveStateRuntimeUtility.ResolveControlMoveDirection(mainCam.eulerAngles.y, h, v);
+            useDirection = MoveStateRuntimeUtility.ResolveControlMoveDirection(
+                mainCam != null ? mainCam.eulerAngles.y : 0f,
+                h,
+                v);
         }
 
         public override void _c_State_FixedUpdate1()

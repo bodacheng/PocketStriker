@@ -82,6 +82,21 @@ public static class PosCal
     /// <returns></returns>
     public static Vector3 GetWorldPos(Camera refC, RectTransform rect, float zOffset)
     {
+        if (rect == null)
+        {
+            return Vector3.zero;
+        }
+
+        if (refC == null)
+        {
+            refC = Camera.main;
+        }
+
+        if (refC == null)
+        {
+            return rect.transform.position;
+        }
+
         var rectPos = rect.transform.position;
         var trueAnchorPos = new Vector2(rectPos.x, rectPos.y);
         var worldPos = refC.ScreenToWorldPoint(trueAnchorPos);
@@ -97,6 +112,16 @@ public static class PosCal
     /// <returns></returns>
     public static Vector3 GetWorldPos(Camera refC, Vector3 rectPos, float zOffset)
     {
+        if (refC == null)
+        {
+            refC = Camera.main;
+        }
+
+        if (refC == null)
+        {
+            return rectPos;
+        }
+
         var screenPos = new Vector2(Screen.width * rectPos.x/ CanvasWidth, Screen.height * rectPos.y/ CanvasHeight);
         var worldPos = refC.ScreenToWorldPoint(screenPos);
         worldPos = new Vector3(worldPos.x, worldPos.y, refC.transform.position.z + zOffset);

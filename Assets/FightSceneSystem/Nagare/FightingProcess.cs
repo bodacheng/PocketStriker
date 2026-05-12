@@ -22,6 +22,7 @@ namespace FightScene
 
         public override void ProcessEnter()
         {
+            Time.timeScale = 1f;
             UILayerLoader.Remove<InBattleEvolution>();
             _layer = UILayerLoader.Get<FightingStepLayer>();
             if (_layer == null)

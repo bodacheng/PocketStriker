@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class AnimationResourceLoader
 {
-    static AnimationResourceLoader instance;
+    private static AnimationResourceLoader instance;
+
     public static AnimationResourceLoader Instance
     {
         get
@@ -13,72 +14,32 @@ public class AnimationResourceLoader
             {
                 instance = new AnimationResourceLoader();
             }
+
             return instance;
         }
     }
-    
-    static readonly IDictionary<string, AnimationClip> AnimationClipDic = new Dictionary<string, AnimationClip>();
-    public static readonly IDictionary<string, List<AnimationClip>> SeriesAnimationClipsDic = new Dictionary<string, List<AnimationClip>>();//这个是用来记录那些一个包里好几个动画的
-    //public IDictionary<string, RuntimeAnimatorController> RuntimeAnimatorControllerIdic = new Dictionary<string, RuntimeAnimatorController>();
+
+    public static IDictionary<string, List<AnimationClip>> SeriesAnimationClipsDic => AnimationResourceLoaderCore.SeriesAnimationClipsDic;
 
     public void Clear()
     {
-        AnimationClipDic.Clear();
-        SeriesAnimationClipsDic.Clear();
+        AnimationResourceLoaderCore.Clear();
     }
-    
-    //战斗场景下角色实时读取动作走的是这个，所以必然的我们有了getAnimationClip和ConstructAnimationClip
+
     public AnimationClip GetAnimationClip(string key)
     {
-        AnimationClipDic.TryGetValue(key, out AnimationClip _AnimationClip);
-        return _AnimationClip;
+        return AnimationResourceLoaderCore.GetAnimationClip(key);
     }
 
     public static async UniTask LoadAnim(string type, string key)
     {
-        var clipKey = type + "/skill/" + key;
-        if (AnimationClipDic.ContainsKey(clipKey))
+        var clipKey = AnimationResourceKeyUtility.SkillClipKey(type, key);
+        if (AnimationResourceLoaderCore.HasAnimationClip(clipKey))
         {
             return;
         }
 
-        var resourceKey = clipKey + ".anim";
-        if (AddressablesLogic.HasIndexedTag("skill_anim") &&
-            !AddressablesLogic.CheckKeyExist("skill_anim", resourceKey))
-        {
-            Debug.LogWarning($"[SkillAnim] Missing animation key: {resourceKey}");
-            return;
-        }
-        
-        var result = await AddressablesLogic.LoadT<AnimationClip>(resourceKey);
-        if (result != null)
-        {
-            DicAdd<string, AnimationClip>.Add(AnimationClipDic, clipKey, result);
-        }
+        var result = await AddressablesLogic.LoadT<AnimationClip>(AnimationResourceKeyUtility.SkillAnimationAddress(type, key));
+        AnimationResourceLoaderCore.AddAnimationClip(clipKey, result);
     }
 }
-
-//public RuntimeAnimatorController getRuntimeAnimatorController(string type)
-    //{
-    //    RuntimeAnimatorController toLoadRuntimeAnimatorController;
-    //    RuntimeAnimatorControllerIdic.TryGetValue(type,out toLoadRuntimeAnimatorController);
-    //    return toLoadRuntimeAnimatorController;
-    //}
-    
-        //if (!RuntimeAnimatorControllerIdic.ContainsKey(type))
-        //{
-        //    RuntimeAnimatorController toLoadRuntimeAnimatorController = Resources.Load("Animations/" + type + "/generic_controller", typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
-        //    if (toLoadRuntimeAnimatorController != null)
-        //        RuntimeAnimatorControllerIdic.Add(type, toLoadRuntimeAnimatorController);
-        //    else
-        //        Debug.Log("找不到动画控制器："+"Animations/" + type + "/generic_controller");
-        //}else{
-        //    if (RuntimeAnimatorControllerIdic[type] == null)
-        //    {
-        //        RuntimeAnimatorController toLoadRuntimeAnimatorController = Resources.Load("Animations/" + type + "/generic_controller", typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
-        //        if (toLoadRuntimeAnimatorController != null)
-        //            RuntimeAnimatorControllerIdic[type] = toLoadRuntimeAnimatorController;
-        //        else
-        //            Debug.Log("找不到动画控制器："+"Animations/" + type + "/generic_controller");
-        //    }
-        //}

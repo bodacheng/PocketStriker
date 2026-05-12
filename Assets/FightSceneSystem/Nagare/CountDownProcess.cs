@@ -1,12 +1,16 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
+using UnityEngine;
 
 namespace FightScene
 {
     public class CountDownProcess : FSceneProcess
     {
+        const float CountDownFallbackSeconds = 8f;
         private FightingStepLayer fightingStepLayer;
         bool AutoMoveToNext;
+        float enterRealtime;
         public CountDownProcess()
         {
             Step = SceneStep.CountDown;
@@ -15,6 +19,8 @@ namespace FightScene
         
         public override void ProcessEnter()
         {
+            AutoMoveToNext = false;
+            enterRealtime = Time.realtimeSinceStartup;
             //CameraMode nowC = RealTimeGameProcessManager.target._CameraManager.CModeDic[C_Mode.OneVOne];
             //if (nowC is OneVOneMode)
             //{
@@ -33,11 +39,23 @@ namespace FightScene
         
         async UniTask BeforeFightCountDown()
         {
-            AutoMoveToNext = false;
-            //RealTimeGameProcessManager.target.CameraParaAdjustment(RealTimeGameProcessManager.playerTeam);
-            var cd = UILayerLoader.Load<CountDownLayer>();
-            await cd.BeforeFightCountDown();
-            AutoMoveToNext = true;
+            try
+            {
+                //RealTimeGameProcessManager.target.CameraParaAdjustment(RealTimeGameProcessManager.playerTeam);
+                var cd = UILayerLoader.Load<CountDownLayer>();
+                if (cd != null)
+                {
+                    await cd.BeforeFightCountDown();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            finally
+            {
+                AutoMoveToNext = true;
+            }
         }
         
         public override void ProcessEnd()
@@ -51,7 +69,7 @@ namespace FightScene
         
         public override bool CanEnterOtherProcess()
         {
-            return AutoMoveToNext;
+            return AutoMoveToNext || Time.realtimeSinceStartup - enterRealtime >= CountDownFallbackSeconds;
         }
         
         public override void LocalUpdate()

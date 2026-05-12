@@ -63,6 +63,7 @@ MonoBehaviour:
   m_GroupAssets:
   - {fileID: 11400000, guid: 1ac9141ffe41041f597365de0370dc81, type: 2}
   - {fileID: 11400000, guid: d62213ee1321e3547be20dd1c3886e0b, type: 2}
+  - {fileID: 11400000, guid: a2fd7463394334e908dd7a09606656c8, type: 2}
   - {fileID: 11400000, guid: 8ebbfed416f964995878b3c6250dc139, type: 2}
   - {fileID: 11400000, guid: 2a9b861e50fe34cf7bb1db0731797657, type: 2}
   - {fileID: 11400000, guid: 45193fcd1036945ed98f00aaa568b836, type: 2}
@@ -170,6 +171,8 @@ MonoBehaviour:
     - resource
     - unit_image
     - music
+    - audio
+    - public_audio
     - app_version
     - gacha_effect
     - slot_effect

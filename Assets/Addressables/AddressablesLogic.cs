@@ -139,6 +139,7 @@ public static class AddressablesLogic
             CheckExistedKey("skill_icon"),
             CheckExistedKey("weapon"),
             CheckExistedKey("effect"),
+            CheckExistedKey("audio"),
             CheckExistedKey("unit_image")
         });
     }
@@ -146,7 +147,7 @@ public static class AddressablesLogic
     static bool IsNonCriticalAssetType<T>()
     {
         var type = typeof(T);
-        return type == typeof(Sprite) || type == typeof(AnimationClip);
+        return type == typeof(Sprite) || type == typeof(AnimationClip) || type == typeof(AudioClip);
     }
 
     static async UniTask HandleLoadFailure<T>(string key)

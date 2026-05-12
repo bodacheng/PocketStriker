@@ -6,11 +6,11 @@ using UnityEngine.Animations;
 public static class EffectsManager
 {
     // 以下的重点是主界面和战斗界面通用问题
-    static readonly IDictionary<string, DecompositionPool> EffectPoolsDic = new Dictionary<string, DecompositionPool>();
+    static readonly ResourcePoolRegistry<DecompositionPool> EffectPools = new ResourcePoolRegistry<DecompositionPool>();
     
     static UniTask<GameObject> TryLoadEffectPrefab(string key)
     {
-        if (!AddressablesLogic.CheckKeyExist("effect", key))
+        if (!AddressablesLogic.CheckKeyExist(EffectResourceKeyUtility.EffectLabel, key))
         {
             return default;
         }
@@ -23,11 +23,7 @@ public static class EffectsManager
     
     public static void Clear()
     {
-        foreach (var pool in EffectPoolsDic)
-        {
-            pool.Value.Clear();
-        }
-        EffectPoolsDic.Clear();
+        EffectPools.Clear(pool => pool.Clear());
     }
     
     public static async UniTask<Decomposition> GenerateEffect(string resourceName, string effectPath, Vector3 pos, Quaternion qua, Transform parentT)
@@ -56,28 +52,26 @@ public static class EffectsManager
         return processingEffectObj;
     }
     
-    private static readonly IDictionary<string, int> PreloadCountIncrementLog = new Dictionary<string, int>();
     static async UniTask<DecompositionPool> ConstructEffectPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
     {
-        if (EffectPoolsDic.ContainsKey(key))
+        if (EffectPools.TryGet(key, out var existingPool))
         {
-            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, PreloadCountIncrementLog[key]+1);
-            await EffectPoolsDic[key].PreloadAsync(PreloadCountIncrementLog[key], 1).ToUniTask();
-            return EffectPoolsDic[key];
+            var preloadCount = EffectPools.IncrementPreloadCount(key, iniCount);
+            await existingPool.PreloadAsync(preloadCount, 1).ToUniTask();
+            return existingPool;
         }
 
         if (prefab != null)
         {
             var poolToConstruct = new DecompositionPool(prefab);
             await poolToConstruct.PreloadAsync(iniCount, 1).ToUniTask();
-            if (EffectPoolsDic.ContainsKey(key))
+            if (EffectPools.TryGet(key, out existingPool))
             {
                 poolToConstruct.Clear();
-                return EffectPoolsDic[key];
+                return existingPool;
             }
 
-            EffectPoolsDic.Add(new KeyValuePair<string, DecompositionPool>(key, poolToConstruct));
-            DicAdd<string, int>.Add(PreloadCountIncrementLog, key, iniCount);
+            EffectPools.TryAdd(key, poolToConstruct, iniCount);
             return poolToConstruct;
         }
         return null;
@@ -88,19 +82,16 @@ public static class EffectsManager
         DecompositionPool effectPool;
         if (effectPath != null)
         {
-            if (EffectPoolsDic.ContainsKey(effectPath + "/" + resourceName))
+            var resourceKey = EffectResourceKeyUtility.ResourceKey(effectPath, resourceName);
+            if (EffectPools.TryGet(resourceKey, out effectPool))
             {
-                EffectPoolsDic.TryGetValue(effectPath + "/" + resourceName, out effectPool);
-                if (effectPool != null)
-                {
-                    return effectPool;
-                }
+                return effectPool;
             }
             
-            var effectPrefab = await TryLoadEffectPrefab(effectPath + "/" + resourceName + ".prefab");
+            var effectPrefab = await TryLoadEffectPrefab(EffectResourceKeyUtility.PrefabAddress(effectPath, resourceName));
             if (effectPrefab != null)
             {
-                effectPool = await ConstructEffectPoolWithPrefabAndKey(effectPrefab, effectPath + "/" + resourceName, objectCount);
+                effectPool = await ConstructEffectPoolWithPrefabAndKey(effectPrefab, resourceKey, objectCount);
                 return effectPool;
             }
             if (effectPath == FightGlobalSetting.EffectPathDefine())

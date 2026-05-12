@@ -214,12 +214,17 @@ public partial class Data_Center : MonoBehaviour
         _MyBehaviorRunner.Controller.DecisionDelay = aiDelayFrame;
         _MyBehaviorRunner.AITriggerDreamComboRateCondition = () =>
             {
+                var inputsManager = RTFightManager.Target != null && RTFightManager.Target.team1 != null
+                    ? RTFightManager.Target.team1.InputsManager
+                    : null;
                 if (teamConfig.myTeam == Team.player1 && 
-                    RTFightManager.Target.team1.InputsManager.CurrentFocus.Value == this)
+                    inputsManager != null &&
+                    inputsManager.CurrentFocus != null &&
+                    inputsManager.CurrentFocus.Value == this)
                 {
                     return false;
                 }
-                return AITriggerDreamComboRateCondition();
+                return AITriggerDreamComboRateCondition == null || AITriggerDreamComboRateCondition();
             };
         
         BoundaryControlByGod.target.SensorUnity.SensorDetectionResultClearProcesses.Add(

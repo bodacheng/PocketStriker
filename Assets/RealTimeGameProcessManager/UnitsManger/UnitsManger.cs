@@ -69,10 +69,6 @@ namespace FightScene
                     }
                 }
 
-                Debug.Log(
-                    $"[UnitsManger.Auto] team={teamConfig?.myTeam} mode={TeamMode} auto={_auto} focus={InputsManager?.CurrentFocus?.Value?.name ?? "null"}",
-                    this
-                );
             }
             get => _auto;
         }

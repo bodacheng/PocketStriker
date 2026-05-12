@@ -16,6 +16,9 @@ public class FightGlobalSetting : ScriptableObject
     [SerializeField] float closeDis = 2;
     [SerializeField] float AT_coefficient = 1;
     [SerializeField] float HP_coefficient = 1;
+    [SerializeField] float levelPowerAverager = 0.6f;
+    [SerializeField] float levelDiminishStart = 10f;
+    [SerializeField] float levelDiminishingRange = 80f;
     [SerializeField] bool Team1Invincible = false;
     [SerializeField] int NormalSkillExGet = 30;
     [SerializeField] int Sp1SkillExGet = 0;
@@ -58,6 +61,9 @@ public class FightGlobalSetting : ScriptableObject
     public static float _fighterMoveSpeed;
     static float AtCoefficient = 1;
     static float HpCoefficient = 1;
+    static float LevelPowerAverager;
+    static float LevelDiminishStart;
+    static float LevelDiminishingRange;
     public static bool _Team1Invincible;
     public static int _NormalSkillExGet;
     public static int _Sp1SkillExGet;
@@ -115,6 +121,9 @@ public class FightGlobalSetting : ScriptableObject
         _fighterMoveSpeed = fighterMoveSpeed;
         AtCoefficient = AT_coefficient;
         HpCoefficient = HP_coefficient;
+        LevelPowerAverager = levelPowerAverager;
+        LevelDiminishStart = Mathf.Max(levelDiminishStart, 1f);
+        LevelDiminishingRange = Mathf.Max(levelDiminishingRange, 0.01f);
         FighterRigidMass = fighterRigidMass;
         OnTouchEnemyBodyRigidDrag = onTouchEnemyBodyRigidDrag;
         _Team1Invincible = Team1Invincible;
@@ -184,41 +193,29 @@ public class FightGlobalSetting : ScriptableObject
     // Ex3 ：60
     public static float ATCal(float originAT, float level)
     {
-        return AtCoefficient * originAT * level;
+        return FightGlobalSettingUtility.CalculateScaledValue(
+            AtCoefficient,
+            originAT,
+            level,
+            LevelPowerAverager,
+            LevelDiminishStart,
+            LevelDiminishingRange);
     }
+
     public static float StoneHpCal(float originHP, float level)
     {
-        return HpCoefficient * originHP * level;
+        return FightGlobalSettingUtility.CalculateScaledValue(
+            HpCoefficient,
+            originHP,
+            level,
+            LevelPowerAverager,
+            LevelDiminishStart,
+            LevelDiminishingRange);
     }
 
     public static string EffectPathDefine(Element element = Element.Null)
     {
-        string personalEffectPath;
-        switch (element)
-        {
-            case Element.blueMagic:
-                personalEffectPath = "bluemagic";
-                break;
-            case Element.redMagic:
-                personalEffectPath = "redmagic";
-                break;
-            case Element.greenMagic:
-                personalEffectPath = "greenmagic";
-                break;
-            case Element.lightMagic:
-                personalEffectPath = "lightmagic";
-                break;
-            case Element.darkMagic:
-                personalEffectPath = "darkmagic";
-                break;
-            case Element.Null:
-                personalEffectPath = "defaultmagic";
-                break;
-            default:
-                personalEffectPath = "defaultmagic";
-                break;
-        }
-        return personalEffectPath;
+        return FightGlobalSettingUtility.EffectPathDefine(element);
     }
 
     public static async UniTask LoadFightParams()

@@ -70,12 +70,13 @@ public partial class BO_Ani_E : MonoBehaviour
         }
     }
 
-    AudioClip audioClip;
+    AudioClip _audioClip;
     public void PlaySoundOnce(string soundClipName)
 	{
-        AudioResourceLoading.Instance.soundClipsDic.TryGetValue("Audios/effects/" + soundClipName, out audioClip);
-        if (audioClip != null)
-            _DATA_CENTER._AudioSource.PlayOneShot(audioClip);
+        AudioResourceLoading.Instance.SoundClipsDic.TryGetValue(
+            AudioResourceLoaderCore.AudioClipKey(AudioResourceLoaderCore.EffectAudioPath, soundClipName), out _audioClip);
+        if (_audioClip != null)
+            _DATA_CENTER._AudioSource.PlayOneShot(_audioClip);
 	}
     
     public void MagicForward(AnimationEvent e)

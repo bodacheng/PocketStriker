@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 namespace FightScene
 {
@@ -27,11 +26,13 @@ namespace FightScene
         public FSceneProcess lastProcess;
         public FSceneProcess currentProcess;
         readonly IDictionary<SceneStep, FSceneProcess> SceneProcessDictionary = new Dictionary<SceneStep, FSceneProcess>();
+        readonly List<SceneStep> SceneProcessOrder = new List<SceneStep>();
         
         public void Clear()
         {
             currentProcess = null;
             SceneProcessDictionary.Clear();
+            SceneProcessOrder.Clear();
         }
             
         public void ProcessUpdate()
@@ -54,16 +55,14 @@ namespace FightScene
         public void AddNewProcess(SceneStep step, FSceneProcess _process)
         {
             SceneProcessDictionary.Add(step, _process);
+            SceneProcessOrder.Add(step);
         }
         
         public void ArrangeProcessOrder()
         {
-            for (int i = 0; i < SceneProcessDictionary.Count; i++)
+            for (int i = 0; i < SceneProcessOrder.Count - 1; i++)
             {
-                if (SceneProcessDictionary.Count > i+1)
-                {
-                    SceneProcessDictionary.ElementAt(i).Value.nextProcessStep = SceneProcessDictionary.ElementAt(i + 1).Key;
-                }
+                SceneProcessDictionary[SceneProcessOrder[i]].nextProcessStep = SceneProcessOrder[i + 1];
             }
         }
         

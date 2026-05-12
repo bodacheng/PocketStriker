@@ -22,7 +22,7 @@ namespace Soul
             bool changed = false;
             
             #region 按键触发
-            if (runner.InputsManager != null)
+            if (runner.HasInputFocus())
             {
                 changed = BtnTrigger(runner, options, runner.InputsManager);
             }
@@ -44,7 +44,7 @@ namespace Soul
             if (!changed)
                 AutoReset(runner);
             
-            if (changed && runner.InputsManager != null && runner.InputsManager.CurrentFocus.Value != null)
+            if (changed && runner.HasInputFocus())
             {
                 runner.InputsManager.BtnRefreshFrames();
             }
@@ -57,7 +57,7 @@ namespace Soul
             if (!changed)
                 AutoReset(runner);
             
-            if (changed && runner.InputsManager != null && runner.InputsManager.CurrentFocus.Value != null)
+            if (changed && runner.HasInputFocus())
             {
                 runner.InputsManager.BtnRefreshFrames();
             }
@@ -258,7 +258,10 @@ namespace Soul
                         behaviorRunner.SingleFightLog.AnalysisLog(behaviorRunner.ConditionAndRespondPriority);
                     }
                     behaviorRunner.ChangeState(se.REAL_NAME);
-                    behaviorRunner.InputsManager?.SkillExplosion(se.EnterInput, se.SP_LEVEL);
+                    if (behaviorRunner.HasInputFocus())
+                    {
+                        behaviorRunner.InputsManager.SkillExplosion(se.EnterInput, se.SP_LEVEL);
+                    }
                     return true;
                 }
             }
@@ -280,7 +283,10 @@ namespace Soul
                 );
                 behaviorRunner.SingleFightLog.AnalysisLog(behaviorRunner.ConditionAndRespondPriority);
                 behaviorRunner.ChangeState(option.REAL_NAME);
-                behaviorRunner.InputsManager?.SkillExplosion(option.EnterInput, option.SP_LEVEL);
+                if (behaviorRunner.HasInputFocus())
+                {
+                    behaviorRunner.InputsManager.SkillExplosion(option.EnterInput, option.SP_LEVEL);
+                }
                 return true;
             }
             return false;

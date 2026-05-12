@@ -66,13 +66,6 @@ public class UnitInfo
                     Debug.LogWarning($"[TeamCompat] Skip skill {skillId} for unit {info.r_id}: type mismatch {skillConfig.TYPE} != {unitConfigInfo.TYPE}");
                     return false;
                 }
-                var animationKey = unitConfigInfo.TYPE + "/skill/" + skillConfig.REAL_NAME + ".anim";
-                if (AddressablesLogic.HasIndexedTag("skill_anim") &&
-                    !AddressablesLogic.CheckKeyExist("skill_anim", animationKey))
-                {
-                    Debug.LogWarning($"[TeamCompat] Skip skill {skillId} for unit {info.r_id}: missing animation {animationKey}");
-                    return false;
-                }
                 return true;
             }
 
