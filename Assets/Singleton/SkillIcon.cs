@@ -8,8 +8,8 @@ public static class SkillIcon
     {
         var prefab = GetDefaultSkillIconByResource();
         var returnValue = Object.Instantiate(prefab);
-        if (AddressablesLogic.HasIndexedTag("skill_icon") &&
-            !AddressablesLogic.CheckKeyExist("skill_icon", skillId))
+        if (AddressablesLogic.HasIndexedTag(AddressablesResourcePolicy.SkillIconLabel) &&
+            !AddressablesLogic.CheckKeyExist(AddressablesResourcePolicy.SkillIconLabel, skillId))
         {
             return returnValue;
         }

@@ -10,7 +10,6 @@ public class SKillAnalyzer
     private const string SetAllBodyMarkerManagersIn = "SetAllBodyMarkerManagersIn";
     private const string ClearMarkerManagers = "ClearMarkerManagers";
     private const string TurnOnFlag = "turn_on_flag";
-    private const string SkillAnimationLabel = "skill_anim";
 
     public static readonly HashSet<string> AttackFrameStartMethodNames = new HashSet<string>
     {
@@ -79,7 +78,7 @@ public class SKillAnalyzer
     public static async UniTask<IDictionary<string, AnimationClip>> AllSkillAnims(string type)
     {
         var animationClips = new Dictionary<string, AnimationClip>();
-        var loadPath = Addressables.LoadResourceLocationsAsync(SkillAnimationLabel);
+        var loadPath = Addressables.LoadResourceLocationsAsync(AddressablesResourcePolicy.SkillAnimationLabel);
         await loadPath.Task;
 
         if (loadPath.Status == AsyncOperationStatus.Succeeded)

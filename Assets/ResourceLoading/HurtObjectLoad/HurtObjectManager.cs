@@ -8,15 +8,11 @@ public static class HurtObjectManager
     
     static UniTask<GameObject> TryLoadWeaponPrefab(string key)
     {
-        if (!AddressablesLogic.CheckKeyExist(EffectResourceKeyUtility.WeaponLabel, key))
-        {
-            return default;
-        }
-        else
-        {
-            var returnValue =  AddressablesLogic.LoadT<GameObject>(key);
-            return returnValue;
-        }
+        return IndexedResourceLoadUtility.LoadIfKeyExists<GameObject>(
+            EffectResourceKeyUtility.WeaponLabel,
+            key,
+            AddressablesLogic.CheckKeyExist,
+            assetKey => AddressablesLogic.LoadT<GameObject>(assetKey));
     }
     
     public static DecompositionPool GetDPool()
@@ -70,7 +66,14 @@ public static class HurtObjectManager
         if (weaponPrefab == null)
             return false;
 
-        await ConstructHitBoxPoolWithPrefabAndKey(weaponPrefab, resourceKey, preloadCount);
+        await ResourcePoolConstructionUtility.GetOrCreatePool(
+            HurtPools,
+            resourceKey,
+            weaponPrefab,
+            preloadCount,
+            prefab => new DecompositionPool(prefab),
+            (pool, count) => pool.PreloadAsync(count, 1).ToUniTask(),
+            pool => pool.Clear());
         await ConstructAttachmentPools(resourceName, weaponPrefab.GetComponent<Decomposition>(), element, preloadCount);
         return true;
     }
@@ -106,31 +109,6 @@ public static class HurtObjectManager
             {
                 return _hurtObjectPool;
             }
-        }
-        return null;
-    }
-
-    static async UniTask<DecompositionPool> ConstructHitBoxPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
-    {
-        if (HurtPools.TryGet(key, out var existingPool))
-        {
-            var preloadCount = HurtPools.IncrementPreloadCount(key, iniCount);
-            await existingPool.PreloadAsync(preloadCount, 1).ToUniTask();
-            return existingPool;
-        }
-
-        if (prefab != null)
-        {
-            var poolToConstruct = new DecompositionPool(prefab);
-            await poolToConstruct.PreloadAsync(iniCount, 1).ToUniTask();
-            if (HurtPools.TryGet(key, out existingPool))
-            {
-                poolToConstruct.Clear();
-                return existingPool;
-            }
-
-            HurtPools.TryAdd(key, poolToConstruct, iniCount);
-            return poolToConstruct;
         }
         return null;
     }

@@ -2,7 +2,7 @@ using System;
 
 public static class AnimationResourceKeyUtility
 {
-    public const string BasicAnimationLabel = "basic_anim";
+    public const string BasicAnimationLabel = AddressablesResourcePolicy.BasicAnimationLabel;
     public const string SkillFolderName = "skill";
     public const string BasicPackFolderName = "BasicPack";
 

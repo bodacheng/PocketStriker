@@ -73,10 +73,9 @@ public partial class BO_Ani_E : MonoBehaviour
     AudioClip _audioClip;
     public void PlaySoundOnce(string soundClipName)
 	{
-        AudioResourceLoading.Instance.SoundClipsDic.TryGetValue(
-            AudioResourceLoaderCore.AudioClipKey(AudioResourceLoaderCore.EffectAudioPath, soundClipName), out _audioClip);
-        if (_audioClip != null)
-            _DATA_CENTER._AudioSource.PlayOneShot(_audioClip);
+        var audioSource = _DATA_CENTER != null ? _DATA_CENTER._AudioSource : null;
+        if (audioSource != null && AudioResourceLoaderCore.TryGetEffectAudioClip(soundClipName, out _audioClip))
+            audioSource.PlayOneShot(_audioClip);
 	}
     
     public void MagicForward(AnimationEvent e)

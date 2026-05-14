@@ -21,9 +21,9 @@ public static class MCombatResourceOrganizer
     private const string UsedSkillIconRoot = "Assets/OrganizedResources/InUse/ExternalAssets/SkillIcon";
     private const string SkillAnimationRoot = "Assets/ExternalAssets/Animations";
     private const string SkillIconGroupName = "SkillIcon";
-    private const string SkillIconLabel = "skill_icon";
+    private const string SkillIconLabel = AddressablesResourcePolicy.SkillIconLabel;
     private const string SkillAnimGroupName = "SkillAnim";
-    private const string SkillAnimLabel = "skill_anim";
+    private const string SkillAnimLabel = AddressablesResourcePolicy.SkillAnimationLabel;
     private const string RecoveredRoot = "Assets/MCombatRecovered";
     private static readonly HashSet<string> SupportedSkillIconExtensions = new HashSet<string>(
         new[] { ".png", ".jpg", ".jpeg", ".psd", ".tif", ".tiff" },

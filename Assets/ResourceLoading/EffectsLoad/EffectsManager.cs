@@ -10,15 +10,11 @@ public static class EffectsManager
     
     static UniTask<GameObject> TryLoadEffectPrefab(string key)
     {
-        if (!AddressablesLogic.CheckKeyExist(EffectResourceKeyUtility.EffectLabel, key))
-        {
-            return default;
-        }
-        else
-        {
-            var returnValue = AddressablesLogic.LoadT<GameObject>(key);
-            return returnValue;
-        }
+        return IndexedResourceLoadUtility.LoadIfKeyExists<GameObject>(
+            EffectResourceKeyUtility.EffectLabel,
+            key,
+            AddressablesLogic.CheckKeyExist,
+            assetKey => AddressablesLogic.LoadT<GameObject>(assetKey));
     }
     
     public static void Clear()
@@ -52,31 +48,6 @@ public static class EffectsManager
         return processingEffectObj;
     }
     
-    static async UniTask<DecompositionPool> ConstructEffectPoolWithPrefabAndKey(GameObject prefab, string key, int iniCount)
-    {
-        if (EffectPools.TryGet(key, out var existingPool))
-        {
-            var preloadCount = EffectPools.IncrementPreloadCount(key, iniCount);
-            await existingPool.PreloadAsync(preloadCount, 1).ToUniTask();
-            return existingPool;
-        }
-
-        if (prefab != null)
-        {
-            var poolToConstruct = new DecompositionPool(prefab);
-            await poolToConstruct.PreloadAsync(iniCount, 1).ToUniTask();
-            if (EffectPools.TryGet(key, out existingPool))
-            {
-                poolToConstruct.Clear();
-                return existingPool;
-            }
-
-            EffectPools.TryAdd(key, poolToConstruct, iniCount);
-            return poolToConstruct;
-        }
-        return null;
-    }
-    
     public static async UniTask<DecompositionPool> IniEffectsPool(string resourceName, string effectPath, int objectCount)
     {
         DecompositionPool effectPool;
@@ -91,7 +62,14 @@ public static class EffectsManager
             var effectPrefab = await TryLoadEffectPrefab(EffectResourceKeyUtility.PrefabAddress(effectPath, resourceName));
             if (effectPrefab != null)
             {
-                effectPool = await ConstructEffectPoolWithPrefabAndKey(effectPrefab, resourceKey, objectCount);
+                effectPool = await ResourcePoolConstructionUtility.GetOrCreatePool(
+                    EffectPools,
+                    resourceKey,
+                    effectPrefab,
+                    objectCount,
+                    prefab => new DecompositionPool(prefab),
+                    (pool, count) => pool.PreloadAsync(count, 1).ToUniTask(),
+                    pool => pool.Clear());
                 return effectPool;
             }
             if (effectPath == FightGlobalSetting.EffectPathDefine())

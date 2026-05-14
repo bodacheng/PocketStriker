@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 public static class EffectResourceKeyUtility
 {
-    public const string EffectLabel = "effect";
-    public const string WeaponLabel = "weapon";
+    public const string EffectLabel = AddressablesResourcePolicy.EffectLabel;
+    public const string WeaponLabel = AddressablesResourcePolicy.WeaponLabel;
     public const string DefaultHitBoxPrefabName = "dHitBox";
 
     public static string ResourceKey(string resourcePath, string resourceName)
