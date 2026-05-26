@@ -12,7 +12,6 @@ using UnityEngine.SceneManagement;
 
 public static class AddressablesLogic
 {
-    private static readonly IDictionary<string, long> Sizes = new Dictionary<string, long>();
     private static readonly IDictionary<string, List<string>> KeyExists = new Dictionary<string, List<string>>();
 
     public static async UniTask CheckExistedKey(string tag)
@@ -124,122 +123,29 @@ public static class AddressablesLogic
         }
     }
     
-    static async UniTask<long> DownLoadSize(string label, Action<string> exceptionProcess)
+    static UniTask<bool> DownLoadMission(string label, Action<string> progressUIRefresh)
     {
-        AsyncOperationHandle<long> handle = default;
-        try
-        {
-            handle = Addressables.GetDownloadSizeAsync(label);
-            await handle.Task;
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                var result = handle.Result;
-                if (result > 0)
-                {
-                    DicAdd<string,long>.Add(Sizes, label, result);
-                }
-                return result;
-            }
-            Debug.LogError(AddressablesResourcePolicy.DownloadSizeFailureMessage(label));
-            exceptionProcess?.Invoke(label);
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(AddressablesResourcePolicy.DownloadSizeExceptionMessage(label, ex));
-            exceptionProcess?.Invoke(label);
-            return 0;
-        }
-        finally
-        {
-            if (handle.IsValid())
-                Addressables.Release(handle);
-        }
+        return AddressablesDependencyDownloader.DownloadDependencies(
+            label,
+            progressUIRefresh,
+            AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
     }
     
-    static async UniTask<bool> DownLoadMission(string label, Action<string> progressUIRefresh)
+    public static UniTask<long> GetWholeDownLoadSize(Action<string> exception, List<string> downLoadLabel)
     {
-        AsyncOperationHandle downloadHandle = default;
-        try
-        {
-            downloadHandle = Addressables.DownloadDependenciesAsync(label, true);
-            while (!downloadHandle.IsDone)
-            {
-                if (downloadedBytes.ContainsKey(label))
-                {
-                    downloadedBytes[label] = downloadHandle.GetDownloadStatus().DownloadedBytes;
-                }
-
-                progressUIRefresh(AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
-                await UniTask.DelayFrame(0);
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(AddressablesResourcePolicy.DownloadMissionExceptionMessage(ex));
-            return false;
-        }
-        finally
-        {
-            if (downloadHandle.IsValid())
-                Addressables.Release(downloadHandle);
-        }
+        return AddressablesDependencyDownloader.GetWholeDownloadSize(downLoadLabel, exception);
     }
     
-    public static async UniTask<long> GetWholeDownLoadSize(Action<string> exception, List<string> downLoadLabel)
-    {
-        //Caching.ClearCache();
-        
-        long wholeSize = 0;
-        var downLoadSizeCal = new List<UniTask<long>>();
-        foreach (var label in downLoadLabel)
-        {
-            downLoadSizeCal.Add(DownLoadSize(label, exception));
-        }
-        await UniTask.WhenAll(downLoadSizeCal);
-
-        foreach (var kv in Sizes)
-        {
-            wholeSize += kv.Value;
-        }
-        return wholeSize;
-    }
+    public static long DownloadedBytes => AddressablesDependencyDownloader.DownloadedBytes;
     
-    public static long DownloadedBytes
-    {
-        get {
-            long whole = 0;
-            foreach (var kv in downloadedBytes)
-            {
-                whole += kv.Value;
-            }
-            return whole;
-        }
-    }
-    
-    private static readonly Dictionary<string, long> downloadedBytes = new Dictionary<string, long>();
     public static async UniTask ResourcePrepareProcess(Action complete, Action<string> progressUIRefresh, List<string> downLoadLabel)
     {
-        // Clear all cached AssetBundles
-        // WARNING: This will cause all asset bundles to be re-downloaded at startup every time and should not be used in a production game
-        //Addressables.ClearDependencyCacheAsync(label);
-        //var unitInstructionLayer = UILayerLoader.Load<UnitInstructionLayer>();
-        //unitInstructionLayer.LoadUnitImage();
-        foreach (var label in downLoadLabel)
-        {
-            AddressablesResourcePolicy.EnsureDownloadedBytesLabel(downloadedBytes, label);
-        }
-        
-        var downLoadTasks = new List<UniTask<bool>>();
-        foreach (var label in downLoadLabel)
-        {
-            if (Sizes.ContainsKey(label))
-                downLoadTasks.Add(DownLoadMission(label, progressUIRefresh));
-        }
-        var results = await UniTask.WhenAll(downLoadTasks);
-        if (results.Any(result => result == false))
+        var success = await AddressablesDependencyDownloader.DownloadRequiredDependencies(
+            downLoadLabel,
+            progressUIRefresh,
+            AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+
+        if (!success)
         {
             await LoadErrorThenBackToStart();
             return;

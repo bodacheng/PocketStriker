@@ -72,6 +72,14 @@ namespace FightScene
                     team2.UnitStartOff();
                     break;
             }
+
+            FacePreparedTeamsTowardEachOther();
+        }
+
+        public void FacePreparedTeamsTowardEachOther()
+        {
+            team1?.FacePreparedUnitsToward(team2);
+            team2?.FacePreparedUnitsToward(team1);
         }
         
         // 战斗模式相机。根据选择队伍做相应调整。

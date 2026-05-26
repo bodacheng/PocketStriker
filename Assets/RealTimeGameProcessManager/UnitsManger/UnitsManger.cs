@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using MCombat.Shared.Combat;
 
 namespace FightScene
 {
@@ -157,27 +158,55 @@ namespace FightScene
             {
                 return;
             }
+
             PlaceUnitByGeometryCenter(dataCenter, standPoint.position, standPoint.rotation);
         }
 
         void PlaceUnitByGeometryCenter(Data_Center dataCenter, Vector3 targetGeometryCenterPosition, Quaternion targetRotation)
         {
-            if (dataCenter == null || dataCenter.WholeT == null)
+            StopPlacementTweens(dataCenter);
+            CombatPlacementUtility.PlaceRootByGeometryCenter(
+                dataCenter?.WholeT,
+                dataCenter?._BasicPhysicSupport?.Rigidbody,
+                dataCenter?.geometryCenter,
+                targetGeometryCenterPosition,
+                targetRotation);
+        }
+
+        public void FacePreparedUnitsToward(UnitsManger opponent)
+        {
+            if (opponent == null)
             {
                 return;
             }
 
-            if (dataCenter.geometryCenter == null)
+            CombatPlacementUtility.FaceRootsTowards(
+                teamMembers.GetValues(),
+                opponent.teamMembers.GetValues(),
+                IsPreparedFacingUnit,
+                center => center?.WholeT,
+                center => center?.geometryCenter,
+                center => center?._BasicPhysicSupport?.Rigidbody,
+                StopPlacementTweens);
+        }
+
+        static bool IsPreparedFacingUnit(Data_Center dataCenter)
+        {
+            return dataCenter != null
+                   && dataCenter.WholeT != null
+                   && dataCenter.WholeT.gameObject.activeSelf
+                   && dataCenter.FightDataRef != null
+                   && !dataCenter.FightDataRef.IsDead.Value;
+        }
+
+        static void StopPlacementTweens(Data_Center dataCenter)
+        {
+            if (dataCenter?.WholeT == null)
             {
-                dataCenter.WholeT.SetPositionAndRotation(targetGeometryCenterPosition, targetRotation);
                 return;
             }
 
-            // geometryCenter is the battle-space anchor used by camera, sensor, and hit logic.
-            var rootScale = dataCenter.WholeT.lossyScale;
-            var localCenterPoint = dataCenter.WholeT.InverseTransformPoint(dataCenter.geometryCenter.position);
-            var centerOffset = Vector3.Scale(localCenterPoint, rootScale);
-            dataCenter.WholeT.SetPositionAndRotation(targetGeometryCenterPosition - targetRotation * centerOffset, targetRotation);
+            DG.Tweening.DOTween.Kill(dataCenter.WholeT);
         }
         
         // 全队无敌

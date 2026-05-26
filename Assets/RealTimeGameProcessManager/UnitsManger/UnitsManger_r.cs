@@ -279,6 +279,11 @@ namespace FightScene
             {
                 InputsManager.FocusUnit(RMode_Unit.Value, true);
             }
+
+            if (emptyState)
+            {
+                RTFightManager.Target?.FacePreparedTeamsTowardEachOther();
+            }
             
             //Refresh(TeamMembers);
             return unitChanged;

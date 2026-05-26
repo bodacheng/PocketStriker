@@ -126,6 +126,11 @@ public static class AddressablesResourcePolicy
         return $"DownloadMission Exception: {exception}";
     }
 
+    public static string DownloadMissionFailureMessage(string label, Exception exception)
+    {
+        return $"[Addressables] DownloadDependenciesAsync failed for label: {label}, Exception: {exception}";
+    }
+
     public static string InstantiateFailureMessage(string key)
     {
         return $"Failed to load : {key}";

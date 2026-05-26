@@ -7,6 +7,7 @@ PocketStriker consumes these modules through thin adapters so MCombat can remain
 Current modules:
 
 - `Account`: shared player-account state model used by PlayFab/login flows.
+- `Addressables`: shared Addressables dependency download sizing, progress, and handle-release flow.
 - `AI`: shared AI decision throttling and condition-response registration rules.
 - `CombatGroup`: boss/group battle unit-count rules extracted from MCombat's group fight flow.
 - `Combat`: shared team/layer/spatial helpers and team-elimination winner tracking.

@@ -180,6 +180,8 @@ public class PreparingProcess : FSceneProcess
                 RTFightManager.Target.team2.ToStartPosRotate();
                 break;
         }
+
+        RTFightManager.Target.FacePreparedTeamsTowardEachOther();
         
         RTFightManager.Target.team1.RMode_Unit.Subscribe(x =>
             {
