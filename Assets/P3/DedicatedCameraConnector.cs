@@ -264,10 +264,16 @@ namespace ModelView
             this.up_down = 0;
             this._z = 0;
             
+            _rotateTo?.Kill();
             // 使用DOTween进行平滑渐变，duration可根据需要调整（此处设为0.5秒）
             _rotateTo = DOTween.To(
                 () => new Vector3(this.left_right, this.up_down, this._z),
                 value => {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
                     this.left_right = value.x;
                     this.up_down = value.y;
                     this._z = value.z;
@@ -276,7 +282,15 @@ namespace ModelView
                 },
                 endValue,
                 0.5f
-            ).OnComplete(OnPointerDown);
+            ).SetLink(gameObject).OnComplete(() =>
+            {
+                if (this == null)
+                {
+                    return;
+                }
+
+                OnPointerDown();
+            });
         }
         
         /// <summary>

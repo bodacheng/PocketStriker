@@ -122,21 +122,34 @@ public partial class SkillEditLayer : UILayer
             end._cell.GetComponent<RectTransform>(), 3);
                     
         var transitionEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>("gachastar0");
-        _transitionEffects.Add(transitionEffect.gameObject);
+        if (transitionEffect == null)
+        {
+            return;
+        }
+
+        var effectObject = transitionEffect.gameObject;
+        _transitionEffects.Add(effectObject);
         if (this == null)
         {
-            Destroy(transitionEffect.gameObject);
+            Destroy(effectObject);
             return;
         }
         transitionEffect.transform.position = startPos;
-        var tween = transitionEffect.transform.DOMove(endPos, 1).OnComplete(
+        Tweener tween = null;
+        tween = transitionEffect.transform.DOMove(endPos, 1).SetLink(effectObject).OnComplete(
             async () =>
             {
+                _tweens.Remove(tween);
+                if (transitionEffect == null)
+                {
+                    return;
+                }
+
                 transitionEffect.Clear(true);
                 await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
                 if (transitionEffect != null)
                 {
-                    Destroy(transitionEffect.gameObject);
+                    Destroy(effectObject);
                 }
             }
         );

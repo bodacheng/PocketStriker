@@ -29,6 +29,7 @@ public class TitleScreenLayer : UILayer
     [SerializeField] Text version;
     
     private float titleAnimFactor = 0;
+    private Tween titleTween;
     public void Initialise()
     {
         version.text = Application.version;
@@ -43,10 +44,18 @@ public class TitleScreenLayer : UILayer
             devLoginBtn.onClick.AddListener(DevUserLogin);
         }
         
-        DOTween.To(() => titleAnimFactor, (x) => titleAnimFactor = x, 2, 10).OnUpdate(() =>
-        {
-            title.material.SetFloat("_Animation_Factor", titleAnimFactor);
-        });
+        titleTween?.Kill();
+        titleTween = DOTween.To(() => titleAnimFactor, (x) => titleAnimFactor = x, 2, 10)
+            .SetLink(gameObject)
+            .OnUpdate(() =>
+            {
+                if (this == null || title == null)
+                {
+                    return;
+                }
+
+                title.material.SetFloat("_Animation_Factor", titleAnimFactor);
+            });
     }
     
     void SwitchTab(int step) // step 1:main ,step 2: login by pw
@@ -82,5 +91,12 @@ public class TitleScreenLayer : UILayer
         PlayFabReadClient.LoginByCustomId(
             devId.text,
             PlayFabReadClient.LoginSuccess);
+    }
+
+    public override void OnDestroy()
+    {
+        titleTween?.Kill();
+        titleTween = null;
+        base.OnDestroy();
     }
 }

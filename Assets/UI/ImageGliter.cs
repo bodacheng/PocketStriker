@@ -11,24 +11,53 @@ public class ImageGliter : MonoBehaviour
     [SerializeField] Text textTarget;
     
     private readonly List<Tweener> _tweeners = new List<Tweener>();
+    private bool _isRunning;
 
     void ColorChange(Image target, Color color1, Color color2)
     {
-        Tweener tweener = target.DOColor(color1, interval).OnComplete(() => { ColorChange(target, color2, color1); });
+        if (!_isRunning || target == null)
+        {
+            return;
+        }
+
+        Tweener tweener = null;
+        tweener = target.DOColor(color1, interval)
+            .SetLink(target.gameObject)
+            .OnComplete(() =>
+            {
+                _tweeners.Remove(tweener);
+                ColorChange(target, color2, color1);
+            });
         _tweeners.Add(tweener);
     }
 
     void ColorChange(Text textTarget, Color color1, Color color2)
     {
-        Tweener tweener = textTarget.DOColor(color1, interval).OnComplete(() => { ColorChange(textTarget, color2, color1); });
+        if (!_isRunning || textTarget == null)
+        {
+            return;
+        }
+
+        Tweener tweener = null;
+        tweener = textTarget.DOColor(color1, interval)
+            .SetLink(textTarget.gameObject)
+            .OnComplete(() =>
+            {
+                _tweeners.Remove(tweener);
+                ColorChange(textTarget, color2, color1);
+            });
         _tweeners.Add(tweener);
     }
 
     void OnEnable()
     {
-        for (int i = 0; i < toChange.Length; i++)
+        _isRunning = true;
+        if (toChange != null)
         {
-            ColorChange(toChange[i], set1, set2);
+            for (int i = 0; i < toChange.Length; i++)
+            {
+                ColorChange(toChange[i], set1, set2);
+            }
         }
 
         if (textTarget != null)
@@ -39,6 +68,7 @@ public class ImageGliter : MonoBehaviour
 
     void OnDisable()
     {
+        _isRunning = false;
         foreach (Tweener tweener in _tweeners)
         {
             tweener.Kill();

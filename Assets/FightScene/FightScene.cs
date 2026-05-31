@@ -2,6 +2,7 @@
 using UnityEngine;
 using UniRx;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using mainMenu;
 using UnityEngine.SceneManagement;
@@ -19,6 +20,12 @@ namespace FightScene
         public Camera fxCamera;
         
         [SerializeField] AdmobAdsButton watchAdBtnPrefab;
+        [SerializeField] private AIServiceManager aiServiceManager;
+
+        public AIServiceManager AIServiceManager => aiServiceManager;
+        private StoryInfo aiStoryInfo;
+        private UniTaskCompletionSource<StoryInfo> aiStoryLoadSource;
+        public StoryInfo AIStoryInfo => aiStoryInfo;
 
         public static FightScene target;
         
@@ -70,10 +77,24 @@ namespace FightScene
         void Awake()
         {
             target = this;
+            EnsureAIServiceManager();
+
             var targetSafeArea = safeAreaRect != null ? safeAreaRect : canvas.GetComponent<RectTransform>();
             PosCal.Canvas = this.canvas;
             PosCal.SafeAreaRect = targetSafeArea;
             PosCal.TestIni();
+        }
+
+        private void EnsureAIServiceManager()
+        {
+            if (aiServiceManager == null)
+            {
+                aiServiceManager = GetComponent<AIServiceManager>();
+                if (aiServiceManager == null)
+                {
+                    aiServiceManager = gameObject.AddComponent<AIServiceManager>();
+                }
+            }
         }
         
         void Start()
@@ -128,6 +149,76 @@ namespace FightScene
             }
             FSceneProcessesRunner.Main.ArrangeProcessOrder();
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.Preparing);
+
+            PreloadAIStory();
+        }
+
+        private void PreloadAIStory()
+        {
+            if (ShouldLoadAIStory())
+            {
+                EnsureAIStory().Forget();
+            }
+        }
+
+        private bool ShouldLoadAIStory()
+        {
+            var fight = FightLoad.Fight;
+            if (fight == null)
+            {
+                return false;
+            }
+
+            switch (fight.EventType)
+            {
+                case FightEventType.Event:
+                case FightEventType.Quest:
+                case FightEventType.Gangbang:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public UniTask<StoryInfo> EnsureAIStory()
+        {
+            if (aiStoryInfo != null)
+            {
+                return UniTask.FromResult(aiStoryInfo);
+            }
+
+            if (!ShouldLoadAIStory())
+            {
+                return UniTask.FromResult<StoryInfo>(null);
+            }
+
+            if (aiStoryLoadSource == null)
+            {
+                EnsureAIServiceManager();
+                aiStoryLoadSource = new UniTaskCompletionSource<StoryInfo>();
+                LoadAIStory(aiStoryLoadSource).Forget();
+            }
+
+            return aiStoryLoadSource.Task;
+        }
+
+        private async UniTaskVoid LoadAIStory(UniTaskCompletionSource<StoryInfo> loadSource)
+        {
+            StoryInfo story = null;
+            try
+            {
+                if (aiServiceManager != null)
+                {
+                    story = await aiServiceManager.LoadAIStory();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[FightScene] Failed to load AI story: {ex.Message}");
+            }
+
+            aiStoryInfo = story;
+            loadSource.TrySetResult(story);
         }
 
         public void LoadAds()

@@ -77,9 +77,15 @@ public class StonesPage : MSceneProcess
             Vector2 newAnchoredPosition = _layer.box.ScrollRect.content.anchoredPosition + new Vector2(0, diff);
             
             _autoScroll?.Kill();
-            _autoScroll = _layer.box.ScrollRect.content.DOAnchorPosY(newAnchoredPosition.y, 0.5f).SetEase(Ease.InOutQuad).OnComplete(
+            var scrollContent = _layer.box.ScrollRect.content;
+            _autoScroll = scrollContent.DOAnchorPosY(newAnchoredPosition.y, 0.5f).SetEase(Ease.InOutQuad).SetLink(scrollContent.gameObject).OnComplete(
                 () =>
                 {
+                    if (_layer == null || targetStoneModel == null || PreScene.target == null)
+                    {
+                        return;
+                    }
+
                     targetStoneModel.Shine(PreScene.target.postProcessCamera);
                 });
             #endregion

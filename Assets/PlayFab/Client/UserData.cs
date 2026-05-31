@@ -10,22 +10,47 @@ public partial class PlayFabReadClient
 {
     public static readonly IDictionary<string, string> MyTimeLimitBundleBoughtLog = new Dictionary<string, string>();
     
-    public static void UpdateUserData(UpdateUserDataRequest req, Action finished, Action fail = null)
+    public static void UpdateUserData(UpdateUserDataRequest req, Action finished, Action fail = null, bool showError = true, bool showLoading = true)
     {
-        ProgressLayer.Loading(Translate.Get("Updating"));
-        PlayFabClientAPI.UpdateUserData
-        (
-            req,
-            obj => {
-                finished.Invoke();
-                ProgressLayer.Close();
-            },
-            errorCallback => {
-                fail?.Invoke();
-                ProgressLayer.Close();
-                ErrorReport(errorCallback);
-            }
-        );
+        if (showLoading)
+        {
+            ProgressLayer.Loading(Translate.Get("Updating"));
+        }
+
+        void Attempt(int attempt)
+        {
+            PlayFabClientAPI.UpdateUserData
+            (
+                req,
+                obj => {
+                    finished?.Invoke();
+                    if (showLoading)
+                    {
+                        ProgressLayer.Close();
+                    }
+                },
+                errorCallback => {
+                    if (ShouldRetryPlayFabRequest(errorCallback, attempt))
+                    {
+                        RetryPlayFabRequest(() => Attempt(attempt + 1), attempt, "UpdateUserData");
+                        return;
+                    }
+
+                    fail?.Invoke();
+                    if (showLoading)
+                    {
+                        ProgressLayer.Close();
+                    }
+
+                    if (showError)
+                    {
+                        ErrorReport(errorCallback);
+                    }
+                }
+            );
+        }
+
+        Attempt(1);
     }
     
     public static void GetAllUserData(List<string> keys, Action<bool> finished)
@@ -48,78 +73,89 @@ public partial class PlayFabReadClient
             }
         }
 
-        PlayFabClientAPI.GetUserData(
-            new GetUserDataRequest()
-            {
-                PlayFabId = PlayerAccountInfo.Me.PlayFabId,
-                Keys = keys
-            },
-            obj => {
-                foreach (var key in keys)
+        void Attempt(int attempt)
+        {
+            PlayFabClientAPI.GetUserData(
+                new GetUserDataRequest()
                 {
-                    if (obj.Data.ContainsKey(key))
+                    PlayFabId = PlayerAccountInfo.Me.PlayFabId,
+                    Keys = keys
+                },
+                obj => {
+                    foreach (var key in keys)
                     {
-                        var userData = obj.Data[key];
-                        PosKeySet value;
-                        switch (key)
+                        if (obj.Data.ContainsKey(key))
                         {
-                            case "arcade":
-                                value = ReadTeamPosSafely(userData.Value, key);
-                                TeamSet.Default = value;
-                                break;
-                            case "arena": // 因为一些特殊处理这个地方现在其实没用。
-                                value = ReadTeamPosSafely(userData.Value, key);
-                                TeamSet.Arena3V3 = value;
-                                break;
-                            case "gangbang":
-                                value = ReadTeamPosSafely(userData.Value, key);
-                                TeamSet.Gangbang = value;
-                                break;
-                            case "origin":
-                                value = ReadTeamPosSafely(userData.Value, key);
-                                TeamSet.Origin = value;
-                                break;
-                            case "noAds":
-                                Int32.TryParse(userData.Value, out var state);
-                                PlayerAccountInfo.Me.noAdsState = state == 1;
-                                break;
-                        }
+                            var userData = obj.Data[key];
+                            PosKeySet value;
+                            switch (key)
+                            {
+                                case "arcade":
+                                    value = ReadTeamPosSafely(userData.Value, key);
+                                    TeamSet.Default = value;
+                                    break;
+                                case "arena": // 因为一些特殊处理这个地方现在其实没用。
+                                    value = ReadTeamPosSafely(userData.Value, key);
+                                    TeamSet.Arena3V3 = value;
+                                    break;
+                                case "gangbang":
+                                    value = ReadTeamPosSafely(userData.Value, key);
+                                    TeamSet.Gangbang = value;
+                                    break;
+                                case "origin":
+                                    value = ReadTeamPosSafely(userData.Value, key);
+                                    TeamSet.Origin = value;
+                                    break;
+                                case "noAds":
+                                    Int32.TryParse(userData.Value, out var state);
+                                    PlayerAccountInfo.Me.noAdsState = state == 1;
+                                    break;
+                            }
                         
-                        if (key == PlayFabSetting._timeLimitBuyCode)
+                            if (key == PlayFabSetting._timeLimitBuyCode)
+                            {
+                                DicAdd<string,string>.Add(MyTimeLimitBundleBoughtLog, key, userData.Value);
+                            }
+                        }
+                        else
                         {
-                            DicAdd<string,string>.Add(MyTimeLimitBundleBoughtLog, key, userData.Value);
+                            switch (key)
+                            {
+                                case "arcade":
+                                    TeamSet.Default = new PosKeySet();
+                                    break;
+                                case "arena":
+                                    TeamSet.Arena3V3 = new PosKeySet();
+                                    break;
+                                case "gangbang":
+                                    TeamSet.Gangbang = new PosKeySet();
+                                    break;
+                                case "origin":
+                                    TeamSet.Origin = new PosKeySet();
+                                    break;
+                                case "noAds":
+                                    PlayerAccountInfo.Me.noAdsState = false;
+                                    break;
+                            }
                         }
                     }
-                    else
-                    {
-                        switch (key)
-                        {
-                            case "arcade":
-                                TeamSet.Default = new PosKeySet();
-                                break;
-                            case "arena":
-                                TeamSet.Arena3V3 = new PosKeySet();
-                                break;
-                            case "gangbang":
-                                TeamSet.Gangbang = new PosKeySet();
-                                break;
-                            case "origin":
-                                TeamSet.Origin = new PosKeySet();
-                                break;
-                            case "noAds":
-                                PlayerAccountInfo.Me.noAdsState = false;
-                                break;
-                        }
-                    }
-                }
                 
-                finished.Invoke(true);
-            },
-            errorCallback => {
-                finished.Invoke(false);
-                ErrorReport(errorCallback);
-            }
-        );
+                    finished.Invoke(true);
+                },
+                errorCallback => {
+                    if (ShouldRetryPlayFabRequest(errorCallback, attempt))
+                    {
+                        RetryPlayFabRequest(() => Attempt(attempt + 1), attempt, "GetUserData");
+                        return;
+                    }
+
+                    finished.Invoke(false);
+                    ErrorReport(errorCallback);
+                }
+            );
+        }
+
+        Attempt(1);
     }
     
     public static void UpdateUserTitleDisplayName(string displayName, Action<UpdateUserTitleDisplayNameResult> finished, Action<PlayFabError> error)

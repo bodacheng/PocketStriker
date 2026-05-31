@@ -45,14 +45,28 @@ public partial class GotchaResultLayer : UILayer
     /// <returns></returns>
     void StarScreenMoveAnim(StoneOfPlayerInfo info, Vector3 waitPos, Vector3 endPos)
     {
-        var effectSet = _effectDic[info];
+        if (!_effectDic.TryGetValue(info, out var effectSet) || effectSet == null)
+        {
+            return;
+        }
+
         var screenStar = effectSet.StoneFigure;
+        if (screenStar == null || effectSet.ScreenExplosionFigure == null)
+        {
+            return;
+        }
+
         screenStar.ParticleSystem.Play();
         screenStar.transform.position = waitPos;
         effectSet.RunSequence(
-            DOTween.Sequence().Append(screenStar.transform.DOMove(endPos, starScreenMoveDuration).OnComplete(
+            DOTween.Sequence().SetLink(gameObject).Append(screenStar.transform.DOMove(endPos, starScreenMoveDuration).OnComplete(
             () =>
             {
+                if (this == null || screenStar == null || effectSet.ScreenExplosionFigure == null)
+                {
+                    return;
+                }
+
                 screenStar.ParticleSystem.Stop();
                 effectSet.ScreenExplosionFigure.transform.position = endPos;
                 effectSet.ScreenExplosionFigure.ParticleSystem.Play(true);

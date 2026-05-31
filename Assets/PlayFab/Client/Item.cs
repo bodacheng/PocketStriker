@@ -12,18 +12,29 @@ public partial class PlayFabReadClient
         dataAccess.Units.Dic.Clear();
         Stones.ClearData();
         Stones.ClearRender();
-        
-        PlayFabClientAPI.GetUserInventory(
-            new GetUserInventoryRequest(),
-            result =>
-            {
-                OnGetUserInventory(result, finished);
-            },
-            errorCallback => {
-                finished?.Invoke(false);
-                ErrorReport(errorCallback);
-            }
-        );
+
+        void Attempt(int attempt)
+        {
+            PlayFabClientAPI.GetUserInventory(
+                new GetUserInventoryRequest(),
+                result =>
+                {
+                    OnGetUserInventory(result, finished);
+                },
+                errorCallback => {
+                    if (ShouldRetryPlayFabRequest(errorCallback, attempt))
+                    {
+                        RetryPlayFabRequest(() => Attempt(attempt + 1), attempt, "GetUserInventory");
+                        return;
+                    }
+
+                    finished?.Invoke(false);
+                    ErrorReport(errorCallback);
+                }
+            );
+        }
+
+        Attempt(1);
     }
     
     static void OnGetUserInventory(GetUserInventoryResult result, Action<bool> finished)

@@ -22,6 +22,11 @@ public class HighLightLayer : UILayer
     public static void HighLightRect(RectTransform r, Options options = null)
     {
         var highLightLayer = UILayerLoader.Load<HighLightLayer>(true, null, true);
+        if (highLightLayer == null)
+        {
+            return;
+        }
+
         highLightLayer._HighLightRect(r, options);
     }
     
@@ -29,6 +34,11 @@ public class HighLightLayer : UILayer
     {
         bigCurtain.raycastTarget = true; // 防止下面那点间隔里有点击画面的空间
         await Observable.TimerFrame(2); // 没有这个间隔ShowForUI的计算可能出错
+        if (this == null || bigCurtain == null)
+        {
+            return;
+        }
+
         bigCurtain.raycastTarget = false;
         
         if (r != null)
@@ -51,18 +61,30 @@ public class HighLightLayer : UILayer
     public static void DarkOff(Color color, float duration)
     {
         var highLightLayer = UILayerLoader.Load<HighLightLayer>(true, null, true);
+        if (highLightLayer == null || highLightLayer.bigCurtain == null)
+        {
+            return;
+        }
+
         highLightLayer.bigCurtain.raycastTarget = true;
-        highLightLayer.bigCurtain.DOColor(color, duration);
+        highLightLayer.bigCurtain.DOColor(color, duration).SetLink(highLightLayer.gameObject);
     }
     
     public static void LightUp(float duration)
     {
         var highLightLayer = UILayerLoader.Get<HighLightLayer>();
-        if (highLightLayer != null)
+        if (highLightLayer != null && highLightLayer.bigCurtain != null)
         {
-            highLightLayer.bigCurtain.DOColor(new Color(0,0,0, 0), duration).OnComplete(() =>
+            var layer = highLightLayer;
+            var curtain = highLightLayer.bigCurtain;
+            curtain.DOColor(new Color(0,0,0, 0), duration).SetLink(layer.gameObject).OnComplete(() =>
             {
-                highLightLayer.bigCurtain.raycastTarget = false;
+                if (layer == null || curtain == null)
+                {
+                    return;
+                }
+
+                curtain.raycastTarget = false;
                 Close();
             });
         }

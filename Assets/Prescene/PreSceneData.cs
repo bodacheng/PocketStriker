@@ -4,12 +4,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using dataAccess;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace mainMenu
 {
     public partial class PreScene : MonoBehaviour
     {
+        const float DataLoadingSoftTimeoutSeconds = 30f;
         protected MissionWatcher missionWatcher;
         
         void StatisticsLoadFinished(bool value)
@@ -45,32 +45,19 @@ namespace mainMenu
         public void DataLoading(Action onDataLoad)
         {
             var timer = new SafeTimer();
-            var errorReturning = false;
+            var dataLoadingFinished = false;
 
-            async UniTaskVoid ReturnToTitleAsync()
+            ProgressLayer.Loading(string.Empty);
+            timer.StartTimer(DataLoadingSoftTimeoutSeconds, () =>
             {
-                ProgressLayer.Loading(Translate.Get("ReturnToLobbyForConnectionError"));
-                await UniTask.Delay(TimeSpan.FromSeconds(3));
-                if (SceneManager.GetActiveScene().buildIndex != 0)
-                {
-                    SceneManager.LoadScene(0);
-                }
-            }
-
-            void HandleDataLoadError()
-            {
-                if (errorReturning)
+                if (dataLoadingFinished)
                 {
                     return;
                 }
 
-                errorReturning = true;
-                timer.Stop();
-                ReturnToTitleAsync().Forget();
-            }
-
-            ProgressLayer.Loading(string.Empty);
-            timer.StartTimer(5, HandleDataLoadError);
+                Debug.LogWarning($"Data loading did not finish in {DataLoadingSoftTimeoutSeconds} seconds. Keep waiting for pending PlayFab requests.");
+                ProgressLayer.Loading(string.Empty);
+            });
             PlayFabReadClient.GetStatistics(StatisticsLoadFinished);
         
             //AccountCharsSet.LoadTutorial();
@@ -95,11 +82,9 @@ namespace mainMenu
                 },
                 () =>
                 {
+                    dataLoadingFinished = true;
                     timer.Stop();
-                    if (errorReturning)
-                    {
-                        return;
-                    }
+                    PlayFabReadClient.ReconcileTutorialProgressAfterDataLoad();
 
                     TeamSet.SanitizeAgainstCurrentInventory(GetFocusInstanceID());
 
@@ -133,7 +118,9 @@ namespace mainMenu
                 },
                 () =>
                 {
-                    HandleDataLoadError();
+                    dataLoadingFinished = true;
+                    timer.Stop();
+                    ProgressLayer.Close();
                 }
             );
         }

@@ -162,13 +162,17 @@ public partial class ArenaFightOver : UILayer
     
     public void Setup(Action onClickStoryMask = null)
     {
+        storyFinishedCallback = onClickStoryMask;
         if (onClickStoryMask != null)
         {
-            storyMaskBtn.SetListener(()=>
+            if (!aiStoryPlaying)
             {
-                storyBgImage.gameObject.SetActive(false);
-                onClickStoryMask();
-            });
+                storyMaskBtn.SetListener(()=>
+                {
+                    storyBgImage.gameObject.SetActive(false);
+                    onClickStoryMask();
+                });
+            }
         }
         
         switch (FightLoad.Fight.EventType)
@@ -210,13 +214,19 @@ public partial class ArenaFightOver : UILayer
             {
                 int.TryParse(DiamondText, out int currentValue);
                 int targetValue = currentValue;
+                _dmAwardTweenerCore?.Kill();
                 _dmAwardTweenerCore = DOTween.To(
                     () => targetValue,
                     setterValue => targetValue = setterValue,
                     x,
                     currencyTextChangeDuration
-                ).OnUpdate(() =>
+                ).SetLink(gameObject).OnUpdate(() =>
                 {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
                     DiamondText = targetValue.ToString();
                 });
             }
@@ -228,13 +238,19 @@ public partial class ArenaFightOver : UILayer
             {
                 int.TryParse(GoldText, out int currentValue);
                 int targetValue = currentValue;
+                _gdAwardTweenerCore?.Kill();
                 _gdAwardTweenerCore = DOTween.To(
                     () => targetValue,
                     setterValue => targetValue = setterValue,
                     x,
                     currencyTextChangeDuration
-                ).OnUpdate(() =>
+                ).SetLink(gameObject).OnUpdate(() =>
                 {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
                     GoldText = targetValue.ToString();
                 });
             }
@@ -246,10 +262,16 @@ public partial class ArenaFightOver : UILayer
         if (FightLogger.value.GetWinnerTeam() == Team.player1)
         {
             winObject.SetActive(true);
-            DOTween.To(() => resultAnimFactor, (x) => resultAnimFactor = x, 2, 1).
-                OnUpdate(
+            DOTween.To(() => resultAnimFactor, (x) => resultAnimFactor = x, 2, 1)
+                .SetLink(gameObject)
+                .OnUpdate(
                     () =>
                     {
+                        if (this == null || winImage == null)
+                        {
+                            return;
+                        }
+
                         winImage.material.SetFloat("_Animation_Factor", resultAnimFactor);
                     }
             );
@@ -258,10 +280,16 @@ public partial class ArenaFightOver : UILayer
         {
             loseObject.SetActive(true);
             powerUpTip.gameObject.SetActive(true);
-            DOTween.To(() => resultAnimFactor, (x) => resultAnimFactor = x, 2, 1).
-                OnUpdate(
+            DOTween.To(() => resultAnimFactor, (x) => resultAnimFactor = x, 2, 1)
+                .SetLink(gameObject)
+                .OnUpdate(
                     () =>
                     {
+                        if (this == null || loseImage == null)
+                        {
+                            return;
+                        }
+
                         loseImage.material.SetFloat("_Animation_Factor", resultAnimFactor);
                     }
                 );
@@ -335,14 +363,20 @@ public partial class ArenaFightOver : UILayer
         arenaRankParent.gameObject.SetActive(true);
         arenaRankIcon.Set(oldPoint);
         arenaPointValue = oldPoint;
+        _arenaPointTweenerCore?.Kill();
         _arenaPointTweenerCore = DOTween.To(
             () => arenaPointValue,          // 何を対象にするのか
             num => arenaPointValue = num,   // 値の更新
             currentPoint,                  // 最終的な値
             2f                  // アニメーション時間
-        ).OnUpdate(
+        ).SetLink(gameObject).OnUpdate(
             ()=>
             {
+                if (this == null || arenaRankIcon == null)
+                {
+                    return;
+                }
+
                 if (PlayFabSetting.ArenaPointToRank(arenaPointValue) > PlayFabSetting.ArenaPointToRank(oldPoint))
                 {
                     oldPoint = arenaPointValue;

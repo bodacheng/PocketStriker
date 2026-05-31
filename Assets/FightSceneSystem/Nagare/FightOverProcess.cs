@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using PlayFab.ClientModels;
+using UnityEngine;
 
 namespace FightScene
 {
@@ -11,6 +12,38 @@ namespace FightScene
         public FightOverProcess()
         {
             Step = SceneStep.FightOver;
+        }
+
+        static void SaveTutorialProgressInBackground(string progress)
+        {
+            PlayerAccountInfo.Me.tutorialProgress = progress;
+            PlayFabReadClient.RememberPendingTutorialProgress(progress);
+            PlayFabReadClient.UpdateUserData(
+                new UpdateUserDataRequest()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { "TutorialProgress", progress }
+                    }
+                },
+                () => PlayFabReadClient.ClearPendingTutorialProgress(progress),
+                () => Debug.LogWarning($"Failed to save tutorial progress '{progress}'. It will be retried later."),
+                false,
+                false
+            );
+        }
+
+        static void TrySaveTutorialProgressAfterStage(string stageId)
+        {
+            switch (stageId)
+            {
+                case "1":
+                    SaveTutorialProgressInBackground("StageOneFinished");
+                    break;
+                case "2":
+                    SaveTutorialProgressInBackground("Finished");
+                    break;
+            }
         }
         
         void EnterProcess()
@@ -52,66 +85,56 @@ namespace FightScene
                         var levelInt = Convert.ToInt32(FightLoad.Fight.ID);
                         if (levelInt > PlayerAccountInfo.Me.arcadeProcess)
                         {
+                            void ShowQuestFightOver(ExecuteCloudScriptResult result, bool progressSynced)
+                            {
+                                var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
+                                arenaFightOver.Setup();
+                                arenaFightOver.Step2Anim();
+
+                                var jsonResult = result?.FunctionResult as PlayFab.Json.JsonObject;
+                                var hasReward = jsonResult != null && jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
+                                var hasRewardBool = hasReward is bool boolValue && boolValue;
+                                if (progressSynced)
+                                {
+                                    if (hasRewardBool)
+                                    {
+                                        var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
+                                        var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
+                                        PlayerAccountInfo.Me.arcadeProcess = levelInt;
+                                        var rewardGdInt = Convert.ToInt32(rewardGd);
+                                        var rewardDmInt = Convert.ToInt32(rewardDm);
+                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt, 
+                                            levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
+                                            levelInt);
+                                    }
+
+                                    arenaFightOver.LoadNextArcadeStage();
+                                    PlayFabReadClient.LoadItems(null);
+                                    return;
+                                }
+
+                                arenaFightOver.AgainBtn.gameObject.SetActive(true);
+                            }
+
                             CloudScript.ArcadeProgress(
                                 FightLoad.Fight.ID,
                                 result =>
                                 {
-                                    void Next()
-                                    {
-                                        var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
-                                        var hasReward = jsonResult.ContainsKey("has_reward") ? jsonResult["has_reward"] : false;
-                                        var hasRewardBool = (bool)hasReward;
-                                        var arenaFightOver = UILayerLoader.Load<ArenaFightOver>();
-                                        arenaFightOver.Setup();
-                                        arenaFightOver.Step2Anim();
-                                        if (hasRewardBool)
-                                        {
-                                            var rewardGd = jsonResult.ContainsKey("gold") ? jsonResult["gold"] : 0;
-                                            var rewardDm = jsonResult.ContainsKey("diamond") ? jsonResult["diamond"] : 0;
-                                            PlayerAccountInfo.Me.arcadeProcess = levelInt;
-                                            var rewardGdInt = Convert.ToInt32(rewardGd);
-                                            var rewardDmInt = Convert.ToInt32(rewardDm);
-                                            arenaFightOver.ShowAward(rewardDmInt, rewardGdInt, 
-                                                levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
-                                                levelInt);
-                                        }
-                                        arenaFightOver.LoadNextArcadeStage();
-                                        PlayFabReadClient.LoadItems(null);
-                                    }
-                                    
-                                    if (FightLoad.Fight.ID == "1")
-                                    {
-                                        PlayerAccountInfo.Me.tutorialProgress = "StageOneFinished";
-                                        PlayFabReadClient.UpdateUserData(
-                                            new UpdateUserDataRequest()
-                                            {
-                                                Data = new Dictionary<string, string>()
-                                                {
-                                                    { "TutorialProgress", "StageOneFinished" }
-                                                }
-                                            },
-                                            Next
-                                        );
-                                    }
-                                    else if (FightLoad.Fight.ID == "2")
-                                    {
-                                        PlayerAccountInfo.Me.tutorialProgress = "Finished";
-                                        PlayFabReadClient.UpdateUserData(
-                                            new UpdateUserDataRequest()
-                                            {
-                                                Data = new Dictionary<string, string>()
-                                                {
-                                                    { "TutorialProgress", "Finished" }
-                                                }
-                                            },
-                                            Next
-                                        );
-                                    }
-                                    else
-                                    {
-                                        Next();
-                                    }
-                                }
+                                    TrySaveTutorialProgressAfterStage(FightLoad.Fight.ID);
+                                    ShowQuestFightOver(result, true);
+                                },
+                                error =>
+                                {
+                                    Debug.LogWarning($"Failed to sync arcade progress for stage {FightLoad.Fight.ID}: {error.GenerateErrorReport()}");
+                                    ShowQuestFightOver(null, false);
+                                },
+                                error =>
+                                {
+                                    Debug.LogWarning($"Failed to claim arcade reward for stage {FightLoad.Fight.ID}: {error.GenerateErrorReport()}");
+                                    TrySaveTutorialProgressAfterStage(FightLoad.Fight.ID);
+                                    ShowQuestFightOver(null, true);
+                                },
+                                false
                             );
                         }
                         else

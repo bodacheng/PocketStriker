@@ -82,8 +82,13 @@ public class UpperInfoBar : UILayer
                 setterValue => targetValue = setterValue,
                 x,
                 currencyTextChangeDuration
-            ).OnUpdate(() =>
+            ).SetLink(gameObject).OnUpdate(() =>
             {
+                if (this == null)
+                {
+                    return;
+                }
+
                 DiamondText = targetValue.ToString();
             });
         }).AddTo(this.gameObject);
@@ -100,8 +105,13 @@ public class UpperInfoBar : UILayer
                 setterValue => targetValue = setterValue,
                 x,
                 currencyTextChangeDuration
-            ).OnUpdate(() =>
+            ).SetLink(gameObject).OnUpdate(() =>
             {
+                if (this == null)
+                {
+                    return;
+                }
+
                 GoldText = targetValue.ToString();
             });
         }).AddTo(this.gameObject);

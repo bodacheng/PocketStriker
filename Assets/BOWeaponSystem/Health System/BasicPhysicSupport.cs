@@ -281,7 +281,16 @@ public class BasicPhysicSupport : MonoBehaviour
             _attackPosFixTween?.Kill();
             _attackPosFixTween = dataCenter.WholeT
                 .DOMove(targetPos, FightGlobalSetting.HurtAutoFixPosDuration)
-                .OnComplete(() => _attackPosFixTween = null);
+                .SetLink(_BasicPhysicSupport.gameObject)
+                .OnComplete(() =>
+                {
+                    if (_BasicPhysicSupport == null)
+                    {
+                        return;
+                    }
+
+                    _attackPosFixTween = null;
+                });
         }
     }
 

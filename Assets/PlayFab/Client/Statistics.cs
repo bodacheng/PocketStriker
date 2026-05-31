@@ -6,18 +6,29 @@ public partial class PlayFabReadClient
 {
     public static void GetStatistics(Action<bool> finished)
     {
-        PlayFabClientAPI.GetPlayerStatistics(
-            new GetPlayerStatisticsRequest(),
-            (GetPlayerStatisticsResult result) => {
-                OnGetStatistics(result);
-                finished(true);
-            },
-            error =>
-            {
-                finished.Invoke(false);
-                ErrorReport(error);
-            }
-        );
+        void Attempt(int attempt)
+        {
+            PlayFabClientAPI.GetPlayerStatistics(
+                new GetPlayerStatisticsRequest(),
+                (GetPlayerStatisticsResult result) => {
+                    OnGetStatistics(result);
+                    finished(true);
+                },
+                error =>
+                {
+                    if (ShouldRetryPlayFabRequest(error, attempt))
+                    {
+                        RetryPlayFabRequest(() => Attempt(attempt + 1), attempt, "GetPlayerStatistics");
+                        return;
+                    }
+
+                    finished.Invoke(false);
+                    ErrorReport(error);
+                }
+            );
+        }
+
+        Attempt(1);
     }
 
     static void OnGetStatistics(GetPlayerStatisticsResult result)

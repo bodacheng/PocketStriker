@@ -210,8 +210,13 @@ public static class SVCenter
             ApplyTempUnitUsage(secondItem, firstCell);
             firstCell.AddItem(secondItem);
             secondItem.transform.position = secondCell.transform.position;
-            secondItem.transform.DOMove(firstCell.transform.position,0.5f).OnComplete(() =>
+            secondItem.transform.DOMove(firstCell.transform.position,0.5f).SetLink(secondItem.gameObject).OnComplete(() =>
             {
+                if (secondItem == null)
+                {
+                    return;
+                }
+
                 secondItem.transform.localPosition = Vector3.zero;
             });
             PlayDropSe();

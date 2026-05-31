@@ -10,9 +10,19 @@ using UnityEngine.SceneManagement;
 public partial class PlayFabReadClient
 {
     const string PLAYFAB_CUSTOM_ID = "PLAYFAB_CUSTOM_ID";
+    const string PENDING_TUTORIAL_PROGRESS = "PENDING_TUTORIAL_PROGRESS";
     const int LoginRetryMaxAttempts = 4;
     const float LoginRetryBaseDelaySeconds = 1.5f;
     const float LoginRetryMaxDelaySeconds = 6f;
+    static readonly string[] TutorialProgressOrder =
+    {
+        "Started",
+        "SkillEditFinished",
+        "StageOneFinished",
+        "GotchaFinished",
+        "SkillEditFinished2",
+        "Finished"
+    };
     static readonly HashSet<PlayFabErrorCode> TransientLoginErrors = new HashSet<PlayFabErrorCode>
     {
         PlayFabErrorCode.Unknown,
@@ -161,6 +171,108 @@ public partial class PlayFabReadClient
     static void AccountInfoFinished(bool value)
     {
         _missionWatcher.Finish("accountInfoFinished", value);
+    }
+
+    public static void RememberPendingTutorialProgress(string progress)
+    {
+        if (string.IsNullOrEmpty(progress))
+        {
+            return;
+        }
+
+        PlayerPrefs.SetString(PENDING_TUTORIAL_PROGRESS, progress);
+        PlayerPrefs.Save();
+    }
+
+    public static void ClearPendingTutorialProgress(string progress)
+    {
+        if (PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null) != progress)
+        {
+            return;
+        }
+
+        PlayerPrefs.DeleteKey(PENDING_TUTORIAL_PROGRESS);
+        PlayerPrefs.Save();
+    }
+
+    public static void ReconcileTutorialProgressAfterDataLoad()
+    {
+        if (PlayerAccountInfo.Me == null)
+        {
+            return;
+        }
+
+        var targetProgress = PlayerAccountInfo.Me.tutorialProgress;
+        var pendingProgress = PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null);
+        if (IsTutorialProgressAhead(pendingProgress, targetProgress))
+        {
+            targetProgress = pendingProgress;
+        }
+
+        if (targetProgress == "SkillEditFinished" && PlayerAccountInfo.Me.arcadeProcess >= 1)
+        {
+            targetProgress = "StageOneFinished";
+        }
+        else if (targetProgress == "SkillEditFinished2" && PlayerAccountInfo.Me.arcadeProcess >= 2)
+        {
+            targetProgress = "Finished";
+        }
+
+        if (targetProgress == PlayerAccountInfo.Me.tutorialProgress && string.IsNullOrEmpty(pendingProgress))
+        {
+            return;
+        }
+
+        PlayerAccountInfo.Me.tutorialProgress = targetProgress;
+        RememberPendingTutorialProgress(targetProgress);
+        RetryPendingTutorialProgressSave();
+    }
+
+    static void RetryPendingTutorialProgressSave()
+    {
+        var pendingProgress = PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null);
+        if (string.IsNullOrEmpty(pendingProgress))
+        {
+            return;
+        }
+
+        UpdateUserData(
+            new UpdateUserDataRequest()
+            {
+                Data = new Dictionary<string, string>()
+                {
+                    { "TutorialProgress", pendingProgress }
+                }
+            },
+            () => ClearPendingTutorialProgress(pendingProgress),
+            () => Debug.LogWarning($"Failed to retry tutorial progress '{pendingProgress}'. It will be retried later."),
+            false,
+            false
+        );
+    }
+
+    static bool IsTutorialProgressAhead(string candidate, string current)
+    {
+        var candidateIndex = TutorialProgressIndex(candidate);
+        return candidateIndex >= 0 && candidateIndex > TutorialProgressIndex(current);
+    }
+
+    static int TutorialProgressIndex(string progress)
+    {
+        if (string.IsNullOrEmpty(progress))
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < TutorialProgressOrder.Length; i++)
+        {
+            if (TutorialProgressOrder[i] == progress)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static readonly int MAXTry = 5;

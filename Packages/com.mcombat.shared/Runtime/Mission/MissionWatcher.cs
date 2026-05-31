@@ -7,6 +7,7 @@ public class MissionWatcher
     private readonly Action _success, _fail;
     private int _unfinishedCount;
     private bool _successInvoked;
+    private bool _failInvoked;
     
     public MissionWatcher(IEnumerable<string> missions, Action success = null, Action fail = null)
     {
@@ -31,6 +32,11 @@ public class MissionWatcher
     
     public void Finish(string missionCode, bool value)
     {
+        if (_successInvoked || _failInvoked)
+        {
+            return;
+        }
+
         var hadMission = _missionDic.TryGetValue(missionCode, out var previousValue);
         _missionDic[missionCode] = value;
         if (!value)
@@ -40,9 +46,8 @@ public class MissionWatcher
                 _unfinishedCount++;
             }
 
-            // 主动报告一个通信错误的时候才直接执行错误处理,
-            // 如果_success过一次，在原MissionWatcher上以value = false 运行Finish的话
-            // 依然会触发_fail
+            // 主动报告通信错误时直接执行错误处理；成功或失败后迟到的回调会被忽略。
+            _failInvoked = true;
             _fail?.Invoke();
             return;
         }

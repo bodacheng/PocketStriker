@@ -9,6 +9,7 @@ Current modules:
 - `Account`: shared player-account state model used by PlayFab/login flows.
 - `Addressables`: shared Addressables dependency download sizing, progress, and handle-release flow.
 - `AI`: shared AI decision throttling and condition-response registration rules.
+- `AIStory`: shared AI text/image clients, story generation, style configuration, and `StoryInfo` data model.
 - `CombatGroup`: boss/group battle unit-count rules extracted from MCombat's group fight flow.
 - `Combat`: shared team/layer/spatial helpers and team-elimination winner tracking.
 - `CombatHit`: shared hit-detection definitions and pure damage utility rules.

@@ -30,17 +30,24 @@ public class ProgressLayer : UILayer
     void DarkOff(float darkness, float duration)
     {
         bigCurtain.raycastTarget = true;
-        bigCurtain.DOColor(new Color(0,0,0, darkness), duration);
+        bigCurtain.DOColor(new Color(0,0,0, darkness), duration).SetLink(gameObject);
     }
 
     public static void LightUp(float duration)
     {
         var popupLayer = UILayerLoader.Get<ProgressLayer>();
-        if (popupLayer != null)
+        if (popupLayer != null && popupLayer.bigCurtain != null)
         {
-            popupLayer.bigCurtain.DOColor(new Color(0,0,0, 0), duration).OnComplete(() =>
+            var layer = popupLayer;
+            var curtain = popupLayer.bigCurtain;
+            curtain.DOColor(new Color(0,0,0, 0), duration).SetLink(layer.gameObject).OnComplete(() =>
             {
-                popupLayer.bigCurtain.raycastTarget = false;
+                if (layer == null || curtain == null)
+                {
+                    return;
+                }
+
+                curtain.raycastTarget = false;
                 Close();
             });
         }

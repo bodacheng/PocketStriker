@@ -14,7 +14,12 @@ public partial class CloudScript
     /// </summary>
     /// <param name="stageNo"></param>
     /// <param name="claimQuestRewardSuccess"></param>
-    public static void ArcadeProgress(string stageNo, Action<ExecuteCloudScriptResult> claimQuestRewardSuccess)
+    public static void ArcadeProgress(
+        string stageNo,
+        Action<ExecuteCloudScriptResult> claimQuestRewardSuccess,
+        Action<PlayFab.PlayFabError> fail = null,
+        Action<PlayFab.PlayFabError> claimQuestRewardFailAfterProgress = null,
+        bool showErrorPopup = true)
     {
         // 之所以把更新关卡进度和获取报酬分开处理，是因为当时把这些处理写到一个cloud函数里的时候，
         // 竟然有一定概率playfab不给执行关卡进度更新所触发的角色获取rule，于是我们才决定在这个部分不要把各种处理集中在一个瞬间
@@ -92,9 +97,19 @@ public partial class CloudScript
                             stageType = "arcade"
                         }
                     },
-                    claimQuestRewardSuccess
+                    claimQuestRewardSuccess,
+                    claimQuestRewardFailAfterProgress ?? fail,
+                    null,
+                    null,
+                    true,
+                    showErrorPopup
                 );
-            }
+            },
+            fail,
+            null,
+            null,
+            true,
+            showErrorPopup
         );
     }
 }

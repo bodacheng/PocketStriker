@@ -31,25 +31,36 @@ public partial class PlayFabReadClient
 
     public static void GetMailCatalogItems(string itemCatalog, Action<bool> finished)
     {
-        PlayFabClientAPI.GetCatalogItems(
-            new GetCatalogItemsRequest
-            {
-                CatalogVersion = itemCatalog
-            },
-            (x)=>
-            {
-                foreach (var v in x.Catalog)
+        void Attempt(int attempt)
+        {
+            PlayFabClientAPI.GetCatalogItems(
+                new GetCatalogItemsRequest
                 {
-                    DicAdd<string, CatalogItem>.Add(CatalogItems, v.DisplayName, v);
+                    CatalogVersion = itemCatalog
+                },
+                (x)=>
+                {
+                    foreach (var v in x.Catalog)
+                    {
+                        DicAdd<string, CatalogItem>.Add(CatalogItems, v.DisplayName, v);
+                    }
+                    finished?.Invoke(true);
+                },
+                (x) =>
+                {
+                    if (ShouldRetryPlayFabRequest(x, attempt))
+                    {
+                        RetryPlayFabRequest(() => Attempt(attempt + 1), attempt, "GetCatalogItems");
+                        return;
+                    }
+
+                    finished?.Invoke(false);
+                    ErrorReport(x);
                 }
-                finished?.Invoke(true);
-            },
-            (x) =>
-            {
-                finished?.Invoke(false);
-                ErrorReport(x);
-            }
-        );
+            );
+        }
+
+        Attempt(1);
     }
     
     /// <summary>

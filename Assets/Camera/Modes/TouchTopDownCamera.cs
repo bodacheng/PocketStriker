@@ -49,20 +49,39 @@ public class TouchTopDownCamera : CameraMode
         
         Vector3 temp = Vector3.zero;
         Height = cameraManager.TopDownModeEndRef.position.y;
+        mainSequence?.Kill();
         mainSequence = DOTween.Sequence().OnStart(() =>
         {
+            if (_camera == null)
+            {
+                return;
+            }
+
             canTouch = false;
             sameHeightCenter = new Vector3(0,height,0);
             temp = _camera.transform.forward;
             temp.y = 0;
-        }).Append(_camera.transform.DOMove(cameraManager.TopDownModeEndRef.position, startPosSetDuration)).
+        }).SetLink(_camera.gameObject).
+        Append(_camera.transform.DOMove(cameraManager.TopDownModeEndRef.position, startPosSetDuration)).
         Join(_camera.transform.DORotateQuaternion(cameraManager.TopDownModeEndRef.rotation, startPosSetDuration)).
         AppendCallback(() =>
         {
+            if (_camera == null)
+            {
+                return;
+            }
+
             zoomScreenDis = Screen.width / 7;
             canTouch = true;
         });
         mainSequence.Play();
+    }
+
+    public override void Exit(Camera camera)
+    {
+        mainSequence?.Kill();
+        mainSequence = null;
+        canTouch = false;
     }
     
     private float backDist = 0.0f;

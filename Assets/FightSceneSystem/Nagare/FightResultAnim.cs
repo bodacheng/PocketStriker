@@ -68,23 +68,41 @@ namespace FightScene
             {
                 case FightEventType.Gangbang:
                 case FightEventType.Quest:
-                    if (FightLogger.value.GetWinnerTeam() == Team.player1 && arenaFightOver.LoadStory())
-                    {
-                        arenaFightOver.Setup(async () =>
-                        {
-                            await EndPart();
-                        });
-                    }
-                    else
-                    {
-                        arenaFightOver.Setup();
-                        await EndPart();
-                    }
+                case FightEventType.Event:
+                    await ShowStoryBeforeResultIfNeeded(arenaFightOver, EndPart);
                     break;
                 default:
                     await EndPart();
                     break;
             }
+        }
+
+        private async UniTask ShowStoryBeforeResultIfNeeded(ArenaFightOver arenaFightOver, Func<UniTask> endPart)
+        {
+            if (FightLogger.value.GetWinnerTeam() != Team.player1)
+            {
+                arenaFightOver.Setup();
+                await endPart();
+                return;
+            }
+
+            var fightScene = global::FightScene.FightScene.target;
+            if (fightScene != null)
+            {
+                await fightScene.EnsureAIStory();
+            }
+
+            if (arenaFightOver.LoadStory())
+            {
+                arenaFightOver.Setup(async () =>
+                {
+                    await endPart();
+                });
+                return;
+            }
+
+            arenaFightOver.Setup();
+            await endPart();
         }
     }
 }
