@@ -137,29 +137,32 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  fighterRigidMass: 1000
-  onTouchEnemyBodyRigidDrag: 1000
+  fighterRigidMass: 99999
+  onTouchEnemyBodyRigidDrag: 99999
   fighterMoveSpeed: 10
   closeDis: 2
   AT_coefficient: 1
-  HP_coefficient: 1
+  HP_coefficient: 0.5
+  levelPowerAverager: 0.2
+  levelDiminishStart: 5
+  levelDiminishingRange: 20
   Team1Invincible: 0
   NormalSkillExGet: 30
   Sp1SkillExGet: 0
   Sp2SkillExGet: 0
   Sp3SkillExGet: 0
   getHurtExGet: 10
-  slightHitLastingTime: 0.3
-  lightHitLastingTime: 0.5
-  heavyHitLastingTime: 0.5
-  superHitLastingTime: 0.5
-  highHitLastingTime: 0.5
+  slightHitLastingTime: 0.1
+  lightHitLastingTime: 0.3
+  heavyHitLastingTime: 0.4
+  superHitLastingTime: 0.6
+  highHitLastingTime: 0.4
   hurtFreezeInDuration: 0.01
   hurtFreezeOutDuration: 0.3
   normalAttackPosFixingTime: 0.01
   knockOffExtent: 15
   MaxKnockoffLaidGroundTime: 1
-  CanGetUpAfterKnockoffToGround: 0.5
+  CanGetUpAfterKnockoffToGround: 0.2
   GetupTime: 0.5
   SureToPushForwardDis: 5
   defendHP: 0
@@ -175,5 +178,6 @@ MonoBehaviour:
   dreamComboResistUpCount: 5
   player1DreamComboAIRateNumM: 20
   arenaEnemyDreamComboAIRate: 30
-  energyResolveAfterExtendBoundary: 1
+  energyResolveAfterExtendBoundary: 2
+  evolutionModeEnemyHpIncreaseRate: 0.5
   _physicMaterial: {fileID: 13400000, guid: 14a74fe52c92e416ea176cf990c64822, type: 2}
