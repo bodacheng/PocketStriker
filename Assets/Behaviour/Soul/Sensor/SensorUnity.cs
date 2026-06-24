@@ -123,8 +123,8 @@ public class SensorUnity : MonoBehaviour
         {
             if (FightLoad.Fight.FightMode == FightMode.Multi)
             {
-                detectColliderCount = (FightLoad.Fight.FightMembers.HeroSets.GetValues().Count +
-                                       FightLoad.Fight.FightMembers.EnemySets.GetValues().Count) * 10;
+                detectColliderCount = (FightLoad.Fight.FightMembers.HeroSets.Count +
+                                       FightLoad.Fight.FightMembers.EnemySets.Count) * 10;
             }
             else
             {

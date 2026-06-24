@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Skill;
-using System.Linq;
 using NoSuchStudio.Common;
 
 // 配置文件属于资源信息，不是账户信息，应该分离开处理。
@@ -53,9 +52,8 @@ namespace dataAccess
                     continue;
                 }
 
-                var exs = filterForm.ExType.ToList();
                 if (skillConfig.TYPE == filterForm.Type
-                    && exs.Contains(skillConfig.SP_LEVEL)
+                    && System.Array.IndexOf(filterForm.ExType, skillConfig.SP_LEVEL) >= 0
                     && SkillConfig.RangeLimit(skillConfig.AIAttrs.AI_MIN_DIS, skillConfig.AIAttrs.AI_MAX_DIS, filterForm.Close, filterForm.Near, filterForm.Far))
                 {
                     skillStonesOfTypeAndExType.Add(pair.Value.InstanceId);

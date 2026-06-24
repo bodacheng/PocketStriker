@@ -24,8 +24,7 @@ public partial class PlayFabReadClient
 
     public static CatalogItem GetCatalogItemByDisplayName(string displayName)
     {
-        if (!CatalogItems.ContainsKey(displayName)) return null;
-        var item = CatalogItems[displayName];
+        CatalogItems.TryGetValue(displayName, out var item);
         return item;
     }
 

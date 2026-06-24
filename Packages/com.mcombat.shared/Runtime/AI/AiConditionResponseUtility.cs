@@ -117,9 +117,9 @@ namespace MCombat.Shared.AI
             string stateKey,
             int priority)
         {
-            if (conditionAndRespond.ContainsKey(condition))
+            if (conditionAndRespond.TryGetValue(condition, out var responses))
             {
-                conditionAndRespond[condition].Add(stateKey);
+                responses.Add(stateKey);
             }
             else
             {

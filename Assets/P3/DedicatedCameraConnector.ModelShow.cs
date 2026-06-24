@@ -74,9 +74,8 @@ namespace ModelView
             {
                 ProgressLayer.Loading(string.Empty);
                 _focusingC = await GeneralModelPool.GetModel(recordID, transform, modelPos- new Vector3(0,0, 200));
-                if (_saves.ContainsKey(recordID))
+                if (_saves.TryGetValue(recordID, out var oldModel))
                 {
-                    var oldModel = _saves[recordID];
                     if (oldModel != null)
                     {
                         Destroy(oldModel.WholeT.gameObject);

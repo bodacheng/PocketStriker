@@ -15,7 +15,8 @@ using UnityEditor.UI;
     {
         Tap,
         Confirm,
-        ExTab
+        ExTab,
+        None,
     }
 
 /// <summary>
@@ -158,7 +159,7 @@ using UnityEditor.UI;
         {
             transform.gameObject.SetActive(active);
         }
-        
+
         public override void OnPointerClick(PointerEventData eventData)
         {
             if (activateDoubleClick)

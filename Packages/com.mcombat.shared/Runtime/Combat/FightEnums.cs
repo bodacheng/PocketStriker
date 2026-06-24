@@ -37,3 +37,45 @@ public enum TeamMode
     MultiRaid = 1,
     Rotation = 2
 }
+
+namespace MCombat.Shared.Combat
+{
+    public static class FightControlPolicy
+    {
+        public static bool IsGroupBattle(global::FightMode fightMode)
+        {
+            return fightMode == global::FightMode.Group;
+        }
+
+        public static bool IsGroupBattle(global::FightMode fightMode, global::FightEventType eventType)
+        {
+            return IsGroupBattle(fightMode) || eventType == global::FightEventType.Gangbang;
+        }
+
+        public static bool AllowsManualUnitControl(global::FightMode fightMode)
+        {
+            return !IsGroupBattle(fightMode);
+        }
+
+        public static bool AllowsManualUnitControl(global::FightMode fightMode, global::FightEventType eventType)
+        {
+            return !IsGroupBattle(fightMode, eventType);
+        }
+
+        public static bool ShouldForceAutoBattle(global::FightMode fightMode, global::FightEventType eventType)
+        {
+            return eventType is global::FightEventType.Screensaver or global::FightEventType.SkillTest
+                   || !AllowsManualUnitControl(fightMode, eventType);
+        }
+
+        public static bool ShouldRunFirstQuestTutorial(
+            global::FightMode fightMode,
+            string fightId,
+            global::FightEventType eventType)
+        {
+            return AllowsManualUnitControl(fightMode, eventType)
+                   && fightId == "1"
+                   && eventType == global::FightEventType.Quest;
+        }
+    }
+}

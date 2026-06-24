@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using dataAccess;
 using UnityEngine;
 using Skill;
@@ -11,10 +10,10 @@ using Random = System.Random;
 public partial class SkillSet
 {
     // exceptSkIDs : 除了这些技能ID。切记是技能ID
-    public static string RandomSkillIDOfStone(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIDs = null)
-    {
-        var skillIDsAndNames = SkillConfigTable.GetSkillIDAndNameDic(filterForm);
-        var stoneSkillIDs = skillIDsAndNames.Keys.ToList();
+        public static string RandomSkillIDOfStone(SkillStonesBox.StoneFilterForm filterForm, List<string> exceptSkIDs = null)
+        {
+            var skillIDsAndNames = SkillConfigTable.GetSkillIDAndNameDic(filterForm);
+            var stoneSkillIDs = new List<string>(skillIDsAndNames.Keys);
         if (stoneSkillIDs.Count == 0)
         {
             return null;
@@ -136,7 +135,11 @@ public partial class SkillSet
             foreach (var skillId in currentStartSkills)
             {
                 var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillId);
-                hasNormal = skillConfig.SP_LEVEL == 0;
+                if (skillConfig != null && skillConfig.SP_LEVEL == 0)
+                {
+                    hasNormal = true;
+                    break;
+                }
             }
 
             if (!hasNormal)
@@ -155,8 +158,7 @@ public partial class SkillSet
         var remainSlotSpLevel = RemainSlotSPLevelCal(skillSet);
         if (form != null)
         {
-            var formSps = form.ExType.ToList();
-            foreach (var spLevel in formSps)
+            foreach (var spLevel in form.ExType)
             {
                 if (!remainSlotSpLevel.Contains(spLevel))
                     useRemainSlotSPLevelCal = true;

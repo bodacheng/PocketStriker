@@ -68,14 +68,7 @@ public static class DicAdd<Key, Value>
             return;
         }
 
-        if (dic.ContainsKey(key))
-        {
-            dic[key] = value;
-        }
-        else
-        {
-            dic.Add(key, value);
-        }
+        dic[key] = value;
     }
 }
 

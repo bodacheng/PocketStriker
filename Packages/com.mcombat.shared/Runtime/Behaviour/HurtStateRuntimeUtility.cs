@@ -260,5 +260,24 @@ namespace MCombat.Shared.Behaviour
         {
             return weaponHp > 0f && currentHp <= 0f;
         }
+
+        public static Vector3 ResolveDrawDamageTarget(Vector3 markerPosition, float currentY)
+        {
+            markerPosition.y = currentY;
+            return markerPosition;
+        }
+
+        public static Vector3 ResolveHighDamageDelta(
+            Vector3 horizontalDirection,
+            AnimationCurve zCurve,
+            AnimationCurve yCurve,
+            float timeCounter,
+            float deltaTime)
+        {
+            var nextTime = timeCounter + deltaTime;
+            var zDelta = zCurve == null ? 0f : zCurve.Evaluate(nextTime) - zCurve.Evaluate(timeCounter);
+            var yDelta = yCurve == null ? 0f : yCurve.Evaluate(nextTime) - yCurve.Evaluate(timeCounter);
+            return horizontalDirection * zDelta + Vector3.up * yDelta;
+        }
     }
 }

@@ -219,6 +219,70 @@ namespace MCombat.Shared.Behaviour
             return clampedPos;
         }
 
+        public static Vector3 ClampPositionToBattleRange(
+            Vector3 worldPos,
+            bool clampToBattleRing,
+            float battleRingRadius)
+        {
+            if (clampToBattleRing)
+            {
+                return ClampPositionToBattleRing(worldPos, battleRingRadius);
+            }
+
+            if (worldPos.y < 0f)
+            {
+                worldPos.y = 0f;
+            }
+
+            return worldPos;
+        }
+
+        public static Vector3 MoveTowardsWithMaxSpeed(
+            Vector3 currentPosition,
+            Vector3 targetPosition,
+            float maxSpeed,
+            float deltaTime)
+        {
+            if (maxSpeed <= 0f)
+            {
+                return targetPosition;
+            }
+
+            var maxStep = maxSpeed * Mathf.Max(0f, deltaTime);
+            return Vector3.MoveTowards(currentPosition, targetPosition, maxStep);
+        }
+
+        public static Vector3 ClampDeltaMagnitude(Vector3 delta, float maxMagnitude)
+        {
+            if (maxMagnitude <= 0f || delta.magnitude <= maxMagnitude)
+            {
+                return delta;
+            }
+
+            return Vector3.ClampMagnitude(delta, maxMagnitude);
+        }
+
+        public static bool ShouldApplyRootMotionRecovery(
+            bool hasActiveCoordinatedDisplacement,
+            bool touchingEnemy,
+            bool hasRigidbody,
+            Vector3 rigidbodyVelocity,
+            Vector3 delta)
+        {
+            return !hasActiveCoordinatedDisplacement
+                   && !touchingEnemy
+                   && hasRigidbody
+                   && rigidbodyVelocity.sqrMagnitude <= MovementEpsilon
+                   && delta.sqrMagnitude > Mathf.Epsilon;
+        }
+
+        public static bool ShouldSkipContactCorrection(
+            bool contactCorrectionBlocked,
+            bool gettingDamage)
+        {
+            return contactCorrectionBlocked || gettingDamage;
+        }
+
         public static Vector3 CalcFixedPlanarMoveTarget(
             Vector3 startPos,
             Vector3 direction,

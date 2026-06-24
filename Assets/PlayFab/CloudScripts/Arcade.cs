@@ -51,9 +51,8 @@ public partial class CloudScript
                 if (x.FunctionResult != null && !String.IsNullOrEmpty(x.FunctionResult.ToString()))
                 {
                     var jsonResult = (PlayFab.Json.JsonObject)x.FunctionResult;
-                    if (jsonResult.ContainsKey("award_unit"))
+                    if (jsonResult.TryGetValue("award_unit", out var award_unit))
                     {
-                        var award_unit = jsonResult["award_unit"];
                         try
                         {
                             var unitAward = JsonConvert.DeserializeObject<List<GrantedItemInstance>>(award_unit.ToString());

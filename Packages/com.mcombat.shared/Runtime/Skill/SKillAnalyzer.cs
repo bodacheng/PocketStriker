@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -98,7 +97,7 @@ public class SKillAnalyzer
                 }
 
                 var animationClip = handle.Result;
-                if (!animationClips.ContainsKey(animationClip.name))
+                if (!animationClips.TryGetValue(animationClip.name, out _))
                 {
                     animationClips.Add(animationClip.name, animationClip);
                 }
@@ -118,8 +117,7 @@ public class SKillAnalyzer
         float endMax)
     {
         var animDic = await AllSkillAnims(type);
-        var animationClips = animDic.Values.ToList();
-        foreach (var clip in animationClips)
+        foreach (var clip in animDic.Values)
         {
             if (SkillFrameFilter(clip, targetEventName, startMin, startMax, endMin, endMax))
             {
@@ -316,8 +314,22 @@ public class SKillAnalyzer
             return false;
         }
 
-        var earliestStartFrame = allAttackStartFrames.Min();
-        var latestEndFrame = allAttackStartFrames.Max();
+        var earliestStartFrame = allAttackStartFrames[0];
+        var latestEndFrame = allAttackStartFrames[0];
+        for (var i = 1; i < allAttackStartFrames.Count; i++)
+        {
+            var attackStartFrame = allAttackStartFrames[i];
+            if (attackStartFrame < earliestStartFrame)
+            {
+                earliestStartFrame = attackStartFrame;
+            }
+
+            if (attackStartFrame > latestEndFrame)
+            {
+                latestEndFrame = attackStartFrame;
+            }
+        }
+
         var attackEndToCancelStart = cancelFlagFrame - latestEndFrame;
         var startFilterOutcome = earliestStartFrame > startMin && earliestStartFrame <= startMax;
         var endFilterOutcome = attackEndToCancelStart > endMin && attackEndToCancelStart <= endMax;

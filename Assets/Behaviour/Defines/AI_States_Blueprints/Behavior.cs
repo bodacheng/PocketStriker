@@ -57,7 +57,16 @@ namespace Soul
             planarVelocity.y = 0f;
             _Rigidbody.linearVelocity = planarVelocity;
         }
-        void ICombatBehaviorRuntime.AddPosition(Vector3 delta) => gameObject.transform.position += delta;
+        void ICombatBehaviorRuntime.AddPosition(Vector3 delta)
+        {
+            if (_BasicPhysicSupport != null)
+            {
+                _BasicPhysicSupport.AddPositionBySkill(delta, false);
+                return;
+            }
+
+            gameObject.transform.position += delta;
+        }
         void ICombatBehaviorRuntime.SetMass(float value) => _Rigidbody.mass = value;
         void ICombatBehaviorRuntime.SetRootMotion(bool enabled) => _Animator.applyRootMotion = enabled;
         void ICombatBehaviorRuntime.SetAnimatorSpeed(float value) => _Animator.SetFloat("speed", value);
@@ -480,13 +489,18 @@ namespace Soul
             }
 
             targetPos = ClampPositionToBattleRing(targetPos);
+            if (_BasicPhysicSupport != null && _DATA_CENTER != null && mover == _DATA_CENTER.WholeT)
+            {
+                return _BasicPhysicSupport.MoveRootToPositionBySkill(targetPos, duration);
+            }
+
             if (rigidbody != null)
             {
                 rigidbody.linearVelocity = Vector3.zero;
                 rigidbody.angularVelocity = Vector3.zero;
             }
 
-            return mover.DOMove(targetPos, duration).SetEase(Ease.Linear).OnUpdate(() =>
+            return mover.DOMove(targetPos, duration).SetEase(Ease.Linear).SetLink(mover.gameObject).OnUpdate(() =>
             {
                 if (rigidbody == null)
                 {

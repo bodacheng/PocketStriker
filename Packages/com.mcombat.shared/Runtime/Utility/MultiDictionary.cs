@@ -1,20 +1,21 @@
 using System.Collections.Generic;
-using System.Linq;
 
 [System.Serializable]
 public class MultiDic<Key1, Key2, Value>
 {
     public Dictionary<(Key1, Key2), Value> mDict = new Dictionary<(Key1, Key2), Value>();
     public SerializableSet[] _SerializableSets;
+    public int Count => mDict.Count;
+    public ICollection<Value> Values => mDict.Values;
 
     public List<Value> GetValues()
     {
-        return mDict.Values.ToList();
+        return new List<Value>(mDict.Values);
     }
 
     public SerializableSet[] ConvertDictionaryToSerializableArray()
     {
-        var temp = new List<SerializableSet>();
+        var temp = new List<SerializableSet>(mDict.Count);
         foreach (var keyValuePair in mDict)
         {
             temp.Add(new SerializableSet
@@ -42,21 +43,14 @@ public class MultiDic<Key1, Key2, Value>
 
     public void Set(Key1 key1, Key2 key2, Value value)
     {
-        if (mDict.ContainsKey((key1, key2)))
-        {
-            mDict[(key1, key2)] = value;
-        }
-        else
-        {
-            mDict.Add((key1, key2), value);
-        }
-
+        var key = (key1, key2);
+        mDict[key] = value;
         ConvertDictionaryToSerializableArray();
     }
 
     public Value Get(Key1 key1, Key2 key2, Value defaultValue = default)
     {
-        return mDict.ContainsKey((key1, key2)) ? mDict[(key1, key2)] : defaultValue;
+        return mDict.TryGetValue((key1, key2), out var value) ? value : defaultValue;
     }
 
     public void Clear()

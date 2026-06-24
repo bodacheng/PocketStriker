@@ -50,8 +50,7 @@ namespace Skill
 
             var trimmed = attackType.Trim();
             return CanonicalAttackTypes.Contains(trimmed)
-                   || (!normalizeLegacyAliases && LegacyAttackTypeAliases.ContainsKey(trimmed))
-                   || (normalizeLegacyAliases && LegacyAttackTypeAliases.ContainsKey(trimmed));
+                   || LegacyAttackTypeAliases.ContainsKey(trimmed);
         }
 
         public static BehaviorType ToBehaviorType(string attackType, bool normalizeLegacyAliases)

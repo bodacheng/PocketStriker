@@ -28,9 +28,9 @@ namespace dataAccess
         /// <param name="instanceId">技能石账户id</param>
         static async UniTask GenerateStoneModelByAccID(string instanceId)
         {
-            if (RenderModelDic.ContainsKey(instanceId))
+            if (RenderModelDic.TryGetValue(instanceId, out var existingItem))
             {
-                if (RenderModelDic[instanceId] != null)
+                if (existingItem != null)
                     return;
             }
             var info = Get(instanceId);
@@ -43,7 +43,7 @@ namespace dataAccess
             }
 
             item.Inherent = info.Born == "true";
-            item._SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(Dic[instanceId].SkillId);
+            item._SkillConfig = SkillConfigTable.GetSkillConfigByRecordId(info.SkillId);
             item.gameObject.name = "stone_" + item._SkillConfig.TYPE + "_" + item._SkillConfig.REAL_NAME;
             item.instanceId = instanceId;
             item.gameObject.transform.SetParent(PreScene.target.stonesTempContainer);

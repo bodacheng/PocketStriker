@@ -8,12 +8,12 @@ public partial class CloudScript
 {
     public static void ArenaDefendTeamSave(MultiDic<int, int, UnitInfo> info, Action<bool> finished)
     {
-        if (info.GetValues().Count != 3)
+        if (info.Count != 3)
         {
             Debug.Log("No enough member.");
         }
         
-        foreach (var kv in info.GetValues())
+        foreach (var kv in info.Values)
         {
             var skillList = Stones.GetEquippingStones(kv.id);
             if (skillList.Count != 9)
@@ -141,7 +141,7 @@ public partial class CloudScript
             },
             (result) => {
                 var jsonResult = (PlayFab.Json.JsonObject)result.FunctionResult;
-                var currentPoint = (jsonResult.ContainsKey("currentPoint") ? jsonResult["currentPoint"] : 0).ToString();
+                var currentPoint = (jsonResult.TryGetValue("currentPoint", out var pointValue) ? pointValue : 0).ToString();
                 int.TryParse(currentPoint, out var currentPointInt);
 
                 var awardDM = 0;

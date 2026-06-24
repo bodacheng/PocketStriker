@@ -68,7 +68,7 @@ namespace dataAccess
 
         public static StoneOfPlayerInfo Get(string id)
         {
-            return id == null ? null : Dic.ContainsKey(id) ? Dic[id] : null;
+            return id != null && Dic.TryGetValue(id, out var stone) ? stone : null;
         }
 
         public static List<string> GetMyStonesBySkillID(string skillID)
@@ -96,7 +96,7 @@ namespace dataAccess
 
         public static SKStoneItem GetRenderModel(string itemId)
         {
-            return itemId == null ? null : RenderModelDic.ContainsKey(itemId) ? RenderModelDic[itemId] : null;
+            return itemId != null && RenderModelDic.TryGetValue(itemId, out var item) ? item : null;
         }
 
         public static void HighLight(string skillId)
@@ -129,12 +129,11 @@ namespace dataAccess
         {
             foreach (var kv in toEditStones)
             {
-                if (!Dic.ContainsKey(kv.Key) || Dic[kv.Key] == null)
+                if (!Dic.TryGetValue(kv.Key, out var stoneOfPlayerInfo) || stoneOfPlayerInfo == null)
                 {
                     Debug.Log("更新对象技能石不存在。stoneOfPlayerID :" + kv.Key);
                     return;
                 }
-                var stoneOfPlayerInfo = Dic[kv.Key];
                 stoneOfPlayerInfo.unitInstanceId = kv.Value.Item1;
                 stoneOfPlayerInfo.slot = kv.Value.Item2;
             }

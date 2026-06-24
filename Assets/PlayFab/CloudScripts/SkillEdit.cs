@@ -7,10 +7,10 @@ using Newtonsoft.Json;
 public partial class CloudScript
 {
     // k v : stoneid , equipingMonster, slot
-    public static void UpdateSkillEdit(IDictionary<string, Tuple<string, string>> ToEditStones, Action<IDictionary<string, Tuple<string, string>>> success)
+    public static void UpdateSkillEdit(IDictionary<string, Tuple<string, string>> toEditStones, Action<IDictionary<string, Tuple<string, string>>> success)
     {
-        var Items = new List<PlayFab.ServerModels.UpdateUserInventoryItemDataRequest>();
-        foreach (var pair in ToEditStones)
+        var items = new List<PlayFab.ServerModels.UpdateUserInventoryItemDataRequest>();
+        foreach (var pair in toEditStones)
         {
             var itemUpdate = new PlayFab.ServerModels.UpdateUserInventoryItemDataRequest
             {
@@ -22,14 +22,14 @@ public partial class CloudScript
                     { "slot", string.IsNullOrEmpty(pair.Value.Item2) ? null : pair.Value.Item2 }
                 },
             };
-            Items.Add(itemUpdate);
+            items.Add(itemUpdate);
         }
 
         ExecuteCloudScriptMainSceneCommon(
             new ExecuteCloudScriptRequest()
             {
                 FunctionName = "skillEdit", // Arbitrary function name (must exist in your uploaded cloud.js file)
-                FunctionParameter = new { inputValue = Items }, // The parameter provided to your function
+                FunctionParameter = new { inputValue = items }, // The parameter provided to your function
                 GeneratePlayStreamEvent = true, // Optional - Shows this event in PlayStream
             },
         (ExecuteCloudScriptResult result) => {

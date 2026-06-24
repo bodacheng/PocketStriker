@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using HittingDetection;
 using MCombat.Shared.Behaviour;
@@ -152,7 +151,7 @@ namespace Soul
 
         public bool SuperComboStrategyCondition()
         {
-            var first = fixedSkillSequence.FirstOrDefault();
+            var first = fixedSkillSequence.Count > 0 ? fixedSkillSequence[0] : null;
             if (first == null)
                 return false;
             for (var y = 0; y < AllConditionCodes.Count; y++)
@@ -178,7 +177,7 @@ namespace Soul
 
         public void StartOffSequenceEngine()
         {
-            var first = fixedSkillSequence.FirstOrDefault();
+            var first = fixedSkillSequence.Count > 0 ? fixedSkillSequence[0] : null;
             sequenceBeginAct?.Invoke();
             if (first != null)
             {
@@ -195,6 +194,7 @@ namespace Soul
         {
             if (IfRunning())
             {
+                var hasInputFocus = HasInputFocus();
                 optionsForButtonRefresh.Clear();
                 if (!ForceTransitionEngine())
                 {
@@ -205,7 +205,7 @@ namespace Soul
                 }
 
                 #region 按钮技能刷新
-                if (HasInputFocus())
+                if (hasInputFocus)
                 {
                     InputsManager.ButtonsFeatureLoad(optionsForButtonRefresh);
                 }
@@ -213,7 +213,7 @@ namespace Soul
 
                 #region 决策制定
                 if (!onFixedSequence)
-                    _controller.Decision(this, _canTranTo, AI && !BeingControl()); // 梦幻连段开始的时候应该是有单独的函数和这个并列
+                    _controller.Decision(this, _canTranTo, AI && !(hasInputFocus && InputsManager.Inputting)); // 梦幻连段开始的时候应该是有单独的函数和这个并列
                 else
                 {
                     _controller.RunFixedSequence(this, _canTranTo);
@@ -230,7 +230,8 @@ namespace Soul
             {
                 if (_nowBehavior != null)
                 {
-                    if (AI && !BeingControl())
+                    var aiControlled = AI && !BeingControl();
+                    if (aiControlled)
                     {
                         _nowBehavior._State_FixedUpdate1();
                         _nowBehavior._State_FixedUpdate2();

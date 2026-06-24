@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using MCombat.Shared.AI;
 using Skill;
 using Random = UnityEngine.Random;
@@ -20,9 +19,10 @@ namespace Soul
         public void Decision(BehaviorRunner runner, List<SkillEntity> options, bool auto)
         {
             bool changed = false;
+            var hasInputFocus = runner.HasInputFocus();
             
             #region 按键触发
-            if (runner.HasInputFocus())
+            if (hasInputFocus)
             {
                 changed = BtnTrigger(runner, options, runner.InputsManager);
             }
@@ -44,7 +44,7 @@ namespace Soul
             if (!changed)
                 AutoReset(runner);
             
-            if (changed && runner.HasInputFocus())
+            if (changed && hasInputFocus)
             {
                 runner.InputsManager.BtnRefreshFrames();
             }
@@ -52,12 +52,13 @@ namespace Soul
 
         public void RunFixedSequence(BehaviorRunner runner, List<SkillEntity> options)
         {
-            bool changed = Sequence_RUNs(runner, options.FirstOrDefault());
+            var hasInputFocus = runner.HasInputFocus();
+            bool changed = Sequence_RUNs(runner, options.Count > 0 ? options[0] : null);
             
             if (!changed)
                 AutoReset(runner);
             
-            if (changed && runner.HasInputFocus())
+            if (changed && hasInputFocus)
             {
                 runner.InputsManager.BtnRefreshFrames();
             }
@@ -237,7 +238,7 @@ namespace Soul
                 }
             }
             
-            if (_triggered.Main.GetValues().Count > 0 && _decisionThrottle.ShouldRun(behaviorRunner.AIMode))
+            if (_triggered.Main.Count > 0 && _decisionThrottle.ShouldRun(behaviorRunner.AIMode))
             {
                 _finalConditionStateKeySet = _triggered.GiveOutMin();
                 if (_finalConditionStateKeySet.Count > 0)

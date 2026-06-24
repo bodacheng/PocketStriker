@@ -31,43 +31,50 @@ public partial class PlayFabReadClient
 
         Debug.LogWarning("PlayFab error: " + error.GenerateErrorReport());
         var shouldReturnToMainMenu = returnToMainMenu && ShouldReturnToMainMenu(error);
-        if (!Application.isPlaying)
+        if (Application.isPlaying)
         {
-            return;
-        }
-
-        switch (error.Error)
-        {
-            case PlayFabErrorCode.NotAuthorizedByTitle:
-                PopupLayer.ArrangeWarnWindow(
-                    () => { HandleErrorReturn(shouldReturnToMainMenu); },
-                    Translate.Get("NotAuthorizedByTitle"));
-                break;
-            case PlayFabErrorCode.ConnectionError:
-                PopupLayer.ArrangeWarnWindow(
-                    () => { HandleErrorReturn(shouldReturnToMainMenu); },
-                    Translate.Get("ConnectionError"));
-                break;
-            case PlayFabErrorCode.InvalidUsername:
-                PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidUsername"));
-                break;
-            case PlayFabErrorCode.DuplicateUsername:
-                PopupLayer.ArrangeWarnWindow(Translate.Get("DuplicateUsername"));
-                break;
-            case PlayFabErrorCode.InvalidParams:
-                PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidParams"));
-                break;
-            case PlayFabErrorCode.AccountNotFound:
-                PopupLayer.ArrangeWarnWindow(Translate.Get("AccountNotFound"));
-                break;
-            case PlayFabErrorCode.InvalidEmailOrPassword:
-                PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidEmailOrPassword"));
-                break;
-            default:
-                PopupLayer.ArrangeWarnWindow(
-                    () => { HandleErrorReturn(shouldReturnToMainMenu); },
-                    GetPlayFabErrorMessage(error));
-                break;
+            switch (error.Error)
+            {
+                case PlayFabErrorCode.NotAuthorizedByTitle:
+                    PopupLayer.ArrangeWarnWindow(
+                        ()=>
+                        {
+                            HandleErrorReturn(shouldReturnToMainMenu);
+                        },
+                        Translate.Get("NotAuthorizedByTitle"));
+                    break;
+                case PlayFabErrorCode.ConnectionError:
+                    PopupLayer.ArrangeWarnWindow(
+                        ()=>
+                        {
+                            HandleErrorReturn(shouldReturnToMainMenu);
+                        },
+                        Translate.Get("ConnectionError"));
+                    break;
+                case PlayFabErrorCode.InvalidUsername:
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidUsername"));
+                    break;
+                case PlayFabErrorCode.DuplicateUsername:
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("DuplicateUsername"));
+                    break;
+                case PlayFabErrorCode.InvalidParams:
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidParams"));
+                    break;
+                case PlayFabErrorCode.AccountNotFound:
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("AccountNotFound"));
+                    break;
+                case PlayFabErrorCode.InvalidEmailOrPassword:
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("InvalidEmailOrPassword"));
+                    break;
+                default:
+                    PopupLayer.ArrangeWarnWindow(
+                        ()=>
+                        {
+                            HandleErrorReturn(shouldReturnToMainMenu);
+                        },
+                        GetPlayFabErrorMessage(error));
+                    break;
+            }
         }
     }
 

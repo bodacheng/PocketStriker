@@ -77,14 +77,7 @@ namespace Log
 
         static void Increment(IDictionary<string, int> counter, string key)
         {
-            if (counter.ContainsKey(key))
-            {
-                counter[key] += 1;
-            }
-            else
-            {
-                counter.Add(key, 1);
-            }
+            counter[key] = counter.TryGetValue(key, out var count) ? count + 1 : 1;
         }
     }
 }

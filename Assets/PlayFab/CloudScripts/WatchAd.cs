@@ -27,6 +27,7 @@ public partial class CloudScript
             (x)=>
             {
                 ProgressLayer.Close();
+                PopupLayer.ArrangeWarnWindow(Translate.Get("GotAdWatchedReward"));
                 var returnValue = (PlayFab.Json.JsonObject) x.FunctionResult;
                 returnValue.TryGetValue("result", out var result);
                 var resultJson = (PlayFab.Json.JsonObject) result;

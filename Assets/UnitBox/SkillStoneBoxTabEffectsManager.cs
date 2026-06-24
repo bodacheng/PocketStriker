@@ -17,6 +17,11 @@ namespace mainMenu
             var zt = new ElementStoneTagsGroup();
             await zt.IniForSkillStoneBox(element, transform);
             ct.ThrowIfCancellationRequested();
+            if (_btnEffects.ContainsKey(element))
+            {
+                zt.Clear();
+                return;
+            }
             _btnEffects.Add(element, zt);
             ct.ThrowIfCancellationRequested();
         }
@@ -51,9 +56,9 @@ namespace mainMenu
             await StartUp(element, ct);
             ct.ThrowIfCancellationRequested();
             _focusingEffectsGroup?.CloseTagEffects();
-            if (_btnEffects.ContainsKey(element))
+            if (_btnEffects.TryGetValue(element, out var effectsGroup))
             {
-                _focusingEffectsGroup = _btnEffects[element];
+                _focusingEffectsGroup = effectsGroup;
             }else{
                 Debug.Log("fatal error element tags");
             }

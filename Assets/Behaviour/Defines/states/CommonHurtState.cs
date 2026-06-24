@@ -274,13 +274,22 @@ namespace Soul
         {
             if (HurtStateRuntimeUtility.ShouldSkipDrawUpdate(newValue.from_weapon.weaponHP, newValue.from_weapon.CurrentHP))
                 return;
+            if (newValue.from_weapon_marker == null)
+                return;
 
             Vector3 Destination()
             {
-                var vector3 = newValue.from_weapon_marker.transform.position;
-                vector3.y = gameObject.transform.position.y;
-                return vector3;
+                return HurtStateRuntimeUtility.ResolveDrawDamageTarget(
+                    newValue.from_weapon_marker.transform.position,
+                    gameObject.transform.position.y);
             }
+
+            if (_BasicPhysicSupport != null)
+            {
+                _BasicPhysicSupport.FollowSkillPosition(Destination());
+                return;
+            }
+
             _Rigidbody.MovePosition(Destination());
         }
 
@@ -306,11 +315,19 @@ namespace Soul
                 return;
             }
 
-            gameObject.transform.position +=
-                _xz * (FightGlobalSetting.HDamageZAnimationCurve.Evaluate(TimeCounter + Time.fixedDeltaTime) -
-                       FightGlobalSetting.HDamageZAnimationCurve.Evaluate(TimeCounter)) +
-                Vector3.up * (FightGlobalSetting.HDamageYAnimationCurve.Evaluate(TimeCounter + Time.fixedDeltaTime) -
-                              FightGlobalSetting.HDamageYAnimationCurve.Evaluate(TimeCounter));
+            var delta = HurtStateRuntimeUtility.ResolveHighDamageDelta(
+                _xz,
+                FightGlobalSetting.HDamageZAnimationCurve,
+                FightGlobalSetting.HDamageYAnimationCurve,
+                TimeCounter,
+                Time.fixedDeltaTime);
+            if (_BasicPhysicSupport != null)
+            {
+                _BasicPhysicSupport.AddPositionBySkill(delta, false);
+                return;
+            }
+
+            gameObject.transform.position += delta;
         }
 
         void SekkaStart(Element element)

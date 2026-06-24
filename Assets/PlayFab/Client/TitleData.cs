@@ -13,7 +13,7 @@ public partial class PlayFabReadClient
     
     private static IDictionary<string, Award> _arenaAward;
     public static IDictionary<string, Award> ArenaAwards => _arenaAward;
-
+    
     private static IDictionary<string, Award> _eventAwards;
     public static IDictionary<string, Award> EventAwards => _eventAwards;
 
@@ -26,7 +26,7 @@ public partial class PlayFabReadClient
             PlayFabClientAPI.GetTitleData(
                 new GetTitleDataRequest
                 {
-                    Keys = new List<string>() {"stage_awards", "gangbang_awards","arena_awards", "event_awards",PlayFabSetting._timeLimitBuyCode}
+                    Keys = new List<string>() {"stage_awards", "gangbang_awards","arena_awards", "event_awards", PlayFabSetting._timeLimitBuyCode}
                 },
                 result =>
                 {
@@ -89,9 +89,8 @@ public partial class PlayFabReadClient
                 
                     #region time limit buy
                 
-                    if (result.Data.ContainsKey(PlayFabSetting._timeLimitBuyCode))
+                    if (result.Data.TryGetValue(PlayFabSetting._timeLimitBuyCode, out var specialBuyJson))
                     {
-                        string specialBuyJson = result.Data[PlayFabSetting._timeLimitBuyCode];
                         TimeLimitedBuyData = JsonConvert.DeserializeObject<TimeLimitedBuyData>(specialBuyJson);
                     }
                 

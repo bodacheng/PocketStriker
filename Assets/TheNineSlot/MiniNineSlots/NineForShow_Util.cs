@@ -43,9 +43,9 @@ public partial class NineForShow : MonoBehaviour
     public static async UniTask RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget, 
         IDictionary<int, ParticleSystem> slotEffects, float scale = 1, int targetLayer = 0)
     {
-        if (slotEffects.ContainsKey(slotNum) && slotEffects[slotNum] != null)
+        if (slotEffects.TryGetValue(slotNum, out var existingEffect) && existingEffect != null)
         {
-            Destroy(slotEffects[slotNum].gameObject);
+            Destroy(existingEffect.gameObject);
         }
         
         string effectName;

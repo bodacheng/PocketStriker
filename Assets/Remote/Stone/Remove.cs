@@ -10,16 +10,16 @@ namespace dataAccess
 
         public static async UniTask RemoveStoneLocal(string instanceId)
         {
-            if (RenderModelDic.ContainsKey(instanceId))
+            if (RenderModelDic.TryGetValue(instanceId, out var renderModel) && renderModel != null)
             {
-                var worldPos = PosCal.GetWorldPos(PreScene.target.postProcessCamera, RenderModelDic[instanceId].GetComponent<RectTransform>(), 0f);
+                var worldPos = PosCal.GetWorldPos(PreScene.target.postProcessCamera, renderModel.GetComponent<RectTransform>(), 0f);
                 var path = FightGlobalSetting.EffectPathDefine();
                 var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>("ButtonEffects/" + path + "/explosion3.prefab");
                 slotEffect.gameObject.name = "stoneExplosion";
                 slotEffect.gameObject.transform.position = worldPos;
                 slotEffect.Play(true);
 
-                Object.Destroy(RenderModelDic[instanceId].gameObject);
+                Object.Destroy(renderModel.gameObject);
             }
             RenderModelDic.Remove(instanceId);
             Dic.Remove(instanceId);

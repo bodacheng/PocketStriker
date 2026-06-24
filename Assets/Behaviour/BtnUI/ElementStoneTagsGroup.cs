@@ -153,7 +153,8 @@ public class ElementStoneTagsGroup
     {
         if (_exTagEffects.ContainsKey(eX))
             return;
-        var p = _btnEffectsSetsForStoneBox[eX];
+        if (!_btnEffectsSetsForStoneBox.TryGetValue(eX, out var p) || p == null)
+            return;
         p.gameObject.name = "UIExTag"+ eX;
         _exTagEffects.Add(eX,p);
         p.gameObject.transform.position = pos;
@@ -163,9 +164,9 @@ public class ElementStoneTagsGroup
 
     public async void RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget)
     {
-        if (_slotEffects.ContainsKey(slotNum) && _slotEffects[slotNum] != null)
+        if (_slotEffects.TryGetValue(slotNum, out var existingEffect) && existingEffect != null)
         {
-            Object.Destroy(_slotEffects[slotNum].gameObject);
+            Object.Destroy(existingEffect.gameObject);
         }
 
         if (!_btnEffectsSetsForStoneBox.ContainsKey(eX)) return;

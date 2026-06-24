@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MCombat.Shared.Combat
 {
@@ -69,8 +68,16 @@ namespace MCombat.Shared.Combat
             if (!IsGameOver && _teamUnitCounts.Count > 0 && _teamUnitCounts.Count <= _deadTeams.Count + 1)
             {
                 IsGameOver = true;
-                var winner = _registeredTeams.Except(_deadTeams).ToList();
-                WinnerTeam = winner.Count > 0 ? winner[0] : Team.none;
+                WinnerTeam = Team.none;
+                for (var i = 0; i < _registeredTeams.Count; i++)
+                {
+                    var registeredTeam = _registeredTeams[i];
+                    if (!_deadTeams.Contains(registeredTeam))
+                    {
+                        WinnerTeam = registeredTeam;
+                        break;
+                    }
+                }
             }
         }
     }

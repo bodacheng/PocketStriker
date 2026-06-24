@@ -22,7 +22,6 @@ public partial class PlayFabReadClient
             {
                 PlayerAccountInfo.Me.Email = email;
                 PlayerAccountInfo.Me.PlayFabUserName = result.Username;
-                Debug.Log("我们把玩家的PlayFab username设置成了他的PlayFabId:" + result.Username);
                 success.Invoke();
             },
             ErrorReportStayInScene

@@ -25,6 +25,10 @@ public partial class PlayFabReadClient
                 PlayerAccountInfo.Me.currentLinkedDeviceId = 
                     result.AccountInfo.AndroidDeviceInfo != null ? result.AccountInfo.AndroidDeviceInfo.AndroidDeviceId : null;
 #endif
+#if UNITY_STANDALONE_WIN
+                PlayerAccountInfo.Me.currentLinkedDeviceId = 
+                    result.AccountInfo.CustomIdInfo != null ? result.AccountInfo.CustomIdInfo.CustomId : null;
+#endif
                 success.Invoke(true);
             },
             errorCallback =>

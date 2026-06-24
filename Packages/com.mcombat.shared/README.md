@@ -21,4 +21,5 @@ SourceSync asset roots:
 
 - `Behaviour`, `P3`, `Camera`, `TheNineSlot`, `SkillStoneBox`, `Remote/Stone`,
   `Remote/API/Dto`, `SimpleDragAndDrop/Scripts`, shared `UnitBox` stone detail/effects/upgrade logic,
+  `POS_Sys`, `ResourceLoading`, `EffectsSystem`, shared `BOWeaponSystem`, `PlayFab`, and `UI` subsets,
   selected `MainSceneSystem` processes, and selected reusable layer files.
