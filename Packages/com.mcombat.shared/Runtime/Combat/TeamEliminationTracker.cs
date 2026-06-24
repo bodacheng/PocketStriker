@@ -45,6 +45,23 @@ namespace MCombat.Shared.Combat
             return _teamIds.TryGetValue(WinnerTeam, out var id) ? id : null;
         }
 
+        public bool IsWinnerTeam(Team team)
+        {
+            return IsGameOver && team != Team.none && WinnerTeam == team;
+        }
+
+        public bool IsWinnerId(string id)
+        {
+            return IsGameOver
+                   && !string.IsNullOrEmpty(id)
+                   && string.Equals(GetWinnerId(), id, System.StringComparison.Ordinal);
+        }
+
+        public bool IsLocalWinner(Team localTeam, string localPlayerId)
+        {
+            return IsWinnerTeam(localTeam) || IsWinnerId(localPlayerId);
+        }
+
         public void MarkDead(Team team, TUnit unit)
         {
             if (!_deadUnitsByTeam.TryGetValue(team, out var deadUnits))

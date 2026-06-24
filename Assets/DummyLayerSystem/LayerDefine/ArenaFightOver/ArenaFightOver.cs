@@ -259,7 +259,7 @@ public partial class ArenaFightOver : UILayer
     
     public void Step1Anim()
     {
-        if (FightLogger.value.GetWinnerTeam() == Team.player1)
+        if (FightLogger.value.IsLocalPlayerWinner(RTFightManager.playerTeam, PlayerAccountInfo.Me.PlayFabId))
         {
             winObject.SetActive(true);
             DOTween.To(() => resultAnimFactor, (x) => resultAnimFactor = x, 2, 1)

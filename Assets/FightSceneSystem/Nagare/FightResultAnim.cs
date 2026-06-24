@@ -79,7 +79,7 @@ namespace FightScene
 
         private async UniTask ShowStoryBeforeResultIfNeeded(ArenaFightOver arenaFightOver, Func<UniTask> endPart)
         {
-            if (FightLogger.value.GetWinnerTeam() != Team.player1)
+            if (!FightLogger.value.IsLocalPlayerWinner(RTFightManager.playerTeam, PlayerAccountInfo.Me.PlayFabId))
             {
                 arenaFightOver.Setup();
                 await endPart();

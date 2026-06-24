@@ -45,6 +45,11 @@ namespace FightScene
                     break;
             }
         }
+
+        static bool LocalPlayerWon()
+        {
+            return FightLogger.value.IsLocalPlayerWinner(RTFightManager.playerTeam, PlayerAccountInfo.Me.PlayFabId);
+        }
         
         void EnterProcess()
         {
@@ -56,7 +61,7 @@ namespace FightScene
             switch (FightLoad.Fight.EventType)
             {
                 case FightEventType.Arena:
-                    if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
+                    if (LocalPlayerWon())
                     {
                         CloudScript.ArenaPointUp(
                             FightLoad.Fight.Team1LeaderboardEntry,
@@ -80,7 +85,7 @@ namespace FightScene
                     //FightOverControl.target.ShowSKillSets(RealTimeGameProcessManager.target.FightTeam1);
                 break;
                 case FightEventType.Quest:
-                    if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
+                    if (LocalPlayerWon())
                     {
                         var levelInt = Convert.ToInt32(FightLoad.Fight.ID);
                         if (levelInt > PlayerAccountInfo.Me.arcadeProcess)
@@ -153,7 +158,7 @@ namespace FightScene
                     }
                     break;
                 case FightEventType.Gangbang:
-                    if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
+                    if (LocalPlayerWon())
                     {
                         var levelInt = Convert.ToInt32(FightLoad.Fight.ID);
                         if (levelInt > PlayerAccountInfo.Me.gangbangProcess)
@@ -227,7 +232,7 @@ namespace FightScene
                     SkillTestReload();
                     break;
                 case FightEventType.Event:
-                    if (FightLogger.value.GetWinnerId() == PlayerAccountInfo.Me.PlayFabId)
+                    if (LocalPlayerWon())
                     {
                         var battleID = FightLoad.Fight.ID;
                         if (!EventModeManager.Instance.CompletedLevels.Contains(battleID))

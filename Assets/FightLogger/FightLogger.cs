@@ -21,6 +21,11 @@ public class FightLogger
     {
         return _eliminationTracker.WinnerTeam;
     }
+
+    public bool IsLocalPlayerWinner(Team playerTeam, string playerId)
+    {
+        return _eliminationTracker.IsLocalWinner(playerTeam, playerId);
+    }
     
     public void WatchMissionsAbandon()
     {
