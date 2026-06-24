@@ -698,8 +698,7 @@ namespace PlayFab.ProgressionModels
         /// </summary>
         public string EntityId;
         /// <summary>
-        /// Arbitrary metadata to store along side the leaderboard entry, will be returned by all Leaderboard APIs. Must be less
-        /// than 50 UTF8 encoded characters.
+        /// Arbitrary metadata to store along side the leaderboard entry, will be returned by all Leaderboard APIs.
         /// </summary>
         public string Metadata;
         /// <summary>
@@ -757,6 +756,14 @@ namespace PlayFab.ProgressionModels
         /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
         /// </summary>
         public Dictionary<string,string> CustomTags;
+        /// <summary>
+        /// The page size for the request.
+        /// </summary>
+        public int? PageSize;
+        /// <summary>
+        /// The skip token for the paged request.
+        /// </summary>
+        public string SkipToken;
     }
 
     [Serializable]
@@ -766,6 +773,14 @@ namespace PlayFab.ProgressionModels
         /// List of leaderboard definitions for the title.
         /// </summary>
         public List<LeaderboardDefinition> LeaderboardDefinitions;
+        /// <summary>
+        /// The page size on the response.
+        /// </summary>
+        public int PageSize;
+        /// <summary>
+        /// The skip token for the paged response.
+        /// </summary>
+        public string SkipToken;
     }
 
     [Serializable]
@@ -775,15 +790,27 @@ namespace PlayFab.ProgressionModels
         /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
         /// </summary>
         public Dictionary<string,string> CustomTags;
+        /// <summary>
+        /// The page size for the request.
+        /// </summary>
+        public int? PageSize;
+        /// <summary>
+        /// The skip token for the paged request.
+        /// </summary>
+        public string SkipToken;
     }
 
     [Serializable]
     public class ListStatisticDefinitionsResponse : PlayFabResultCommon
     {
         /// <summary>
-        /// The optional custom tags associated with the request (e.g. build number, external trace identifiers, etc.).
+        /// The page size on the response.
         /// </summary>
-        public Dictionary<string,string> CustomTags;
+        public int PageSize;
+        /// <summary>
+        /// The skip token for the paged response.
+        /// </summary>
+        public string SkipToken;
         /// <summary>
         /// List of statistic definitions for the title.
         /// </summary>
@@ -911,8 +938,7 @@ namespace PlayFab.ProgressionModels
     public class StatisticUpdate : PlayFabBaseModel
     {
         /// <summary>
-        /// Arbitrary metadata to store along side the statistic, will be returned by all Leaderboard APIs. Must be less than 50
-        /// UTF8 encoded characters.
+        /// Arbitrary metadata to store along side the statistic, will be returned by all Leaderboard APIs.
         /// </summary>
         public string Metadata;
         /// <summary>

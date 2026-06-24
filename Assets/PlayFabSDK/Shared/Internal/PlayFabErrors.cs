@@ -611,6 +611,8 @@ namespace PlayFab
         PreconditionFailed = 1610,
         CannotEnableAnonymousPlayerCreation = 1611,
         ParentCustomerAccountNotFound = 1612,
+        AccountLinkedToABannedPlayer = 1613,
+        AzureSubscriptionNotEligibleForLinking = 1614,
         MatchmakingEntityInvalid = 2001,
         MatchmakingPlayerAttributesInvalid = 2002,
         MatchmakingQueueNotFound = 2016,
@@ -655,6 +657,7 @@ namespace PlayFab
         CatalogBadRequest = 4013,
         CatalogTooManyRequests = 4014,
         InvalidCatalogItemConfiguration = 4015,
+        LegacyEconomyDisabled = 4016,
         ExportInvalidStatusUpdate = 5000,
         ExportInvalidPrefix = 5001,
         ExportBlobContainerDoesNotExist = 5002,
@@ -726,6 +729,7 @@ namespace PlayFab
         ExperimentationExclusionGroupInvalidTrafficAllocation = 7021,
         ExperimentationExclusionGroupInvalidName = 7022,
         ExperimentationLegacyExperimentInvalidOperation = 7023,
+        ExperimentationExperimentStopFailed = 7024,
         MaxActionDepthExceeded = 8000,
         TitleNotOnUpdatedPricingPlan = 9000,
         SegmentManagementTitleNotInFlight = 10000,
@@ -947,6 +951,7 @@ namespace PlayFab
         UnsupportedEntityType = 23011,
         EntityTypeSpecifiedRequiresAggregationSource = 23012,
         PlayFabErrorEventNotSupportedForEntityType = 23013,
+        MetadataLengthExceeded = 23014,
         StoreMetricsRequestInvalidInput = 23501,
         StoreMetricsErrorRetrievingMetrics = 23502
     }
