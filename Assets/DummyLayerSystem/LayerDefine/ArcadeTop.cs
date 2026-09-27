@@ -19,9 +19,35 @@ public class ArcadeTop : UILayer
     [SerializeField] Button lastChapter;
 
     private MainSceneStep step;
-    List<int> _currentStages;
+    List<int> _currentStages = new List<int>();
     readonly List<StageButton> _stageButtons = new List<StageButton>();
     
+    int _showStagesVersion;
+    int _previewVersion;
+    readonly SingleThreadProcessor _previewQueue = new SingleThreadProcessor();
+
+    bool IsActiveShowStages(int version) =>
+        this != null && !IsClosing && version == _showStagesVersion && container != null;
+
+    void ClearStageButtons()
+    {
+        foreach (var button in _stageButtons)
+        {
+            if (button == null) continue;
+            button.gameObject.SetActive(false);
+            Destroy(button.gameObject);
+        }
+        _stageButtons.Clear();
+    }
+
+    public override void OnDestroy()
+    {
+        _showStagesVersion++;
+        _previewVersion++;
+        ClearStageButtons();
+        base.OnDestroy();
+    }
+
     LoadStageDelegate LoadStageMethod;
     LoadGangbangDelegate LoadGangbangMethod;
     Action<int, bool> directToStage;
@@ -29,6 +55,9 @@ public class ArcadeTop : UILayer
 
     void SetupCommon()
     {
+        nextChapter.onClick.RemoveListener(ShowNextStages);
+        lastChapter.onClick.RemoveListener(ShowLastStages);
+        jumpToNewStage.onClick.RemoveListener(ToNew);
         nextChapter.onClick.AddListener(ShowNextStages);
         lastChapter.onClick.AddListener(ShowLastStages);
         jumpToNewStage.onClick.AddListener(ToNew);
@@ -55,26 +84,37 @@ public class ArcadeTop : UILayer
         SetupCommon();
     }
     
-    async UniTask IconButtonFeature(UnitInfo unitInfo)
+    async UniTask IconButtonFeature(UnitInfo unitInfo, int showStagesVersion)
     {
-        UnitConfig unitConfig = Units.GetUnitConfig(unitInfo.r_id);
-        
-        ProgressLayer.Loading(string.Empty);
-        BackGroundPS.target.ChangeBGByElement(unitConfig.element);
-        
-        await UniTask.WhenAll(
-            connector.ShowModel(unitConfig.RECORD_ID), 
-            nineForShow.SkillSetInfoOfUnitOnArcadePage(unitInfo.set)
-        );
-        
-        nineForShow.AddOnClickToSlots(
-            (RECORD_ID) =>
+        if (!IsActiveShowStages(showStagesVersion) || unitInfo == null) return;
+        var previewVersion = ++_previewVersion;
+        bool IsCurrent() => IsActiveShowStages(showStagesVersion) && previewVersion == _previewVersion;
+        await _previewQueue.RunAsQueued(async () =>
+        {
+            if (!IsCurrent()) return;
+            var unitConfig = Units.GetUnitConfig(unitInfo.r_id);
+            if (unitConfig == null) return;
+            ProgressLayer.Loading(string.Empty);
+            BackGroundPS.target.ChangeBGByElement(unitConfig.element);
+            try
             {
-                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
-                connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
+                await UniTask.WhenAll(
+                    connector.ShowModel(unitConfig.RECORD_ID),
+                    nineForShow.SkillSetInfoOfUnitOnArcadePage(unitInfo.set));
+                if (!IsCurrent()) return;
+                nineForShow.AddOnClickToSlots(recordId =>
+                {
+                    if (!IsCurrent()) return;
+                    var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(recordId);
+                    connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
+                });
             }
-        );
-        ProgressLayer.Close();
+            catch (Exception) when (!IsCurrent()) { }
+            finally
+            {
+                if (IsCurrent()) ProgressLayer.Close();
+            }
+        });
     }
 
     void ToNew()
@@ -98,62 +138,60 @@ public class ArcadeTop : UILayer
     
     public async UniTask ShowStages(List<int> stages)
     {
+        if (this == null || container == null || IsClosing) return;
+        var version = ++_showStagesVersion;
+        _previewVersion++;
         ProgressLayer.Loading("Loading stages");
-        container.transform.gameObject.SetActive(false);
-        foreach (var child in _stageButtons) {
-            Destroy(child.gameObject);
-        }
-        _stageButtons.Clear();
-        _currentStages = stages;
-        var tasks = new List<UniTask>();
-        for (var index = 0; index < _currentStages.Count; index++)
+        container.gameObject.SetActive(false);
+        ClearStageButtons();
+        _currentStages = stages != null ? new List<int>(stages) : new List<int>();
+        var arcade = step == MainSceneStep.ArcadeFront;
+        var progress = arcade ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess;
+        var lastStage = _currentStages.Count > 0 ? _currentStages.Max() : 0;
+        try
         {
-            tasks.Add(LoadStage(_currentStages[index]));
+            var tasks = new List<UniTask>(_currentStages.Count);
+            foreach (var stageNo in _currentStages)
+                tasks.Add(LoadStage(stageNo, stageNo == lastStage, arcade, version));
+            await UniTask.WhenAll(tasks);
+            if (!IsActiveShowStages(version)) return;
+            Refresh(progress, arcade ? PlayFabReadClient.StageAwards : PlayFabReadClient.GangbangAwards, arcade ? 3 : 5);
+            container.gameObject.SetActive(true);
         }
-        await UniTask.WhenAll(tasks);
-        Refresh(step == MainSceneStep.ArcadeFront ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess,  
-            step == MainSceneStep.ArcadeFront ? PlayFabReadClient.StageAwards : PlayFabReadClient.GangbangAwards,
-            step == MainSceneStep.ArcadeFront ? 3:5);
-        if (container != null)
-            container.transform.gameObject.SetActive(true);
-        ProgressLayer.Close();
+        finally
+        {
+            if (IsActiveShowStages(version)) ProgressLayer.Close();
+        }
     }
-    
-    async UniTask LoadStage(int stageNo)
+
+    async UniTask LoadStage(int stageNo, bool clickBoss, bool arcade, int version)
     {
-        var one = step == MainSceneStep.ArcadeFront ? await LoadStageMethod(stageNo) : await LoadGangbangMethod(stageNo);
-        if (one == null)
-        {
-            return;
-        }
-        
-        var stageBtn = Instantiate(step == MainSceneStep.ArcadeFront ? evolutionStagePrefab : normalStagePrefab);
+        var one = arcade ? await LoadStageMethod(stageNo) : await LoadGangbangMethod(stageNo);
+        if (!IsActiveShowStages(version) || one == null) return;
+        // After the awaited data load, this block is synchronous. Only the active
+        // page may create cards; old requests never append into a newer page.
+        var stageBtn = Instantiate(arcade ? evolutionStagePrefab : normalStagePrefab, container.transform);
         _stageButtons.Add(stageBtn);
-        stageBtn.Button.onClick.AddListener(
-            ()=>
-            {
-                directToStage(stageNo, false);
-            }
-        );
+        stageBtn.Button.onClick.AddListener(() =>
+        {
+            if (IsActiveShowStages(version)) directToStage(stageNo, false);
+        });
         stageBtn.name = "Stage" + stageNo;
         stageBtn.StageNo = stageNo;
         stageBtn.CriticalGaugeMode = one.EvolutionMode ? CriticalGaugeMode.Normal : one.team2CGMode;
-        if (one.FightMembers != null)
+        if (one.FightMembers == null) return;
+        if (one is GangbangInfo gb)
         {
-            if (one is GangbangInfo)
-            {
-                var gb = (GangbangInfo)one;
-                stageBtn.LoadUnitIconsGangbang(
-                    one.FightMembers.EnemySets.GetValues(), 
-                    (x)=> gb.GetTeam2GroupSet(x).Count,
-                    IconButtonFeature, 
-                    stageNo == _currentStages.Max());
-            }
-            else
-            {
-                stageBtn.LoadUnitIcons(one.FightMembers.EnemySets.GetValues(), IconButtonFeature, stageNo == _currentStages.Max());
-            }
-            
+            stageBtn.LoadUnitIconsGangbang(one.FightMembers.EnemySets.GetValues(),
+                id => gb.GetTeam2GroupSet(id).Count,
+                info => IconButtonFeature(info, version), clickBoss,
+                () => IsActiveShowStages(version));
+        }
+        else
+        {
+            stageBtn.LoadUnitIcons(one.FightMembers.EnemySets.GetValues(),
+                info => IconButtonFeature(info, version), clickBoss,
+                () => IsActiveShowStages(version));
         }
     }
 

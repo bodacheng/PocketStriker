@@ -1,6 +1,6 @@
 ﻿//------------------------------------
 //             OmniShade
-//     Copyright© 2023 OmniShade     
+//     Copyright© 2025 OmniShade
 //------------------------------------
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,10 @@ struct appdata_full {
 #define UnityMetaInput MetaInput
 #define UnityMetaVertexPosition MetaVertexPosition
 #define UnityMetaFragment MetaFragment
-#define unity_LightData unity_LightData.rgb
+#ifndef unity_LightData
+	#define unity_LightData unity_LightData.rgb
+#endif
+#define unity_ShadowColor _SubtractiveShadowColor
 
 // Macro definitions
 #define UNITY_PI 3.14159265359f
@@ -38,23 +41,22 @@ struct appdata_full {
 #define UNITY_SAMPLE_TEX2D_SAMPLER(tex, samplertex, coord) tex.Sample (sampler##samplertex,coord)
 #define UNITY_TRANSFER_FOG(o, outpos) o.fogCoord = ComputeFogFactor(outpos.z);
 #define UNITY_APPLY_FOG(coord, col) col = MixFog(col, coord);
-#define UNITY_LIGHT_ATTENUATION(atten, i, pos_world) \
-	VertexPositionInputs vi = (VertexPositionInputs)0; \
-	vi.positionWS = pos_world; \
-	float4 shadowCoord = GetShadowCoord(vi); \
-	half atten = MainLightRealtimeShadow(shadowCoord); \
-	half shadowFade = GetMainLightShadowFade(pos_world); \
-	atten = lerp(atten, 1, shadowFade);
+#define UNITY_LIGHT_ATTENUATION(atten, i, pos_world) half atten = UnityLightAttenuation(pos_world);
 #define TRANSFER_SHADOW_CAST(o, v) o.pos = GetShadowPositionClip(v.vertex.xyz, v.normal);
 #define UNITY_LIGHTDATA
+#if !defined(LIGHT_LOOP_BEGIN)
+	#define LIGHT_LOOP_BEGIN(lightCount) \
+        for (uint lightIndex = 0u; lightIndex < lightCount; ++lightIndex) {
+	#define LIGHT_LOOP_END }
+#endif
 
 // Functions missing from built-in
-float3 UnityObjectToViewPos(float3 pos ) {
+float3 UnityObjectToViewPos(float3 pos) {
     return TransformWorldToView(TransformObjectToWorld(pos));
 }
 
 float3 WorldSpaceViewDir(float4 vertex) {
-	float3 worldPos = mul(unity_ObjectToWorld, vertex).xyz;
+	float3 worldPos = TransformObjectToWorld(vertex.xyz);
 	float3 camPos = float3(
 		unity_CameraToWorld[0][3],
 		unity_CameraToWorld[1][3],
@@ -84,7 +86,7 @@ half3 DecodeDirectionalLightmap (half3 color, half4 dirTex, half3 normalWorld) {
 #if LIGHTMAP_ON
 half3 SampleUnityLightmap(float2 uv) {
 	return SampleSingleLightmap(
-		TEXTURE2D_ARGS(unity_Lightmap, samplerunity_Lightmap), 
+		TEXTURE2D_ARGS(unity_Lightmap, samplerunity_Lightmap),
 		uv,
 		float4(1.0, 1.0, 0.0, 0.0),
 		#if defined(UNITY_LIGHTMAP_FULL_HDR)
@@ -94,6 +96,21 @@ half3 SampleUnityLightmap(float2 uv) {
 		#endif
 		float4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0, 0.0)
 	);
+}
+#endif
+
+// Custom functions
+#if SHADOWS_ENABLED
+half UnityLightAttenuation(float3 pos_world) {
+	VertexPositionInputs vi = (VertexPositionInputs)0;
+	vi.positionWS = pos_world;
+	float4 shadowCoord = GetShadowCoord(vi);
+	half atten = MainLightRealtimeShadow(shadowCoord);
+	#if UNITY_VERSION >= 202102
+		half shadowFade = GetMainLightShadowFade(pos_world);
+		atten = lerp(atten, 1, shadowFade);
+	#endif
+	return atten;
 }
 #endif
 
@@ -116,29 +133,90 @@ float4 GetShadowPositionClip(float3 vertex, float3 normal) {
 }
 #endif
 
-half3 AdditionalLights(half3 pos_world, half3 nor_world, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers) {
+
+#if _ADDITIONAL_LIGHTS
+half AdditionalLightsShadow(uint lightIndex, half3 pos_world, Light light) {
+	#if SHADOWS_ENABLED
+		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
+			int perObjectLightIndex = lightIndex;
+		#else
+			int perObjectLightIndex = GetPerObjectLightIndex(lightIndex);
+		#endif
+		#if UNITY_VERSION >= 202102
+			half shadow = AdditionalLightRealtimeShadow(perObjectLightIndex, pos_world, light.direction);
+			shadow = lerp(shadow, 1, GetAdditionalLightShadowFade(pos_world));
+		#else
+			half shadow = AdditionalLightRealtimeShadow(perObjectLightIndex, pos_world);
+		#endif
+		return shadow;
+	#else
+		return 1;
+	#endif
+}
+#endif
+
+half3 AdditionalLightsFrag(half3 pos_world, half3 nor_world, half4 pos_clip, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
 	half3 col_diffuse = 0;
 	#if _ADDITIONAL_LIGHTS
 		uint lightsCount = GetAdditionalLightsCount();
-		for (uint lightIndex = 0u; lightIndex < lightsCount; ++lightIndex) {
+		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
+			InputData inputData = (InputData)0;
+			inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(pos_clip);
+			inputData.positionWS = pos_world;
+		#endif
+		LIGHT_LOOP_BEGIN(lightsCount)
 			Light light = GetAdditionalLight(lightIndex, pos_world);
 			#if (_LIGHT_LAYERS && UNITY_VERSION >= 202102)
-				if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers)) 
+				if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
 			#endif
 			{
 				half ndotl = max(0, dot(light.direction, nor_world));
-				ndotl = max(0, lerp(ndotl, 1, _DiffuseWrap));			
+				ndotl = max(0, lerp(ndotl, 1, _DiffuseWrap));
 				ndotl = pow(ndotl, _DiffuseContrast) * _DiffuseBrightness;
-				half diff = ndotl * light.distanceAttenuation;
-				col_diffuse += light.color * diff;
+				half diff = ndotl;
+				// This line is not supported in vertex shader since it samples a texture
+				// so it is omitted from AdditionalLightsVert()
+				half atten = AdditionalLightsShadow(lightIndex, pos_world, light);
+				half3 col_shadow = lerp(shadowColor, 1, (atten));
+				#if URP && _LIGHT_COOKIES
+					real3 cookieColor = SampleAdditionalLightCookie(lightIndex, pos_world);
+					diff *= cookieColor;
+				#endif
+				col_diffuse += diff * light.color * light.distanceAttenuation * col_shadow;
 			}
-		}
+		LIGHT_LOOP_END
+	#endif
+	return col_diffuse;
+}
+
+half3 AdditionalLightsVert(half3 pos_world, half3 nor_world, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
+	half3 col_diffuse = 0;
+	#if _ADDITIONAL_LIGHTS
+		uint lightsCount = GetAdditionalLightsCount();
+		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
+			InputData inputData = (InputData)0;
+		#endif
+		LIGHT_LOOP_BEGIN(lightsCount)
+			Light light = GetAdditionalLight(lightIndex, pos_world);
+			#if (_LIGHT_LAYERS && UNITY_VERSION >= 202102)
+				if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
+			#endif
+			{
+				half ndotl = max(0, dot(light.direction, nor_world));
+				ndotl = max(0, lerp(ndotl, 1, _DiffuseWrap));
+				ndotl = pow(ndotl, _DiffuseContrast) * _DiffuseBrightness;
+				half diff = ndotl;
+				col_diffuse += light.color * light.distanceAttenuation * diff;
+			}
+		LIGHT_LOOP_END
 	#endif
 	return col_diffuse;
 }
 
 uint GetMeshRenderingLightLayerCustom() {
-    #if (_LIGHT_LAYERS && UNITY_VERSION >= 202102)
+    #if (_LIGHT_LAYERS && UNITY_VERSION >= 202203)
+		return asuint(unity_RenderingLayer.x);
+    #elif (_LIGHT_LAYERS && UNITY_VERSION >= 202102)
 		return (asuint(unity_RenderingLayer.x) & RENDERING_LIGHT_LAYERS_MASK) >> RENDERING_LIGHT_LAYERS_MASK_SHIFT;
     #else
 		return 0xFF;
@@ -153,12 +231,20 @@ uint GetMeshRenderingLightLayerCustom() {
 #define UNITY_LIGHTDATA half3 unity_LightData = half3(0, 0, dot(_WorldSpaceLightPos0, 1) != 0);
 #define TRANSFER_SHADOW_CAST(o, v) o.pos = UnityClipSpaceShadowCasterPos(v.vertex.xyz, v.normal); o.pos = UnityApplyLinearShadowBias(o.pos);
 
+float4x4 GetObjectToWorldMatrix() {
+	return unity_ObjectToWorld;
+}
+
+float4x4 GetWorldToObjectMatrix() {
+	return unity_WorldToObject;
+}
+
 half3 SampleUnityLightmap(float2 uv) {
 	half4 color = UNITY_SAMPLE_TEX2D(unity_Lightmap, uv);
 	return DecodeLightmap(color);
 }
 
-half3 AdditionalLights(half3 pos_world, half3 nor_world, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers) {
+half3 AdditionalLightsFrag(half3 pos_world, half3 nor_world, half4 pos_clip, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
 	half3 col_diffuse = 0;
 	float4 lightPosX = unity_4LightPosX0;
 	float4 lightPosY = unity_4LightPosY0;
@@ -184,6 +270,10 @@ half3 AdditionalLights(half3 pos_world, half3 nor_world, half _DiffuseWrap, half
 	col_diffuse += unity_LightColor[2].rgb * diff.z;
 	col_diffuse += unity_LightColor[3].rgb * diff.w;
 	return col_diffuse;
+}
+
+half3 AdditionalLightsVert(half3 pos_world, half3 nor_world, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
+	return AdditionalLightsFrag(pos_world, nor_world, 0, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers, shadowColor);
 }
 
 uint GetMeshRenderingLightLayerCustom() {

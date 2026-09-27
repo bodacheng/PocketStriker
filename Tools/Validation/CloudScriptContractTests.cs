@@ -9,10 +9,12 @@ internal static class CloudScriptContractTests
 {
     private static int checks;
 
-    public static int Main()
+    public static int Main(string[] args)
     {
         try
         {
+            Check(args.Length == 1 && args[0].Equals(typeof(PlayFab.PlayFabSettings).GetField("SdkVersion").GetRawConstantValue()),
+                "imported PlayFab assembly matches the source SDK version");
             var edit = new CloudScriptUpdateUserInventoryItemDataRequest
             {
                 ItemInstanceId = "stone-1",

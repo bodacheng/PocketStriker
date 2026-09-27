@@ -112,6 +112,7 @@ public partial class FightPrepareLayer : UILayer
 
     public async UniTask GangbangStageUnitsDisplay(GangbangInfo stage, CancellationToken token)
     {
+        var version = ++_displayVersion;
         var heroUnits = stage.FightMembers.HeroSets.GetValues();
         var enemyUnits = stage.FightMembers.EnemySets.GetValues();
         var heroLookup = BuildUnitLookup(heroUnits);
@@ -124,10 +125,10 @@ public partial class FightPrepareLayer : UILayer
         var enemyNineForShow = nineForShowE != null ? nineForShowE : nineForShow;
 
         UniTask FocusHero(string instanceId) =>
-            FocusTeamUnit(instanceId, heroLookup, connector, nineForShow);
+            FocusTeamUnit(instanceId, heroLookup, connector, nineForShow, version, token);
 
         UniTask FocusEnemy(string instanceId) =>
-            FocusTeamUnit(instanceId, enemyLookup, enemyConnector, enemyNineForShow);
+            FocusTeamUnit(instanceId, enemyLookup, enemyConnector, enemyNineForShow, version, token);
 
         var focusTasks = new List<UniTask>();
 
@@ -140,7 +141,6 @@ public partial class FightPrepareLayer : UILayer
             PlayerAccountInfo.Me.tutorialProgress == "Finished");
 
         var defaultHeroId = _gangbangHeroIconsM.FirstOrDefault()?.InstanceID;
-        WarmupUnitModels(heroUnits, defaultHeroId, connector, _preparedHeroModelIds, token);
 
         if (heroUnits.Count < 1)
         {
@@ -161,7 +161,6 @@ public partial class FightPrepareLayer : UILayer
             2);
 
         var defaultEnemyId = _gangbangHeroIconsE.FirstOrDefault()?.InstanceID;
-        WarmupUnitModels(enemyUnits, defaultEnemyId, enemyConnector, _preparedEnemyModelIds, token);
 
         ApplySelectedCountOption();
 
@@ -177,22 +176,20 @@ public partial class FightPrepareLayer : UILayer
 
         await UniTask.WhenAll(focusTasks);
 
-        if (token.IsCancellationRequested)
+        if (!IsActiveDisplay(version, token))
         {
             return;
         }
 
-        _gangbangHeroIconsE.FirstOrDefault()?.iconButton.onClick.Invoke();
+        WarmupUnitModels(heroUnits, defaultHeroId, connector, _preparedHeroModelIds, token);
+        WarmupUnitModels(enemyUnits, defaultEnemyId, enemyConnector, _preparedEnemyModelIds, token);
         team1Name.text = "YOU";
     }
 
     List<GangbangHeroIcon> GangbangInfosShow(List<UnitInfo> unitSets, Action<string> iconBehaviour, RectTransform showT,
         bool withSkillCheck, int team, bool btnInteractive = true)
     {
-        foreach (Transform t in showT)
-        {
-            Destroy(t.gameObject);
-        }
+        ClearUnitIcons(showT);
         var icons = new List<GangbangHeroIcon>();
         int wholeTeamCount = 0;
         foreach(var unitInfo in unitSets)

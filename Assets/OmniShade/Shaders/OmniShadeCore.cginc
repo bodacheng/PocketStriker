@@ -1,6 +1,6 @@
 //------------------------------------
 //             OmniShade
-//     Copyright© 2023 OmniShade
+//     Copyright© 2025 OmniShade
 //------------------------------------
 
 #include "OmniShadeURP.cginc"
@@ -47,11 +47,13 @@ half4 _ReflectionColor;
 
 sampler2D _NormalTex;
 half4 _NormalTex_ST;
+half _NormalStrength;
 sampler2D _NormalTex2;
 half4 _NormalTex2_ST;
-half _NormalStrength;
+half _Normal2Strength;
 sampler2D _NormalTopTex;
 half4 _NormalTopTex_ST;
+half _NormalTopStrength;
 
 sampler2D _LightmapTex;
 half4 _LightmapTex_ST;
@@ -128,6 +130,7 @@ half _PlantBaseHeight;
 
 float _OutlineWidth;
 half4 _OutlineColor;
+float _OutlineZPos;
 
 half _AnimeThreshold1;
 half4 _AnimeColor1;
@@ -138,12 +141,32 @@ half _AnimeSoftness;
 
 half _CameraFadeStart;
 half _CameraFadeEnd;
+half _CameraFadeInvert;
+
+half _UVTileDiscardUV;
+half _UVTileV3U0;
+half _UVTileV3U1;
+half _UVTileV3U2;
+half _UVTileV3U3;
+half _UVTileV2U0;
+half _UVTileV2U1;
+half _UVTileV2U2;
+half _UVTileV2U3;
+half _UVTileV1U0;
+half _UVTileV1U1;
+half _UVTileV1U2;
+half _UVTileV1U3;
+half _UVTileV0U0;
+half _UVTileV0U1;
+half _UVTileV0U2;
+half _UVTileV0U3;
 
 half _AmbientBrightness;
 
 half4 _ShadowColor;
 
 half _ZOffset;
+half _CutoutCutoff;
 CBUFFER_END
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +181,7 @@ CBUFFER_END
 		#endif
 		float3 pos_world : TEXCOORD1;
 		float3 nor_world : TEXCOORD2;
-		#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2) && !DIRLIGHTMAP_COMBINED && !FLAT
+		#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2) && !(DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) && !FLAT
 			float3 specReflectDir : TEXCOORD3;
 		#endif
 		#if RIM || SPECULAR || REFLECTION
@@ -174,8 +197,7 @@ CBUFFER_END
 		#if REFLECTION && !(NORMAL_MAP || NORMAL_MAP2) && !FLAT
 			float3 viewReflectDir : TEXCOORD6;
 		#endif
-		#if (NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || DIRLIGHTMAP_COMBINED || REFLECTION) \
-			|| SPECULAR_HAIR
+		#if (NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || REFLECTION) || SPECULAR_HAIR
 			float4 tan_world : TEXCOORD7;
 		#endif
 		#if HEIGHT_COLORS
@@ -191,13 +213,13 @@ CBUFFER_END
 				float fogCoord : TEXCOORD10;
 			#endif
 		#endif
-		#if DIFFUSE && !DIFFUSE_PER_PIXEL && !FLAT && !(NORMAL_MAP || NORMAL_MAP2) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
+		#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)) && !FLAT && !(NORMAL_MAP || NORMAL_MAP2) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
 			half3 col_diffuse_add : TEXCOORD11;
 		#endif
 		#if CAMERA_FADE
 			half fade : TEXCOORD12;
 		#endif
-	#if (SHADOWS_SCREEN || SHADOWS_SHADOWMASK || LIGHTMAP_SHADOW_MIXING) && SHADOWS_ENABLED
+		#if (SHADOWS_SCREEN || SHADOWS_SHADOWMASK || LIGHTMAP_SHADOW_MIXING) && SHADOWS_ENABLED
 			UNITY_SHADOW_COORDS(13)
 		#endif
 		UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -211,6 +233,11 @@ CBUFFER_END
 float3 PlantSway(appdata_full v) {
 	float3 pos = v.vertex.xyz;
 	#if PLANT_SWAY
+		#if !PLANT_SWAY_LOCAL
+			// Do computation in world space so rotation don't affect it
+			pos = mul((float3x3)GetObjectToWorldMatrix(), pos);
+		#endif
+
 		// Semi-random phase based on world position of this mesh
 		float3 worldPosCenter = TransformObjectToWorld(float3(0, 0, 0)).xyz;
 		half posBasedRandom = dot(worldPosCenter, 1);
@@ -220,7 +247,7 @@ float3 PlantSway(appdata_full v) {
 		#if _PLANTTYPE_LEAF					// Constant for leaves
 			half swayAmount = 0.15;
 		#elif _PLANTTYPE_PLANT				// Based on height for plants
-			half swayAmount = max(0, v.vertex.y - _PlantBaseHeight);
+			half swayAmount = max(0, pos.y - _PlantBaseHeight);
 		#elif _PLANTTYPE_VERTEX_COLOR_ALPHA	// Based on alpha
 			half swayAmount = 0.15 * v.color.a;
 		#endif
@@ -231,8 +258,36 @@ float3 PlantSway(appdata_full v) {
 		half swayXZ = sin(_PlantSwaySpeed * _Time.y + phase) * swayAmount;
 		pos.xz += swayXZ;
 		pos.y += -(sin(_PlantSwaySpeed * _Time.z + phase*2 - UNITY_PI/2) * 0.5 + 0.5) * swayAmount * 0.5;
+
+		#if !PLANT_SWAY_LOCAL
+			// Change back to object space
+			pos = mul((float3x3)GetWorldToObjectMatrix(), pos);
+		#endif
 	#endif
 	return pos;
+}
+
+bool UVTileDiscard(float2 uv) {
+	uv /= 4.0;
+	return ((_UVTileV0U0 && uv.y < 0.25 && uv.x < 0.25) ||
+		(_UVTileV0U1 && uv.y < 0.25 && uv.x >= 0.25 && uv.x < 0.5) ||
+		(_UVTileV0U2 && uv.y < 0.25 && uv.x >= 0.5 && uv.x < 0.75) ||
+		(_UVTileV0U3 && uv.y < 0.25 && uv.x >= 0.75) ||
+
+		(_UVTileV1U0 && uv.y >= 0.25 && uv.y < 0.5 && uv.x < 0.25) ||
+		(_UVTileV1U1 && uv.y >= 0.25 && uv.y < 0.5 && uv.x >= 0.25 && uv.x < 0.5) ||
+		(_UVTileV1U2 && uv.y >= 0.25 && uv.y < 0.5 && uv.x >= 0.5 && uv.x < 0.75) ||
+		(_UVTileV1U3 && uv.y >= 0.25 && uv.y < 0.5 && uv.x >= 0.75) ||
+
+		(_UVTileV2U0 && uv.y >= 0.5 && uv.y < 0.75 && uv.x < 0.25) ||
+		(_UVTileV2U1 && uv.y >= 0.5 && uv.y < 0.75 && uv.x >= 0.25 && uv.x < 0.5) ||
+		(_UVTileV2U2 && uv.y >= 0.5 && uv.y < 0.75 && uv.x >= 0.5 && uv.x < 0.75) ||
+		(_UVTileV2U3 && uv.y >= 0.5 && uv.y < 0.75 && uv.x >= 0.75) ||
+
+		(_UVTileV3U0 && uv.y >= 0.75 && uv.x < 0.25) ||
+		(_UVTileV3U1 && uv.y >= 0.75 && uv.x >= 0.25 && uv.x < 0.5) ||
+		(_UVTileV3U2 && uv.y >= 0.75 && uv.x >= 0.5 && uv.x < 0.75) ||
+		(_UVTileV3U3 && uv.y >= 0.75 && uv.x >= 0.75));
 }
 
 half4 ColorBrightness(half4 base, half brightness, half4 color) {
@@ -249,8 +304,13 @@ float3 TangentSpaceNormalToWorldSpaceNormal(float3 nor_world, float4 tan_world, 
 }
 
 bool IsLitMainLight(float3 unityLightData, uint meshRenderingLayers, bool isSpecular) {
+	// Hack to prevent flickering in Forward+
+	#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
+		return true;
+	#endif
+
 	// For dir baked lights, just default Specular to on
-	#if DIRLIGHTMAP_COMBINED
+	#if (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON)
 		if (isSpecular)
 			return true;
 	#endif
@@ -272,10 +332,10 @@ float FadeShadows(float3 pos_world, float3 nor_world, float atten) {
 		float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
 		atten = saturate(atten + shadowFade);
 	#endif
-	
+
 	// Mixed lighting - Hide non-lightfacing shadows
-	#if LIGHTMAP_ON  
-		float ndotl = max(0, dot(_WorldSpaceLightPos0.xyz, nor_world));
+	#if LIGHTMAP_ON
+		float ndotl = step(0, dot(_WorldSpaceLightPos0.xyz, nor_world));
 		atten = lerp(1, atten, ndotl);
 	#endif
 	return atten;
@@ -456,7 +516,7 @@ half4 BlendHeightColors(half4 col, half4 col_blend, float blendAlpha) {
 //////////////////////////////////////////////////////////////////////////////////////////
 v2f vert (appdata_full v) {
 	v2f o;
-	UNITY_INITIALIZE_OUTPUT(v2f, o)
+	UNITY_INITIALIZE_OUTPUT(v2f, o);
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_TRANSFER_INSTANCE_ID(v, o);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
@@ -464,7 +524,15 @@ v2f vert (appdata_full v) {
 	// Vertex manipulations
 	#if OUTLINE_PASS
 		#if OUTLINE
-			v.vertex.xyz += _OutlineWidth * normalize(v.normal);
+			float outlineWidth = _OutlineWidth;
+			half objDepth = -UnityObjectToViewPos(float3(0, 0, 0)).z;
+			#if OUTLINE_WIDTH_INDEPENDENT
+				half objDepthLog = objDepth;
+				if (objDepthLog > 1)
+					objDepthLog = 1 + log(objDepthLog);
+				outlineWidth *= objDepthLog;
+			#endif
+			v.vertex.xyz += outlineWidth * normalize(v.normal);
 		#else
 			o.pos = 0;
 			return o;
@@ -478,6 +546,19 @@ v2f vert (appdata_full v) {
 		v.vertex.xyz = PlantSway(v);
 	#endif
 
+	// UV Tile discard
+	#if UVTILE
+		float2 uv = v.texcoord;
+		if (_UVTileDiscardUV == 2)
+			uv = v.texcoord1;
+		else if (_UVTileDiscardUV == 3)
+			uv = v.texcoord2;
+		else if (_UVTileDiscardUV == 4)
+			uv = v.texcoord3;
+		if (UVTileDiscard(uv))
+			v.vertex = asfloat(0x7fc00000);
+	#endif
+
 	// Clip pos
 	#if ZOFFSET || CAMERA_FADE
 		float3 pos_view = UnityObjectToViewPos(v.vertex.xyz);
@@ -488,11 +569,20 @@ v2f vert (appdata_full v) {
 	#else
 		o.pos = UnityObjectToClipPos(v.vertex.xyz);
 	#endif
+	#if OUTLINE_PASS && OUTLINE
+		float outlineOffset = _OutlineZPos / -100 / objDepth;
+		#if !UNITY_REVERSED_Z
+			outlineOffset = -outlineOffset;
+		#endif
+		o.pos.z += outlineOffset;
+	#endif
 	#if TRIPLANAR_LOCAL
 		o.pos_local = v.vertex.xyz;
 	#endif
 	#if CAMERA_FADE
 		o.fade = saturate((-pos_view.z - _CameraFadeStart) / (_CameraFadeEnd - _CameraFadeStart));
+		if (_CameraFadeInvert)
+			o.fade = 1 - o.fade;
 	#endif
 
 	// Fragment data
@@ -503,15 +593,15 @@ v2f vert (appdata_full v) {
 	#endif
 	o.nor_world = UnityObjectToWorldNormal(v.normal);
 	#if (!TRIPLANAR && \
-			(NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || DIRLIGHTMAP_COMBINED || REFLECTION)) \
+			(NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || REFLECTION)) \
 		|| SPECULAR_HAIR
 			o.tan_world = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 	#endif
-	#if DIFFUSE && !DIFFUSE_PER_PIXEL && !FLAT && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
+	#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP))  && !_LIGHT_COOKIES && !FLAT && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
 		uint meshRenderingLayers = GetMeshRenderingLightLayerCustom();
-		o.col_diffuse_add = AdditionalLights(o.pos_world, o.nor_world, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers);
+		o.col_diffuse_add = AdditionalLightsVert(o.pos_world, o.nor_world, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers, _ShadowColor.rgb);
 	#endif
-	#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && !DIRLIGHTMAP_COMBINED && !FLAT && !SPECULAR_HAIR
+	#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && !(DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) && !FLAT && !SPECULAR_HAIR
 		o.specReflectDir = normalize(reflect(-_WorldSpaceLightPos0.rgb, o.nor_world));
 	#endif
 	#if RIM || SPECULAR || REFLECTION
@@ -591,6 +681,9 @@ half4 frag (v2f i) : COLOR {
 			#if NORMAL_MAP
 				_NormalTex_ST /= TEX_SCALE;
 			#endif
+			#if NORMAL_MAP2
+				_NormalTex2_ST /= TEX_SCALE;
+			#endif
 			#if DETAIL
 				_DetailTex_ST /= TEX_SCALE;
 			#endif
@@ -614,15 +707,16 @@ half4 frag (v2f i) : COLOR {
 
 	// Normalize vectors
 	#if FLAT
-		i.nor_world = cross(ddy(i.pos_world), ddx(i.pos_world)) * -_ProjectionParams.x;;
+		i.nor_world = cross(ddy(i.pos_world), ddx(i.pos_world));
+		#if UNITY_REVERSED_Z
+			i.nor_world *= -_ProjectionParams.x;
+		#endif
 	#endif
 	i.nor_world = normalize(i.nor_world);
-	#if (!TRIPLANAR && \
-			(NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || DIRLIGHTMAP_COMBINED || REFLECTION)) \
-		|| SPECULAR_HAIR
+	#if (!TRIPLANAR && (NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || REFLECTION)) || SPECULAR_HAIR
 		i.tan_world.xyz = normalize(i.tan_world.xyz);
 	#endif
-	#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && !DIRLIGHTMAP_COMBINED && !FLAT && !SPECULAR_HAIR
+	#if SPECULAR && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && !(DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) && !FLAT && !SPECULAR_HAIR
 		i.specReflectDir = normalize(i.specReflectDir);
 	#endif
 	#if RIM || SPECULAR || (REFLECTION && ((NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) || FLAT))
@@ -671,23 +765,28 @@ half4 frag (v2f i) : COLOR {
 			#if _NORMALUV_UV2
 				normalUV = uv2;
 			#endif
+			float2 normalUV2 = uv;
+			#if _NORMALUV2_UV2
+				normalUV2 = uv2;
+			#endif
 			float3 nor_tan = 0;
 			#if NORMAL_MAP
 				nor_tan = UnpackNormal(tex2D(_NormalTex, TRANSFORM_TEX(normalUV, _NormalTex)));
+				nor_tan.xy *= _NormalStrength;
 			#endif
 			#if NORMAL_MAP2
-				nor_tan += UnpackNormal(tex2D(_NormalTex2, TRANSFORM_TEX(normalUV, _NormalTex2)));
+				nor_tan += UnpackNormal(tex2D(_NormalTex2, TRANSFORM_TEX(normalUV2, _NormalTex2)));
+				nor_tan.xy *= _Normal2Strength;
 			#endif
-			nor_tan.xy *= _NormalStrength;
 			nor_tan = normalize(nor_tan);
 		#else
 			float3 nor_tan = float3(0, 0, 1);
 		#endif
-		#if (NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || DIRLIGHTMAP_COMBINED || REFLECTION)
+		#if (NORMAL_MAP || NORMAL_MAP2) && ((DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || REFLECTION)
 			float3 bumpNor_world = TangentSpaceNormalToWorldSpaceNormal(i.nor_world, i.tan_world, nor_tan);
 		#endif
 	#else
-		#if (NORMAL_MAP || NORMAL_MAP_TOP)
+		#if (NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP)
 			#if NORMAL_MAP
 				float3 norX = UnpackNormal(tex2D(_NormalTex, TRANSFORM_TEX(uvX, _NormalTex))) * _NormalStrength;
 				float3 norYbottom = UnpackNormal(tex2D(_NormalTex, TRANSFORM_TEX(uvY, _NormalTex))) * _NormalStrength;
@@ -697,17 +796,22 @@ half4 frag (v2f i) : COLOR {
 				float3 norYbottom = float3(0, 0, 1);
 				float3 norZ = float3(0, 0, 1);
 			#endif
+			#if NORMAL_MAP2
+				norX += UnpackNormal(tex2D(_NormalTex2, TRANSFORM_TEX(uvX, _NormalTex2))) * _Normal2Strength;
+				norYbottom += UnpackNormal(tex2D(_NormalTex2, TRANSFORM_TEX(uvY, _NormalTex2))) * _Normal2Strength;
+				norZ += UnpackNormal(tex2D(_NormalTex2, TRANSFORM_TEX(uvZ, _NormalTex2))) * _Normal2Strength;
+			#endif
 			norX = float3(norX.xy + i.nor_world.zy, i.nor_world.x);
 			norYbottom = float3(norYbottom.xy + i.nor_world.xz, i.nor_world.y);
 			norZ = float3(norZ.xy + i.nor_world.xy, i.nor_world.z);
 			#if NORMAL_MAP_TOP
-				float3 norYtop = UnpackNormal(tex2D(_NormalTopTex, TRANSFORM_TEX(uvY, _NormalTopTex))) * _NormalStrength;
+				float3 norYtop = UnpackNormal(tex2D(_NormalTopTex, TRANSFORM_TEX(uvY, _NormalTopTex))) * _NormalTopStrength;
 				norYtop = float3(norYtop.xy + i.nor_world.xz, i.nor_world.y);
 			#else
 				float3 norYtop = norYbottom;
 			#endif
-			#if (DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || DIRLIGHTMAP_COMBINED || REFLECTION
-				float3 bumpNor_world = normalize(norX.zyx * blend.x + norYtop.xzy * blend.y + norZ.xyz * blend.z + norYbottom * blend.w);
+			#if (DIFFUSE && (!LIGHTMAP_ON || MIXED_LIGHTING)) || RIM || SPECULAR || MATCAP || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || REFLECTION
+				float3 bumpNor_world = normalize(norX.zyx * blend.x + norYtop.xzy * blend.y + norZ.xyz * blend.z + norYbottom.xzy * blend.w);
 			#endif
 		#endif
 	#endif
@@ -728,7 +832,7 @@ half4 frag (v2f i) : COLOR {
 	#if LIGHTMAP_ON
 		float2 lightmapUnityUV = uv2 * unity_LightmapST.xy + unity_LightmapST.zw;
 	#endif
-	#if ((NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) || SPECULAR) && DIRLIGHTMAP_COMBINED
+	#if ((NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) || SPECULAR) && (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON)
 		half4 lightmapDir = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, lightmapUnityUV);
 	#endif
 	#if SPECULAR_MAP && (SPECULAR || REFLECTION_SPECULAR)
@@ -806,13 +910,25 @@ half4 frag (v2f i) : COLOR {
 		#endif
 	#endif
 	#if LAYER1
-		col_base = Layer1(col_base, uv, i.color, uvX, uvY, uvZ, blend);
+		float2 layer1UV = uv;
+		#if _LAYER1UV_UV2
+			layer1UV = uv2;
+		#endif
+		col_base = Layer1(col_base, layer1UV, i.color, uvX, uvY, uvZ, blend);
 	#endif
 	#if LAYER2
-		col_base = Layer2(col_base, uv, i.color, uvX, uvY, uvZ, blend);
+		float2 layer2UV = uv;
+		#if _LAYER2UV_UV2
+			layer2UV = uv2;
+		#endif
+		col_base = Layer2(col_base, layer2UV, i.color, uvX, uvY, uvZ, blend);
 	#endif
 	#if LAYER3
-		col_base = Layer3(col_base, uv, i.color, uvX, uvY, uvZ, blend);
+		float2 layer3UV = uv;
+		#if _LAYER3UV_UV2
+			layer3UV = uv2;
+		#endif
+		col_base = Layer3(col_base, layer3UV, i.color, uvX, uvY, uvZ, blend);
 	#endif
 	#if !TRIPLANAR
 		#if TRANSPARENCY_MASK
@@ -882,13 +998,17 @@ half4 frag (v2f i) : COLOR {
 				ndotl = max(0, lerp(ndotl, 1, _DiffuseWrap));
 				ndotl = pow(ndotl, _DiffuseContrast) * _DiffuseBrightness;
 				col_diffuse = ndotl * _LightColor0.rgb;
+				#if URP && _LIGHT_COOKIES
+					real3 cookieColor = SampleMainLightCookie(i.pos_world);
+					col_diffuse *= cookieColor;
+				#endif
 			}
 		#endif
 		#if (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
-			#if !DIFFUSE_PER_PIXEL && !FLAT && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP)
+			#if (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)) && !FLAT && !_LIGHT_COOKIES && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP)
 				col_diffuse += i.col_diffuse_add;
 			#else
-				col_diffuse += AdditionalLights(i.pos_world, adjNor_world, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers);
+				col_diffuse += AdditionalLightsFrag(i.pos_world, adjNor_world, i.pos, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers, _ShadowColor.rgb);
 			#endif
 		#endif
 		#if DETAIL && DETAIL_LIGHTING
@@ -932,13 +1052,11 @@ half4 frag (v2f i) : COLOR {
 	#endif
 	#if SPECULAR
 		if (IsLitMainLight(unity_LightData, meshRenderingLayers, true)) {
-			#if !DIRLIGHTMAP_COMBINED
+			#if !(DIRLIGHTMAP_COMBINED && LIGHTMAP_ON)
 				float3 specLightDir = _WorldSpaceLightPos0.xyz;
 			#else
 				float3 specLightDir = (lightmapDir.xyz - 0.5) * 2;
-				#if DIRLIGHTMAP_COMBINED
-					specLightDir /= max(0.000001, lightmapDir.w);
-				#endif
+				specLightDir /= max(0.000001, lightmapDir.w);
 			#endif
 			#if !TRIPLANAR && SPECULAR_MAP
 				half specBrightness = _SpecularBrightness * specTex.r;
@@ -950,7 +1068,7 @@ half4 frag (v2f i) : COLOR {
 				half shiftTex = 0;
 			#endif
 			#if !SPECULAR_HAIR
-				#if (NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) || DIRLIGHTMAP_COMBINED || FLAT
+				#if (NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) || (DIRLIGHTMAP_COMBINED && LIGHTMAP_ON) || FLAT
 					float3 specReflectDir = reflect(-specLightDir, adjNor_world);
 				#else
 					float3 specReflectDir = i.specReflectDir;
@@ -982,11 +1100,16 @@ half4 frag (v2f i) : COLOR {
 	#endif
 
 	// Shadows
-	#if (SHADOWS_SCREEN || SHADOWS_SHADOWMASK || LIGHTMAP_SHADOW_MIXING || \
-		_MAIN_LIGHT_SHADOWS || _MAIN_LIGHT_SHADOWS_CASCADE || _MAIN_LIGHT_SHADOWS_SCREEN) && SHADOWS_ENABLED
+	#if (SHADOWS_SCREEN || SHADOWS_SHADOWMASK || LIGHTMAP_SHADOW_MIXING || _MAIN_LIGHT_SHADOWS || _MAIN_LIGHT_SHADOWS_CASCADE || _MAIN_LIGHT_SHADOWS_SCREEN) && SHADOWS_ENABLED
 		UNITY_LIGHT_ATTENUATION(atten, i, i.pos_world)
 		atten = FadeShadows(i.pos_world, i.nor_world, atten);
-		half3 col_shadow = lerp(_ShadowColor.rgb, 1, atten);
+		#if LIGHTMAP_ON
+			half3 col_shadow = max(0.000001, lerp(unity_ShadowColor.rgb, 1, atten));
+			float3 subtractShadow = min(1, max(0, col_light2 - col_shadow) / col_shadow);
+			col_shadow = lerp(1, col_shadow, subtractShadow);
+		#else
+			half3 col_shadow = lerp(_ShadowColor.rgb, 1, atten);
+		#endif
 		col *= col_shadow;
 	#endif
 	#if SHADOW_OVERLAY
@@ -995,6 +1118,12 @@ half4 frag (v2f i) : COLOR {
 		shadowMask = saturate(shadowMask + (_ShadowOverlayBrightness - 1));
 		half topFactor = max(0, dot(float3(0, 1, 0), i.nor_world));
 		col *= lerp(1, shadowMask, topFactor);
+	#endif
+	#if _SCREEN_SPACE_OCCLUSION
+		float2 normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(i.pos.xy);
+		AmbientOcclusionFactor ao = GetScreenSpaceAmbientOcclusion(normalizedScreenSpaceUV);
+		float aoFactor = ao.indirectAmbientOcclusion * ao.directAmbientOcclusion;
+		col *= aoFactor;
 	#endif
 
 	#if ANIME
@@ -1023,7 +1152,7 @@ half4 frag (v2f i) : COLOR {
 		#endif
 		else
 			animeColor = _AnimeColor3.rgb;
-		if (dot(col, 1) > 0.000001)
+		if (dot(col, 1) > 0.001)
 			animeColor *= normalize(col);
 		else
 			animeColor = 0;
@@ -1052,25 +1181,29 @@ half4 frag (v2f i) : COLOR {
 		col = heightCol.rgb;
 		col_base.a = heightCol.a;
 	#endif
-	#if FOG
-		UNITY_APPLY_FOG(i.fogCoord, col);
-	#endif
 	#if BASE_SATURATION
 		half3 col_desat = Luminance(col);
 		col = lerp(col_desat, col, _Saturation);
 	#endif
+	#if FOG
+		UNITY_APPLY_FOG(i.fogCoord, col);
+	#endif
 
-	// Special-case return values
 	#if CUTOUT
-		if (col_base.a < 0.5)
+		if (col_base.a < _CutoutCutoff)
 			discard;
 		else
 			col_base.a = 1;
 	#endif
-	#if SHADOW_CASTER || DEPTH
+
+	// Special handling of passes
+	#if SHADOW_CASTER
 		return 0;
-	#endif
-	#if OUTLINE_PASS
+	#elif DEPTH
+		return 0;
+	#elif DEPTH_NORMALS
+		return float4(i.nor_world, 0);
+	#elif OUTLINE_PASS
 		#if OUTLINE
 			return _OutlineColor;
 		#else

@@ -327,23 +327,24 @@ namespace HittingDetection
         // 它在攻击到一个对象后不会立刻随着自身hp的减少而cleartargets，但如果它有着大于0的hp，它依然会随着打击到对象而掉血，并随着寿命结束而消失
         // 设想有一个地上火焰技能是ContinuousDamage，它可能有两种消失方式，一种是打击了不少对象hp为0了，一种是随着自身BO_destroyer的设置而时间已经尽。        
         // WeaponEnergyExhaust 这个函数在“与敌人武器发生接触”和“与敌人肉体产生接触”的时候是不同的处理逻辑
-        private readonly List<UnityEngine.Events.UnityAction> _weaponEnergyExhaustMissions = new List<UnityAction>();
+        private readonly List<UnityAction> _weaponEnergyExhaustMissions = new List<UnityAction>(8);
+        UnityAction _attackerFreezeMission;
+        UnityAction _clearTargetsMission;
+
         void AddWeaponEnergyExhaust(HitPointPara hitPointPara)
         {
             if (weaponHP > 0 && CurrentHP > 0)
             {
                 CurrentHP -= hitPointPara.WeaponHpCost;
-                UnityEngine.Events.UnityAction wC = AttackerFreeze;
-                _weaponEnergyExhaustMissions.Add(wC);
+                _weaponEnergyExhaustMissions.Add(_attackerFreezeMission);
                 if (!ContinuousDamage)
                 {
-                    _weaponEnergyExhaustMissions.Add(ClearTargets);
+                    _weaponEnergyExhaustMissions.Add(_clearTargetsMission);
                 }
             }
             if (weaponHP <= 0)
             {
-                UnityEngine.Events.UnityAction we_C = AttackerFreeze;
-                _weaponEnergyExhaustMissions.Add(we_C);
+                _weaponEnergyExhaustMissions.Add(_attackerFreezeMission);
             }
             
             if (hitPointPara.exhaustEffect && !string.IsNullOrEmpty(ExplosionEffect))

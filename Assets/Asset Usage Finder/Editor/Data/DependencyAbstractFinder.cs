@@ -23,7 +23,7 @@ namespace AssetUsageFinder {
         public IEnumerable<ResultRow> Group(IEnumerable<ResultRow> inScenePro) {
             ResultRow cur = null;
             var res = new List<ResultRow>();
-            var list = inScenePro.OrderBy(t => t.Main.GetInstanceID());
+            var list = inScenePro.GroupBy(t => t.Main).SelectMany(group => group);
             var modificationsString = "Object.Modification.Modifications";
             var correpsondingString = "CorrespondingSourceObject";
             var gameObjectString = "GameObject";

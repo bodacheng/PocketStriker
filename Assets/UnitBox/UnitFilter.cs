@@ -41,7 +41,11 @@ public class UnitFilter : MonoBehaviour
                 text = types[i]
             };
             typeDropDown.options.Add(m_NewData);
+            if (types[i] == "human")
+                typeDropDown.SetValueWithoutNotify(i);
         }
+        typeDropDown.RefreshShownValue();
+        typeDropDown.gameObject.SetActive(types.Count > 1);
     }
 
     List<HeroIcon> TypeFilter(List<HeroIcon> originMainMenuIcons)

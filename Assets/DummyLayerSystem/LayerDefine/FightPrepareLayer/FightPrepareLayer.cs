@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -48,6 +48,32 @@ public partial class FightPrepareLayer : UILayer
     readonly HashSet<string> _preparedHeroModelIds = new HashSet<string>(StringComparer.Ordinal);
     readonly HashSet<string> _preparedEnemyModelIds = new HashSet<string>(StringComparer.Ordinal);
     readonly HashSet<string> _warmedIconRecordIds = new HashSet<string>(StringComparer.Ordinal);
+
+    int _displayVersion;
+    readonly SingleThreadProcessor _previewQueue = new SingleThreadProcessor();
+    readonly Dictionary<NineForShow, int> _previewVersions = new Dictionary<NineForShow, int>();
+
+    bool IsActiveDisplay(int version, CancellationToken token) =>
+        this != null && !IsClosing && version == _displayVersion && !token.IsCancellationRequested;
+
+    static void ClearUnitIcons(Transform parent)
+    {
+        if (parent == null) return;
+        foreach (Transform child in parent)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        _displayVersion++;
+        _previewVersions.Clear();
+        ClearUnitIcons(myTeamShowT);
+        ClearUnitIcons(enemyTeamShowT);
+        base.OnDestroy();
+    }
 
     public void SetLayerAnimatorTrigger(string code)
     {
@@ -133,11 +159,18 @@ public partial class FightPrepareLayer : UILayer
         );
     }
 
-    public void StageMembersInfoShow(FightInfo stage)
+    public async UniTask StageMembersInfoShow(FightInfo stage, CancellationToken token)
     {
-        MemberInfosShow(stage.FightMembers.HeroSets.GetValues(),
+        var version = ++_displayVersion;
+        var heroUnits = stage.FightMembers.HeroSets.GetValues();
+        var enemyUnits = stage.FightMembers.EnemySets.GetValues();
+        var enemyLookup = BuildUnitLookup(enemyUnits);
+        WarmupUnitIcons(heroUnits);
+        WarmupUnitIcons(enemyUnits);
+        MemberInfosShow(heroUnits,
             (x) =>
             {
+                if (!IsActiveDisplay(version, token)) return;
                 PreScene.target.Focusing.id = x;
                 PreScene.target.trySwitchToStep(MainSceneStep.UnitSkillEdit);
             },
@@ -158,13 +191,13 @@ public partial class FightPrepareLayer : UILayer
             teamEditIndicator.SetActive(false);
         }
 
-        var icons = MemberInfosShow(stage.FightMembers.EnemySets.GetValues(),
-            (x) =>
-            {
-                FocusTeam2Unit(x, stage.FightMembers.EnemySets.GetValues());
-            },
+        MemberInfosShow(enemyUnits,
+            id => FocusTeamUnit(id, enemyLookup, connector, nineForShow, version, token).Forget(),
             enemyTeamShowT, false);
-        icons.FirstOrDefault()?.iconButton.onClick.Invoke();
+        var defaultEnemyId = enemyUnits.FirstOrDefault()?.id;
+        await FocusTeamUnit(defaultEnemyId, enemyLookup, connector, nineForShow, version, token);
+        if (!IsActiveDisplay(version, token)) return;
+        WarmupUnitModels(enemyUnits, defaultEnemyId, connector, _preparedEnemyModelIds, token);
 
         if (stage.EventType == FightEventType.Arena)
         {
@@ -182,57 +215,50 @@ public partial class FightPrepareLayer : UILayer
         enemyInfiniteExModeFlg.SetActive(stage.team2CGMode == CriticalGaugeMode.Unlimited);
     }
 
-    async void FocusTeam2Unit(string instanceId, List<UnitInfo> team2Units)
+    async UniTask FocusTeamUnit(string instanceId, IReadOnlyDictionary<string, UnitInfo> teamUnits,
+        DedicatedCameraConnector targetConnector, NineForShow targetNineForShow, int displayVersion, CancellationToken token)
     {
-        ProgressLayer.Loading(String.Empty);
-        var info = team2Units.FirstOrDefault((x) => x.id == instanceId);
-        if (info != null)
-        {
-            await UniTask.WhenAll(
-                nineForShow.SkillSetInfoOfUnitOnArcadePage(info.set),
-                //Set2DView(info.r_id, view2D, unitOutAnimator, 0, 0.6f, 0, DedicatedCameraConnector.Unit2DViewYoKoSpaceWhenAtRight(info.r_id)),
-                connector.ShowModel(info.r_id)
-            );
-        }
-        ProgressLayer.Close();
-    }
+        if (!IsActiveDisplay(displayVersion, token) || string.IsNullOrEmpty(instanceId) ||
+            teamUnits == null || !teamUnits.TryGetValue(instanceId, out var info)) return;
 
-    async UniTask FocusTeamUnit(string instanceId, IReadOnlyDictionary<string, UnitInfo> teamUnits, DedicatedCameraConnector targetConnector, NineForShow targetNineForShow)
-    {
-        if (string.IsNullOrEmpty(instanceId) || teamUnits == null || !teamUnits.TryGetValue(instanceId, out var info))
-        {
-            return;
-        }
+        if (targetConnector == null) targetConnector = connector;
+        if (targetNineForShow == null) targetNineForShow = nineForShow;
+        if (targetConnector == null || targetNineForShow == null) return;
 
-        if (targetConnector == null)
-        {
-            targetConnector = connector;
-        }
-        if (targetNineForShow == null)
-        {
-            targetNineForShow = nineForShow;
-        }
+        _previewVersions.TryGetValue(targetNineForShow, out var previousVersion);
+        var previewVersion = previousVersion + 1;
+        _previewVersions[targetNineForShow] = previewVersion;
+        bool IsCurrent() => IsActiveDisplay(displayVersion, token) && targetConnector != null &&
+            targetNineForShow != null && _previewVersions.TryGetValue(targetNineForShow, out var current) &&
+            current == previewVersion;
 
-        ProgressLayer.Loading(String.Empty);
         try
         {
-            await UniTask.WhenAll(
-                targetNineForShow.SkillSetInfoOfUnitOnArcadePage(info.set),
-                targetConnector.ShowModel(info.r_id)
-            );
+            // The model/skill renderers do not accept cancellation. Serialize their writes and
+            // skip superseded queued requests so a slower old selection cannot overwrite the latest.
+            await _previewQueue.RunAsQueued(async () =>
+            {
+                if (!IsCurrent()) return;
+                ProgressLayer.Loading(string.Empty);
+                try
+                {
+                    await UniTask.WhenAll(
+                        targetNineForShow.SkillSetInfoOfUnitOnArcadePage(info.set),
+                        targetConnector.ShowModel(info.r_id));
+                }
+                catch (Exception) when (!IsCurrent()) { }
+                finally
+                {
+                    if (IsCurrent()) ProgressLayer.Close();
+                }
+            }).AttachExternalCancellation(token);
         }
-        finally
-        {
-            ProgressLayer.Close();
-        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
     }
 
     List<HeroIcon> MemberInfosShow(List<UnitInfo> heroSets, Action<string> iconBehaviour, RectTransform _showT, bool withSkillCheck, bool btnInteractive = true)
     {
-        foreach (Transform t in _showT)
-        {
-            Destroy(t.gameObject);
-        }
+        ClearUnitIcons(_showT);
         var icons = new List<HeroIcon>();
         foreach(var oneMember in heroSets)
         {
@@ -301,6 +327,7 @@ public partial class FightPrepareLayer : UILayer
             return;
         }
 
+        var version = _displayVersion;
         var preloadTasks = new List<UniTask>();
         foreach (var unit in units)
         {
@@ -319,7 +346,20 @@ public partial class FightPrepareLayer : UILayer
                 continue;
             }
 
-            preloadTasks.Add(targetConnector.PrepareModel(recordId));
+            preloadTasks.Add(_previewQueue.RunAsQueued(async () =>
+            {
+                if (!IsActiveDisplay(version, token) || targetConnector == null)
+                {
+                    preparedIds.Remove(recordId);
+                    return;
+                }
+                try { await targetConnector.PrepareModel(recordId); }
+                catch
+                {
+                    preparedIds.Remove(recordId);
+                    throw;
+                }
+            }));
         }
 
         if (preloadTasks.Count == 0)

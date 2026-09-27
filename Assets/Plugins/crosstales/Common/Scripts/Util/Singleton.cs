@@ -108,7 +108,7 @@ namespace Crosstales.Common.Util
             //SingletonHelper.isQuitting = true;
 
             if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
-               Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY: {instance.GetInstanceID()}");
+               Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY");
 
             if (!dontDestroy)
                Instance = null;

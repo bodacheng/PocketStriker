@@ -34,6 +34,11 @@ public class FightLogger
         DisposeDeathWatchers();
     }
     
+    public void StopWatchingDeaths()
+    {
+        DisposeDeathWatchers();
+    }
+
     public void ReadyToLog(IDictionary<TeamConfig, List<Data_Center>> teamMembers)
     {
         DisposeDeathWatchers();

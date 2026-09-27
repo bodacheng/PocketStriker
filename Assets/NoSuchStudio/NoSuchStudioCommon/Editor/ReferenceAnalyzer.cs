@@ -23,7 +23,7 @@ namespace NoSuchStudio.Common.Editor {
 
                     while (sp.NextVisible(true)) {
                         if (sp.propertyType == SerializedPropertyType.ObjectReference) {
-                            if (sp.objectReferenceValue == null && sp.objectReferenceInstanceIDValue != 0) {
+                            if (sp.objectReferenceValue == null && HasMissingObjectReference(sp)) {
                                 ShowError(go, sp.name);
                             }
                         }
@@ -34,6 +34,14 @@ namespace NoSuchStudio.Common.Editor {
 
         private static void ShowError(GameObject go, string propertyName) {
             Debug.LogFormat(LogType.Error, LogOption.None, go, "Missing reference found in {0} -> {1}", FullObjectPath(go), propertyName);
+        }
+
+        private static bool HasMissingObjectReference(SerializedProperty property) {
+#if UNITY_6000_5_OR_NEWER
+            return property.objectReferenceEntityIdValue != EntityId.None;
+#else
+            return property.objectReferenceInstanceIDValue != 0;
+#endif
         }
 
         private static string FullObjectPath(GameObject go) {

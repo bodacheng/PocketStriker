@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using HittingDetection;
 
@@ -7,7 +7,8 @@ public class HitBoxesProcesser : MonoBehaviour
     public static HitBoxesProcesser Instance;
     
     private static readonly Dictionary<Collider, HitBoxManager> ColliderHitBox = new Dictionary<Collider, HitBoxManager>();
-    private readonly List<Decomposition> _processingDecompositions = new List<Decomposition>();
+    private readonly List<Decomposition> _processingDecompositions = new List<Decomposition>(64);
+    private readonly HashSet<Decomposition> _processingMembership = new HashSet<Decomposition>();
     
     void Awake()
     {
@@ -17,6 +18,7 @@ public class HitBoxesProcesser : MonoBehaviour
     public void Clear()
     {
         _processingDecompositions.Clear();
+        _processingMembership.Clear();
     }
 
     public HitBoxManager GetHitBox(Collider c)
@@ -44,7 +46,8 @@ public class HitBoxesProcesser : MonoBehaviour
     {
         for (var i = 0; i < _processingDecompositions.Count; i++)
         {
-            _processingDecompositions[i].Phase = -1;
+            if (_processingDecompositions[i] != null)
+                _processingDecompositions[i].Phase = -1;
         }
     }
 
@@ -52,25 +55,40 @@ public class HitBoxesProcesser : MonoBehaviour
     {
         if (_processingDecompositions.Count > 0)
         {
-            for (var i = 0; i < _processingDecompositions.Count; i++)
+            if (!Physics.autoSyncTransforms)
             {
-                _processingDecompositions[i].Step1();
+                foreach (var item in _processingDecompositions)
+                {
+                    if (item != null && item.RequiresTransformSyncBeforePhysicsQuery)
+                    {
+                        Physics.SyncTransforms();
+                        break;
+                    }
+                }
             }
             for (var i = 0; i < _processingDecompositions.Count; i++)
             {
-                _processingDecompositions[i].Step2();
+                if (_processingDecompositions[i] != null)
+                    _processingDecompositions[i].Step1();
             }
             for (var i = 0; i < _processingDecompositions.Count; i++)
             {
-                _processingDecompositions[i].Life();
+                if (_processingDecompositions[i] != null)
+                    _processingDecompositions[i].Step2();
+            }
+            for (var i = 0; i < _processingDecompositions.Count; i++)
+            {
+                if (_processingDecompositions[i] != null)
+                    _processingDecompositions[i].Life();
             }
             _processingDecompositions.Clear();
+            _processingMembership.Clear();
         }
     }
 
     void AddToHitBoxesProcessorList(Decomposition poolObject)
     {
-        if (!_processingDecompositions.Contains(poolObject))
+        if (poolObject != null && _processingMembership.Add(poolObject))
             _processingDecompositions.Add(poolObject);
     }
 }

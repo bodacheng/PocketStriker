@@ -9,6 +9,7 @@ namespace MagicaCloth2
     /// Capsuleコライダーコンポーネント
     /// </summary>
     [AddComponentMenu("MagicaCloth2/MagicaCapsuleCollider")]
+    [HelpURL("https://magicasoft.jp/en/mc2_capsulecollidercomponent/")]
     public class MagicaCapsuleCollider : ColliderComponent
     {
         public enum Direction
@@ -29,20 +30,32 @@ namespace MagicaCloth2
         public Direction direction = Direction.X;
 
         /// <summary>
+        /// Reverse direction.
+        /// 方向を逆転させる
+        /// </summary>
+        public bool reverseDirection = false;
+
+        /// <summary>
         /// 半径をStart/End別々に設定
         /// Set radius separately for Start/End.
         /// </summary>
         public bool radiusSeparation = false;
 
+        /// <summary>
+        /// 中央揃え
+        /// Aligned on center.
+        /// </summary>
+        public bool alignedOnCenter = true;
+
 
         public override ColliderManager.ColliderType GetColliderType()
         {
             if (direction == Direction.X)
-                return ColliderManager.ColliderType.CapsuleX;
+                return alignedOnCenter ? ColliderManager.ColliderType.CapsuleX_Center : ColliderManager.ColliderType.CapsuleX_Start;
             else if (direction == Direction.Y)
-                return ColliderManager.ColliderType.CapsuleY;
+                return alignedOnCenter ? ColliderManager.ColliderType.CapsuleY_Center : ColliderManager.ColliderType.CapsuleY_Start;
             else
-                return ColliderManager.ColliderType.CapsuleZ;
+                return alignedOnCenter ? ColliderManager.ColliderType.CapsuleZ_Center : ColliderManager.ColliderType.CapsuleZ_Start;
         }
 
         /// <summary>
@@ -79,12 +92,14 @@ namespace MagicaCloth2
         /// <returns></returns>
         public Vector3 GetLocalDir()
         {
+            float rev = reverseDirection ? -1 : 1;
+
             if (direction == Direction.X)
-                return Vector3.right;
+                return Vector3.right * rev;
             else if (direction == Direction.Y)
-                return Vector3.up;
+                return Vector3.up * rev;
             else
-                return Vector3.forward;
+                return Vector3.forward * rev;
         }
 
         /// <summary>
@@ -100,6 +115,12 @@ namespace MagicaCloth2
             else
                 return Vector3.up;
         }
+
+        /// <summary>
+        /// 方向の逆転（基本的にカプセルコライダー用）
+        /// </summary>
+        /// <returns></returns>
+        public override bool IsReverseDirection() => reverseDirection;
 
         public override void DataValidate()
         {

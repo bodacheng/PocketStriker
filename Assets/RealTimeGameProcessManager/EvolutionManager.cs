@@ -44,6 +44,8 @@ public class EvolutionManager
     
     public async UniTask ChangeSkill(Data_Center focusUnit, int targetSlotIndex, string skillId)
     {
+        focusUnit._MyBehaviorRunner.ChangeToWaitingState();
+        focusUnit._MyBehaviorRunner.fixedSkillSequence.Clear();
         switch (targetSlotIndex)
         {
             case 1:

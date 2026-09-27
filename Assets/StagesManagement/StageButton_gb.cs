@@ -7,15 +7,14 @@ using Cysharp.Threading.Tasks;
 public partial class StageButton : MonoBehaviour
 {
     public void LoadUnitIconsGangbang(List<UnitInfo> units, Func<string, int> TeamCountGet, 
-        Func<UnitInfo, UniTask> iconButtonFeature, bool clickBoss = false)
+        Func<UnitInfo, UniTask> iconButtonFeature, bool clickBoss = false, Func<bool> isCurrent = null)
     {
         var heroIcons = GangbangUnitInfosShow(units, TeamCountGet,
             async (x) =>
             {
-                ProgressLayer.Loading(string.Empty);
+                if (this == null || (isCurrent != null && !isCurrent())) return;
                 var targetUnitInfo = units.FirstOrDefault(info => info.id == x);
-                await iconButtonFeature(targetUnitInfo);
-                ProgressLayer.Close();
+                if (targetUnitInfo != null) await iconButtonFeature(targetUnitInfo);
             },
             iconsT);
         for (var i = 0; i < heroIcons.Count; i++)
@@ -32,6 +31,7 @@ public partial class StageButton : MonoBehaviour
     {
         foreach (Transform t in showT)
         {
+            t.gameObject.SetActive(false);
             Destroy(t.gameObject);
         }
         var icons = new List<GangbangHeroIcon>();

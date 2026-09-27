@@ -58,6 +58,27 @@ namespace HittingDetection
         private readonly List<Vector3> _shieldHitPos = new List<Vector3>();
         private readonly List<V_Damage> hitsOnHealthBody = new List<V_Damage>();
         readonly bool _traditionalDefendMode = false;
+
+        public bool RequiresTransformSyncBeforePhysicsQuery
+        {
+            get
+            {
+                if (!_enabled)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < _markers.Count; i++)
+                {
+                    if (_markers[i] is Trail_Marker trailMarker && trailMarker.WillQueryPhysics)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
         
         public string GeneratedByStateKey { get; set; }
         HitBoxLifeEnding hitBoxLifeEnding = HitBoxLifeEnding.untouched;
@@ -104,6 +125,8 @@ namespace HittingDetection
         void Awake()
         {
             _usedTargets = _localUsedTargets;
+            _attackerFreezeMission = AttackerFreeze;
+            _clearTargetsMission = ClearTargets;
             Transform _MarkersParent = transform;
             Transform[] children = new Transform[_MarkersParent.childCount];
             var bms = new List<Marker>(children.Length);

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -10,6 +11,14 @@ using UnityEngine;
 public class FightInfoGUI : Editor
 {
     private StageEditor _stageEditor;
+
+    void OnDisable()
+    {
+        _stageEditor?.Dispose();
+        _stageEditor = null;
+        _initialized = false;
+    }
+
     private bool _initialized = false;
     
     public override void OnInspectorGUI()
@@ -58,17 +67,32 @@ public class FightInfoGUI : Editor
         }
     }
     
+    static readonly Dictionary<string, Sprite> SpriteCache = new Dictionary<string, Sprite>(StringComparer.OrdinalIgnoreCase);
+
+    static FightInfoGUI()
+    {
+        EditorApplication.projectChanged += SpriteCache.Clear;
+    }
+
     public static Sprite GetSprite(string name)
     {
-        var searchRootAssetFolder = Application.dataPath;
-        var pfGuiPaths = Directory.GetFiles(searchRootAssetFolder, name, SearchOption.AllDirectories);
-        foreach (var eachPath in pfGuiPaths)
+        if (string.IsNullOrEmpty(name)) return null;
+        if (SpriteCache.TryGetValue(name, out var cached)) return cached;
+        Sprite sprite = null;
+        if (name.StartsWith("Assets/", StringComparison.Ordinal))
+            sprite = AssetDatabase.LoadAssetAtPath<Sprite>(name);
+        else
         {
-            var loadPath = eachPath.Substring(eachPath.LastIndexOf("Assets"));
-            var sprite =(Sprite)AssetDatabase.LoadAssetAtPath(loadPath, typeof(Sprite));
-            return sprite;
+            foreach (var guid in AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(name) + " t:Sprite", new[] { "Assets" }))
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (!string.Equals(Path.GetFileName(assetPath), name, StringComparison.OrdinalIgnoreCase)) continue;
+                sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                if (sprite != null) break;
+            }
         }
-        return null;
+        SpriteCache[name] = sprite;
+        return sprite;
     }
 }
 #endif

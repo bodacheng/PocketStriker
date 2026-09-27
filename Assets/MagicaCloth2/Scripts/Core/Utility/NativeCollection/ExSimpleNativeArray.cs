@@ -7,6 +7,9 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
+#if UNITY_6000_5_OR_NEWER
+using System.Runtime.InteropServices;
+#endif
 
 namespace MagicaCloth2
 {
@@ -45,6 +48,7 @@ namespace MagicaCloth2
 
         public ExSimpleNativeArray(T[] dataArray) : this()
         {
+            Debug.Assert(dataArray != null);
             nativeArray = new NativeArray<T>(dataArray, Allocator.Persistent);
             length = dataArray.Length;
             count = length;
@@ -52,6 +56,7 @@ namespace MagicaCloth2
 
         public ExSimpleNativeArray(NativeArray<T> array) : this()
         {
+            Debug.Assert(array.IsCreated);
             nativeArray = new NativeArray<T>(array, Allocator.Persistent);
             length = array.Length;
             count = length;
@@ -59,9 +64,15 @@ namespace MagicaCloth2
 
         public ExSimpleNativeArray(NativeList<T> array) : this()
         {
+            Debug.Assert(array.IsCreated);
             nativeArray = new NativeArray<T>(array.AsArray(), Allocator.Persistent);
             length = array.Length;
             count = length;
+        }
+
+        public ExSimpleNativeArray(SerializationData sdata)
+        {
+            Deserialize(sdata);
         }
 
         public void Dispose()
@@ -105,11 +116,13 @@ namespace MagicaCloth2
         //=========================================================================================
         /// <summary>
         /// 領域のみ拡張する
+        /// すでにその長さの領域が確保されている場合は何もしない
         /// </summary>
-        /// <param name="capacity"></param>
-        public void AddCapacity(int capacity)
+        /// <param name="newLength"></param>
+        public void SetLength(int newLength)
         {
-            Expand(capacity, true);
+            if (newLength > length)
+                Expand(newLength - length, force: true, copy: true);
         }
 
         /// <summary>
@@ -128,8 +141,13 @@ namespace MagicaCloth2
         /// <param name="dataArray"></param>
         public void AddRange(T[] dataArray)
         {
+            Debug.Assert(dataArray != null);
+
             if (length == 0)
             {
+                if (nativeArray.IsCreated)
+                    nativeArray.Dispose();
+
                 nativeArray = new NativeArray<T>(dataArray, Allocator.Persistent);
                 length = dataArray.Length;
                 count = length;
@@ -150,8 +168,13 @@ namespace MagicaCloth2
         /// <param name="dataArray"></param>
         public void AddRange(T[] dataArray, int cnt)
         {
+            Debug.Assert(dataArray != null);
+
             if (length == 0)
             {
+                if (nativeArray.IsCreated)
+                    nativeArray.Dispose();
+
                 nativeArray = new NativeArray<T>(cnt, Allocator.Persistent);
                 // copy
                 NativeArray<T>.Copy(dataArray, 0, nativeArray, 0, cnt);
@@ -182,8 +205,13 @@ namespace MagicaCloth2
 
         public void AddRange(NativeArray<T> narray)
         {
+            Debug.Assert(narray.IsCreated);
+
             if (length == 0)
             {
+                if (nativeArray.IsCreated)
+                    nativeArray.Dispose();
+
                 nativeArray = new NativeArray<T>(narray, Allocator.Persistent);
                 length = narray.Length;
                 count = length;
@@ -198,8 +226,19 @@ namespace MagicaCloth2
             }
         }
 
+        public void AddRange(NativeArray<T> narray, int start, int length)
+        {
+            if (length > 0)
+            {
+                Expand(length);
+                NativeArray<T>.Copy(narray, start, nativeArray, count, length);
+                count += length;
+            }
+        }
+
         public void AddRange(NativeList<T> nlist)
         {
+            Debug.Assert(nlist.IsCreated);
             AddRange(nlist.AsArray());
         }
 
@@ -216,16 +255,32 @@ namespace MagicaCloth2
         /// <returns></returns>
         public unsafe void AddRange<U>(U[] array) where U : struct
         {
+            Debug.Assert(array != null);
+
             int dataLength = array.Length;
             Expand(dataLength);
 
             // copy
             int dstSize = UnsafeUtility.SizeOf<T>();
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+                UnsafeUtility.MemCpy(dst_p + count * dstSize, src_p, (long)dataLength * dstSize);
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
             UnsafeUtility.MemCpy(dst_p + count * dstSize, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
             count += dataLength;
         }
 
@@ -239,23 +294,42 @@ namespace MagicaCloth2
         /// <returns></returns>
         public unsafe void AddRangeTypeChange<U>(U[] array) where U : struct
         {
+            Debug.Assert(array != null);
+
             int srcSize = UnsafeUtility.SizeOf<U>();
             int dstSize = UnsafeUtility.SizeOf<T>();
             int dataLength = (array.Length * srcSize) / dstSize;
 
             Expand(dataLength);
 
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+
+                UnsafeUtility.MemCpy(dst_p + count * dstSize, src_p, (long)dataLength * dstSize);
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
 
             UnsafeUtility.MemCpy(dst_p + count * dstSize, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
             count += dataLength;
         }
 
         public unsafe void AddRangeTypeChange<U>(NativeArray<U> array) where U : struct
         {
+            Debug.Assert(array.IsCreated);
+
             int srcSize = UnsafeUtility.SizeOf<U>();
             int dstSize = UnsafeUtility.SizeOf<T>();
             int dataLength = (array.Length * srcSize) / dstSize;
@@ -277,12 +351,28 @@ namespace MagicaCloth2
         /// <returns></returns>
         public unsafe void AddRangeStride<U>(U[] array) where U : struct
         {
+            Debug.Assert(array != null);
             int dataLength = array.Length;
             Expand(dataLength);
 
             int srcSize = UnsafeUtility.SizeOf<U>();
             int dstSize = UnsafeUtility.SizeOf<T>();
 
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+                int elementSize = math.min(srcSize, dstSize);
+
+                UnsafeUtility.MemCpyStride(dst_p + count * dstSize, dstSize, src_p, srcSize, elementSize, dataLength);
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
@@ -290,6 +380,7 @@ namespace MagicaCloth2
 
             UnsafeUtility.MemCpyStride(dst_p + count * dstSize, dstSize, src_p, srcSize, elementSize, dataLength);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
             count += dataLength;
         }
 
@@ -338,11 +429,25 @@ namespace MagicaCloth2
             int dataLength = (Length * srcSize) / dstSize;
 
             byte* src_p = (byte*)nativeArray.GetUnsafePtr();
+#if UNITY_6000_5_OR_NEWER
+            GCHandle dstGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* dst_p = (void*)dstGCHandle.AddrOfPinnedObject();
+
+                UnsafeUtility.MemCpy(dst_p, src_p, (long)dataLength * dstSize);
+            }
+            finally
+            {
+                dstGCHandle.Free();
+            }
+#else
             ulong dst_gcHandle;
             void* dst_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out dst_gcHandle);
 
             UnsafeUtility.MemCpy(dst_p, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(dst_gcHandle);
+#endif
         }
 
         /// <summary>
@@ -358,6 +463,21 @@ namespace MagicaCloth2
             int dataLength = Length;
 
             byte* src_p = (byte*)nativeArray.GetUnsafePtr();
+#if UNITY_6000_5_OR_NEWER
+            GCHandle dstGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* dst_p = (void*)dstGCHandle.AddrOfPinnedObject();
+
+                int elementSize = srcSize;
+
+                UnsafeUtility.MemCpyStride(dst_p, dstSize, src_p, srcSize, elementSize, dataLength);
+            }
+            finally
+            {
+                dstGCHandle.Free();
+            }
+#else
             ulong dst_gcHandle;
             void* dst_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out dst_gcHandle);
 
@@ -365,6 +485,7 @@ namespace MagicaCloth2
 
             UnsafeUtility.MemCpyStride(dst_p, dstSize, src_p, srcSize, elementSize, dataLength);
             UnsafeUtility.ReleaseGCObject(dst_gcHandle);
+#endif
         }
 
         public void CopyFrom(NativeArray<T> array)
@@ -455,13 +576,16 @@ namespace MagicaCloth2
         /// </summary>
         /// <param name="dataLength"></param>
         /// <param name="force">強制的に領域を追加</param>
-        void Expand(int dataLength, bool force = false)
+        /// <param name="copy">古いデータをコピーするかどうか</param>
+        void Expand(int dataLength, bool force = false, bool copy = true)
         {
-            //int newlength = count + dataLength;
             int newlength = force ? length + dataLength : count + dataLength;
 
             if (length == 0)
             {
+                if (nativeArray.IsCreated)
+                    nativeArray.Dispose();
+
                 nativeArray = new NativeArray<T>(dataLength, Allocator.Persistent);
                 length = dataLength;
             }
@@ -471,8 +595,11 @@ namespace MagicaCloth2
                 var newNativeArray = new NativeArray<T>(newlength, Allocator.Persistent);
 
                 // copy
-                // コピーは使用分だけ
-                NativeArray<T>.Copy(nativeArray, newNativeArray, count);
+                if (copy)
+                {
+                    // コピーは使用分だけ
+                    NativeArray<T>.Copy(nativeArray, newNativeArray, count);
+                }
 
                 nativeArray.Dispose();
                 nativeArray = newNativeArray;
@@ -484,8 +611,8 @@ namespace MagicaCloth2
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"ExNativeArray Length:{Length} Count:{Count} IsValid:{IsValid}");
-            sb.AppendLine("---- Datas[100] ----");
+            sb.AppendLine($"ExSimpleNativeArray Length:{Length} Count:{Count} IsValid:{IsValid}");
+            sb.AppendLine("---- Datas[~100] ----");
             if (IsValid)
             {
                 for (int i = 0; i < Length && i < 100; i++)
@@ -495,6 +622,60 @@ namespace MagicaCloth2
             }
 
             return sb.ToString();
+        }
+
+        //=========================================================================================
+        /// <summary>
+        /// シリアライズデータ
+        /// </summary>
+        [System.Serializable]
+        public class SerializationData
+        {
+            public int count;
+            public int length;
+            public byte[] arrayBytes;
+        }
+
+        /// <summary>
+        /// シリアライズする
+        /// </summary>
+        /// <returns></returns>
+        public SerializationData Serialize()
+        {
+            var data = new SerializationData();
+            data.count = count;
+            data.length = length;
+            if (nativeArray.IsCreated && nativeArray.Length > 0)
+            {
+                data.arrayBytes = nativeArray.MC2ToRawBytes();
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// デシリアライズする
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public bool Deserialize(SerializationData data)
+        {
+            try
+            {
+                Dispose();
+                count = data.count;
+                length = data.length;
+                if (data.length > 0 && data.arrayBytes != null)
+                {
+                    nativeArray = NativeArrayExtensions.MC2FromRawBytes<T>(data.arrayBytes, Allocator.Persistent);
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                return false;
+            }
         }
     }
 }

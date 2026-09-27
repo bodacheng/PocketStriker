@@ -358,7 +358,7 @@ namespace DummyLayerSystem
             if (layer == null)
                 return "<null>";
 
-            return $"{layer.GetType().Name}#{layer.GetInstanceID()} path={GetPath(layer.transform)} active={layer.gameObject.activeInHierarchy}";
+            return $"{layer.GetType().Name}#{layer.GetEntityId()} path={GetPath(layer.transform)} active={layer.gameObject.activeInHierarchy}";
         }
 
         static string GetPath(Transform target)

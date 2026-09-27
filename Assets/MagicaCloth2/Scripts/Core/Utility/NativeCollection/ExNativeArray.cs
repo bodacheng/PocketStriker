@@ -7,6 +7,10 @@ using System.Text;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
+using UnityEngine;
+#if UNITY_6000_5_OR_NEWER
+using System.Runtime.InteropServices;
+#endif
 
 namespace MagicaCloth2
 {
@@ -119,7 +123,18 @@ namespace MagicaCloth2
         /// <returns></returns>
         public DataChunk AddRange(int dataLength)
         {
+            // サイズ0対応
+            if (dataLength == 0)
+            {
+                // 領域だけは0で確保する
+                if (nativeArray.IsCreated == false)
+                    nativeArray = new NativeArray<T>(0, Allocator.Persistent);
+
+                return DataChunk.Empty;
+            }
+
             var chunk = GetEmptyChunk(dataLength);
+
             if (chunk.IsValid == false)
             {
                 // 空きを増やす
@@ -221,12 +236,31 @@ namespace MagicaCloth2
             int dataLength = array.Length;
             var chunk = AddRange(dataLength);
 
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+
+                UnsafeUtility.MemCpy(
+                    dst_p + chunk.startIndex * dstSize,
+                    src_p,
+                    (long)dataLength * dstSize
+                );
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
 
             UnsafeUtility.MemCpy(dst_p + chunk.startIndex * dstSize, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
 
             return chunk;
         }
@@ -270,12 +304,27 @@ namespace MagicaCloth2
             int dataLength = (array.Length * srcSize) / dstSize;
             var chunk = AddRange(dataLength);
 
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+
+                UnsafeUtility.MemCpy(dst_p + chunk.startIndex * dstSize, src_p, (long)dataLength * dstSize);
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
 
             UnsafeUtility.MemCpy(dst_p + chunk.startIndex * dstSize, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
 
             return chunk;
         }
@@ -296,6 +345,21 @@ namespace MagicaCloth2
             int dataLength = array.Length;
             var chunk = AddRange(dataLength);
 
+#if UNITY_6000_5_OR_NEWER
+            GCHandle srcGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* src_p = (void*)srcGCHandle.AddrOfPinnedObject();
+                byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
+                int elementSize = math.min(srcSize, dstSize);
+
+                UnsafeUtility.MemCpyStride(dst_p + chunk.startIndex * dstSize, dstSize, src_p, srcSize, elementSize, dataLength);
+            }
+            finally
+            {
+                srcGCHandle.Free();
+            }
+#else
             ulong src_gcHandle;
             void* src_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out src_gcHandle);
             byte* dst_p = (byte*)nativeArray.GetUnsafePtr();
@@ -303,6 +367,7 @@ namespace MagicaCloth2
 
             UnsafeUtility.MemCpyStride(dst_p + chunk.startIndex * dstSize, dstSize, src_p, srcSize, elementSize, dataLength);
             UnsafeUtility.ReleaseGCObject(src_gcHandle);
+#endif
 
             return chunk;
         }
@@ -312,6 +377,60 @@ namespace MagicaCloth2
             var chunk = AddRange(1);
             nativeArray[chunk.startIndex] = data;
             return chunk;
+        }
+
+        /// <summary>
+        /// 指定チャンクのデータ数を拡張し新しいチャンクを返す
+        /// 古いチャンクのデータは新しいチャンクにコピーされる
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="newDataLength"></param>
+        /// <returns></returns>
+        public DataChunk Expand(DataChunk c, int newDataLength)
+        {
+            Develop.Assert(c.IsValid);
+            if (c.IsValid == false)
+                return c;
+            if (newDataLength <= c.dataLength)
+                return c;
+
+            // 新しい領域を確保する
+            var nc = AddRange(newDataLength);
+
+            // 古い領域をコピーする
+            NativeArray<T>.Copy(nativeArray, c.startIndex, nativeArray, nc.startIndex, c.dataLength);
+
+            // 古い領域を開放する
+            Remove(c);
+
+            return nc;
+        }
+
+        /// <summary>
+        /// 指定チャンクのデータ数を拡張し新しいチャンクを返す
+        /// 古いチャンクのデータは新しいチャンクにコピーされる
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="newDataLength"></param>
+        /// <returns></returns>
+        public DataChunk ExpandAndFill(DataChunk c, int newDataLength, T fillData = default(T), T clearData = default(T))
+        {
+            Develop.Assert(c.IsValid);
+            if (c.IsValid == false)
+                return c;
+            if (newDataLength <= c.dataLength)
+                return c;
+
+            // 新しい領域を確保する
+            var nc = AddRange(newDataLength, fillData);
+
+            // 古い領域をコピーする
+            NativeArray<T>.Copy(nativeArray, c.startIndex, nativeArray, nc.startIndex, c.dataLength);
+
+            // 古い領域を開放する
+            RemoveAndFill(c, clearData);
+
+            return nc;
         }
 
         public T[] ToArray()
@@ -324,6 +443,12 @@ namespace MagicaCloth2
             NativeArray<T>.Copy(nativeArray, array);
         }
 
+        public void CopyTo(T[] array, int startIndex)
+        {
+            Debug.Assert(array != null);
+            NativeArray<T>.Copy(nativeArray, startIndex, array, 0, array.Length);
+        }
+
         public void CopyTo<U>(U[] array) where U : struct
         {
             NativeArray<U>.Copy(nativeArray.Reinterpret<U>(), array);
@@ -334,9 +459,20 @@ namespace MagicaCloth2
             NativeArray<T>.Copy(array, nativeArray);
         }
 
+        public void CopyFrom(T[] array, int startIndex)
+        {
+            Debug.Assert(array != null);
+            NativeArray<T>.Copy(array, 0, nativeArray, startIndex, array.Length);
+        }
+
         public void CopyFrom<U>(NativeArray<U> array) where U : struct
         {
             NativeArray<T>.Copy(array.Reinterpret<T>(), nativeArray);
+        }
+
+        public void CopyFrom<U>(NativeArray<U> array, int dstIndex, int length) where U : struct
+        {
+            NativeArray<T>.Copy(array.Reinterpret<T>(), 0, nativeArray, dstIndex, length);
         }
 
         /// <summary>
@@ -352,11 +488,25 @@ namespace MagicaCloth2
             int dataLength = (Length * srcSize) / dstSize;
 
             byte* src_p = (byte*)nativeArray.GetUnsafePtr();
+#if UNITY_6000_5_OR_NEWER
+            GCHandle dstGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* dst_p = (void*)dstGCHandle.AddrOfPinnedObject();
+
+                UnsafeUtility.MemCpy(dst_p, src_p, (long)dataLength * dstSize);
+            }
+            finally
+            {
+                dstGCHandle.Free();
+            }
+#else
             ulong dst_gcHandle;
             void* dst_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out dst_gcHandle);
 
             UnsafeUtility.MemCpy(dst_p, src_p, dataLength * dstSize);
             UnsafeUtility.ReleaseGCObject(dst_gcHandle);
+#endif
         }
 
         /// <summary>
@@ -372,6 +522,21 @@ namespace MagicaCloth2
             int dataLength = Length;
 
             byte* src_p = (byte*)nativeArray.GetUnsafePtr();
+#if UNITY_6000_5_OR_NEWER
+            GCHandle dstGCHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            try
+            {
+                void* dst_p = (void*)dstGCHandle.AddrOfPinnedObject();
+
+                int elementSize = srcSize;
+
+                UnsafeUtility.MemCpyStride(dst_p, dstSize, src_p, srcSize, elementSize, dataLength);
+            }
+            finally
+            {
+                dstGCHandle.Free();
+            }
+#else
             ulong dst_gcHandle;
             void* dst_p = UnsafeUtility.PinGCArrayAndGetDataAddress(array, out dst_gcHandle);
 
@@ -379,6 +544,7 @@ namespace MagicaCloth2
 
             UnsafeUtility.MemCpyStride(dst_p, dstSize, src_p, srcSize, elementSize, dataLength);
             UnsafeUtility.ReleaseGCObject(dst_gcHandle);
+#endif
         }
 
         /// <summary>
@@ -407,6 +573,11 @@ namespace MagicaCloth2
                     useCount = math.max(useCount, echunk.startIndex);
                 }
             }
+        }
+
+        public void Remove(int index)
+        {
+            Remove(new DataChunk(index));
         }
 
         public void RemoveAndFill(DataChunk chunk, T clearData = default(T))
@@ -486,6 +657,18 @@ namespace MagicaCloth2
             }
         }
 
+        public unsafe ref T GetRef(int index)
+        {
+            T* p = (T*)nativeArray.GetUnsafePtr();
+            return ref *(p + index);
+        }
+
+        //public unsafe ref T GetRef(int index)
+        //{
+        //    var span = new Span<T>(nativeArray.GetUnsafePtr(), nativeArray.Length);
+        //    return ref span[index];
+        //}
+
         /// <summary>
         /// Jobで利用する場合はこの関数でNativeArrayに変換して受け渡す
         /// </summary>
@@ -508,6 +691,9 @@ namespace MagicaCloth2
         //=========================================================================================
         DataChunk GetEmptyChunk(int dataLength)
         {
+            if (dataLength <= 0)
+                return new DataChunk();
+
             for (int i = 0; i < emptyChunks.Count; i++)
             {
                 var c = emptyChunks[i];
@@ -536,6 +722,9 @@ namespace MagicaCloth2
 
         void AddEmptyChunk(DataChunk chunk)
         {
+            if (chunk.IsValid == false)
+                return;
+
             // 後ろに連結できる場所を探す
             for (int i = 0; i < emptyChunks.Count; i++)
             {
@@ -593,6 +782,11 @@ namespace MagicaCloth2
             sb.AppendLine();
 
             return sb.ToString();
+        }
+
+        public string ToSummary()
+        {
+            return $"ExNativeArray Length:{Length} Count:{Count} IsValid:{IsValid}";
         }
     }
 }

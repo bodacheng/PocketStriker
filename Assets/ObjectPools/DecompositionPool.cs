@@ -1,9 +1,8 @@
-﻿using UnityEngine.Animations;
+using UnityEngine.Animations;
 using UnityEngine;
 using UniRx.Toolkit;
 using HittingDetection;
 using System;
-using System.Collections.Generic;
 using Log;
 
 public class DecompositionPool : ObjectPool<Decomposition> {
@@ -23,55 +22,6 @@ public class DecompositionPool : ObjectPool<Decomposition> {
     {
         EnsureMarker();
         Prefab = prefab;
-    }
-    
-    /// <summary>
-    /// Return instance to pool.
-    /// </summary>
-    public override void Return(Decomposition instance)
-    {
-        if (isDisposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
-        if (instance == null)
-        {
-            return;
-        }
-        if (q == null) q = new List<Decomposition>();
-        if ((q.Count + 1) == MaxPoolCount)
-        {
-            throw new InvalidOperationException("Reached Max PoolSize");
-        }
-        OnBeforeReturn(instance);
-        if (!q.Contains(instance))
-            q.Add(instance);
-        else{
-            Debug.Log(" 邪门了："+ instance);
-        }
-    }
-
-    /// <summary>
-    /// Get instance from pool.
-    /// </summary>
-    public override Decomposition Rent()
-    {
-        if (isDisposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
-        if (q == null) q = new List<Decomposition>();
-        Decomposition instance = null;
-        if (q.Count > 0)
-        {
-            instance = q[0];
-        }
-        if (instance == null)
-        {
-            instance = CreateInstance();
-        }else{
-            q.Remove(instance);
-        }
-        if (instance == null)
-        {
-            return null;
-        }
-        OnBeforeRent(instance);
-        return instance;
     }
     
     protected override void OnBeforeReturn(Decomposition instance)
@@ -101,14 +51,13 @@ public class DecompositionPool : ObjectPool<Decomposition> {
         var a = UnityEngine.Object.Instantiate(Prefab);
         if (a == null)
         {
-            Debug.Log("逻辑问题"+ Prefab);
-            return null;
+            throw new InvalidOperationException($"Could not instantiate pooled prefab: {Prefab}");
         }
         var decomposition = a.GetComponent<Decomposition>();
         if (decomposition == null)
         {
-            Debug.Log("decomposition："+ Prefab.name);
-            return null;
+            UnityEngine.Object.Destroy(a);
+            throw new InvalidOperationException($"Pooled prefab has no Decomposition component: {Prefab.name}");
         }
 
         a.transform.SetParent(Marker.transform);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -37,14 +38,24 @@ namespace FightScene
             Target = this;
         }
         
-        public async UniTask LoadUnits(FightInfo info)
+        public async UniTask LoadUnits(FightInfo info, Action<float> onProgress = null)
         {
+            var totalUnits = info.FightMembers.HeroSets.mDict.Count + info.FightMembers.EnemySets.mDict.Count;
+            var loadedProgress = 0f;
+            void ReportProgressDelta(float delta)
+            {
+                loadedProgress += delta;
+                onProgress?.Invoke(totalUnits > 0 ? Mathf.Clamp01(loadedProgress / totalUnits) : 1f);
+            }
+            onProgress?.Invoke(0f);
+            var concurrentLoads = info.EventType == FightEventType.Gangbang ? 2 : 1;
             await UniTask.WhenAll(
-                team1._UnitsLoad(info.FightMembers.HeroSets, UnitInfoRef), 
-                team2._UnitsLoad(info.FightMembers.EnemySets, UnitInfoRef)
+                team1._UnitsLoad(info.FightMembers.HeroSets, UnitInfoRef, ReportProgressDelta, concurrentLoads),
+                team2._UnitsLoad(info.FightMembers.EnemySets, UnitInfoRef, ReportProgressDelta, concurrentLoads)
             );
+            onProgress?.Invoke(1f);
         }
-        
+
         public void SetGame(FightInfo stage)
         {
             _loadFight = stage;
@@ -139,6 +150,7 @@ namespace FightScene
         
         public void ClearUnitData()
         {
+            FightLogger.value.StopWatchingDeaths();
             foreach (var one in team1.teamMembers.GetValues())
             {
                 one.CleanClear();

@@ -10,6 +10,7 @@ bundled Mono/compiler and never starts the editor or contacts PlayFab.
 
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 
@@ -41,6 +42,8 @@ def main():
         if not dependency.is_file():
             raise SystemExit(f"Missing Unity compiler dependency: {dependency}")
     newtonsoft = json_dlls[-1]
+    sdk_source = (root / "Assets/PlayFabSDK/Shared/Public/PlayFabSettings.cs").read_text()
+    sdk_version = re.search(r'SdkVersion\s*=\s*"([^"]+)"', sdk_source).group(1)
 
     with tempfile.TemporaryDirectory(prefix="pocketstriker-contracts-") as directory:
         executable = Path(directory) / "CloudScriptContractTests.exe"
@@ -57,7 +60,7 @@ def main():
             str(editor / "Contents/Resources/Scripting/Managed/UnityEngine"),
             str(mono_root / "lib/mono/4.5/Facades"),
         ])
-        subprocess.run([str(mono), str(executable)], check=True, cwd=root, env=environment)
+        subprocess.run([str(mono), str(executable), sdk_version], check=True, cwd=root, env=environment)
 
 
 if __name__ == "__main__":

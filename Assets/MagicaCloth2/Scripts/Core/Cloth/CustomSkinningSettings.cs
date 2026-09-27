@@ -19,10 +19,8 @@ namespace MagicaCloth2
         public bool enable = false;
 
         /// <summary>
-        /// bones for skinning.
-        /// Calculated from the parent-child structure line of bones registered here.
-        /// スキニング用ボーン
-        /// ここに登録されたボーンの親子構造ラインから算出される
+        /// Bones for custom skinning.
+        /// カスタムスキニング用ボーン
         /// [NG] Runtime changes.
         /// [NG] Export/Import with Presets
         /// </summary>
@@ -87,14 +85,14 @@ namespace MagicaCloth2
             }
         }
 
-        public void ReplaceTransform(Dictionary<int, Transform> replaceDict)
+        public void ReplaceTransform(Dictionary<MagicaObjectId, Transform> replaceDict)
         {
             for (int i = 0; i < skinningBones.Count; i++)
             {
                 var t = skinningBones[i];
-                if (t && replaceDict.ContainsKey(t.GetInstanceID()))
+                if (t && replaceDict.ContainsKey(t.GetMagicaId()))
                 {
-                    skinningBones[i] = replaceDict[t.GetInstanceID()];
+                    skinningBones[i] = replaceDict[t.GetMagicaId()];
                 }
             }
         }

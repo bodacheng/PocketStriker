@@ -9,6 +9,7 @@ namespace MagicaCloth2
     /// MagicaCloth main component.
     /// </summary>
     [AddComponentMenu("MagicaCloth2/MagicaCloth")]
+    [HelpURL("https://magicasoft.jp/en/mc2_magicaclothcomponent/")]
     public partial class MagicaCloth : ClothBehaviour, IValid
     {
         /// <summary>
@@ -26,7 +27,7 @@ namespace MagicaCloth2
         /// Hidden data that cannot be rewritten at runtime
         /// </summary>
         [SerializeField]
-        private ClothSerializeData2 serializeData2 = new ClothSerializeData2();
+        internal ClothSerializeData2 serializeData2 = new ClothSerializeData2();
 
 #if UNITY_EDITOR
         /// <summary>
@@ -41,7 +42,14 @@ namespace MagicaCloth2
         /// General processing.
         /// </summary>
         private ClothProcess process = new ClothProcess();
-        public ClothProcess Process { get { process.cloth = this; return process; } }
+        public ClothProcess Process
+        {
+            get
+            {
+                process.cloth = this;
+                return process;
+            }
+        }
 
         /// <summary>
         /// Cloth component transform.
@@ -52,7 +60,14 @@ namespace MagicaCloth2
         /// <summary>
         /// Synchronization target.
         /// </summary>
-        public MagicaCloth SyncCloth => SerializeData.selfCollisionConstraint.GetSyncPartner();
+        public MagicaCloth SyncPartnerCloth
+        {
+            get
+            {
+                var syncCloth = SerializeData.IsBoneSpring() ? null : SerializeData.selfCollisionConstraint.GetSyncPartner();
+                return syncCloth == this ? null : syncCloth;
+            }
+        }
 
         /// <summary>
         /// Check if the cloth component is in a valid state.
@@ -65,32 +80,50 @@ namespace MagicaCloth2
         }
 
         //=========================================================================================
-        private void OnValidate()
+        protected void Reset()
+        {
+#if UNITY_EDITOR
+            // Automatically generate pre-build ID
+            serializeData2.preBuildData.buildId = PreBuildSerializeData.GenerateBuildID();
+#endif
+        }
+
+        protected void OnValidate()
         {
             Process.DataUpdate();
         }
 
-        private void Awake()
+        protected void Awake()
         {
-            Process.Init();
+            if (MagicaManager.initializationLocation == MagicaManager.InitializationLocation.Awake)
+            {
+                Process.Init();
+                MagicaManager.Team.RemoveMonitoringProcess(Process);
+            }
         }
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             Process.StartUse();
         }
 
-        private void OnDisable()
+        protected void OnDisable()
         {
             Process.EndUse();
         }
 
-        void Start()
+        protected void Start()
         {
+            if (MagicaManager.initializationLocation == MagicaManager.InitializationLocation.Start)
+            {
+                Process.Init();
+                MagicaManager.Team.RemoveMonitoringProcess(Process);
+            }
+
             Process.AutoBuild();
         }
 
-        private void OnDestroy()
+        protected void OnDestroy()
         {
             Process.Dispose();
         }
@@ -101,8 +134,8 @@ namespace MagicaCloth2
         /// <returns></returns>
         public override int GetMagicaHashCode()
         {
-            int hash = SerializeData.GetHashCode();
-            hash += isActiveAndEnabled ? GetInstanceID() : 0; // component active.
+            int hash = SerializeData.GetHashCode() + serializeData2.GetHashCode();
+            hash += isActiveAndEnabled ? this.GetMagicaId().GetHashCode() : 0; // component active.
             return hash;
         }
     }

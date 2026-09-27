@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using dataAccess;
 using DummyLayerSystem;
 using mainMenu;
@@ -9,145 +11,176 @@ public class QuestInfoPage : MSceneProcess
     private FightPrepareLayer _layer;
     private GangbangInfo _controllingGangbangInfo = null;
 
-    async UniTask EnterProcess(FightInfo stage)
+    int _enterVersion;
+    CancellationTokenSource _enterCancellation;
+
+    bool IsActiveEnter(int version, CancellationToken token) =>
+        version == _enterVersion && !token.IsCancellationRequested && _layer != null && !_layer.IsClosing;
+
+    async UniTask EnterProcess(FightInfo stage, int version, CancellationToken token)
     {
-        var represent = stage.GetRepresentUnitInfo();
-        UnitConfig unitConfig = Units.GetUnitConfig(represent.r_id);
-        BackGroundPS.target.ChangeBGByElement(unitConfig.element);
-
-        FightLoad.Fight = stage;
-        _layer = FightLoad.Fight.EventType == FightEventType.Gangbang
-            ? UILayerLoader.Load<FightPrepareLayer>(false, "FightPrepareLayer_gb")
-            : UILayerLoader.Load<FightPrepareLayer>();
-
-        switch (FightLoad.Fight.EventType)
+        if (stage == null) return;
+        try
         {
-            case FightEventType.Arena:
-                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arena").LoadTeamDic();
-                void GoToTeamEditArena()
-                {
-                    PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arena", true);
-                }
+            var represent = stage.GetRepresentUnitInfo();
+            UnitConfig unitConfig = Units.GetUnitConfig(represent.r_id);
+            BackGroundPS.target.ChangeBGByElement(unitConfig.element);
 
-                _layer.SetLayerAnimatorTrigger("normal");
-                await _layer.BattleGroundSwitch.INI();
-                _layer.BattleGroundSwitch.gameObject.SetActive(true);
-                _layer.SetTeamEditFeature(GoToTeamEditArena);
+            FightLoad.Fight = stage;
+            _layer = FightLoad.Fight.EventType == FightEventType.Gangbang
+                ? UILayerLoader.Load<FightPrepareLayer>(false, "FightPrepareLayer_gb")
+                : UILayerLoader.Load<FightPrepareLayer>();
 
-                break;
-            case FightEventType.Quest:
-                _layer.SetLayerAnimatorTrigger("evolution");
-
-                var arcadeTeam = TeamSet.GetTargetSet("arcade");
-                // 处理以前的旧逻辑
-                if (arcadeTeam.PosNumsWithLocalKeys.Length > 1)
-                {
-                    for (var index = 0; index < arcadeTeam.PosNumsWithLocalKeys.Length; index++)
-                    {
-                        if (index > 0)
-                        {
-                            arcadeTeam.SetPosUnitByInstanceID(index, null);
-                        }
-                    }
-                }
-
-                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
-                void GoToTeamEditArcade()
-                {
-                    PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arcade", true);
-                }
-                _layer.SetTeamEditFeature(GoToTeamEditArcade);
-                _layer.SetArcadeFeature(
-                    () =>
-                    {
-                        PreScene.target.trySwitchToStep(MainSceneStep.ArcadeFront, false);
-                    },
-                    FightLoad.Fight.ID
-                );
-                break;
-            case FightEventType.Event:
-                void GoToOriginTeamEditArcade()
-                {
-                    PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "origin", true);
-                }
-                _layer.SetLayerAnimatorTrigger("normal");
-                FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("origin").LoadTeamDic();
-                _layer.SetTeamEditFeature(GoToOriginTeamEditArcade);
-                _layer.SetEventFeature(FightLoad.Fight.ID);
-                break;
-            case FightEventType.Gangbang:
-                _layer.SetLayerAnimatorTrigger("normal");
-                _controllingGangbangInfo = GangbangInfo.Copy((GangbangInfo)stage);
-                _controllingGangbangInfo.FightMembers.HeroSets = TeamSet.GetTargetSet("gangbang").LoadTeamDic(); // 为了队员显示
-                _layer.SetTeamEditFeature(
-                    () =>
-                    {
-                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "gangbang", true);
-                    }
-                );
-
-                _layer.SetGangbangFeature(
-                    _controllingGangbangInfo,
-                    () => { PreScene.target.trySwitchToStep(MainSceneStep.GangBangFront, false); },
-                    FightLoad.Fight.ID,
-                    (x, y ,z, maxCount)=>
-                    {
-                        var whole = _controllingGangbangInfo.SetTeamUnitCount(x, y, z, maxCount);
-                        if (x == 1) // 本地存储各个gangbang人数
-                        {
-                            PlayerPrefs.SetInt("gangbangPos"+ y, _controllingGangbangInfo.GetTeamUnitCount(x,y));
-                            PlayerPrefs.Save();
-                        }
-
-                        var canFight = CanFightCheck(FightLoad.Fight, _controllingGangbangInfo);
-                        //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
-                        _layer.SetFightBeginEnableRender(canFight);
-                        return whole;
-                    },
-                    (x,y)=> _controllingGangbangInfo.GetTeamUnitCount(x,y,x == 1));
-                break;
-        }
-
-        if (stage is GangbangInfo)
-        {
-            await _layer.GangbangStageUnitsDisplay(_controllingGangbangInfo, _layer.gameObject.GetCancellationTokenOnDestroy());
-        }
-        else
-        {
-            _layer.StageMembersInfoShow(stage);
-        }
-
-        if (FightLoad.Fight.EventType == FightEventType.Gangbang)
-        {
-            _layer.SetFightMode(1);
-            _layer.SetFightBeginFeature(()=> GoToFight(_controllingGangbangInfo, _layer.SelectedMaxTeamCount));
-        }
-        else
-        {
-            int FightMode()
+            switch (FightLoad.Fight.EventType)
             {
-                if (FightLoad.Fight.EvolutionMode)
-                {
-                    return 3;
-                }
+                case FightEventType.Arena:
+                    FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arena").LoadTeamDic();
+                    void GoToTeamEditArena()
+                    {
+                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arena", true);
+                    }
 
-                switch (FightLoad.Fight.EventType)
-                {
-                    case FightEventType.Quest:
-                    case FightEventType.Event:
-                        return FightLoad.Fight.ArcadeFightMode;
-                    default:
-                        return 0;
-                }
+                    _layer.SetLayerAnimatorTrigger("normal");
+                    await _layer.BattleGroundSwitch.INI().AttachExternalCancellation(token);
+                    if (!IsActiveEnter(version, token)) return;
+                    _layer.BattleGroundSwitch.gameObject.SetActive(true);
+                    _layer.SetTeamEditFeature(GoToTeamEditArena);
+
+                    break;
+                case FightEventType.Quest:
+                    _layer.SetLayerAnimatorTrigger("evolution");
+
+                    var arcadeTeam = TeamSet.GetTargetSet("arcade");
+                    // 处理以前的旧逻辑
+                    if (arcadeTeam.PosNumsWithLocalKeys.Length > 1)
+                    {
+                        for (var index = 0; index < arcadeTeam.PosNumsWithLocalKeys.Length; index++)
+                        {
+                            if (index > 0)
+                            {
+                                arcadeTeam.SetPosUnitByInstanceID(index, null);
+                            }
+                        }
+                    }
+
+                    FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
+                    void GoToTeamEditArcade()
+                    {
+                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arcade", true);
+                    }
+                    _layer.SetTeamEditFeature(GoToTeamEditArcade);
+                    _layer.SetArcadeFeature(
+                        () =>
+                        {
+                            PreScene.target.trySwitchToStep(MainSceneStep.ArcadeFront, false);
+                        },
+                        FightLoad.Fight.ID
+                    );
+                    break;
+                case FightEventType.Event:
+                    void GoToOriginTeamEditArcade()
+                    {
+                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "origin", true);
+                    }
+                    _layer.SetLayerAnimatorTrigger("normal");
+                    FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("origin").LoadTeamDic();
+                    _layer.SetTeamEditFeature(GoToOriginTeamEditArcade);
+                    _layer.SetEventFeature(FightLoad.Fight.ID);
+                    break;
+                case FightEventType.Gangbang:
+                    _layer.SetLayerAnimatorTrigger("normal");
+                    var controllingGangbangInfo = GangbangInfo.Copy((GangbangInfo)stage);
+                    _controllingGangbangInfo = controllingGangbangInfo;
+                    controllingGangbangInfo.FightMembers.HeroSets = TeamSet.GetTargetSet("gangbang").LoadTeamDic(); // 为了队员显示
+                    _layer.SetTeamEditFeature(
+                        () =>
+                        {
+                            PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "gangbang", true);
+                        }
+                    );
+
+                    _layer.SetGangbangFeature(
+                        controllingGangbangInfo,
+                        () => { PreScene.target.trySwitchToStep(MainSceneStep.GangBangFront, false); },
+                        FightLoad.Fight.ID,
+                        (x, y ,z, maxCount)=>
+                        {
+                            var whole = controllingGangbangInfo.SetTeamUnitCount(x, y, z, maxCount);
+                            if (x == 1) // 本地存储各个gangbang人数
+                            {
+                                PlayerPrefs.SetInt("gangbangPos"+ y, controllingGangbangInfo.GetTeamUnitCount(x,y));
+                                PlayerPrefs.Save();
+                            }
+
+                            var canFight = CanFightCheck(FightLoad.Fight, controllingGangbangInfo);
+                            //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
+                            _layer.SetFightBeginEnableRender(canFight);
+                            return whole;
+                        },
+                        (x,y)=> controllingGangbangInfo.GetTeamUnitCount(x,y,x == 1));
+                    break;
             }
-            _layer.SetFightMode(FightMode());
-            _layer.SetFightBeginFeature(()=> GoToFight(FightLoad.Fight));
-        }
 
-        var canFight = CanFightCheck(FightLoad.Fight, _controllingGangbangInfo);
-        //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
-        _layer.SetFightBeginEnableRender(canFight, PlayerAccountInfo.Me.tutorialProgress != "Finished");
-        SetLoaded(true);
+            if (stage is GangbangInfo)
+            {
+                await _layer.GangbangStageUnitsDisplay(_controllingGangbangInfo, token);
+            }
+            else
+            {
+                await _layer.StageMembersInfoShow(stage, token);
+            }
+
+            if (!IsActiveEnter(version, token)) return;
+            if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+            {
+                _layer.SetFightMode(1);
+                _layer.SetFightBeginFeature(()=> GoToFight(_controllingGangbangInfo, _layer.SelectedMaxTeamCount));
+            }
+            else
+            {
+                int FightMode()
+                {
+                    if (FightLoad.Fight.EvolutionMode)
+                    {
+                        return 3;
+                    }
+
+                    switch (FightLoad.Fight.EventType)
+                    {
+                        case FightEventType.Quest:
+                        case FightEventType.Event:
+                            return FightLoad.Fight.ArcadeFightMode;
+                        default:
+                            return 0;
+                    }
+                }
+                _layer.SetFightMode(FightMode());
+                _layer.SetFightBeginFeature(()=> GoToFight(FightLoad.Fight));
+            }
+
+            var canFight = CanFightCheck(FightLoad.Fight, _controllingGangbangInfo);
+            //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
+            _layer.SetFightBeginEnableRender(canFight, PlayerAccountInfo.Me.tutorialProgress != "Finished");
+            SetLoaded(true);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+    }
+
+    void BeginEnter(FightInfo stage)
+    {
+        CancelEnter();
+        SetLoaded(false);
+        _controllingGangbangInfo = null;
+        _enterCancellation = new CancellationTokenSource();
+        EnterProcess(stage, _enterVersion, _enterCancellation.Token).Forget();
+    }
+
+    void CancelEnter()
+    {
+        _enterVersion++;
+        _enterCancellation?.Cancel();
+        _enterCancellation?.Dispose();
+        _enterCancellation = null;
     }
 
     public QuestInfoPage()
@@ -157,25 +190,28 @@ public class QuestInfoPage : MSceneProcess
 
     public override void ProcessEnter()
     {
-        EnterProcess(FightLoad.Fight).Forget();
+        BeginEnter(FightLoad.Fight);
     }
 
     public override void ProcessEnter<T>(T t)
     {
         if (t is GangbangInfo)
         {
-            EnterProcess(t as GangbangInfo).Forget();
+            BeginEnter(t as GangbangInfo);
         }
         else
         {
-            EnterProcess(t as FightInfo).Forget();
+            BeginEnter(t as FightInfo);
         }
     }
 
     public override void ProcessEnd()
     {
+        CancelEnter();
+        SetLoaded(false);
         _controllingGangbangInfo = null;
         UILayerLoader.Remove<FightPrepareLayer>();
+        _layer = null;
     }
 
     bool CanFightCheck(FightInfo fight, GangbangInfo refGangbangInfo = null)

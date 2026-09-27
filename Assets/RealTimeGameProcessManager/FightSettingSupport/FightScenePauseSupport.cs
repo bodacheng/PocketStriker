@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FightScene;
 using UnityEngine;
 using UnityEngine.UI;
@@ -60,5 +60,18 @@ public class FightScenePauseSupport : UILayer
     public void OnEffectChange()
     {
         AppSetting.Value.EffectsVolume = effectsSoundsSlider.value;
+        var manager = RTFightManager.Target;
+        if (manager == null)
+            return;
+        void ApplyVolume(UnitsManger team)
+        {
+            if (team?.teamMembers == null)
+                return;
+            foreach (var unit in team.teamMembers.mDict.Values)
+                if (unit != null && unit._AudioSource != null)
+                    unit._AudioSource.volume = AppSetting.Value.EffectsVolume;
+        }
+        ApplyVolume(manager.team1);
+        ApplyVolume(manager.team2);
     }
 }

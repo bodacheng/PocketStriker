@@ -94,17 +94,21 @@ public class ReturnLayer : UILayer
         var layer = UILayerLoader.Get<ReturnLayer>();
         if (layer != null)
         {
-            void triggerCts()
+            void TriggerCancellation()
             {
-                if (cts != null && !cts.IsCancellationRequested)
-                    cts.Cancel();
+                layer.returnButton.onClick.RemoveListener(TriggerCancellation);
+                try
+                {
+                    if (cts != null && !cts.IsCancellationRequested)
+                        cts.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The owning preview may already have completed and disposed it.
+                }
             }
-            
-            layer.returnButton.onClick.AddListener(() =>
-            {
-                triggerCts();
-                layer.returnButton.onClick.RemoveListener(triggerCts);
-            });
+
+            layer.returnButton.onClick.AddListener(TriggerCancellation);
         }
     }
 

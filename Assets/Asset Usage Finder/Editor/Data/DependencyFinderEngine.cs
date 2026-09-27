@@ -97,7 +97,7 @@ namespace AssetUsageFinder {
         }
 
 
-        public static IEnumerable<(int state, string crumbs)> Traverse(AnimatorController controller) {
+        public static IEnumerable<(AnimatorState state, string crumbs)> Traverse(AnimatorController controller) {
             for (var index = 0; index < controller.layers.Length; index++) {
                 var controllerLayer = controller.layers[index];
                 foreach (var i in Inner(controllerLayer.stateMachine, $"{controllerLayer.name}({index})"))
@@ -105,9 +105,9 @@ namespace AssetUsageFinder {
             }
         }
 
-        static IEnumerable<(int state, string crumbs)> Inner(AnimatorStateMachine f, string crumbs) {
+        static IEnumerable<(AnimatorState state, string crumbs)> Inner(AnimatorStateMachine f, string crumbs) {
             foreach (var state in f.states)
-                yield return (state.state.GetInstanceID(), crumbs);
+                yield return (state.state, crumbs);
 
             foreach (var child in f.stateMachines) {
                 foreach (var tuple in Inner(child.stateMachine, $"{crumbs}/{child.stateMachine.name}"))
@@ -115,18 +115,17 @@ namespace AssetUsageFinder {
             }
         }
 
-        // todo use GetInstanceID instead of unityobj refs
-        static Dictionary<int, Dictionary<int, string>> _animCache = new Dictionary<int, Dictionary<int, string>>();
+        static Dictionary<AnimatorController, Dictionary<AnimatorState, string>> _animCache = new Dictionary<AnimatorController, Dictionary<AnimatorState, string>>();
 
         static string GetBread(AnimatorController c, AnimatorState state) {
-            if (!_animCache.TryGetValue(c.GetInstanceID(), out var res)) {
-                res = new Dictionary<int, string>();
-                _animCache.Add(c.GetInstanceID(), res);
-                foreach (var (stateId, crumbs) in Traverse(c))
-                    res.Add(stateId, crumbs);
+            if (!_animCache.TryGetValue(c, out var res)) {
+                res = new Dictionary<AnimatorState, string>();
+                _animCache.Add(c, res);
+                foreach (var (animatorState, crumbs) in Traverse(c))
+                    res.Add(animatorState, crumbs);
             }
 
-            if (res.TryGetValue(state.GetInstanceID(), out var crumb))
+            if (res.TryGetValue(state, out var crumb))
                 return $"{crumb}/";
             return string.Empty;
         }

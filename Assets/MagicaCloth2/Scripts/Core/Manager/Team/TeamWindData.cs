@@ -23,9 +23,14 @@ namespace MagicaCloth2
             return main > 1e-06f;
         }
 
+        public override string ToString()
+        {
+            return $"windId:{windId}, time:{time}, main:{main}, direction:{direction}";
+        }
+
         public void DebugLog()
         {
-            Debug.Log($"windId:{windId}, time:{time}, main:{main}, direction:{direction}");
+            Debug.Log(ToString());
         }
     }
 
@@ -81,19 +86,25 @@ namespace MagicaCloth2
             }
         }
 
-        public void DebugLog(int teamId)
+        public void CopyFrom(in TeamWindData wdata)
         {
-            Debug.Log($"TeamWindData:{teamId}, zoneCnt:{ZoneCount}");
-            for (int i = 0; i < ZoneCount; i++)
-            {
-                windZoneList[i].DebugLog();
-            }
-
-            if (movingWind.IsValid())
-            {
-                Debug.Log("Moving");
-                movingWind.DebugLog();
-            }
+            windZoneList = wdata.windZoneList;
+            movingWind = wdata.movingWind;
         }
+
+        //public void DebugLog(int teamId)
+        //{
+        //    Debug.Log($"TeamWindData:{teamId}, zoneCnt:{ZoneCount}");
+        //    for (int i = 0; i < ZoneCount; i++)
+        //    {
+        //        windZoneList[i].DebugLog();
+        //    }
+
+        //    if (movingWind.IsValid())
+        //    {
+        //        Debug.Log("Moving");
+        //        movingWind.DebugLog();
+        //    }
+        //}
     }
 }

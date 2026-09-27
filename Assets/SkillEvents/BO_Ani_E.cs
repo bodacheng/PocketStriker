@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -154,6 +154,12 @@ public partial class BO_Ani_E : MonoBehaviour
         hiddenMethods.Bullet_shoot_from_Core(target.position, transform.rotation,e.intParameter, e.floatParameter,null);
     }
     
+    public void Bullet_shoot_from_body_part_TD(AnimationEvent e)
+    {
+        DecideTarget(e.stringParameter);
+        hiddenMethods.Bullet_shoot_from_Core(target.position, target.rotation, e.intParameter, e.floatParameter, null);
+    }
+
     Transform target;
     Decomposition effect;
     ConstraintSource myConstraintSource;

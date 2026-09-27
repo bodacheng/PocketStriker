@@ -15,7 +15,7 @@ public class BannerAds : MonoBehaviour
 
     void Start()
     {
-        if (AdsInitializer.target.Initialized && _bannerView == null)
+        if (AdsInitializer.target != null && AdsInitializer.target.Initialized && _bannerView == null)
         {
             LoadAd();
         }
@@ -35,34 +35,38 @@ public class BannerAds : MonoBehaviour
         _adUnitId = CommonSetting.Admob_banner_androidKey;
 #endif
     }
-    
+
     BannerView _bannerView;
     public BannerView BannerView => _bannerView;
-    
+
     /// <summary>
     /// Creates a 320x50 banner view at top of the screen.
     /// </summary>
     public void CreateBannerView()
     {
+        if (!AdsInitializer.ShouldEnableAds() || string.IsNullOrEmpty(_adUnitId))
+            return;
         // If we already have a banner, destroy the old one.
         if (_bannerView != null)
         {
             DestroyBannerView();
         }
-        
+
         // Use the AdSize argument to set a custom size for the ad.
-        
+
         var adSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(200);
         // Debug.Log(adSize.Width + ":"+ adSize.Height);
         _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);
         ListenToAdEvents();
     }
-    
+
     /// <summary>
     /// Creates the banner view and loads a banner ad.
     /// </summary>
     public void LoadAd()
     {
+        if (!AdsInitializer.ShouldEnableAds() || string.IsNullOrEmpty(_adUnitId))
+            return;
         // create an instance of a banner view first.
         if(_bannerView == null)
         {
@@ -76,7 +80,7 @@ public class BannerAds : MonoBehaviour
         Debug.Log("Loading banner ad.");
         _bannerView.LoadAd(adRequest);
     }
-    
+
     /// <summary>
     /// listen to events the banner view may raise.
     /// </summary>
@@ -122,7 +126,7 @@ public class BannerAds : MonoBehaviour
             Debug.Log("Banner view full screen content closed.");
         };
     }
-    
+
     /// <summary>
     /// Destroys the banner view.
     /// </summary>
@@ -135,7 +139,7 @@ public class BannerAds : MonoBehaviour
             _bannerView = null;
         }
     }
-    
+
     // Tuple<Vector2, Vector2> CalSize()
     // {
     //     var screenHeight = Screen.height * (posRef.rect.height / PosCal.CanvasHeight);
@@ -145,7 +149,7 @@ public class BannerAds : MonoBehaviour
     //     //Debug.Log("size :"+ new Vector2(screenWidth, screenHeight));
     //     return new Tuple<Vector2, Vector2>(new Vector2(screenWidth, screenHeight), Vector2.zero);
     // }
-    
+
     // void OnGUI()
     // {
     //     var rect = CalSize();

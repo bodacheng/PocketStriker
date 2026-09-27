@@ -6,6 +6,14 @@ using UnityEditor;
 public class StageEditorWindow : EditorWindow
 {
     private StageEditor _stageEditor;
+
+    void OnDisable()
+    {
+        _stageEditor?.Dispose();
+        _stageEditor = null;
+        _initialized = false;
+    }
+
     private FightInfo _target;
     string _pathAndNameForLocalSave = "Assets/ExternalAssets/Stage";
     string _fileName;

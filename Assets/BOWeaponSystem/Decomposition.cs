@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using HittingDetection;
 using UnityEngine.Animations;
@@ -26,6 +26,8 @@ public partial class Decomposition : MonoBehaviour {
     public float Counter;
     public int Phase { get; set; }
     public bool IsWeapon { get; set; }
+    public bool RequiresTransformSyncBeforePhysicsQuery =>
+        Phase == 1 && IsWeapon && _HitBox != null && _HitBox.RequiresTransformSyncBeforePhysicsQuery;
     bool hasParticle { get; set; }
     #endregion
 
@@ -105,6 +107,9 @@ public partial class Decomposition : MonoBehaviour {
 
     void EnergyResolve()
     {
+        if (Phase == 0)
+            return;
+
         CloseMarkers();
         StopEmissions(false);
         if (pool == null)

@@ -2,10 +2,13 @@
 using DummyLayerSystem;
 using mainMenu;
 using System.Linq;
+using System.Collections.Generic;
 
 public partial class ShopTop : MSceneProcess
 {
     private ShopTopLayer shopTopLayer;
+    private bool isActive;
+    private int catalogRequestVersion;
     public ShopTop()
     {
         Step = MainSceneStep.ShopTop;
@@ -13,6 +16,7 @@ public partial class ShopTop : MSceneProcess
     
     public override void ProcessEnter()
     {
+        isActive = true;
         BackGroundPS.target.ChangeBGByElement(Element.Null);
         var upperInfoBar = UILayerLoader.Load<UpperInfoBar>();
         upperInfoBar.Setup(null,
@@ -21,43 +25,55 @@ public partial class ShopTop : MSceneProcess
             null,
             PlayerAccountInfo.Me.noAdsState);
         
-        var stoneCatalog = IAPManager.StoneProductCatalog;
-        var productIds = stoneCatalog.Select(x=> x.ItemId).ToList();
-        PlayFabReadClient.GetAllReadOnlyUserData(productIds, (x) =>
+        shopTopLayer = UILayerLoader.Load<ShopTopLayer>();
+        shopTopLayer.Initialize();
+        shopTopLayer.ShowTimeLimitedBundle();
+        // The shop remains navigable while catalogs and purchase history load.
+        IAPManager.StoneProductCatalogChanged -= RefreshStoneBundles;
+        IAPManager.StoneProductCatalogChanged += RefreshStoneBundles;
+        SetLoaded(true);
+        RefreshStoneBundles();
+    }
+
+    private void RefreshStoneBundles()
+    {
+        if (!isActive)
+            return;
+
+        var requestVersion = ++catalogRequestVersion;
+        shopTopLayer.ShowStoneBundle(new List<string>());
+        var productIds = IAPManager.StoneProductCatalog
+            .Where(item => item != null && !string.IsNullOrEmpty(item.ItemId))
+            .Select(item => item.ItemId).Distinct().ToList();
+        if (productIds.Count == 0)
+            return;
+
+        bool IsCurrentRequest() => isActive && catalogRequestVersion == requestVersion;
+        PlayFabReadClient.GetAllReadOnlyUserData(productIds, succeeded =>
         {
-            if (x)
-            {
-                shopTopLayer = UILayerLoader.Load<ShopTopLayer>();
-                shopTopLayer.Initialize();
+            if (IsCurrentRequest() && succeeded)
                 shopTopLayer.ShowStoneBundle(PlayFabReadClient.ShowStoneBundleIds);
-                shopTopLayer.ShowTimeLimitedBundle();
-            }
-            SetLoaded(true);
-        });
+        }, IsCurrentRequest);
     }
     
     public override void ProcessEnd()
     {
+        isActive = false;
+        catalogRequestVersion++;
+        IAPManager.StoneProductCatalogChanged -= RefreshStoneBundles;
         UILayerLoader.Remove<UpperInfoBar>();
         UILayerLoader.Remove<ShopTopLayer>();
+        shopTopLayer = null;
     }
 
     public static bool HasTimeLimitSale(TimeLimitedBuyData data)
     {
-        if (data == null)
+        if (data == null || !TimeLimitedSaleWindow.TryGetActiveEndUtc(data.startTime, data.endTime, DateTime.UtcNow, out _))
         {
             return false;
         }
-        
-        DateTime startTime = DateTime.Parse(data.startTime);
-        DateTime endTime = DateTime.Parse(data.endTime);
-        DateTime currentTime = DateTime.UtcNow;
-        bool on = currentTime >= startTime && currentTime <= endTime;
-        
-        if (!on)
-        {
-            return on;
-        }
+
+        bool on;
         
         PlayFabReadClient.MyTimeLimitBundleBoughtLog.TryGetValue(PlayFabSetting._timeLimitBuyCode, out var eventId);
         

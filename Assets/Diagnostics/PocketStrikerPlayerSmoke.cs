@@ -16,6 +16,7 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
     const string ReportArgument = "-smokeReport";
     const double TimeoutSeconds = 120;
     const double ReadySeconds = 20;
+    const string ExpectedUnityVersion = "6000.5.1f1";
 
     readonly Stopwatch elapsed = new Stopwatch();
     readonly List<string> errors = new List<string>();
@@ -29,7 +30,13 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
     {
         public string check = "standalone-startup";
         public string unityVersion;
+        public string expectedUnityVersion;
         public string platform;
+        public string buildTarget;
+        public string screenOrientation;
+        public int screenWidth;
+        public int screenHeight;
+        public bool portraitViewport;
         public bool passed;
         public double elapsedSeconds;
         public string state;
@@ -56,6 +63,8 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
         }
 
         runner.elapsed.Start();
+        if (Application.unityVersion != ExpectedUnityVersion)
+            runner.errors.Add($"Expected Unity {ExpectedUnityVersion}; this player was built with {Application.unityVersion}.");
         Application.logMessageReceived += runner.CaptureError;
         Debug.Log("POCKETSTRIKER_PLAYER_SMOKE_STARTED report=" + runner.reportPath);
     }
@@ -109,6 +118,13 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
             return;
         }
 
+        if (Screen.width >= Screen.height)
+        {
+            errors.Add($"The playable viewport must remain portrait; found {Screen.width}x{Screen.height}.");
+            Finish();
+            return;
+        }
+
         if (readySince < 0)
         {
             readySince = elapsed.Elapsed.TotalSeconds;
@@ -126,7 +142,7 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
         var title = UILayerLoader.Get<TitleScreenLayer>();
         return $"scene={SceneManager.GetActiveScene().name}; config={Starter.ConfigInitialised}; "
             + $"process={process?.GetType().Name ?? "none"}; team1={team1Count}; team2={team2Count}; "
-            + $"title={title != null}; frames={Time.frameCount}; timeScale={Time.timeScale}";
+            + $"title={title != null}; frames={Time.frameCount}; timeScale={Time.timeScale}; viewport={Screen.width}x{Screen.height}";
     }
 
     void Finish()
@@ -136,7 +152,13 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
         var report = new Report
         {
             unityVersion = Application.unityVersion,
+            expectedUnityVersion = ExpectedUnityVersion,
             platform = Application.platform.ToString(),
+            buildTarget = BuildTargetName,
+            screenOrientation = Screen.orientation.ToString(),
+            screenWidth = Screen.width,
+            screenHeight = Screen.height,
+            portraitViewport = Screen.width < Screen.height,
             passed = errors.Count == 0,
             elapsedSeconds = elapsed.Elapsed.TotalSeconds,
             state = GetState(),
@@ -162,6 +184,22 @@ public sealed class PocketStrikerPlayerSmoke : MonoBehaviour
     void OnDestroy()
     {
         Application.logMessageReceived -= CaptureError;
+    }
+
+    static string BuildTargetName
+    {
+        get
+        {
+#if UNITY_IOS
+            return "iOS";
+#elif UNITY_ANDROID
+            return "Android";
+#elif UNITY_STANDALONE_OSX
+            return "StandaloneOSX";
+#else
+            return Application.platform.ToString();
+#endif
+        }
     }
 }
 #endif

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FightScene;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -30,6 +30,7 @@ public class PreparingProcess : FSceneProcess
 #endif
         }
         
+        RTFightManager.Target.Disposables?.Dispose();
         RTFightManager.Target.Disposables = new CompositeDisposable();
         
         Sensor.ClearFightingMember();
@@ -39,55 +40,82 @@ public class PreparingProcess : FSceneProcess
         UILayerLoader.Load<ProgressLayer>(true, null, true);
         ProgressLayer.LoadingPercent(Translate.Get("LoadingBattle"), 0.5f);
         
+        var heroUnits = FightLoad.Fight.FightMembers.HeroSets.GetValues();
+        var enemyUnits = FightLoad.Fight.FightMembers.EnemySets.GetValues();
         var effectPreloadCount = FightLoad.Fight.team1Mode == TeamMode.Rotation ? 1 :
-            Mathf.Max(RTFightManager.Target.team1.teamMembers.GetValues().Count,
-                RTFightManager.Target.team2.teamMembers.GetValues().Count);
-        
+            Mathf.Max(1, Mathf.Max(heroUnits.Count, enemyUnits.Count));
+
+        // Pool loaders consult the label index synchronously. Finish indexing before
+        // starting them, otherwise the first battle can skip valid effect resources.
+        await AddressablesLogic.Essentials();
         var tasks = new List<UniTask>
         {
             AppSetting.PlayBGM(FightLoad.Fight.GetBGMKey()),
             HurtObjectManager.ConstructDPool(),
-            AddressablesLogic.Essentials(),
             BoundaryControlByGod.target.ChangeBackGround(FightLoad.Fight.battleGroundID),
-            RTFightManager.Target.LoadUnits(FightLoad.Fight),
             EffectsManager.IniEffectsPool(CommonSetting.HitGroundEffectCode, null, effectPreloadCount),
             EffectsManager.IniEffectsPool(CommonSetting.WallCrackEffectCode, null, effectPreloadCount)
         };
-        
-        List<Element> allElements = new List<Element>();
-        void AddBasicEffectLoadingTask(List<UnitInfo> list)
+
+        var elementCounts = new Dictionary<Element, int>();
+        void CountElements(List<UnitInfo> units)
         {
-            foreach (var unit in list)
+            foreach (var unit in units)
             {
-                var unitConfig = Units.RowToUnitConfigInfo(Units.Find_RECORD_ID(unit.r_id));
-                if (!allElements.Contains(unitConfig.element))
-                {
-                    allElements.Add(unitConfig.element);
-                    tasks.AddRange(
-                        new UniTask[]
-                        {
-                            EffectsManager.IniEffectsPool("light_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
-                            EffectsManager.IniEffectsPool("heavy_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
-                            EffectsManager.IniEffectsPool("super_hit", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
-                            EffectsManager.IniEffectsPool("electric_s_e", FightGlobalSetting.EffectPathDefine(unitConfig.element), effectPreloadCount),
-                            EffectsManager.IniEffectsPool("super_combo_explosion", null, effectPreloadCount),
-                            EffectsManager.IniEffectsPool("dream_buff", null, effectPreloadCount)
-                        }
-                    );
-                }
+                var config = Units.GetUnitConfig(unit.r_id);
+                if (config == null)
+                    continue;
+                elementCounts.TryGetValue(config.element, out var count);
+                elementCounts[config.element] = count + 1;
             }
         }
-        
-        AddBasicEffectLoadingTask(FightLoad.Fight.FightMembers.HeroSets.GetValues());
-        AddBasicEffectLoadingTask(FightLoad.Fight.FightMembers.EnemySets.GetValues());
-        
+        CountElements(heroUnits);
+        CountElements(enemyUnits);
+
+        foreach (var element in elementCounts)
+        {
+            var effectPath = FightGlobalSetting.EffectPathDefine(element.Key);
+            tasks.Add(EffectsManager.IniEffectsPool("light_hit", effectPath, element.Value));
+            tasks.Add(EffectsManager.IniEffectsPool("heavy_hit", effectPath, element.Value));
+            tasks.Add(EffectsManager.IniEffectsPool("super_hit", effectPath, element.Value));
+            tasks.Add(EffectsManager.IniEffectsPool("electric_s_e", effectPath, element.Value));
+        }
+
+        // Shared effects need one pool each, regardless of the teams' element count.
+        var sharedEffectCount = Mathf.Max(effectPreloadCount, heroUnits.Count + enemyUnits.Count);
+        tasks.Add(EffectsManager.IniEffectsPool("super_combo_explosion", null, sharedEffectCount));
+        tasks.Add(EffectsManager.IniEffectsPool("dream_buff", null, sharedEffectCount));
         if (FightLoad.Fight.team1Mode == TeamMode.Rotation && FightLoad.Fight.team2Mode == TeamMode.Rotation)
         {
             tasks.Add(EffectsManager.IniEffectsPool(CommonSetting.MemberShiftEffectCode, null, 1));
         }
-        ProgressLayer.LoadingPercent(Translate.Get("LoadingBattle"), 0.7f);
-        await UniTask.WhenAll(tasks);
-        
+
+        var completedPreloads = 0;
+        var unitProgress = 0f;
+        var loadingBattleText = Translate.Get("LoadingBattle");
+        void ReportProgress()
+        {
+            var resourceProgress = completedPreloads / (float)tasks.Count;
+            ProgressLayer.LoadingPercent(loadingBattleText,
+                Mathf.Lerp(0.5f, 0.75f, unitProgress * 0.8f + resourceProgress * 0.2f), false);
+        }
+        var unitLoading = RTFightManager.Target.LoadUnits(FightLoad.Fight, progress =>
+        {
+            unitProgress = Mathf.Max(unitProgress, progress);
+            ReportProgress();
+        });
+        async UniTask TrackPreload(UniTask task)
+        {
+            await task;
+            completedPreloads++;
+            ReportProgress();
+        }
+        var trackedTasks = new List<UniTask>(tasks.Count);
+        foreach (var task in tasks)
+            trackedTasks.Add(TrackPreload(task));
+        trackedTasks.Add(unitLoading);
+        await UniTask.WhenAll(trackedTasks);
+
         var teamMembers = new Dictionary<TeamConfig, List<Data_Center>>();
         RTFightManager.Target.heroTeamConfig.playID = FightLoad.Fight.Team1ID;
         RTFightManager.Target.EnemyTeamConfig.playID = FightLoad.Fight.Team2ID;

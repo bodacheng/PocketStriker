@@ -8,6 +8,14 @@ using UnityEngine;
 public class GangbangInfoGUI : Editor
 {
     private StageEditor _stageEditor;
+
+    void OnDisable()
+    {
+        _stageEditor?.Dispose();
+        _stageEditor = null;
+        _initialized = false;
+    }
+
     private bool _initialized = false;
     
     public override void OnInspectorGUI()

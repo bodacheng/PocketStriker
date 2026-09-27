@@ -3,6 +3,7 @@
 // https://magicasoft.jp
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -16,7 +17,7 @@ namespace MagicaCloth2
     /// TransformAccessArrayを中心とした一連のTransform管理クラス
     /// スレッドで利用できるように様々な工夫を行っている
     /// </summary>
-    public class TransformData : IDisposable
+    public partial class TransformData : IDisposable
     {
         internal List<Transform> transformList;
 
@@ -69,17 +70,17 @@ namespace MagicaCloth2
         /// <summary>
         /// トランスフォームのインスタンスID
         /// </summary>
-        internal ExSimpleNativeArray<int> idArray;
+        internal ExSimpleNativeArray<MagicaObjectId> idArray;
 
         /// <summary>
         /// 親トランスフォームのインスタンスID(0=なし)
         /// </summary>
-        internal ExSimpleNativeArray<int> parentIdArray;
+        internal ExSimpleNativeArray<MagicaObjectId> parentIdArray;
 
         /// <summary>
         /// BoneClothのルートトランスフォームIDリスト
         /// </summary>
-        internal List<int> rootIdList;
+        internal List<MagicaObjectId> rootIdList;
 
         /// <summary>
         /// Transformリストに変更があったかどうか
@@ -101,10 +102,7 @@ namespace MagicaCloth2
         Queue<int> emptyStack;
 
         //=========================================================================================
-        public TransformData()
-        {
-            Init(100);
-        }
+        public TransformData() { }
 
         public TransformData(int capacity)
         {
@@ -116,8 +114,8 @@ namespace MagicaCloth2
         {
             // 領域のみ確保する
             transformList = new List<Transform>(capacity);
-            idArray = new ExSimpleNativeArray<int>(capacity, true);
-            parentIdArray = new ExSimpleNativeArray<int>(capacity, true);
+            idArray = new ExSimpleNativeArray<MagicaObjectId>(capacity, true);
+            parentIdArray = new ExSimpleNativeArray<MagicaObjectId>(capacity, true);
             flagArray = new ExSimpleNativeArray<ExBitFlag8>(capacity, true);
             initLocalPositionArray = new ExSimpleNativeArray<float3>(capacity, true);
             initLocalRotationArray = new ExSimpleNativeArray<quaternion>(capacity, true);
@@ -133,7 +131,7 @@ namespace MagicaCloth2
 
         public void Dispose()
         {
-            transformList.Clear();
+            transformList?.Clear();
             idArray?.Dispose();
             parentIdArray?.Dispose();
             flagArray?.Dispose();
@@ -145,15 +143,11 @@ namespace MagicaCloth2
             localPositionArray?.Dispose();
             localRotationArray?.Dispose();
             inverseRotationArray?.Dispose();
-            emptyStack.Clear();
+            emptyStack?.Clear();
 
             // transformAccessArrayはメインスレッドのみ
             if (transformAccessArray.isCreated)
             {
-                //if (MagicaManager.Discard != null)
-                //    MagicaManager.Discard.AddMain(transformAccessArray);
-                //else
-                //    transformAccessArray.Dispose();
                 transformAccessArray.Dispose();
             }
         }
@@ -161,7 +155,7 @@ namespace MagicaCloth2
         public int Count => transformList.Count;
         public int RootCount => rootIdList?.Count ?? 0;
         public bool IsDirty => isDirty;
-
+        public bool IsEmpty => transformList == null;
 
         //=========================================================================================
         /// <summary>
@@ -169,10 +163,12 @@ namespace MagicaCloth2
         /// すでに登録済みの同じトランスフォームがある場合はそのインデックスを返す
         /// </summary>
         /// <param name="t"></param>
-        /// <param name="tid">0の場合はTransformからGetInstanceId()を即時設定する</param>
+        /// <param name="tid">Invalidの場合はTransformからGetInstanceId()を即時設定する</param>
+        /// <param name="pid">不要ならInvalid</param>
         /// <param name="flag"></param>
         /// <returns></returns>
-        public int AddTransform(Transform t, int tid = 0, int pid = 0, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
+        //public int AddTransform(Transform t, int tid = 0, int pid = 0, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
+        public int AddTransform(Transform t, MagicaObjectId tid, MagicaObjectId pid, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
         {
             int index;
 
@@ -189,11 +185,11 @@ namespace MagicaCloth2
             {
                 index = emptyStack.Dequeue();
                 transformList[index] = t;
-                if (tid == 0)
+                if (tid.IsValid() == false)
                 {
                     // Transformからデータを取得（メインスレッドのみ）
-                    idArray[index] = t.GetInstanceID();
-                    parentIdArray[index] = t.parent?.GetInstanceID() ?? 0;
+                    idArray[index] = t.GetMagicaId();
+                    parentIdArray[index] = t.parent ? t.parent.GetMagicaId() : MagicaObjectId.Invalid;
                     initLocalPositionArray[index] = t.localPosition;
                     initLocalRotationArray[index] = t.localRotation;
                     positionArray[index] = t.position;
@@ -224,11 +220,11 @@ namespace MagicaCloth2
             {
                 index = Count;
                 transformList.Add(t);
-                if (tid == 0)
+                if (tid.IsValid() == false)
                 {
                     // Transformからデータを取得（メインスレッドのみ）
-                    idArray.Add(t.GetInstanceID());
-                    parentIdArray.Add(t.parent?.GetInstanceID() ?? 0);
+                    idArray.Add(t.GetMagicaId());
+                    parentIdArray.Add(t.parent ? t.parent.GetMagicaId() : MagicaObjectId.Invalid);
                     initLocalPositionArray.Add(t.localPosition);
                     initLocalRotationArray.Add(t.localRotation);
                     positionArray.Add(t.position);
@@ -266,11 +262,12 @@ namespace MagicaCloth2
         /// すでに登録済みの同じトランスフォームがある場合はそのインデックスを返す
         /// </summary>
         /// <param name="record">トランスフォーム記録クラス</param>
-        /// <param name="pid">親のインスタンスID</param>
+        /// <param name="pid">親のインスタンスID。なければInvalid</param>
         /// <param name="flag"></param>
         /// <param name="checkDuplicate">重複チェックの有無</param>
         /// <returns></returns>
-        public int AddTransform(TransformRecord record, int pid = 0, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
+        //public int AddTransform(TransformRecord record, int pid = 0, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
+        public int AddTransform(TransformRecord record, MagicaObjectId pid, byte flag = TransformManager.Flag_Read, bool checkDuplicate = true)
         {
             int index;
 
@@ -341,8 +338,8 @@ namespace MagicaCloth2
             }
 
             // 新規追加
-            int id = srcData.idArray[srcIndex];
-            int pid = srcData.parentIdArray[srcIndex];
+            MagicaObjectId id = srcData.idArray[srcIndex];
+            MagicaObjectId pid = srcData.parentIdArray[srcIndex];
             var initPos = srcData.initLocalPositionArray[srcIndex];
             var initRot = srcData.initLocalRotationArray[srcIndex];
             var pos = srcData.positionArray[srcIndex];
@@ -395,7 +392,7 @@ namespace MagicaCloth2
         /// </summary>
         /// <param name="tlist"></param>
         /// <returns></returns>
-        public int[] AddTransformRange(List<Transform> tlist, List<int> idList, List<int> pidList, int copyCount = 0)
+        public int[] AddTransformRange(List<Transform> tlist, List<MagicaObjectId> idList, List<MagicaObjectId> pidList, int copyCount = 0)
         {
             //int tcnt = tlist.Count;
             int tcnt = copyCount > 0 ? copyCount : tlist.Count;
@@ -440,8 +437,8 @@ namespace MagicaCloth2
             Debug.Assert(stdata != null);
             return AddTransformRange(
                 stdata.transformList,
-                new List<int>(stdata.idArray.ToArray()),
-                new List<int>(stdata.parentIdArray.ToArray()),
+                new List<MagicaObjectId>(stdata.idArray.ToArray()),
+                new List<MagicaObjectId>(stdata.parentIdArray.ToArray()),
                 copyCount
                 );
         }
@@ -459,9 +456,9 @@ namespace MagicaCloth2
         /// <returns></returns>
         public int[] AddTransformRange(
             List<Transform> tlist,
-            List<int> idList,
-            List<int> pidList,
-            List<int> rootIds,
+            List<MagicaObjectId> idList,
+            List<MagicaObjectId> pidList,
+            List<MagicaObjectId> rootIds,
             NativeArray<float3> localPositions,
             NativeArray<quaternion> localRotations,
             NativeArray<float3> positions,
@@ -488,7 +485,7 @@ namespace MagicaCloth2
             if (rootIds != null && rootIds.Count > 0)
             {
                 if (rootIdList == null)
-                    rootIdList = new List<int>(rootIds);
+                    rootIdList = new List<MagicaObjectId>(rootIds);
                 else
                     rootIdList.AddRange(rootIds);
             }
@@ -528,20 +525,22 @@ namespace MagicaCloth2
         /// Transform単体を追加する(tidを指定するならスレッド可）
         /// </summary>
         /// <param name="t"></param>
-        /// <param name="tid">0の場合はTransformからGetInstanceId()を即時設定する</param>
+        /// <param name="tid">Invalidの場合はTransformからGetInstanceId()を即時設定する</param>
+        /// <param name="pid">不要ならInvalid</param>
         /// <param name="flag"></param>
         /// <returns></returns>
-        public int ReplaceTransform(int index, Transform t, int tid = 0, int pid = 0, byte flag = TransformManager.Flag_Read)
+        //public int ReplaceTransform(int index, Transform t, int tid = 0, int pid = 0, byte flag = TransformManager.Flag_Read)
+        public int ReplaceTransform(int index, Transform t, MagicaObjectId tid, MagicaObjectId pid, byte flag = TransformManager.Flag_Read)
         {
             Debug.Assert(index < Count);
 
             transformList[index] = t;
             flagArray[index] = new ExBitFlag8(flag);
-            if (tid == 0)
+            if (tid.IsValid() == false)
             {
                 // Transformからデータを取得（メインスレッドのみ）
-                idArray[index] = t.GetInstanceID();
-                parentIdArray[index] = t.parent?.GetInstanceID() ?? 0;
+                idArray[index] = t.GetMagicaId();
+                parentIdArray[index] = t.parent ? t.parent.GetMagicaId() : MagicaObjectId.Invalid;
                 initLocalPositionArray[index] = t.localPosition;
                 initLocalRotationArray[index] = t.localRotation;
                 positionArray[index] = t.position;
@@ -653,8 +652,7 @@ namespace MagicaCloth2
                 //byte flag = flagList[index];
                 //if ((flag & Flag_Write) != 0)
                 {
-                    transform.localPosition = localPositionArray[index];
-                    transform.localRotation = localRotationArray[index];
+                    transform.SetLocalPositionAndRotation(localPositionArray[index], localRotationArray[index]);
                 }
             }
         }
@@ -730,8 +728,7 @@ namespace MagicaCloth2
                 //byte flag = flagList[index];
                 //if ((flag & Flag_Read) != 0)
                 {
-                    var pos = transform.position;
-                    var rot = transform.rotation;
+                    transform.GetPositionAndRotation(out var pos, out var rot);
                     float4x4 LtoW = transform.localToWorldMatrix;
 
                     positionArray[index] = pos;
@@ -753,6 +750,7 @@ namespace MagicaCloth2
         }
 
         //=========================================================================================
+#if false
         /// <summary>
         /// Transformを書き込むジョブを発行する（メインスレッドのみ）
         /// </summary>
@@ -813,6 +811,7 @@ namespace MagicaCloth2
                 }
             }
         }
+#endif
 
         //=========================================================================================
         /// <summary>
@@ -846,8 +845,8 @@ namespace MagicaCloth2
 
             // 新しい領域
             var newTransformList = new List<Transform>(newTransformCount);
-            var newTransformIdArray = new ExSimpleNativeArray<int>(newTransformCount);
-            var newParentIdArray = new ExSimpleNativeArray<int>(newTransformCount);
+            var newTransformIdArray = new ExSimpleNativeArray<MagicaObjectId>(newTransformCount);
+            var newParentIdArray = new ExSimpleNativeArray<MagicaObjectId>(newTransformCount);
             var newFlagArray = new ExSimpleNativeArray<ExBitFlag8>(newTransformCount);
             var newInitLocalPositionArray = new ExSimpleNativeArray<float3>(newTransformCount);
             var newInitLocalRotationArray = new ExSimpleNativeArray<quaternion>(newTransformCount);
@@ -916,7 +915,7 @@ namespace MagicaCloth2
         /// </summary>
         /// <param name="id"></param>
         /// <returns>-1=見つからない</returns>
-        public int GetTransformIndexFormId(int id)
+        public int GetTransformIndexFormId(MagicaObjectId id)
         {
             var array = idArray.GetNativeArray();
             int cnt = Count;
@@ -928,12 +927,12 @@ namespace MagicaCloth2
             return -1;
         }
 
-        public int GetTransformIdFromIndex(int index)
+        public MagicaObjectId GetTransformIdFromIndex(int index)
         {
             return idArray[index];
         }
 
-        public int GetParentIdFromIndex(int index)
+        public MagicaObjectId GetParentIdFromIndex(int index)
         {
             return parentIdArray[index];
         }
@@ -949,6 +948,20 @@ namespace MagicaCloth2
         public float4x4 GetWorldToLocalMatrix(int index)
         {
             return math.inverse(GetLocalToWorldMatrix(index));
+        }
+
+        //=========================================================================================
+        public override string ToString()
+        {
+            int transformListCount = transformList?.Count ?? 0;
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("==== TransformData ====");
+            sb.AppendLine($"isDirty:{isDirty}");
+            sb.AppendLine($"transformList:{transformListCount}");
+            sb.AppendLine($"flagArray:{flagArray.Length}");
+
+            return sb.ToString();
         }
     }
 }

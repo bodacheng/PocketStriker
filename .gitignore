@@ -58,9 +58,5 @@ crashlytics-build.properties
 /Assets/AddressableAssetsData/link.xml
 /Assets/AddressableAssetsData/link.xml.meta
 
-# Unity ignores this upstream tooling mirror, but Git must preserve it.
-!/Packages/com.mcombat.shared/SourceSync~/
-!/Packages/com.mcombat.shared/SourceSync~/**
-
 /Tools/__pycache__/
 /Tools/**/__pycache__/

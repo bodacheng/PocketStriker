@@ -16,6 +16,7 @@ public class Sensor
     readonly List<GameObject> _deadEnemiesByDistance = new List<GameObject>();
     readonly List<GameObject> _enemiesByDistance = new List<GameObject>();
     readonly List<GameObject> _alliesByDistance = new List<GameObject>();
+    readonly Team[] _selfTeam = new Team[1];
     Data_Center _selfDataCenter;
     Collider _jiaMateAmMate, _nearestEnemy;
     public float SensorRadius
@@ -35,6 +36,7 @@ public class Sensor
         _teamConfig = teamConfig;
         _meAndEnemyLayerMask = teamConfig.myTeamAndMyEnemy;
         _selfDataCenter = self;
+        _selfTeam[0] = teamConfig.myTeam;
     }
 
     public static void ClearFightingMember()
@@ -59,14 +61,7 @@ public class Sensor
         _damagingWeaponAround.Clear();
     }
 
-    List<GameObject> FindTargetsByDistance(Team[] tags, CombatUnitRegistry<Data_Center> targetRegistry)
-    {
-        var targetList = new List<GameObject>();
-        FindTargetsByDistance(tags, targetRegistry, targetList);
-        return targetList;
-    }
-
-    void FindTargetsByDistance(Team[] tags, CombatUnitRegistry<Data_Center> targetRegistry, List<GameObject> targetList)
+    void FindTargetsByDistance(IReadOnlyList<Team> tags, CombatUnitRegistry<Data_Center> targetRegistry, List<GameObject> targetList)
     {
         targetList.Clear();
         if (tags == null || targetRegistry == null)
@@ -74,7 +69,7 @@ public class Sensor
             return;
         }
 
-        for (var i = 0; i < tags.Length; i++)
+        for (var i = 0; i < tags.Count; i++)
         {
             var searchingMembers = targetRegistry.GetUnits(tags[i]);
             if (searchingMembers == null)
@@ -112,12 +107,21 @@ public class Sensor
             target => target != null ? target.transform.position : (Vector3?)null);
     }
 
-    public void SensorDetectionResultSortProcess(Collider[] hits) //这个函数的调用必须要确保每次都在update函数之后
+    public void SensorDetectionResultSortProcess(Collider[] hits, int hitCount) //这个函数的调用必须要确保每次都在update函数之后
     {
+        if (hits == null || hitCount <= 0 || Center == null)
+        {
+            _nearestEnemyCollider = null;
+            _nearestDamagingWeapon = null;
+            return;
+        }
+
         float sensorRadiusSqr = SensorRadius * SensorRadius;  // 预计算半径的平方
         Vector3 centerPosition = Center.position;
-        foreach (Collider hit in hits)
+        var count = Mathf.Min(hitCount, hits.Length);
+        for (var i = 0; i < count; i++)
         {
+            var hit = hits[i];
             if (hit == null || (hit.transform.position - centerPosition).sqrMagnitude > sensorRadiusSqr)
             {
                 continue;
@@ -211,7 +215,7 @@ public class Sensor
             return _enemiesByDistance;
         }
         if (refresh)
-            FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedUnitRegistry, _enemiesByDistance);
+            FindTargetsByDistance(_teamConfig.myEnemies, SharedUnitRegistry, _enemiesByDistance);
         return _enemiesByDistance;
     }
 
@@ -223,7 +227,7 @@ public class Sensor
             return _alliesByDistance;
         }
         if (refresh)
-            FindTargetsByDistance(new [] { this._teamConfig.myTeam }, SharedUnitRegistry, _alliesByDistance);
+            FindTargetsByDistance(_selfTeam, SharedUnitRegistry, _alliesByDistance);
         return _alliesByDistance;
     }
 
@@ -234,7 +238,7 @@ public class Sensor
             return null;
         }
 
-        FindTargetsByDistance(this._teamConfig.myEnemies.ToArray(), SharedDeadUnitRegistry, _deadEnemiesByDistance);
+        FindTargetsByDistance(_teamConfig.myEnemies, SharedDeadUnitRegistry, _deadEnemiesByDistance);
         return _deadEnemiesByDistance.Count > 0 ? _deadEnemiesByDistance[_deadEnemiesByDistance.Count - 1] : null;
     }
 

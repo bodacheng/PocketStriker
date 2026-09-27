@@ -510,7 +510,7 @@ public class BasicPhysicSupport : MonoBehaviour
     public Tweener RotateToTarget_Tween(Vector3 target, float duration)
     {
         rotateTween?.Kill();
-        rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up);
+        rotateTween = _DATA_CENTER.WholeT.DOLookAt(target, duration, AxisConstraint.Y, Vector3.up).SetLink(_DATA_CENTER.WholeT.gameObject);
         return rotateTween;
     }
 
@@ -634,10 +634,10 @@ public class BasicPhysicSupport : MonoBehaviour
             return;
 
         var correction = Vector3.zero;
-        var contacts = collision.contacts;
-        for (int i = 0; i < contacts.Length; i++)
+        var contactCount = collision.contactCount;
+        for (var i = 0; i < contactCount; i++)
         {
-            var contact = contacts[i];
+            var contact = collision.GetContact(i);
             float penetration = Mathf.Max(0f, -contact.separation);
             if (penetration <= Mathf.Epsilon)
                 continue;

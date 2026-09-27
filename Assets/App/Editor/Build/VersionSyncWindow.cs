@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
@@ -351,7 +353,7 @@ namespace Cocone.ProjectP3
 
         private static string ReplaceProfileVersion(string input, string profileName, string version, bool replaceAll, string context)
         {
-            var regex = new Regex($@"(/{Regex.Escape(profileName)}/(?:v/)?)\d+(?:\.\d+)+(?=(/|$))", RegexOptions.CultureInvariant);
+            var regex = new Regex($@"(/{Regex.Escape(profileName)}/(?:v/)?)\d+(?:\.\d+)+(?=/|[\r\n]|$)", RegexOptions.CultureInvariant);
             var replaceCount = 0;
 
             var output = regex.Replace(input, match =>
@@ -371,6 +373,107 @@ namespace Cocone.ProjectP3
             }
 
             return output;
+        }
+
+        public static void AssertVersionSettingsSynchronized(string expectedVersion = null)
+        {
+            var version = string.IsNullOrWhiteSpace(expectedVersion) ? PlayerSettings.bundleVersion : expectedVersion;
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                throw new InvalidOperationException("PlayerSettings.bundleVersion 为空，无法校验 Addressables 版本。");
+            }
+
+            var errors = new List<string>();
+            if (!string.Equals(PlayerSettings.bundleVersion, version, StringComparison.Ordinal))
+            {
+                errors.Add($"PlayerSettings.bundleVersion={PlayerSettings.bundleVersion}, expected={version}");
+            }
+
+            var resourceVersion = ReadResourceVersion();
+            if (!string.Equals(version, resourceVersion, StringComparison.Ordinal))
+            {
+                errors.Add($"app_version.json={resourceVersion}, expected={version}");
+            }
+
+            var settings = BuildAddressableAssets.GetSettings();
+            if (settings == null)
+            {
+                errors.Add("AddressableAssetSettings が見つかりません。");
+            }
+            else
+            {
+                CollectAddressableProfileVersionError(settings, DevProfileName, RemoteBuildPathName, version, errors);
+                CollectAddressableProfileVersionError(settings, DevProfileName, RemoteLoadPathName, version, errors);
+                CollectAddressableProfileVersionError(settings, ReleaseProfileName, RemoteBuildPathName, version, errors);
+                CollectAddressableProfileVersionError(settings, ReleaseProfileName, RemoteLoadPathName, version, errors);
+            }
+
+            CollectAddressablesProfileYamlVersionErrors(version, errors);
+
+            if (errors.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    "Version settings are not synchronized. Run P3/Version/Sync Version Settings first.\n" +
+                    string.Join("\n", errors));
+            }
+        }
+
+        private static void CollectAddressableProfileVersionError(
+            AddressableAssetSettings settings,
+            string profileName,
+            string variableName,
+            string version,
+            ICollection<string> errors)
+        {
+            var profileId = settings.profileSettings.GetProfileId(profileName);
+            if (string.IsNullOrEmpty(profileId))
+            {
+                errors.Add($"Addressables Profile 不存在: {profileName}");
+                return;
+            }
+
+            var value = settings.profileSettings.GetValueByName(profileId, variableName);
+            CollectProfileVersionErrors(value, profileName, version, $"Addressables {profileName} {variableName}", errors);
+        }
+
+        private static void CollectAddressablesProfileYamlVersionErrors(string version, ICollection<string> errors)
+        {
+            if (!File.Exists(AddressablesProfileSettingsPath))
+            {
+                errors.Add($"AddressablesProfileSettings.yaml 不存在: {AddressablesProfileSettingsPath}");
+                return;
+            }
+
+            var content = File.ReadAllText(AddressablesProfileSettingsPath);
+            CollectProfileVersionErrors(content, DevProfileName, version, AddressablesProfileSettingsPath, errors);
+            CollectProfileVersionErrors(content, ReleaseProfileName, version, AddressablesProfileSettingsPath, errors);
+        }
+
+        private static void CollectProfileVersionErrors(
+            string input,
+            string profileName,
+            string version,
+            string context,
+            ICollection<string> errors)
+        {
+            var regex = new Regex($@"/{Regex.Escape(profileName)}/(?:v/)?(?<version>\d+(?:\.\d+)+)(?=/|[\r\n]|$)", RegexOptions.CultureInvariant);
+            var matches = regex.Matches(input ?? string.Empty);
+            if (matches.Count <= 0)
+            {
+                errors.Add($"{context} 中没有找到 {profileName} 的版本号片段。");
+                return;
+            }
+
+            var staleVersions = matches
+                .Cast<Match>()
+                .Select(match => match.Groups["version"].Value)
+                .Where(foundVersion => !string.Equals(foundVersion, version, StringComparison.Ordinal))
+                .Distinct()
+                .ToArray();
+            if (staleVersions.Length > 0)
+            {
+                errors.Add($"{context} {profileName} contains stale version(s): {string.Join(", ", staleVersions)}; expected {version}");
+            }
         }
     }
 }

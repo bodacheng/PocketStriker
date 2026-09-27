@@ -16,8 +16,8 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     // The Unity Purchasing system
     private static IStoreController _mStoreController;
     // Items list, configurable via inspector
-    private static List<CatalogItem> _productCatalog;
-    private static List<CatalogItem> _stoneProductCatalog;
+    private static List<CatalogItem> _productCatalog = new List<CatalogItem>();
+    private static List<CatalogItem> _stoneProductCatalog = new List<CatalogItem>();
     private string noAdsServiceName = "vip_v";
     private string productClassName = "Product";
     private string ProductCatalogVersion = "Product";
@@ -27,6 +27,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     private readonly List<PurchaseEventArgs> purchasesAwaitingInitialization = new List<PurchaseEventArgs>();
 
     public static List<CatalogItem> StoneProductCatalog => _stoneProductCatalog;
+    public static event Action StoneProductCatalogChanged;
 
     string ProductCatalog(string productId)
     {
@@ -76,6 +77,15 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     public void Start() {
         // Make PlayFab log in
         Target = this;
+        // The persistent shop may start before PlayFab login completes.
+        if (PlayerAccountInfo.Me == null)
+        {
+            Observable.EveryUpdate()
+                .First(_ => PlayerAccountInfo.Me != null)
+                .Subscribe(_ => RefreshIAPItems())
+                .AddTo(this);
+            return;
+        }
         RefreshIAPItems();
     }
     
@@ -90,7 +100,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
                 CatalogVersion = ProductCatalogVersion
             },
         result => {
-                _productCatalog = result.Catalog;
+                _productCatalog = result.Catalog ?? new List<CatalogItem>();
                 // Make UnityIAP initialize
                 ProductCatalogInitialised = true;
             }, 
@@ -103,12 +113,25 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
                 CatalogVersion = StoneProductCatalogVersion
             },
             result => {
-                _stoneProductCatalog = result.Catalog.FindAll(x=>x.ItemClass == ProductCatalogVersion);
+                _stoneProductCatalog = result.Catalog?.FindAll(x => x != null && x.ItemClass == ProductCatalogVersion)
+                    ?? new List<CatalogItem>();
+                StoneProductCatalogChanged?.Invoke();
                 // Make UnityIAP initialize
                 StoneProductCatalogInitialised = true;
             },
-            error => Debug.LogError(error.GenerateErrorReport())
+            error =>
+            {
+                _stoneProductCatalog = new List<CatalogItem>();
+                StoneProductCatalogChanged?.Invoke();
+                Debug.LogError(error.GenerateErrorReport());
+            }
         );
+    }
+
+    public bool CanPurchaseProduct(string productId)
+    {
+        return IsInitialized.Value &&
+               _mStoreController?.products?.WithID(productId)?.availableToPurchase == true;
     }
 
     public string GetProductLocalPriceString(string productId)

@@ -58,14 +58,7 @@ public class SkillCancelFlag : MonoBehaviour {
     {
         if (i == 1)
         {
-            _C.Sensor.GetEnemiesByDistance(true);
-            if (_C.Sensor.GetEnemiesByDistance(false).Count > 0)
-            {
-                if (_C.Sensor.GetEnemiesByDistance(false)[0] != null)
-                {
-                    _C._MyBehaviorRunner.GetNowState().RotateToTargetTween(_C.Sensor.GetEnemiesByDistance(false)[0].transform.position, 0.01f);
-                }
-            }
+            RotateToNearestEnemy();
             AttackApproachLoopCounter = 0f;
             attackApproaching = false;//与校准方向一起 开始校准迈步
         }
@@ -75,16 +68,18 @@ public class SkillCancelFlag : MonoBehaviour {
     {
         if (i == 1)
         {
-            _C.Sensor.GetEnemiesByDistance(true);
-            if (_C.Sensor.GetEnemiesByDistance(false).Count > 0)
-            {
-                if (_C.Sensor.GetEnemiesByDistance(false)[0] != null)
-                {
-                    _C._MyBehaviorRunner.GetNowState().RotateToTargetTween(_C.Sensor.GetEnemiesByDistance(false)[0].transform.position, 0.01f);
-                }
-            }
+            RotateToNearestEnemy();
             AttackApproachLoopCounter = 0f;
             attackApproaching = true;//与校准方向一起 开始校准迈步
+        }
+    }
+
+    void RotateToNearestEnemy()
+    {
+        var enemies = _C.Sensor.GetEnemiesByDistance(true);
+        if (enemies.Count > 0 && enemies[0] != null)
+        {
+            _C._MyBehaviorRunner.GetNowState().RotateToTargetTween(enemies[0].transform.position, 0.01f);
         }
     }
 }

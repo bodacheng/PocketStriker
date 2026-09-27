@@ -309,19 +309,15 @@ namespace FightScene
         {
             if (FSceneProcessesRunner.Main.CurrentStep() == SceneStep.Fighting)
             {
-                for (var i = 0; i < teamMembers.GetValues().Count; i++)
+                var refreshTimes = RTFightManager.Target.RefreshTimeDic;
+                foreach (var member in teamMembers.mDict.Values)
                 {
-                    var member = teamMembers.GetValues()[i];
-                    if (member == null || !RTFightManager.Target.RefreshTimeDic.ContainsKey(member))
-                    {
+                    if (member == null || !refreshTimes.TryGetValue(member, out var refreshTime))
                         continue;
-                    }
-                    if (RTFightManager.Target.RefreshTimeDic[member].Value > 0)
-                    {
-                        RTFightManager.Target.RefreshTimeDic[member].Value -= Time.deltaTime; // 角色切换倒计时;
-                    }
+                    if (refreshTime.Value > 0)
+                        refreshTime.Value -= Time.deltaTime;
                 }
-            
+
                 if (waitingMember != null &&  RMode_Unit.Value != waitingMember && CanChangeToThisMember(waitingMember))
                 {
                     if (RMode_Unit.Value != null && RTFightManager.Target.RefreshTimeDic.ContainsKey(RMode_Unit.Value))

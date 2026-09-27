@@ -34,7 +34,7 @@ namespace Soul
         void Shake()
         {
             _shakeTweener = _DATA_CENTER.WholeT.DOPunchPosition(-_DATA_CENTER.WholeT.forward * magnitude, duration,
-                vibrato, randomness);
+                vibrato, randomness).SetLink(_DATA_CENTER.WholeT.gameObject);
         }
 
         void PlayHurtAnim(V_Damage newValue)
@@ -57,7 +57,7 @@ namespace Soul
             var obj = AnimationManger.GetRandomHurtAnim(decision.HurtAnimationKey);
             AnimationManger.AnimationTrigger(obj, hurtAnimDuration);
             AnimationManger.TriggerExpression(Facial.hit);
-            mySequence = DOTween.Sequence();
+            mySequence = DOTween.Sequence().SetLink(_DATA_CENTER.WholeT.gameObject);
             mySequence.Append(RotateToTargetTween(decision.RotateTarget, 0.1f));
         }
 

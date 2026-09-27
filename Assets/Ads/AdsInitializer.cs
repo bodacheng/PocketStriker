@@ -10,21 +10,29 @@ public class AdsInitializer : MonoBehaviour
         get;
         set;
     }
-    
+
     void Awake()
     {
         target = this;
-#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
-        InitializeAds();
-#endif
+        if (ShouldEnableAds())
+            InitializeAds();
     }
-    
+
+    public static bool ShouldEnableAds()
+    {
+        return Application.platform == RuntimePlatform.IPhonePlayer ||
+               Application.platform == RuntimePlatform.Android;
+    }
+
     void InitializeAds()
     {
-        // Google admob
+        // Ad callbacks update Unity UI and must run on the Unity thread.
+        MobileAds.RaiseAdEventsOnUnityMainThread = true;
         MobileAds.Initialize(initStatus =>
         {
-            Debug.Log("谷歌广告插件初始化状态："+initStatus.getAdapterStatusMap());
+            if (this == null)
+                return;
+            Debug.Log("谷歌广告插件初始化状态：" + initStatus);
             Initialized = true;
             if (BannerAds.target != null)
             {

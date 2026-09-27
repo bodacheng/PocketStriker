@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -47,15 +47,14 @@ public partial class StageButton : MonoBehaviour
         button.interactable = on;
     }
     
-    public void LoadUnitIcons(List<UnitInfo> units, Func<UnitInfo, UniTask> iconButtonFeature, bool clickBoss = false)
+    public void LoadUnitIcons(List<UnitInfo> units, Func<UnitInfo, UniTask> iconButtonFeature, bool clickBoss = false, Func<bool> isCurrent = null)
     {
         var heroIcons = UnitInfosShow(units, 
             async (x) =>
             {
-                ProgressLayer.Loading(string.Empty);
+                if (this == null || (isCurrent != null && !isCurrent())) return;
                 var targetUnitInfo = units.FirstOrDefault(info => info.id == x);
-                await iconButtonFeature(targetUnitInfo);
-                ProgressLayer.Close();
+                if (targetUnitInfo != null) await iconButtonFeature(targetUnitInfo);
             },
             iconsT
         );
@@ -74,6 +73,7 @@ public partial class StageButton : MonoBehaviour
     {
         foreach (Transform t in showT)
         {
+            t.gameObject.SetActive(false);
             Destroy(t.gameObject);
         }
         var icons = new List<HeroIcon>();

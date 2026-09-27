@@ -18,12 +18,12 @@ public class AdmobAdsButton : MonoBehaviour
     [SerializeField] Image[] colorImages;
 
     public Button ShowAdButton=>_showAdButton;
-    
+
     public String Text
     {
         set => text.text = value;
     }
-    
+
     public void SetWatchedAdExtraProcess(Action watchedAdProcess)
     {
         this._watchedAdExtraProcess = watchedAdProcess;
@@ -63,7 +63,7 @@ public class AdmobAdsButton : MonoBehaviour
             image.color = new Color(color.r, color.g, color.b, _showAdButton.interactable ? 1:0.5f);
         }
     }
-    
+
     void Awake()
     {
         IniUnitId();
@@ -94,7 +94,7 @@ public class AdmobAdsButton : MonoBehaviour
         }
 #endif
     }
-    
+
     // Implement a method to execute when the user clicks the button:
     public void ShowAd()
     {
@@ -104,7 +104,7 @@ public class AdmobAdsButton : MonoBehaviour
                 if (_interstitialAd != null && _interstitialAd.CanShowAd())
                 {
                     _interstitialAd.Show();
-                } 
+                }
                 else
                 {
                     Debug.LogError("Interstitial ad is not ready yet.");
@@ -115,9 +115,7 @@ public class AdmobAdsButton : MonoBehaviour
                 {
                     _rewardedAd.Show((x) =>
                     {
-                        _watchedAdExtraProcess.Invoke();
-                        if (reloadAfterWatched)
-                            LoadRewardAd();
+                        _watchedAdExtraProcess?.Invoke();
                         AppSetting.Value.UnMute();
                     });
                 }
@@ -128,7 +126,7 @@ public class AdmobAdsButton : MonoBehaviour
                 break;
         }
     }
-    
+
     private void RegisterEventHandlers(InterstitialAd interstitialAd)
     {
         // Raised when the ad is estimated to have earned money.
@@ -146,7 +144,7 @@ public class AdmobAdsButton : MonoBehaviour
         {
             Debug.Log("Rewarded interstitial ad was clicked.");
         };
-        
+
         // Raised when an ad opened full screen content.
         interstitialAd.OnAdFullScreenContentOpened += () =>
         {
@@ -162,17 +160,18 @@ public class AdmobAdsButton : MonoBehaviour
             // Load another ad: 需要检查在实机上这里跑的是否有问题。在editor上产生一个造成广告再次观看时连续跑了两次的错误
             if (reloadAfterWatched)
                 LoadInterstitialAd();
-            
+
             AppSetting.Value.UnMute();
         };
         // Raised when the ad failed to open full screen content.
         interstitialAd.OnAdFullScreenContentFailed += (AdError error) =>
         {
+            AppSetting.Value.UnMute();
             Debug.LogError("Rewarded interstitial ad failed to open " +
                            "full screen content with error : " + error);
         };
     }
-    
+
     private void RegisterEventHandlers(RewardedAd rewardedAd)
     {
         // Raised when the ad is estimated to have earned money.
@@ -190,7 +189,7 @@ public class AdmobAdsButton : MonoBehaviour
         {
             Debug.Log("Rewarded ad was clicked.");
         };
-        
+
         // Raised when an ad opened full screen content.
         rewardedAd.OnAdFullScreenContentOpened += () =>
         {
@@ -201,12 +200,14 @@ public class AdmobAdsButton : MonoBehaviour
         // Raised when the ad closed full screen content.
         rewardedAd.OnAdFullScreenContentClosed += () =>
         {
-            // 相关处理放到_rewardedAd.Show那边？
             AppSetting.Value.UnMute();
+            if (reloadAfterWatched)
+                LoadRewardAd();
         };
         // Raised when the ad failed to open full screen content.
         rewardedAd.OnAdFullScreenContentFailed += (AdError error) =>
         {
+            AppSetting.Value.UnMute();
             Debug.LogError("Rewarded ad failed to open " +
                            "full screen content with error : " + error);
         };
@@ -214,6 +215,11 @@ public class AdmobAdsButton : MonoBehaviour
 
     public void LoadAd()
     {
+        if (!AdsInitializer.ShouldEnableAds() || string.IsNullOrEmpty(_adUnitId))
+        {
+            AdIsReady = false;
+            return;
+        }
         switch (adType)
         {
             case AdType.Interstitial:
@@ -224,12 +230,13 @@ public class AdmobAdsButton : MonoBehaviour
                 break;
         }
     }
-    
+
     /// <summary>
     /// Loads the rewarded interstitial ad.
     /// </summary>
     void LoadInterstitialAd()
     {
+        AdIsReady = false;
         // Clean up the old ad before loading a new one.
         if (_interstitialAd != null)
         {
@@ -238,7 +245,7 @@ public class AdmobAdsButton : MonoBehaviour
         }
 
         Debug.Log("Loading the rewarded interstitial ad.");
-        
+
         // create our request used to load the ad.
         var adRequest = new AdRequest();
         //adRequest.Keywords.Add("unity-admob-sample");
@@ -247,34 +254,40 @@ public class AdmobAdsButton : MonoBehaviour
         InterstitialAd.Load(_adUnitId, adRequest,
             (InterstitialAd ad, LoadAdError error) =>
             {
+                if (this == null)
+                {
+                    ad?.Destroy();
+                    return;
+                }
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
                 {
                     Debug.LogError("rewarded interstitial ad failed to load an ad with error : " + error);
                     return;
                 }
-                
+
                 Debug.Log("Rewarded interstitial ad loaded with response : " + ad.GetResponseInfo());
-                
+
                 _interstitialAd = ad;
                 AdIsReady = true;
                 RegisterEventHandlers(_interstitialAd);
             });
     }
-    
+
     void LoadRewardAd()
     {
+        AdIsReady = false;
         ProgressLayer.Loading(string.Empty);
-        
+
         // Clean up the old ad before loading a new one.
         if (_rewardedAd != null)
         {
             _rewardedAd.Destroy();
             _rewardedAd = null;
         }
-        
+
         Debug.Log("Loading the reward ad.");
-        
+
         // create our request used to load the ad.
         var adRequest = new AdRequest();
         //adRequest.Keywords.Add("unity-admob-sample");
@@ -284,22 +297,34 @@ public class AdmobAdsButton : MonoBehaviour
             (RewardedAd ad, LoadAdError error) =>
             {
                 ProgressLayer.Close();
-                
+
+                if (this == null)
+                {
+                    ad?.Destroy();
+                    return;
+                }
+
                 // if error is not null, the load request failed.
                 if (error != null || ad == null)
                 {
                     Debug.LogError("Rewarded ad failed to load an ad with error : " + error);
                     return;
                 }
-                
+
                 Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
-                
+
                 _rewardedAd = ad;
                 AdIsReady = true;
                 RegisterEventHandlers(_rewardedAd);
             });
     }
-    
+
+    void OnDestroy()
+    {
+        _interstitialAd?.Destroy();
+        _rewardedAd?.Destroy();
+    }
+
     enum AdType
     {
         Interstitial = 0,

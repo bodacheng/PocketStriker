@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using HittingDetection;
@@ -117,7 +117,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
             if (FightGlobalSetting.HitBoxLogger)
             {
-                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
+                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? SkillLogIdentity.ResolveCurrentSkillKey(Ani_E._DATA_CENTER._MyBehaviorRunner);
                 Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }
@@ -170,7 +170,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
             if (FightGlobalSetting.HitBoxLogger)
             {
-                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
+                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? SkillLogIdentity.ResolveCurrentSkillKey(Ani_E._DATA_CENTER._MyBehaviorRunner);
                 Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }
@@ -226,7 +226,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
                 if (FightGlobalSetting.HitBoxLogger)
                 {
-                    Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
+                    Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? SkillLogIdentity.ResolveCurrentSkillKey(Ani_E._DATA_CENTER._MyBehaviorRunner);
                     Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
                 }
             }
@@ -277,7 +277,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
             if (FightGlobalSetting.HitBoxLogger)
             {
-                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? Ani_E._DATA_CENTER._MyBehaviorRunner.GetNowState().StateKey;
+                Ani_E.processingHitBox._HitBox.GeneratedByStateKey = logForStateKey ?? SkillLogIdentity.ResolveCurrentSkillKey(Ani_E._DATA_CENTER._MyBehaviorRunner);
                 Ani_E.processingHitBox._HitBox.HitBoxLifeEnding = HitBoxLifeEnding.untouched;
             }
         }

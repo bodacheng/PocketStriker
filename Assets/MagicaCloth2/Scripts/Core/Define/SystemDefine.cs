@@ -13,24 +13,79 @@ namespace MagicaCloth2
         public static class System
         {
             /// <summary>
+            /// プロジェクトセッティングに登録するDefineシンボル
+            /// </summary>
+            public const string DefineSymbol = "MAGICACLOTH2";
+
+            /// <summary>
+            /// 現在有効なPreBuildの最新バージョン
+            /// </summary>
+            public const int LatestPreBuildVersion = 2;
+
+            /// <summary>
             /// 計算を省略する最小の浮動小数点数
             /// </summary>
             public const float Epsilon = 1e-8f;
 
             /// <summary>
-            /// １秒間の更新回数
+            /// MeshClothで設定可能な最大レンダラー数
             /// </summary>
-            public const int SolverFrequency = 90;
+            public const int MaxRendererCount = 31;
 
             /// <summary>
-            /// １フレームでの最大更新回数
+            /// 最小のグリッドサイズ定義(GridSize=0は動作しないため)
             /// </summary>
-            public const int MaxUpdateCount = 3;
+            public const float MinimumGridSize = 0.00001f;
+
+            /// <summary>
+            /// 生成できるチーム数
+            /// </summary>
+            public const int MaximumTeamCount = 4096;
+
+            /// <summary>
+            /// シミュレーション周波数初期値
+            /// </summary>
+            public const int DefaultSimulationFrequency = 90;
+
+            /// <summary>
+            /// シミュレーション周波数最小値
+            /// </summary>
+            public const int SimulationFrequency_Low = 30;
+
+            /// <summary>
+            /// シミュレーション周波数最大値
+            /// </summary>
+            public const int SimulationFrequency_Hi = 150;
+
+            /// <summary>
+            /// 1フレームでの最大更新回数初期値
+            /// </summary>
+            public const int DefaultMaxSimulationCountPerFrame = 3;
+
+            /// <summary>
+            /// 1フレームでの最大更新回数最小
+            /// </summary>
+            public const int MaxSimulationCountPerFrame_Low = 1;
+
+            /// <summary>
+            /// 1フレームでの最大更新回数最大
+            /// </summary>
+            public const int MaxSimulationCountPerFrame_Hi = 5;
 
             /// <summary>
             /// 法線整列時に同一の面（レイヤー）として判定する隣接トライアングルのなす角（デグリー）
             /// </summary>
             public const float SameSurfaceAngle = 80.0f;
+
+            /// <summary>
+            /// 未来予測時のルートからの距離制限倍率
+            /// </summary>
+            public const float MaxDistanceRatioFutuerPrediction = 1.3f;
+
+            /// <summary>
+            /// 分割ジョブを適用するプロキシメッシュメッシュの頂点数
+            /// </summary>
+            public const int SplitProxyMeshVertexCount = 300;
 
             /// <summary>
             /// [Reduction]
@@ -86,6 +141,18 @@ namespace MagicaCloth2
             /// トライアングルのペアと判定する角度(Deg)
             /// </summary>
             public const float ProxyMeshTrianglePairAngle = 20.0f;
+
+            /// <summary>
+            /// [ProxyMesh]
+            /// BoneClothのMesh接続時にトライアングルとして判断される有効な内角
+            /// </summary>
+            public const float ProxyMeshBoneClothTriangleValidAngle = 120.0f;
+
+            /// <summary>
+            /// [ProxyMesh]
+            /// BoneClothのMesh接続時にトライアングルとして判断される無効な内角
+            /// </summary>
+            public const float ProxyMeshBoneClothTriangleInvalidAngle = 10.0f;
 
             /// <summary>
             /// [Simulation]
@@ -229,9 +296,9 @@ namespace MagicaCloth2
 
             /// <summary>
             /// [Collider Collision]
-            /// チームに登録できる最大のコライダー数
+            /// 一度に拡張するコライダー数
             /// </summary>
-            public const int MaxColliderCount = 32;
+            public const int ExpandedColliderCount = 8;
 
             /// <summary>
             /// [Collider Collision]
@@ -273,7 +340,19 @@ namespace MagicaCloth2
             /// [Self Collision]
             /// 反復回数
             /// </summary>
-            public const int SelfCollisionSolverIteration = 4;
+            public const int SelfCollisionSolverIteration = 4; // 4
+
+            /// <summary>
+            /// [Self Collision]
+            /// 無効グリッド座標
+            /// </summary>
+            public const int SelfCollisionIgnoreGrid = 1000000;
+
+            /// <summary>
+            /// [Self Collision]
+            /// 交差判定の分割数
+            /// </summary>
+            public const int SelfCollisionIntersectDiv = 2; // 8
 
             /// <summary>
             /// [Self Collision]
@@ -307,12 +386,6 @@ namespace MagicaCloth2
 
             /// <summary>
             /// [Self Collision]
-            /// 交差判定の分割数
-            /// </summary>
-            public const int SelfCollisionIntersectDiv = 8;
-
-            /// <summary>
-            /// [Self Collision]
             /// Thicknessの最小値(m)
             /// </summary>
             public const float SelfCollisionThicknessMin = 0.001f;
@@ -334,6 +407,30 @@ namespace MagicaCloth2
             /// 風速係数の基準となる風速(m/s)
             /// </summary>
             public const float WindBaseSpeed = 7.5f;
+
+            /// <summary>
+            /// [Spring]
+            /// BoneSpring利用時のDistanceConstraintのStiffness値
+            /// </summary>
+            public const float BoneSpringDistanceStiffness = 0.5f;
+
+            /// <summary>
+            /// [Spring]
+            /// BoneSpring利用時のTetherConstraintのCompressionLimit値
+            /// </summary>
+            public const float BoneSpringTetherCompressionLimit = 0.8f;
+
+            /// <summary>
+            /// [Spring]
+            /// BoneSpring利用時のfriction値
+            /// </summary>
+            public const float BoneSpringCollisionFriction = 0.5f;
+
+            /// <summary>
+            /// [Culling]
+            /// 距離カリングの最大距離
+            /// </summary>
+            public const float DistanceCullingMaxLength = 100.0f;
         }
     }
 }

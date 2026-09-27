@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -74,26 +75,73 @@ namespace FightScene
             get => _auto;
         }
         
-        public async UniTask _UnitsLoad(MultiDic<int, int, UnitInfo> membersSets, IDictionary<Data_Center, UnitInfo> unitInfoRef)
+        public async UniTask _UnitsLoad(MultiDic<int, int, UnitInfo> membersSets, IDictionary<Data_Center, UnitInfo> unitInfoRef,
+            Action<float> onUnitProgressDelta = null, int maxConcurrentLoads = 1)
         {
-            async UniTask LoadOneUnit(int key1, int key2, UnitInfo info)
+            async UniTask LoadOneUnit(int key1, int key2, UnitInfo info, int preloadCount)
             {
+                float unitProgress = 0f;
+                void ReportProgress(float progress)
+                {
+                    var delta = Mathf.Clamp01(progress) - unitProgress;
+                    if (delta <= 0f)
+                    {
+                        return;
+                    }
+                    unitProgress += delta;
+                    onUnitProgressDelta?.Invoke(delta);
+                }
+
                 var center = teamMembers.Get(key1, key2);
                 if (center == null)
                 {
-                    center = await UnitCreator.CreateUnit(info, 1);
+                    center = await UnitCreator.CreateUnit(info, preloadCount, ReportProgress);
                 }
+                else
+                {
+                    ReportProgress(1f);
+                }
+                if (center == null)
+                    throw new InvalidOperationException($"Could not prepare unit: {info.r_id}");
                 teamMembers.Set(key1, key2, center);
                 DicAdd<Data_Center, UnitInfo>.Add(unitInfoRef, center, info);
             }
-            var tasks = new List<UniTask>();
+            var sameUnitCounts = new Dictionary<(string rId, float level), int>();
             foreach (var kv in membersSets.mDict)
             {
-                tasks.Add(LoadOneUnit(kv.Key.Item1, kv.Key.Item2, kv.Value));
+                var unitKey = (kv.Value.r_id, kv.Value.level);
+                if (sameUnitCounts.TryGetValue(unitKey, out var count))
+                {
+                    sameUnitCounts[unitKey] = count + 1;
+                }
+                else
+                {
+                    sameUnitCounts.Add(unitKey, 1);
+                }
             }
-            await UniTask.WhenAll(tasks);
+
+            maxConcurrentLoads = Mathf.Max(1, maxConcurrentLoads);
+            var tasks = new List<UniTask>(maxConcurrentLoads);
+            foreach (var kv in membersSets.mDict)
+            {
+                var unitKey = (kv.Value.r_id, kv.Value.level);
+                // 这个统计相同种类角色的逻辑并不精确。如果一个队伍里有两个同masterid角色，等级还一样，问题就出来了，但现在我们的代码构造造成没有别的做法。
+                tasks.Add(LoadOneUnit(kv.Key.Item1, kv.Key.Item2, kv.Value, sameUnitCounts[unitKey]));
+                if (tasks.Count < maxConcurrentLoads)
+                {
+                    continue;
+                }
+
+                await UniTask.WhenAll(tasks);
+                tasks.Clear();
+            }
+
+            if (tasks.Count > 0)
+            {
+                await UniTask.WhenAll(tasks);
+            }
         }
-        
+
         public bool IfAllUnitsPreparedForBattle()
         {
             foreach (var oneMember in teamMembers.GetValues())

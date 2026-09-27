@@ -1,7 +1,7 @@
 #define LITE
 //------------------------------------
 //             OmniShade
-//     Copyright© 2023 OmniShade     
+//     Copyright© 2025 OmniShade
 //------------------------------------
 
 using UnityEditor;
@@ -13,13 +13,13 @@ using System.Linq;
 /**
  * This class manages the GUI for the shader, automatically enabling/disabling keywords when values change.
  **/
-public class OmniShadeGUI : ShaderGUI {	
+public class OmniShadeGUI : ShaderGUI {
 	// Shader keywords which are automatically enabled/disabled based on usage
-	readonly List<(string keyword, string name, PropertyType type, Vector4 defaultValue)> props = new List<(string keyword, string name, PropertyType type, Vector4 defaultValue)> {
+	readonly List<(string keyword, string name, PropertyType type, Vector4 defaultValue)> props = new List<(string keyword, string name, PropertyType type, Vector4 defaultValue)>() {
 		("TOP_TEX", "_TopTex", PropertyType.Texture, Vector4.one),							// Triplanar
 		("TRIPLANAR_SHARPNESS", "_TriplanarSharpness", PropertyType.Float, Vector4.one),	// Triplanar
 		("BASE_CONTRAST", "_Contrast", PropertyType.Float, Vector4.one),
-		("BASE_SATURATION", "_Saturation", PropertyType.Float, Vector4.one), 
+		("BASE_SATURATION", "_Saturation", PropertyType.Float, Vector4.one),
 		("SPECULAR_MAP", "_SpecularTex", PropertyType.Texture, Vector4.one),
 		("RIM_DIRECTION", "_RimDirection", PropertyType.Vector, Vector4.zero),
 		("REFLECTION_TEX", "_ReflectionTex", PropertyType.Texture, Vector4.one),
@@ -28,7 +28,7 @@ public class OmniShadeGUI : ShaderGUI {
 		("NORMAL_MAP_TOP", "_NormalTopTex", PropertyType.Texture, Vector4.one),				// Triplanar
 		("LIGHT_MAP", "_LightmapTex", PropertyType.Texture, Vector4.one),
 		("EMISSIVE_MAP", "_EmissiveTex", PropertyType.Texture, Vector4.one),
-		("MATCAP", "_MatCapTex", PropertyType.Texture, Vector4.one),	
+		("MATCAP", "_MatCapTex", PropertyType.Texture, Vector4.one),
 		("MATCAP_CONTRAST", "_MatCapContrast", PropertyType.Float, Vector4.one),
 		("VERTEX_COLORS_CONTRAST", "_VertexColorsContrast", PropertyType.Float, Vector4.one),
 		("DETAIL", "_DetailTex", PropertyType.Texture, Vector4.one),
@@ -65,7 +65,7 @@ public class OmniShadeGUI : ShaderGUI {
 			this.headerName = _header;
 			this.isOpen = _isOpen;
 		}
-	}; 
+	};
 
 	const string HEADER_GROUP = "HeaderGroup";
 
@@ -86,21 +86,8 @@ public class OmniShadeGUI : ShaderGUI {
 	public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
 		this.RenderGUI(materialEditor, properties);
 
-		// Multi-selection
-		var mat = materialEditor.target as Material;
-		var mats = new List<Material>();
-		if (mat != null)
-			mats.Add(mat);
-		foreach (var selected in Selection.objects) {
-			if (selected.GetType() == typeof(Material)) {
-				var selectedMat = selected as Material;
-				if (selectedMat != mat && selectedMat != null &&
-					selectedMat.shader.name.Contains(OmniShade.NAME))
-					mats.Add(selectedMat);
-			}
-		}
-
 		// Loop selected materials
+		var mats = this.GetSelectedMaterials(materialEditor);
 		foreach (var material in mats) {
 			this.AutoEnableShaderKeywords(material);
 			this.UpdatePresetValues(material);
@@ -115,6 +102,22 @@ public class OmniShadeGUI : ShaderGUI {
 			mats[0] != null && this.prevSelectedMats[0] != null && mats[0].name != this.prevSelectedMats[0].name)
 			this.prevPreset = -1;
 		this.prevSelectedMats = mats;
+	}
+
+	List<Material> GetSelectedMaterials(MaterialEditor materialEditor) {
+		var mat = materialEditor.target as Material;
+		var mats = new List<Material>();
+		if (mat != null)
+			mats.Add(mat);
+		foreach (var selected in Selection.objects) {
+			if (selected.GetType() == typeof(Material)) {
+				var selectedMat = selected as Material;
+				if (selectedMat != mat && selectedMat != null &&
+					selectedMat.shader.name.Contains(OmniShade.NAME))
+					mats.Add(selectedMat);
+			}
+		}
+		return mats;
 	}
 
 	void AutoEnableShaderKeywords(Material mat) {
@@ -142,7 +145,7 @@ public class OmniShadeGUI : ShaderGUI {
 			if (isInUse) {
 				if (!mat.IsKeywordEnabled(prop.keyword))
 					mat.EnableKeyword(prop.keyword);
-			} 
+			}
 			else if (mat.IsKeywordEnabled(prop.keyword))
 				mat.DisableKeyword(prop.keyword);
 		}
@@ -158,9 +161,9 @@ public class OmniShadeGUI : ShaderGUI {
 
 	void AutoConfigureProperties(Material mat) {
 		// MatCap Static Rotation default angle points to camera
-		if (mat.IsKeywordEnabled("MATCAP_STATIC") && mat.HasProperty("_MatCapRot") && 
+		if (mat.IsKeywordEnabled("MATCAP_STATIC") && mat.HasProperty("_MatCapRot") &&
 			mat.GetVector("_MatCapRot") == Vector4.zero) {
-			var cam = GameObject.FindObjectOfType<Camera>();
+			var cam = GameObject.FindFirstObjectByType<Camera>();
 			if (cam != null) {
 				var matCapRot = -cam.transform.rotation.eulerAngles * Mathf.PI / 180;
 				mat.SetVector("_MatCapRot", matCapRot);
@@ -171,26 +174,25 @@ public class OmniShadeGUI : ShaderGUI {
 		float fadeStart = mat.HasProperty("_CameraFadeStart") ? mat.GetFloat("_CameraFadeStart") : 0;
 		float fadeEnd = mat.HasProperty("_CameraFadeEnd") ? mat.GetFloat("_CameraFadeEnd") : 0;
 		bool cameraFadeEnabled = fadeStart < fadeEnd;
-		if (cameraFadeEnabled) {
-			if (!mat.IsKeywordEnabled("CAMERA_FADE"))
-				mat.EnableKeyword("CAMERA_FADE");
-		} 
-		else {
-			if (mat.IsKeywordEnabled("CAMERA_FADE"))
-				mat.DisableKeyword("CAMERA_FADE");
-		}
+		EnableDisableKeyword(mat, cameraFadeEnabled, "CAMERA_FADE");
 
 		// Enable/disable outline pass
 		bool outlineEnabled = mat.GetFloat("_Outline") == 1;
 		string outlinePassName = mat.shader.name.Contains("URP") ? "SRPDefaultUnlit" : "Always";
-		if (outlineEnabled != mat.GetShaderPassEnabled(outlinePassName)) {
+		if (outlineEnabled != mat.GetShaderPassEnabled(outlinePassName))
 			mat.SetShaderPassEnabled(outlinePassName, outlineEnabled);
-			if (!outlineEnabled)
-				mat.EnableKeyword("OUTLINE_PASS_DISABLED");
+		EnableDisableKeyword(mat, !outlineEnabled, "OUTLINE_PASS_DISABLED");
+		if (mat.GetInt("_OutlineComp") == 6) {	// Interior outline: Show
+			// Auto-set OutlineGroup to non-zero value if hiding interior outlines
+			if (mat.GetInt("_OutlineGroup") == 0)
+				mat.SetInt("_OutlineGroup", 1);
+			mat.SetInt("_OutlinePass", 2);  	// Stencil pass: Replace
 		}
+		else
+			mat.SetInt("_OutlinePass", 0);  	// Stencil pass: Keep
 
 		// Enable GPU instancing automatically for certain keywords
-		var instancingParams = new List<string>() { 
+		var instancingParams = new List<string>() {
 			"_Plant",
 		};
 		if (!mat.enableInstancing) {
@@ -208,6 +210,17 @@ public class OmniShadeGUI : ShaderGUI {
 		else {
 			if (mat.globalIlluminationFlags != MaterialGlobalIlluminationFlags.EmissiveIsBlack)
 				mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+		}
+	}
+
+	void EnableDisableKeyword(Material mat, bool value, string keyword) {
+		if (value) {
+			if (!mat.IsKeywordEnabled(keyword))
+				mat.EnableKeyword(keyword);
+		}
+		else {
+			if (mat.IsKeywordEnabled(keyword))
+				mat.DisableKeyword(keyword);
 		}
 	}
 
@@ -282,7 +295,7 @@ public class OmniShadeGUI : ShaderGUI {
 
 		this.prevPreset = preset;
 	}
-	
+
 	void RenderGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
 		materialEditor.SetDefaultGUIWidths();
 
@@ -293,7 +306,7 @@ public class OmniShadeGUI : ShaderGUI {
 		};
       	if (GUILayout.Button(content))
 		  Help.BrowseURL(OmniShade.DOCS_URL);
-		
+
 		// Expand/Close all buttons
 		GUILayout.BeginHorizontal();
 		var expandAll = new GUIContent(EditorGUIUtility.IconContent("Toolbar Plus")) { text = "Expand All" };
@@ -328,7 +341,11 @@ public class OmniShadeGUI : ShaderGUI {
 
 		bool isFoldoutOpen = true;
 		string currentHeaderName = string.Empty;
+		int uvTileCount = 0;
 		foreach (var prop in properties) {
+			if (((uint)prop.propertyFlags & (uint)ShaderPropertyFlags.HideInInspector) == 1)
+				continue;
+
 			// If start of header, begin a new foldout group
 			if (this.propertyHeaders.ContainsKey(prop.name)) {
 				// Close previous foldout group
@@ -353,11 +370,34 @@ public class OmniShadeGUI : ShaderGUI {
 			}
 
 			// Render shader property
-			if (isFoldoutOpen)
-				this.RenderShaderProperty(materialEditor, prop);
+			if (isFoldoutOpen) {
+				if (prop.name.StartsWith("_UVTileV")) {
+					this.RenderUVTileDiscardProperty(materialEditor, prop, uvTileCount);
+					uvTileCount++;
+				}
+				else
+					this.RenderShaderProperty(materialEditor, prop);
+			}
 		}
 
 		return currentHeaderName;
+	}
+
+	void RenderUVTileDiscardProperty(MaterialEditor materialEditor, MaterialProperty prop, int uvTileCount) {
+		if (uvTileCount % 4 == 0) {
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Label(prop.displayName);
+		}
+
+		float val = GUILayout.Toggle(prop.floatValue > 0, string.Empty) ? 1.0f : 0.0f;
+		if (val != prop.floatValue) {
+			var mats = this.GetSelectedMaterials(materialEditor);
+			foreach (var mat in mats)
+				mat.SetFloat(prop.name, val);
+		}
+
+		if ((uvTileCount + 1) % 4 == 0)
+			EditorGUILayout.EndHorizontal();
 	}
 
 	void RenderShaderProperty(MaterialEditor materialEditor, MaterialProperty prop) {
@@ -365,7 +405,7 @@ public class OmniShadeGUI : ShaderGUI {
 		var content = this.GetTooltip(label);
 		materialEditor.ShaderProperty(prop, content);
 	}
-	
+
 	void RefreshPropertyHeaders(MaterialEditor materialEditor) {
 		var mat = materialEditor.target as Material;
 		var shader = mat.shader;
@@ -537,6 +577,9 @@ public class OmniShadeGUI : ShaderGUI {
 			case "Outline": tooltip = "Adds an outline silhouette around the object."; break;
 			case "Enable Outline": tooltip = "Adds an outline silhouette around the object."; break;
 			case "Outline Width": tooltip = "Width of the outline. Recommend not setting this too large."; break;
+			case "Outline Width Camera-Independent": tooltip = "Width does not vary based on camera depth."; break;
+			case "Interior Outlines": tooltip = "Show or hide interior outlines."; break;
+			case "Outline Group": tooltip = "Group object outlines, used with Interior Outlines."; break;
 			case "Anime": tooltip = "Anime-style ramp-lighting."; break;
 			case "Enable Anime": tooltip = "Anime-style ramp-lighting."; break;
 			case "Color 1": tooltip = "First ramp (shadow) color."; break;
@@ -553,6 +596,7 @@ public class OmniShadeGUI : ShaderGUI {
 			case "Depth Offset": tooltip = "Adjust the distance from the camera to tune visibility."; break;
 			case "Cutout Transparency": tooltip = "Discards pixels with alpha less than 0.5. Performance may be slow on mobile."; break;
 			case "Enable Flat Shading": tooltip = "Use a flat-shading style for a blocky low-poly look."; break;
+			case "Enable UV Tile Discard": tooltip = "Discard vertices based on UV values, used for toggling portions of a model on/off."; break;
 			default: tooltip = ""; break;
 		}
 
@@ -615,6 +659,10 @@ public class OmniShadeGUI : ShaderGUI {
 		// Replace shader
 		base.AssignNewShaderToMaterial(mat, oldShader, newShader);
 
+		// Re-enable outline pass
+		string outlinePassName = mat.shader.name.Contains("URP") ? "SRPDefaultUnlit" : "Always";
+		mat.SetShaderPassEnabled(outlinePassName, true);
+
 		// Replace textures
 		Vector2 baseTiling = Vector2.one, baseOffset = Vector2.zero;
 		foreach (var texToRep in texToReplace) {
@@ -658,7 +706,7 @@ public class OmniShadeGUI : ShaderGUI {
 		// Replace emission color
 		if (mat.HasProperty("_Emissive"))
 			mat.SetVector("_Emissive", emissive);
-		
+
 		this.forceExpand = ExpandType.Active;
 	}
 }

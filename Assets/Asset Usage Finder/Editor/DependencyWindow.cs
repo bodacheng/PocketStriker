@@ -118,7 +118,7 @@ namespace AssetUsageFinder {
 
             // var t = new[] {_data.Target.Root};
             // if (_data.Target.Nested.TryGet(out var nested))
- 
+
             titleContent = new GUIContent($"{FindMode.GetWindowTitleByFindMode(_findMode)}");
             titleContent.tooltip = _data.Title;
         }
@@ -214,8 +214,6 @@ namespace AssetUsageFinder {
         }
 
         void DrawRow(ResultRow dependency) {
-            var id = dependency.Main.GetInstanceID();
-
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
                 using (new EditorGUILayout.HorizontalScope()) {
                     if (GUILayout.Button(dependency.LabelContent, StyleInstance.RowMainAssetBtn)) {

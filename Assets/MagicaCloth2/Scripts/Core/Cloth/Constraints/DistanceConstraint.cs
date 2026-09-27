@@ -3,9 +3,8 @@
 // https://magicasoft.jp
 using System;
 using System.Collections.Generic;
-using Unity.Burst;
+using System.Text;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -58,9 +57,19 @@ namespace MagicaCloth2
             /// </summary>
             public float velocityAttenuation;
 
-            public void Convert(SerializeData sdata)
+            public void Convert(SerializeData sdata, ClothProcess.ClothType clothType)
             {
-                restorationStiffness = sdata.stiffness.ConvertFloatArray();
+                switch (clothType)
+                {
+                    case ClothProcess.ClothType.BoneCloth:
+                    case ClothProcess.ClothType.MeshCloth:
+                        restorationStiffness = sdata.stiffness.ConvertFloatArray();
+                        break;
+                    case ClothProcess.ClothType.BoneSpring:
+                        // BoneSpringは定数
+                        restorationStiffness = Define.System.BoneSpringDistanceStiffness;
+                        break;
+                }
                 velocityAttenuation = Define.System.DistanceVelocityAttenuation;
             }
         }
@@ -74,9 +83,10 @@ namespace MagicaCloth2
         /// <summary>
         /// 制約データ
         /// </summary>
-        internal class ConstraintData : IValid
+        [System.Serializable]
+        public class ConstraintData : IValid
         {
-            internal ResultCode result;
+            public ResultCode result;
 
             public uint[] indexArray;
             public ushort[] dataArray;
@@ -124,12 +134,23 @@ namespace MagicaCloth2
             distanceArray?.Dispose();
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"[DistanceConstraint]");
+            sb.AppendLine($"  -indexArray:{indexArray.ToSummary()}");
+            sb.AppendLine($"  -dataArray:{dataArray.ToSummary()}");
+            sb.AppendLine($"  -distanceArray:{distanceArray.ToSummary()}");
+
+            return sb.ToString();
+        }
+
         //=========================================================================================
         /// <summary>
         /// 制約データの作成
         /// </summary>
         /// <param name="cbase"></param>
-        internal static ConstraintData CreateData(VirtualMesh proxyMesh, in ClothParameters parameters)
+        public static ConstraintData CreateData(VirtualMesh proxyMesh, in ClothParameters parameters)
         {
             var constraintData = new ConstraintData();
 
@@ -194,7 +215,7 @@ namespace MagicaCloth2
                     for (int l = 0; l < ecnt; l++)
                     {
                         int2 edge = proxyMesh.edges[l];
-                        var tset = proxyMesh.edgeToTriangles.ToFixedList128Bytes(edge);
+                        var tset = proxyMesh.edgeToTriangles.MC2ToFixedList128Bytes(edge);
                         int tcnt = tset.Length;
                         if (tcnt < 2)
                             continue;
@@ -277,22 +298,21 @@ namespace MagicaCloth2
 
                         for (int k = 0; k < TypeCount; k++)
                         {
-                            DataUtility.Unpack10_22(k == 0 ? indexArrayV[i] : indexArrayH[i], out var dcnt, out var dstart);
+                            DataUtility.Unpack12_20(k == 0 ? indexArrayV[i] : indexArrayH[i], out var dcnt, out var dstart);
                             for (int j = 0; j < dcnt; j++)
                             {
                                 ushort data = k == 0 ? dataArryaV[dstart + j] : dataArryaH[dstart + j];
                                 var tpos = proxyMesh.localPositions[data];
                                 float dist = math.distance(pos, tpos);
-                                if (dist < 1e-06f)
-                                    continue;
 
+                                // ゼロ距離も認める(v2.17.0)
                                 dataList.Add(data);
-                                distanceList.Add(k == 0 ? dist : -dist); // マイナスはhorizontalタイプ
+                                distanceList.Add(dist < 1e-08f ? 0.0f : (k == 0 ? dist : -dist)); // マイナスはhorizontalタイプ
                                 cnt++;
                             }
                         }
 
-                        uint pack = DataUtility.Pack10_22(cnt, start);
+                        uint pack = DataUtility.Pack12_20(cnt, start);
                         indexList.Add(pack);
                     }
 
@@ -327,13 +347,11 @@ namespace MagicaCloth2
         {
             if (cprocess?.distanceConstraintData?.IsValid() ?? false)
             {
-                var tdata = MagicaManager.Team.GetTeamData(cprocess.TeamId);
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(cprocess.TeamId);
 
                 tdata.distanceStartChunk = indexArray.AddRange(cprocess.distanceConstraintData.indexArray);
                 tdata.distanceDataChunk = dataArray.AddRange(cprocess.distanceConstraintData.dataArray);
                 distanceArray.AddRange(cprocess.distanceConstraintData.distanceArray);
-
-                MagicaManager.Team.SetTeamData(cprocess.TeamId, tdata);
             }
         }
 
@@ -345,7 +363,7 @@ namespace MagicaCloth2
         {
             if (cprocess != null && cprocess.TeamId > 0)
             {
-                var tdata = MagicaManager.Team.GetTeamData(cprocess.TeamId);
+                ref var tdata = ref MagicaManager.Team.GetTeamDataRef(cprocess.TeamId);
 
                 indexArray.Remove(tdata.distanceStartChunk);
                 dataArray.Remove(tdata.distanceDataChunk);
@@ -353,146 +371,91 @@ namespace MagicaCloth2
 
                 tdata.distanceStartChunk.Clear();
                 tdata.distanceDataChunk.Clear();
-
-                MagicaManager.Team.SetTeamData(cprocess.TeamId, tdata);
             }
         }
 
         //=========================================================================================
-        /// <summary>
-        /// 制約の解決
-        /// </summary>
-        /// <param name="clothBase"></param>
-        /// <param name="jobHandle"></param>
-        /// <returns></returns>
-        unsafe internal JobHandle SolverConstraint(JobHandle jobHandle)
-        {
-            var tm = MagicaManager.Team;
-            var sm = MagicaManager.Simulation;
-            var vm = MagicaManager.VMesh;
-
-            var job = new DistanceConstraintJob()
-            {
-                stepParticleIndexArray = sm.processingStepParticle.Buffer,
-
-                teamDataArray = tm.teamDataArray.GetNativeArray(),
-                parameterArray = tm.parameterArray.GetNativeArray(),
-
-                attributes = vm.attributes.GetNativeArray(),
-                depthArray = vm.vertexDepths.GetNativeArray(),
-
-                teamIdArray = sm.teamIdArray.GetNativeArray(),
-                nextPosArray = sm.nextPosArray.GetNativeArray(),
-                basePosArray = sm.basePosArray.GetNativeArray(),
-                velocityPosArray = sm.velocityPosArray.GetNativeArray(),
-                frictionArray = sm.frictionArray.GetNativeArray(),
-
-                //stepBasicPositionBuffer = sm.stepBasicPositionBuffer,
-
-                indexArray = indexArray.GetNativeArray(),
-                dataArray = dataArray.GetNativeArray(),
-                distanceArray = distanceArray.GetNativeArray(),
-            };
-            jobHandle = job.Schedule(sm.processingStepParticle.GetJobSchedulePtr(), 32, jobHandle);
-
-            return jobHandle;
-        }
-
-        /// <summary>
-        /// 距離制約の解決
-        /// </summary>
-        [BurstCompile]
-        struct DistanceConstraintJob : IJobParallelForDefer
-        {
-            [Unity.Collections.ReadOnly]
-            public NativeArray<int> stepParticleIndexArray;
-
+        // Solver
+        //=========================================================================================
+        internal static void SolverConstraint(
+            DataChunk chunk,
+            float4 simulationPower,
             // team
-            [Unity.Collections.ReadOnly]
-            public NativeArray<TeamManager.TeamData> teamDataArray;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<ClothParameters> parameterArray;
-
+            ref TeamManager.TeamData tdata,
+            ref ClothParameters param,
             // vmesh
-            [Unity.Collections.ReadOnly]
-            public NativeArray<VertexAttribute> attributes;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<float> depthArray;
-
+            ref NativeArray<VertexAttribute> attributes,
+            ref NativeArray<float> depthArray,
             // particle
-            [Unity.Collections.ReadOnly]
-            public NativeArray<short> teamIdArray;
-            [NativeDisableParallelForRestriction]
-            public NativeArray<float3> nextPosArray;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<float3> basePosArray;
-            [NativeDisableParallelForRestriction]
-            public NativeArray<float3> velocityPosArray;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<float> frictionArray;
-
-            // buffer
-            //[Unity.Collections.ReadOnly]
-            //public NativeArray<float3> stepBasicPositionBuffer;
-
+            ref NativeArray<float3> nextPosArray,
+            ref NativeArray<float3> basePosArray,
+            ref NativeArray<float3> velocityPosArray,
+            ref NativeArray<float> frictionArray,
             // constrants
-            [Unity.Collections.ReadOnly]
-            public NativeArray<uint> indexArray;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<ushort> dataArray;
-            [Unity.Collections.ReadOnly]
-            public NativeArray<float> distanceArray;
+            ref NativeArray<uint> indexArray,
+            ref NativeArray<ushort> dataArray,
+            ref NativeArray<float> distanceArray
+            )
+        {
+            var sc = tdata.distanceStartChunk;
+            var dc = tdata.distanceDataChunk;
+            if (sc.dataLength == 0)
+                return;
+            int c_start = sc.startIndex;
+            int d_start = dc.startIndex;
 
-            // ステップ有効パーティクルごと
-            public void Execute(int index)
+            // 復元を基本姿勢で行うかアニメーション後の姿勢で行うかの判定
+            float animeRatio = tdata.animationPoseRatio;
+
+            // スケール倍率
+            float scl = tdata.InitScale * tdata.scaleRatio;
+
+            bool isSpring = tdata.IsSpring;
+
+            // パーティクルごと
+            int p_start = tdata.particleChunk.startIndex;
+            int pindex = p_start + chunk.startIndex;
+            //int pindex = p_start;
+            int v_start = tdata.proxyCommonChunk.startIndex;
+            int vindex = v_start + chunk.startIndex;
+            //int vindex = v_start;
+            int dataIndex = chunk.startIndex;
+            //int dataIndex = 0;
+            //for (int k = 0; k < tdata.particleChunk.dataLength; k++, pindex++, vindex++, dataIndex++)
+            for (int k = 0; k < chunk.dataLength; k++, pindex++, vindex++, dataIndex++)
             {
-                // pindexのチームは有効であることが保証されている
-                int pindex = stepParticleIndexArray[index];
-
-                int teamId = teamIdArray[pindex];
-                var tdata = teamDataArray[teamId];
-                var parameter = parameterArray[teamId];
-
-                // 復元を基本姿勢で行うかアニメーション後の姿勢で行うかの判定
-                float blendRatio = tdata.animationPoseRatio;
-
-                // スケール倍率
-                float scl = tdata.InitScale * tdata.scaleRatio;
-
-                int p_start = tdata.particleChunk.startIndex;
-                int l_index = pindex - p_start;
-
-                var sc = tdata.distanceStartChunk;
-                var dc = tdata.distanceDataChunk;
-
-                int c_start = sc.startIndex;
-                int d_start = dc.startIndex;
-                int v_start = tdata.proxyCommonChunk.startIndex;
-                int vindex = v_start + l_index;
-
                 // パーティクル情報
                 var nextPos = nextPosArray[pindex];
                 var attr = attributes[vindex];
                 float depth = depthArray[vindex];
                 float friction = frictionArray[pindex];
 
-                if (attr.IsDontMove())
-                    return;
+                if (attr.IsInvalid())
+                    continue;
+
+                // Spring利用中は固定も通す
+                if (attr.IsDontMove() && isSpring == false)
+                    continue;
+
+                // 固定点の重量
+                float fixMass = isSpring ? 10.0f : 50.0f;
 
                 // 重量
-                float invMass = MathUtility.CalcInverseMass(friction, depth, attr.IsDontMove());
+                // BoneSpringでは固定点の重量加算を行わない
+                float invMass = MathUtility.CalcInverseMass(friction, depth, attr.IsDontMove(), fixMass);
 
                 // 基本剛性
-                float stiffness = parameter.distanceConstraint.restorationStiffness.EvaluateCurveClamp01(depth);
+                float stiffness = param.distanceConstraint.restorationStiffness.MC2EvaluateCurveClamp01(depth);
+                stiffness *= simulationPower.y;
 
-                var pack = indexArray[c_start + l_index];
-                DataUtility.Unpack10_22(pack, out int dcnt, out int dstart);
+                //var pack = indexArray[c_start + k];
+                var pack = indexArray[c_start + dataIndex];
+                DataUtility.Unpack12_20(pack, out int dcnt, out int dstart);
 
                 if (dcnt > 0)
                 {
                     // 基準座標を切り替え
                     float3 basePos = basePosArray[pindex];
-                    //float3 basicPos = stepBasicPositionBuffer[pindex];
 
                     float3 addPos = 0;
                     int addCnt = 0;
@@ -504,45 +467,55 @@ namespace MagicaCloth2
                         float restDist = distanceArray[start + i];
 
                         // タイプ別剛性
-                        float finalStiffness = restDist >= 0.0f ? stiffness : stiffness * Define.System.DistanceHorizontalStiffness;
+                        float finalStiffness = math.saturate(restDist >= 0.0f ? stiffness : stiffness * Define.System.DistanceHorizontalStiffness);
 
                         // 相手パーティクル情報
                         int tpindex = p_start + t_l_index;
                         int tvindex = v_start + t_l_index;
                         var t_nextPos = nextPosArray[tpindex];
                         float3 t_basePos = basePosArray[tpindex];
-                        //float3 t_basicPos = stepBasicPositionBuffer[tpindex];
                         float t_depth = depthArray[tvindex];
                         float t_friction = frictionArray[tpindex];
                         var t_attr = attributes[tvindex];
 
-                        // 重量
-                        float t_invMass = MathUtility.CalcInverseMass(t_friction, t_depth, t_attr.IsDontMove());
-
-                        // 復元する長さ
-                        // !Distance制約は初期化時に保存した距離を見るようにしないと駄目
-                        // フラグにより初期値かアニメーション後の姿勢かを切り替える
-                        float restLength = math.lerp(math.abs(restDist) * scl, math.distance(basePos, t_basePos), blendRatio);
-                        //float restLength = math.distance(basicPos, t_basicPos);
-
                         var v = t_nextPos - nextPos;
 
-                        // 現在の長さ
-                        float distance = math.length(v);
+                        // ゼロ距離対応(v2.17.0)
+                        if(restDist == 0.0f)
+                        {
+                            // ゼロ距離は単に中点で結合させる
+                            // AnimationPoseRatioも無関係
+                            addPos = v * 0.5f;
+                            addCnt++;
+                        }
+                        else
+                        {
+                            // 重量
+                            // BoneSpringでは固定点の重量加算を行わない
+                            float t_invMass = MathUtility.CalcInverseMass(t_friction, t_depth, t_attr.IsDontMove(), fixMass);
 
-                        // 距離がほぼ０ならば処理をスキップする（エラーの回避）
-                        if (distance < Define.System.Epsilon)
-                            continue;
+                            // 復元する長さ
+                            // !Distance制約は初期化時に保存した距離を見るようにしないと駄目
+                            // フラグにより初期値かアニメーション後の姿勢かを切り替える
+                            float restLength = math.lerp(math.abs(restDist) * scl, math.distance(basePos, t_basePos), animeRatio);
 
-                        // 伸縮
-                        float3 n = math.normalize(v);
-                        float3 corr = finalStiffness * n * (distance - restLength) / (invMass + t_invMass);
-                        float3 corr0 = invMass * corr;
-                        //float3 corr1 = -t_invMass * corr; // 相手側(使用しない)
+                            // 現在の長さ
+                            float distance = math.length(v);
 
-                        // すべて加算する
-                        addPos += corr0;
-                        addCnt++;
+                            // 距離がほぼ０ならば処理をスキップする（エラーの回避）
+                            if (distance < Define.System.Epsilon)
+                                continue;
+
+                            // 伸縮
+                            float3 n = math.normalize(v);
+                            float3 corr = (distance - restLength) * finalStiffness * n / (invMass + t_invMass);
+                            float3 corr0 = invMass * corr;
+                            //float3 corr1 = -t_invMass * corr; // 相手側(使用しない)
+
+                            // すべて加算する
+                            addPos += corr0;
+                            addCnt++;
+                        }
                     }
 
                     // 最終位置
@@ -553,7 +526,7 @@ namespace MagicaCloth2
                         nextPosArray[pindex] = nextPos;
 
                         // 速度影響
-                        float attn = parameter.distanceConstraint.velocityAttenuation;
+                        float attn = param.distanceConstraint.velocityAttenuation;
                         velocityPosArray[pindex] = velocityPosArray[pindex] + addPos * attn;
                     }
                 }

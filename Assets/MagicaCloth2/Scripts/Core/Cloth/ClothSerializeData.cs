@@ -29,6 +29,13 @@ namespace MagicaCloth2
         /// </summary>
         public List<Renderer> sourceRenderers = new List<Renderer>();
 
+        /// <summary>
+        /// Write target to mesh in MeshCloth.
+        /// [OK] Runtime changes.
+        /// [NG] Export/Import with Presets
+        /// </summary>
+        public ClothMeshWriteMode meshWriteMode = ClothMeshWriteMode.PositionAndNormal;
+
         public enum PaintMode
         {
             Manual = 0,
@@ -54,6 +61,14 @@ namespace MagicaCloth2
         /// [NG] Export/Import with Presets
         /// </summary>
         public List<Texture2D> paintMaps = new List<Texture2D>();
+
+        /// <summary>
+        /// The UV channel that references the paint map.
+        /// [NG] Runtime changes.
+        /// [NG] Export/Import with Presets
+        /// </summary>
+        [Range(0, 7)]
+        public int paintMapUvChannel = 0;
 
         /// <summary>
         /// Root bone list used in BoneCloth.
@@ -92,7 +107,15 @@ namespace MagicaCloth2
         /// [OK] Runtime changes.
         /// [NG] Export/Import with Presets
         /// </summary>
-        public ClothUpdateMode updateMode = ClothUpdateMode.Normal;
+        public ClothUpdateMode updateMode = ClothUpdateMode.AnimatorLinkage;
+
+        /// <summary>
+        /// Set the disable mode.
+        /// Component inactive behavior.
+        /// [OK] Runtime changes.
+        /// [NG] Export/Import with Presets
+        /// </summary>
+        public ClothDisableMode disableMode = ClothDisableMode.Reset;
 
         /// <summary>
         /// Blend ratio between initial pose and animation pose.
@@ -116,6 +139,11 @@ namespace MagicaCloth2
         /// Normal definition.
         /// </summary>
         public NormalAlignmentSettings normalAlignmentSetting = new NormalAlignmentSettings();
+
+        /// <summary>
+        /// culling settings.
+        /// </summary>
+        public CullingSettings cullingSettings = new CullingSettings();
 
         /// <summary>
         /// axis to use as normal.
@@ -143,11 +171,11 @@ namespace MagicaCloth2
         /// 初期姿勢での重力の減衰率(0.0 ~ 1.0)
         /// 1.0にすることで初期姿勢では重力係数が０になる。
         /// 0.0では常にどの姿勢でも重力が100%発生する。
-        /// 
+        ///
         /// Attenuation rate of gravity at initial pose (0.0 ~ 1.0)
         /// By setting it to 1.0, the gravity coefficient becomes 0 in the initial posture.
         /// At 0.0, gravity is always 100% in any pose.
-        /// 
+        ///
         /// [OK] Runtime changes.
         /// [OK] Export/Import with Presets
         /// </summary>
@@ -157,10 +185,10 @@ namespace MagicaCloth2
         /// <summary>
         /// リセット後の速度安定化時間(s)
         /// 急激な速度変化を抑えます。
-        /// 
+        ///
         /// Speed stabilization time after reset (s).
         /// Avoid sudden speed changes.
-        /// 
+        ///
         /// [OK] Runtime changes.
         /// [NG] Export/Import with Presets
         /// </summary>
@@ -169,13 +197,13 @@ namespace MagicaCloth2
 
         /// <summary>
         /// 元の姿勢とシミュレーション結果のブレンド割合(0.0 ~ 1.0)
-        /// 
+        ///
         /// Blend ratio of original posture and simulation result (0.0 ~ 1.0).
-        /// 
+        ///
         /// [OK] Runtime changes.
         /// [NG] Export/Import with Presets
         /// </summary>
-        [System.NonSerialized]
+        [Range(0.0f, 1.0f)]
         public float blendWeight = 1.0f;
 
         /// <summary>
@@ -241,5 +269,10 @@ namespace MagicaCloth2
         /// Wind
         /// </summary>
         public WindSettings wind = new WindSettings();
+
+        /// <summary>
+        /// Spring
+        /// </summary>
+        public SpringConstraint.SerializeData springConstraint = new SpringConstraint.SerializeData();
     }
 }

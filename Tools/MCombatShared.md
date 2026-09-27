@@ -1,31 +1,43 @@
 # MCombatShared in PocketStriker
 
-The embedded package comes from `https://github.com/bodacheng/MCombatShared.git`,
-commit `5e962289405dd8a4078538350915e444fad1e4d4` (2026-09-14).
-`origin/main` was fetched and verified at that commit on 2026-09-27. The package
-still reports version `0.1.20`, so the commit and SHA-256 manifest in
-`mcombat-shared-lock.json` identify the actual snapshot.
+`Packages/com.mcombat.shared` is a Git submodule of
+`https://github.com/bodacheng/MCombatShared.git`, pinned to
+`5e962289405dd8a4078538350915e444fad1e4d4` (2026-09-14).
+The upstream `origin/main` was fetched and verified on 2026-09-27.
+Unity Package Manager imports it through `file:com.mcombat.shared` in
+`Packages/manifest.json`. Its package version remains `0.1.20`; the parent Git
+repository's gitlink and `mcombat-shared-lock.json` record the actual revision.
 
-The checkout used for this import was
-`/Users/daisei/MComat/Packages/com.mcombat.shared`. The package's `UPSTREAM.md`
-still mentions a retired `/Users/daisei/MCombatShared` path; use the repository
-URL and pinned commit above instead. PocketStriker keeps a self-contained
-embedded package, so another consumer checkout is not required to open it.
+## Cloning and opening
+
+```sh
+git clone --recurse-submodules https://github.com/bodacheng/PocketStriker.git
+# For an existing clone, after pulling changes:
+git submodule update --init --recursive
+Tools/open_unity.sh
+```
+
+Use Unity **6000.5.1f1** with the **iOS Build Support** module. The launcher
+opens with iOS selected; normal interactive opens also default to iOS.
+A sibling MCombat checkout is not required. The upstream package's `UPSTREAM.md`
+mentions an obsolete local path; use its Git URL instead.
 
 ## Reviewing an update
 
-From the project root, use a local checkout of the upstream repository:
-
 ```sh
-python3 Tools/sync_mcombat_shared.py --source /path/to/MCombatShared
-python3 Tools/sync_mcombat_shared.py --source /path/to/MCombatShared --revision COMMIT
+git -C Packages/com.mcombat.shared fetch origin
+python3 Tools/sync_mcombat_shared.py --revision origin/main
+# After reviewing the proposed revision:
+python3 Tools/sync_mcombat_shared.py --revision COMMIT --apply
+git add Packages/com.mcombat.shared Tools/mcombat-shared-lock.json
 ```
 
-These commands only report differences. Add `--apply` to import the reviewed
-commit. The updater imports committed files, checks the package name, records
-file hashes, and refuses to overwrite edits to a previously recorded snapshot.
-It modifies only this project's embedded package and its provenance lock.
-It never modifies any consumer's `Assets` or another project's files.
+The updater defaults to review only. `--apply` changes the submodule checkout
+and provenance lock; it refuses local modifications and preserves the `.git`
+link. The parent repository pins the selected commit when the gitlink is staged
+and committed. An optional `--source /path/to/MCombatShared` can supply committed
+revisions from another local checkout. It never edits `Assets` or that source
+checkout. Keep consumer-specific fixes in this project's adapters.
 
 The package's `SourceSync~` directory is retained verbatim and ignored by Unity.
 Do not run its upstream `sync-to-projects.sh` blindly: it targets two projects
@@ -52,5 +64,5 @@ changes and apply project adapters explicitly.
   the package snapshot remains the original committed upstream source.
 
 Run `Tools/validate_unity.sh` after imports and consumer changes. The exact
-upstream package should stay unchanged; keep project-specific behavior in
+upstream submodule should stay unchanged; keep project-specific behavior in
 `Assets` adapters.

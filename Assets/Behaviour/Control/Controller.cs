@@ -195,7 +195,7 @@ namespace Soul
         }
 
         string _condition;
-        List<(string, string)> _finalConditionStateKeySet = new List<(string, string)>();
+        readonly List<(string, string)> _finalConditionStateKeySet = new List<(string, string)>();
         readonly AiDecisionThrottle _decisionThrottle = new AiDecisionThrottle();
 
         public int DecisionDelay
@@ -206,41 +206,48 @@ namespace Soul
         
         bool AI_RUNs(BehaviorRunner behaviorRunner, List<SkillEntity> options, Func<bool> AITriggerDreamComboRateCondition = null) // AI根据目前可作出的行为作出选择
         {
-            _triggered.Main.Clear();
-
-            if (behaviorRunner.GetNowState().Strategic_exit_condition())
+            if (!behaviorRunner.GetNowState().Strategic_exit_condition())
             {
-                // 首先看超级连招的条件是不是满足。
-                if (!behaviorRunner.OnFixedSequence)
+                return false;
+            }
+
+            // 超级连招保持逐帧响应；普通 AI 条件扫描按既有 DecisionDelay 节流。
+            if (!behaviorRunner.OnFixedSequence)
+            {
+                if ((AITriggerDreamComboRateCondition == null || AITriggerDreamComboRateCondition())
+                    && behaviorRunner.SuperComboStrategyCondition() && behaviorRunner.SuperComboCondition())
                 {
-                    if ((AITriggerDreamComboRateCondition == null || AITriggerDreamComboRateCondition()) 
-                        &&  behaviorRunner.SuperComboStrategyCondition() && behaviorRunner.SuperComboCondition())
-                    {
-                        behaviorRunner.StartOffSequenceEngine();
-                        return true;
-                    }
+                    behaviorRunner.StartOffSequenceEngine();
+                    return true;
                 }
-                
-                for (var y = 0; y < behaviorRunner.AllConditionCodes.Count; y++)
+            }
+
+            if (!_decisionThrottle.ShouldRun(behaviorRunner.AIMode))
+            {
+                return false;
+            }
+
+            _triggered.Main.Clear();
+            for (var y = 0; y < behaviorRunner.AllConditionCodes.Count; y++)
+            {
+                _condition = behaviorRunner.AllConditionCodes[y];
+                for (var x = 0; x < options.Count; x++)
                 {
-                    _condition = behaviorRunner.AllConditionCodes[y];
-                    for (var x = 0; x < options.Count; x++)
+                    if (behaviorRunner.ConditionAndRespond[_condition].Contains(options[x].REAL_NAME))
                     {
-                        if (behaviorRunner.ConditionAndRespond[_condition].Contains(options[x].REAL_NAME))
+                        behaviorRunner.BehaviourDic.TryGetValue(options[x].REAL_NAME, out var tryBehavior);
+                        if (tryBehavior.CheckTriggerCondition(_condition))
                         {
-                            behaviorRunner.BehaviourDic.TryGetValue(options[x].REAL_NAME, out var tryBehavior);
-                            if (tryBehavior.CheckTriggerCondition(_condition))
-                            {
-                                _triggered.Main.Set(_condition, options[x].REAL_NAME, behaviorRunner.ConditionAndRespondPriority.Get(_condition, options[x].REAL_NAME));
-                            }
+                            _triggered.Set(_condition, options[x].REAL_NAME,
+                                behaviorRunner.ConditionAndRespondPriority.Get(_condition, options[x].REAL_NAME));
                         }
                     }
                 }
             }
             
-            if (_triggered.Main.Count > 0 && _decisionThrottle.ShouldRun(behaviorRunner.AIMode))
+            if (_triggered.Main.Count > 0)
             {
-                _finalConditionStateKeySet = _triggered.GiveOutMin();
+                _triggered.GiveOutMin(_finalConditionStateKeySet);
                 if (_finalConditionStateKeySet.Count > 0)
                 {
                     var random = Random.Range(0, _finalConditionStateKeySet.Count);//这里虽然是随机但是毕竟随机的这几个选项在优先级上是相同的。

@@ -3,7 +3,7 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 28
+  serializedVersion: 29
   productGUID: 300874e0df9454767b21664c7ffe7445
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
@@ -44,10 +44,10 @@ PlayerSettings:
     duration: 2
   m_VirtualRealitySplashScreen: {fileID: 2800000, guid: 58f1b5b05d57c48499d65e7fbda3bf53,
     type: 3}
-  defaultScreenWidth: 1920
-  defaultScreenHeight: 1080
-  defaultScreenWidthWeb: 960
-  defaultScreenHeightWeb: 600
+  defaultScreenWidth: 540
+  defaultScreenHeight: 960
+  defaultScreenWidthWeb: 540
+  defaultScreenHeightWeb: 960
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 0
   unsupportedMSAAFallback: 0
@@ -61,17 +61,22 @@ PlayerSettings:
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
   iosUseCustomAppBackgroundBehavior: 0
-  allowedAutorotateToPortrait: 0
+  allowedAutorotateToPortrait: 1
   allowedAutorotateToPortraitUpsideDown: 0
-  allowedAutorotateToLandscapeRight: 1
-  allowedAutorotateToLandscapeLeft: 1
+  allowedAutorotateToLandscapeRight: 0
+  allowedAutorotateToLandscapeLeft: 0
   useOSAutorotation: 0
   use32BitDisplayBuffer: 1
   preserveFramebufferAlpha: 0
+  adjustIOSFPSUsingThermalState: 1
+  thermalStateSeriousIOSFPS: 30
+  thermalStateCriticalIOSFPS: 15
   disableDepthAndStencilBuffers: 0
   androidStartInFullscreen: 1
   androidRenderOutsideSafeArea: 1
   androidUseSwappy: 0
+  androidRequestedVisibleInsets: 0
+  androidSystemBarsBehavior: 2
   androidDisplayOptions: 1
   androidBlitType: 0
   androidResizeableActivity: 0
@@ -83,7 +88,7 @@ PlayerSettings:
   androidAutoRotationBehavior: 1
   androidPredictiveBackSupport: 1
   androidApplicationEntry: 1
-  defaultIsNativeResolution: 1
+  defaultIsNativeResolution: 0
   macRetinaSupport: 1
   runInBackground: 0
   muteOtherAudioSources: 0
@@ -178,7 +183,7 @@ PlayerSettings:
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 100
-  AndroidMinSdkVersion: 25
+  AndroidMinSdkVersion: 26
   AndroidTargetSdkVersion: 33
   AndroidPreferredInstallLocation: 1
   AndroidPreferredDataLocation: 1
@@ -203,6 +208,7 @@ PlayerSettings:
   tvOSTargetOSVersionString: 15.0
   VisionOSSdkVersion: 0
   VisionOSTargetOSVersionString: 1.0
+  xcodeProjectType: 0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
@@ -270,7 +276,6 @@ PlayerSettings:
   useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 1
   AndroidTargetArchitectures: 1
-  AndroidAllowedArchitectures: -1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: '{inproject}: Assets/App/Editor/Build/Configs/Android/mcombat.keystore'
@@ -572,12 +577,6 @@ PlayerSettings:
   - m_BuildTarget: WebGLSupport
     m_APIs: 0b000000
     m_Automatic: 1
-  m_BuildTargetVRSettings:
-  - m_BuildTarget: Standalone
-    m_Enabled: 0
-    m_Devices:
-    - Oculus
-    - OpenVR
   m_DefaultShaderChunkSizeInMB: 16
   m_DefaultShaderChunkCount: 0
   openGLRequireES31: 0
@@ -751,6 +750,8 @@ PlayerSettings:
   switchMicroSleepForYieldTime: 25
   switchRamDiskSpaceSize: 12
   switchUpgradedPlayerSettingsToNMETA: 0
+  switchCaStoreSource: 0
+  switchCaStoreFilePath: 
   ps4NPAgeRating: 12
   ps4NPTitleSecret: 
   ps4NPTrophyPackPath: 
@@ -861,27 +862,27 @@ PlayerSettings:
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
     : UNITY_POST_PROCESSING_STACK_V2;ENABLE_PLAYFABADMIN_API;ENABLE_PLAYFABSERVER_API;Pre;PLAYFAB_REQUEST_TIMING;ENABLE_PLAYFAB_BETA;CT_BWF
-    Android: CT_BWF;ENABLE_PLAYFABADMIN_API;ENABLE_PLAYFABSERVER_API
+    Android: CT_BWF;ENABLE_PLAYFABADMIN_API;ENABLE_PLAYFABSERVER_API;DOTWEEN
     CloudRendering: CT_BWF
-    EmbeddedLinux: CT_BWF
-    GameCoreScarlett: CT_BWF
-    GameCoreXboxOne: CT_BWF
-    Kepler: CT_BWF
-    LinuxHeadlessSimulation: CT_BWF
+    EmbeddedLinux: CT_BWF;DOTWEEN
+    GameCoreScarlett: CT_BWF;DOTWEEN
+    GameCoreXboxOne: CT_BWF;DOTWEEN
+    Kepler: CT_BWF;DOTWEEN
+    LinuxHeadlessSimulation: CT_BWF;DOTWEEN
     Lumin: CT_BWF
-    Nintendo Switch: CT_BWF
-    Nintendo Switch 2: CT_BWF
-    PS4: CT_BWF
-    PS5: CT_BWF
-    QNX: CT_BWF
+    Nintendo Switch: CT_BWF;DOTWEEN
+    Nintendo Switch 2: CT_BWF;DOTWEEN
+    PS4: CT_BWF;DOTWEEN
+    PS5: CT_BWF;DOTWEEN
+    QNX: CT_BWF;DOTWEEN
     Stadia: CT_BWF
-    Standalone: CT_BWF;ENABLE_PLAYFABSERVER_API;ENABLE_PLAYFABADMIN_API
-    VisionOS: CT_BWF
-    WebGL: CT_BWF
-    Windows Store Apps: CT_BWF
-    XboxOne: CT_BWF
-    iPhone: CT_BWF;ENABLE_PLAYFABADMIN_API;ENABLE_PLAYFABSERVER_API
-    tvOS: CT_BWF
+    Standalone: CT_BWF;ENABLE_PLAYFABSERVER_API;ENABLE_PLAYFABADMIN_API;DOTWEEN
+    VisionOS: CT_BWF;DOTWEEN
+    WebGL: CT_BWF;DOTWEEN
+    Windows Store Apps: CT_BWF;DOTWEEN
+    XboxOne: CT_BWF;DOTWEEN
+    iPhone: CT_BWF;ENABLE_PLAYFABADMIN_API;ENABLE_PLAYFABSERVER_API;MAGICACLOTH2;DOTWEEN
+    tvOS: CT_BWF;DOTWEEN
   additionalCompilerArguments: {}
   platformArchitecture:
     Android: 4
@@ -889,6 +890,7 @@ PlayerSettings:
     Android: 1
   il2cppCompilerConfiguration: {}
   il2cppCodeGeneration: {}
+  il2cppLTOMode: {}
   il2cppStacktraceInformation: {}
   managedStrippingLevel:
     Android: 1
@@ -912,7 +914,7 @@ PlayerSettings:
   useDeterministicCompilation: 1
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
-  gcIncremental: 0
+  gcIncremental: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   editorAssembliesCompatibilityLevel: 1
@@ -974,7 +976,6 @@ PlayerSettings:
   XboxOneXTitleMemory: 8
   XboxOneOverrideIdentityName: 
   XboxOneOverrideIdentityPublisher: 
-  vrEditorSettings: {}
   cloudServicesEnabled:
     Analytics: 1
     Legacy Analytics: 1
@@ -1002,6 +1003,7 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
+  enableDirectStorage: 0
   cloudProjectId: a06a666a-c72c-4666-bd4a-76c6944869c9
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []

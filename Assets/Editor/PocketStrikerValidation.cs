@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Build.DataBuilders;
@@ -21,18 +22,52 @@ public static class PocketStrikerValidation
     const string ErrorKey = SmokeKey + ".Errors";
     const string StartKey = SmokeKey + ".Started";
     const string ReadyKey = SmokeKey + ".Ready";
+    const string RunsKey = SmokeKey + ".Runs";
+    const string ReadyFrameKey = SmokeKey + ".ReadyFrame";
+    const string ReentryKey = SmokeKey + ".ReentryObserved";
+    const string PoolCheckKey = SmokeKey + ".PoolChecked";
     const string PlayModeBuilderKey = SmokeKey + ".PlayModeBuilder";
     const string ReportDirectory = "Logs/Revival";
+
+    [Serializable]
+    public class FightRunReport
+    {
+        public int run;
+        public int team1;
+        public int team2;
+        public int startFrame;
+        public int endFrame;
+        public double stableSeconds;
+    }
+
+    [Serializable]
+    class FightRuns
+    {
+        public List<FightRunReport> items = new List<FightRunReport>();
+    }
 
     [Serializable]
     public class ValidationReport
     {
         public string unityVersion;
+        public string expectedUnityVersion;
+        public string activeBuildTarget;
+        public string defaultOrientation;
+        public string runtimeOrientation;
+        public int screenWidth;
+        public int screenHeight;
+        public int defaultScreenWidth;
+        public int defaultScreenHeight;
+        public bool portraitOnly;
+        public string outputPath;
         public string check;
         public bool passed;
         public int scenes;
         public int addressableEntries;
         public string[] errors;
+        public FightRunReport[] fightRuns;
+        public bool reentryObserved;
+        public bool poolLifecyclePassed;
     }
 
     static PocketStrikerValidation()
@@ -46,7 +81,9 @@ public static class PocketStrikerValidation
     public static void CheckProject()
     {
         RequireSavedScenes();
-        var errors = new List<string>();
+        var errors = EnvironmentErrors();
+        try { Cocone.ProjectP3.VersionSyncUtility.AssertVersionSettingsSynchronized(); }
+        catch (Exception exception) { errors.Add(exception.Message); }
         var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).ToArray();
         var setup = EditorSceneManager.GetSceneManagerSetup();
         var entriesCount = 0;
@@ -108,10 +145,26 @@ public static class PocketStrikerValidation
         }
     }
 
-    // Run without -quit; completion and the 120-second deadline exit batch mode.
+    public static void PrepareEditor()
+    {
+        if (Application.isBatchMode || EditorApplication.isPlayingOrWillChangePlaymode)
+            throw new InvalidOperationException("PrepareEditor requires a stopped interactive editor.");
+        RequireSavedScenes();
+        RequireEnvironment();
+        if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.iOS)
+            throw new InvalidOperationException("Open Unity with -buildTarget iOS before preparing the editor.");
+        EditorSceneManager.OpenScene(EditorBuildSettings.scenes.First(scene => scene.enabled).path, OpenSceneMode.Single);
+        ConfigurePortraitGameView();
+        WriteReport("editor-ready", Array.Empty<string>(), 1, 0);
+        Debug.Log("PocketStriker editor ready: iOS, Portrait 540x960, startup scene open. Press Play to run.");
+    }
+
+    // Run without -quit; completion and the 180-second deadline exit batch mode.
     public static void SmokeStartup()
     {
         RequireSavedScenes();
+        RequireEnvironment();
+        ConfigurePortraitGameView();
         var settings = AddressableAssetSettingsDefaultObject.Settings;
         if (settings == null) throw new InvalidOperationException("Addressables settings are missing.");
         var fastModeIndex = settings.DataBuilders.FindIndex(builder => builder is BuildScriptFastMode);
@@ -122,6 +175,9 @@ public static class PocketStrikerValidation
         SessionState.SetString(ErrorKey, "");
         SessionState.SetString(StartKey, DateTime.UtcNow.ToString("O"));
         SessionState.SetString(ReadyKey, "");
+        SessionState.SetString(RunsKey, JsonUtility.ToJson(new FightRuns()));
+        SessionState.SetBool(ReentryKey, false);
+        SessionState.SetBool(PoolCheckKey, false);
         Application.logMessageReceived -= CaptureError;
         Application.logMessageReceived += CaptureError;
         EditorApplication.update -= PollSmoke;
@@ -155,13 +211,54 @@ public static class PocketStrikerValidation
         }
     }
 
+    static string ExpectedUnityVersion => File.ReadLines("ProjectSettings/ProjectVersion.txt")
+        .First(line => line.StartsWith("m_EditorVersion: ")).Substring("m_EditorVersion: ".Length).Trim();
+
+    static bool PortraitOnly => PlayerSettings.defaultInterfaceOrientation == UIOrientation.Portrait
+        && !PlayerSettings.allowedAutorotateToLandscapeLeft
+        && !PlayerSettings.allowedAutorotateToLandscapeRight
+        && !PlayerSettings.allowedAutorotateToPortraitUpsideDown;
+
+    static List<string> EnvironmentErrors()
+    {
+        var errors = new List<string>();
+        if (Application.unityVersion != ExpectedUnityVersion)
+            errors.Add($"Expected Unity {ExpectedUnityVersion}; running {Application.unityVersion}.");
+        if (!PortraitOnly)
+            errors.Add("PocketStriker requires Portrait orientation with landscape/upside-down autorotation disabled.");
+        if (PlayerSettings.defaultScreenWidth >= PlayerSettings.defaultScreenHeight)
+            errors.Add("The default player window must be portrait.");
+        return errors;
+    }
+
+    static void RequireEnvironment()
+    {
+        var errors = EnvironmentErrors();
+        if (errors.Count == 0) return;
+        WriteReport("environment", errors, 0, 0);
+        throw new InvalidOperationException(string.Join("\n", errors));
+    }
+
+    static void ConfigurePortraitGameView()
+    {
+        // Unity 6000.5 exposes this operation internally on GameView. Use its own
+        // resolution setter so the rendered viewport, not just the window, is 9:16.
+        var gameViewType = typeof(Editor).Assembly.GetType("UnityEditor.GameView", true);
+        var setResolution = gameViewType.GetMethod("SetCustomResolution", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (setResolution == null)
+            throw new InvalidOperationException("This Unity editor cannot configure the portrait validation Game view.");
+        var view = EditorWindow.GetWindow(gameViewType);
+        setResolution.Invoke(view, new object[] { new Vector2(540, 960), "PocketStriker Portrait" });
+        view.Repaint();
+    }
+
     static void PollSmoke()
     {
         if (!SessionState.GetBool(SmokeKey, false)) return;
         var elapsed = DateTime.UtcNow - DateTime.Parse(SessionState.GetString(StartKey, DateTime.UtcNow.ToString("O"))).ToUniversalTime();
         var errors = SessionState.GetString(ErrorKey, "");
         if (!string.IsNullOrEmpty(errors)) { FinishSmoke(new[] { errors }); return; }
-        if (elapsed.TotalSeconds > 120)
+        if (elapsed.TotalSeconds > 180)
         {
             var manager = RTFightManager.Target;
             FinishSmoke(new[] { $"Startup timed out: scene={SceneManager.GetActiveScene().name}, " +
@@ -179,7 +276,10 @@ public static class PocketStrikerValidation
                 && RTFightManager.Target != null
                 && RTFightManager.Target.team1.teamMembers.GetValues().Count > 0
                 && RTFightManager.Target.team2.teamMembers.GetValues().Count > 0;
-            var title = UnityEngine.Object.FindObjectsByType<TitleScreenLayer>(FindObjectsSortMode.None).Length > 0;
+            var titleLayer = FindActiveTitle();
+            var title = titleLayer != null && titleLayer.gameObject.activeInHierarchy && !titleLayer.IsClosing;
+            var runs = ReadFightRuns();
+            if (runs.items.Count == 1 && !fight && !title) SessionState.SetBool(ReentryKey, true);
             // A player may have disabled the background fight. Exercise it directly
             // once their normal title has loaded, without changing PlayerPrefs.
             if (title && SceneManager.GetActiveScene().buildIndex == 0)
@@ -190,15 +290,99 @@ public static class PocketStrikerValidation
             }
             if (fight && title)
             {
+                if (Screen.width >= Screen.height)
+                {
+                    FinishSmoke(new[] { $"Startup viewport must remain portrait; found {Screen.width}x{Screen.height}." });
+                    return;
+                }
                 var ready = SessionState.GetString(ReadyKey, "");
-                if (ready == "") SessionState.SetString(ReadyKey, DateTime.UtcNow.ToString("O"));
+                if (ready == "")
+                {
+                    if (runs.items.Count == 1 && !SessionState.GetBool(ReentryKey, false))
+                    {
+                        FinishSmoke(new[] { "Fight reload did not leave the original battle/title process." });
+                        return;
+                    }
+                    if (!SessionState.GetBool(PoolCheckKey, false))
+                    {
+                        try { CheckPoolLifecycle(); SessionState.SetBool(PoolCheckKey, true); }
+                        catch (Exception exception) { FinishSmoke(new[] { exception.ToString() }); return; }
+                    }
+                    SessionState.SetString(ReadyKey, DateTime.UtcNow.ToString("O"));
+                    SessionState.SetInt(ReadyFrameKey, Time.frameCount);
+                    Debug.Log($"POCKETSTRIKER_SMOKE_READY run={runs.items.Count + 1}, frame={Time.frameCount}");
+                }
                 else if ((DateTime.UtcNow - DateTime.Parse(ready).ToUniversalTime()).TotalSeconds >= 20)
                 {
-                    FinishSmoke(Array.Empty<string>());
+                    var firstFrame = SessionState.GetInt(ReadyFrameKey, Time.frameCount);
+                    if (Time.frameCount <= firstFrame || Time.timeScale <= 0)
+                    {
+                        FinishSmoke(new[] { "Battle frames did not advance during smoke validation." });
+                        return;
+                    }
+                    runs.items.Add(new FightRunReport
+                    {
+                        run = runs.items.Count + 1,
+                        team1 = RTFightManager.Target.team1.teamMembers.GetValues().Count,
+                        team2 = RTFightManager.Target.team2.teamMembers.GetValues().Count,
+                        startFrame = firstFrame,
+                        endFrame = Time.frameCount,
+                        stableSeconds = (DateTime.UtcNow - DateTime.Parse(ready).ToUniversalTime()).TotalSeconds
+                    });
+                    SessionState.SetString(RunsKey, JsonUtility.ToJson(runs));
+                    if (runs.items.Count >= 2) FinishSmoke(Array.Empty<string>());
+                    else
+                    {
+                        SessionState.SetString(ReadyKey, "");
+                        Debug.Log("POCKETSTRIKER_SMOKE_REENTER requesting another screensaver battle.");
+                        FightLoad.Go(FightLoad.Fight, inSceneLoad: true);
+                        // Preparing can finish before the next editor update when assets are cached.
+                        var leftBattle = !(FSceneProcessesRunner.Main.currentProcess is FightingProcess);
+                        var previousTitle = FindActiveTitle();
+                        SessionState.SetBool(ReentryKey, leftBattle && (previousTitle == null || previousTitle.IsClosing));
+                    }
                     return;
                 }
             }
             else SessionState.SetString(ReadyKey, "");
+        }
+    }
+
+    static TitleScreenLayer FindActiveTitle() => UnityEngine.Object
+        .FindObjectsByType<TitleScreenLayer>(FindObjectsSortMode.None)
+        .FirstOrDefault(layer => layer != null && !layer.IsClosing && layer.gameObject.activeInHierarchy);
+
+    static FightRuns ReadFightRuns() => JsonUtility.FromJson<FightRuns>(SessionState.GetString(RunsKey, "{}")) ?? new FightRuns();
+
+    static void CheckPoolLifecycle()
+    {
+        var prefab = new GameObject("PocketStriker pool lifecycle fixture");
+        var prototype = prefab.AddComponent<Decomposition>();
+        prototype.to_be_faded_renderers = new List<MeshRenderer>();
+        prefab.SetActive(false);
+        var pool = new DecompositionPool(prefab);
+        Decomposition first = null, second = null;
+        try
+        {
+            first = pool.Rent();
+            var resolve = typeof(Decomposition).GetMethod("EnergyResolve", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (resolve == null) throw new InvalidOperationException("Missing pooled effect lifecycle method.");
+            resolve.Invoke(first, null);
+            resolve.Invoke(first, null);
+            if (pool.Count != 1) throw new InvalidOperationException("Returning an effect twice duplicated its pool entry.");
+            first = pool.Rent();
+            second = pool.Rent();
+            if (first == second) throw new InvalidOperationException("Two active pool rentals share the same effect instance.");
+            if (first.Phase != 1 || second.Phase != 1)
+                throw new InvalidOperationException("A rented effect did not restart its lifetime.");
+        }
+        finally
+        {
+            // Fixtures never reach Update, so they never register with the live effect processor.
+            pool.Dispose();
+            if (first != null) UnityEngine.Object.DestroyImmediate(first.gameObject);
+            if (second != null && second != first) UnityEngine.Object.DestroyImmediate(second.gameObject);
+            UnityEngine.Object.DestroyImmediate(prefab);
         }
     }
 
@@ -216,7 +400,20 @@ public static class PocketStrikerValidation
 
     public static void BuildMac()
     {
-        var path = "Builds/Revival/PocketStriker.app";
+        BuildLocalPlayer(BuildTarget.StandaloneOSX, "Builds/Revival/PocketStriker.app", "build-mac");
+    }
+
+    public static void BuildIOS()
+    {
+        BuildLocalPlayer(BuildTarget.iOS, "Builds/Revival/iOS", "build-ios");
+    }
+
+    static void BuildLocalPlayer(BuildTarget target, string path, string check)
+    {
+        RequireSavedScenes();
+        RequireEnvironment();
+        if (EditorUserBuildSettings.activeBuildTarget != target)
+            throw new InvalidOperationException($"Start Unity with -buildTarget {target} before building this player.");
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         var settings = AddressableAssetSettingsDefaultObject.Settings;
         if (settings == null) throw new InvalidOperationException("Addressables settings are missing.");
@@ -224,6 +421,17 @@ public static class PocketStrikerValidation
         var originalRemoteCatalog = settings.BuildRemoteCatalog;
         var originalBuildOption = settings.BuildAddressablesWithPlayerBuild;
         var localProfile = settings.profileSettings.AddProfile("Local validation " + Guid.NewGuid(), originalProfile);
+        var errors = new List<string>();
+        var buildErrors = new List<string>();
+        void CaptureBuildError(string message, string stack, LogType type)
+        {
+            if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert) return;
+            lock (buildErrors)
+            {
+                if (buildErrors.Count < 100) buildErrors.Add(type + ": " + message + "\n" + stack);
+            }
+        }
+        Application.logMessageReceivedThreaded += CaptureBuildError;
         try
         {
             // Bundle every Addressable into this local development player. Existing
@@ -239,49 +447,155 @@ public static class PocketStrikerValidation
             {
                 scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
                 locationPathName = path,
-                target = BuildTarget.StandaloneOSX,
+                target = target,
                 options = BuildOptions.Development
             });
             if (report.summary.result != BuildResult.Succeeded)
                 throw new InvalidOperationException("Player build failed: " + report.summary.result);
-            Debug.Log("PocketStriker player build succeeded: " + Path.GetFullPath(path));
+            if (target == BuildTarget.iOS) ValidateUnsignedIOSExport(path);
+        }
+        catch (Exception exception)
+        {
+            errors.Add(exception.ToString());
+            throw;
         }
         finally
         {
+            Application.logMessageReceivedThreaded -= CaptureBuildError;
+            lock (buildErrors) errors.AddRange(buildErrors);
             settings.activeProfileId = originalProfile;
             settings.BuildRemoteCatalog = originalRemoteCatalog;
             settings.BuildAddressablesWithPlayerBuild = originalBuildOption;
             settings.profileSettings.RemoveProfile(localProfile);
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
+            WriteReport(check, errors, EditorBuildSettings.scenes.Count(scene => scene.enabled), 0, Path.GetFullPath(path));
         }
+        if (errors.Count > 0)
+            throw new InvalidOperationException($"Unity logged {errors.Count} build error(s), even though BuildReport returned Succeeded. See the validation report.");
+        Debug.Log("PocketStriker player build succeeded: " + Path.GetFullPath(path));
     }
+
+    static void ValidateUnsignedIOSExport(string path)
+    {
+#if UNITY_IOS
+        var projectPath = UnityEditor.iOS.Xcode.PBXProject.GetPBXProjectPath(path);
+        var plistPath = Path.Combine(path, "Info.plist");
+        if (!File.Exists(projectPath) || !File.Exists(plistPath) || !Directory.Exists(Path.Combine(path, "Data")))
+            throw new InvalidOperationException("The iOS export is missing its Xcode project, Info.plist, or player data.");
+        var plist = new UnityEditor.iOS.Xcode.PlistDocument();
+        plist.ReadFromFile(plistPath);
+        foreach (var key in new[] { "UISupportedInterfaceOrientations", "UISupportedInterfaceOrientations~ipad" })
+        {
+            if (!plist.root.values.TryGetValue(key, out var element))
+            {
+                if (key == "UISupportedInterfaceOrientations")
+                    throw new InvalidOperationException("The exported iOS app has no supported screen orientation.");
+                continue;
+            }
+            var orientations = element.AsArray().values;
+            if (orientations.Count == 0 || orientations.Any(value => value.AsString() != "UIInterfaceOrientationPortrait"))
+                throw new InvalidOperationException("The exported iOS app must support only Portrait: " + key);
+        }
+        // This verification produces an unsigned export. It does not invoke Xcode,
+        // request provisioning profiles, archive an IPA, or change signing settings.
+        var project = new UnityEditor.iOS.Xcode.PBXProject();
+        project.ReadFromFile(projectPath);
+        ValidateAppleSignInExport(path, project);
+        foreach (var target in new[] { project.GetUnityMainTargetGuid(), project.GetUnityFrameworkTargetGuid() })
+        {
+            project.SetBuildProperty(target, "CODE_SIGNING_ALLOWED", "NO");
+            project.SetBuildProperty(target, "CODE_SIGNING_REQUIRED", "NO");
+            project.SetBuildProperty(target, "CODE_SIGN_IDENTITY", "");
+            project.SetBuildProperty(target, "DEVELOPMENT_TEAM", "");
+            project.SetBuildProperty(target, "PROVISIONING_PROFILE_SPECIFIER", "");
+            project.SetBuildProperty(target, "PROVISIONING_PROFILE", "");
+        }
+        project.WriteToFile(projectPath);
+#else
+        throw new InvalidOperationException("The iOS export check must run with iOS as the active build target.");
+#endif
+    }
+
+#if UNITY_IOS
+    static void ValidateAppleSignInExport(string path, UnityEditor.iOS.Xcode.PBXProject project)
+    {
+        var mainTarget = project.GetUnityMainTargetGuid();
+        var entitlementFile = project.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
+        if (string.IsNullOrWhiteSpace(entitlementFile))
+            throw new InvalidOperationException("The iOS app target has no Sign in with Apple entitlements file.");
+        var entitlementPath = Path.Combine(path, entitlementFile.Trim('"'));
+        if (!File.Exists(entitlementPath))
+            throw new InvalidOperationException("The exported Apple entitlements file is missing: " + entitlementFile);
+        var entitlements = new UnityEditor.iOS.Xcode.PlistDocument();
+        entitlements.ReadFromFile(entitlementPath);
+        if (!entitlements.root.values.TryGetValue("com.apple.developer.applesignin", out var signIn) ||
+            !signIn.AsArray().values.Any(value => value.AsString() == "Default"))
+            throw new InvalidOperationException("The exported app lacks the Default Sign in with Apple entitlement.");
+        if (!project.ContainsFramework(project.GetUnityFrameworkTargetGuid(), "AuthenticationServices.framework"))
+            throw new InvalidOperationException("UnityFramework does not link AuthenticationServices.framework.");
+
+        // Unity's public AddSignInWithApple helper binds this entitlement without
+        // emitting a SystemCapabilities display marker in current Xcode projects.
+    }
+#endif
 
     public static void CompilePlayer()
     {
-        var result = PlayerBuildInterface.CompilePlayerScripts(new ScriptCompilationSettings
+        RequireEnvironment();
+        var target = EditorUserBuildSettings.activeBuildTarget;
+        var errors = new List<string>();
+        var outputPath = "Library/RevivalPlayerScripts/" + target;
+        try
         {
-            target = BuildTarget.StandaloneOSX,
-            group = BuildTargetGroup.Standalone,
-            options = ScriptCompilationOptions.DevelopmentBuild
-        }, "Library/RevivalPlayerScripts");
-        if (result.assemblies == null || !result.assemblies.Any())
-            throw new InvalidOperationException("Player script compilation produced no assemblies.");
-        Debug.Log("PocketStriker player script compilation passed.");
+            var result = PlayerBuildInterface.CompilePlayerScripts(new ScriptCompilationSettings
+            {
+                target = target,
+                group = BuildPipeline.GetBuildTargetGroup(target),
+                options = ScriptCompilationOptions.DevelopmentBuild
+            }, outputPath);
+            if (result.assemblies == null || !result.assemblies.Any())
+                throw new InvalidOperationException("Player script compilation produced no assemblies.");
+            Debug.Log($"PocketStriker {target} player script compilation passed.");
+        }
+        catch (Exception exception)
+        {
+            errors.Add(exception.ToString());
+            throw;
+        }
+        finally
+        {
+            WriteReport("compile", errors, 0, 0, Path.GetFullPath(outputPath));
+        }
     }
 
-    static void WriteReport(string check, IEnumerable<string> errors, int scenes, int entries)
+    static void WriteReport(string check, IEnumerable<string> errors, int scenes, int entries, string outputPath = null)
     {
         var errorArray = errors.ToArray();
         Directory.CreateDirectory(ReportDirectory);
-        File.WriteAllText(Path.Combine(ReportDirectory, check + "-report.json"), JsonUtility.ToJson(new ValidationReport
+        var json = JsonUtility.ToJson(new ValidationReport
         {
             unityVersion = Application.unityVersion,
+            expectedUnityVersion = ExpectedUnityVersion,
+            activeBuildTarget = EditorUserBuildSettings.activeBuildTarget.ToString(),
+            defaultOrientation = PlayerSettings.defaultInterfaceOrientation.ToString(),
+            runtimeOrientation = Screen.orientation.ToString(),
+            screenWidth = Screen.width,
+            screenHeight = Screen.height,
+            defaultScreenWidth = PlayerSettings.defaultScreenWidth,
+            defaultScreenHeight = PlayerSettings.defaultScreenHeight,
+            portraitOnly = PortraitOnly,
+            outputPath = outputPath,
             check = check,
             passed = errorArray.Length == 0,
             scenes = scenes,
             addressableEntries = entries,
-            errors = errorArray
-        }, true));
+            errors = errorArray,
+            fightRuns = check == "startup" ? ReadFightRuns().items.ToArray() : Array.Empty<FightRunReport>(),
+            reentryObserved = check == "startup" && SessionState.GetBool(ReentryKey, false),
+            poolLifecyclePassed = check == "startup" && SessionState.GetBool(PoolCheckKey, false)
+        }, true);
+        File.WriteAllText(Path.Combine(ReportDirectory, check + "-report.json"), json);
+        File.WriteAllText(Path.Combine(ReportDirectory, check + "-" + EditorUserBuildSettings.activeBuildTarget + "-report.json"), json);
     }
 }

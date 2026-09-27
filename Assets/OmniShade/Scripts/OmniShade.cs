@@ -1,6 +1,6 @@
 //------------------------------------
 //             OmniShade
-//     Copyright© 2023 OmniShade     
+//     Copyright© 2025 OmniShade
 //------------------------------------
 
 using UnityEngine;
@@ -18,5 +18,5 @@ public static class OmniShade {
 	public const string PRO_URL = "https://assetstore.unity.com/packages/vfx/shaders/omnishade-mobile-optimized-shader-213594";
 
 	public const int TRIPLANAR_UV_SCALE = 32;
-    
+
 }

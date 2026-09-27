@@ -8,7 +8,7 @@ public partial class PlayFabReadClient
     // 当前玩家会显示的石头包商品。因为如果这个玩家够买过对应商品的话，则不会再显示
     // ReadOnlyUserData主要是用来管购买记录
     public static readonly List<string> ShowStoneBundleIds = new List<string>();
-    public static void GetAllReadOnlyUserData(List<string> keys, Action<bool> finished)
+    public static void GetAllReadOnlyUserData(List<string> keys, Action<bool> finished, Func<bool> isCurrentRequest = null)
     {
         PlayFabClientAPI.GetUserReadOnlyData
         (
@@ -19,11 +19,13 @@ public partial class PlayFabReadClient
             },
             (obj) =>
             {
+                if (isCurrentRequest != null && !isCurrentRequest())
+                    return;
                 // 石头包购买
                 ShowStoneBundleIds.Clear();
                 foreach (var productId in keys)
                 {
-                    if (!obj.Data.ContainsKey(productId))
+                    if (obj.Data == null || !obj.Data.ContainsKey(productId))
                     {
                         ShowStoneBundleIds.Add(productId);
                     }
@@ -32,6 +34,8 @@ public partial class PlayFabReadClient
             },
             errorCallback =>
             {
+                if (isCurrentRequest != null && !isCurrentRequest())
+                    return;
                 finished.Invoke(false);
                 PlayFabReadClient.ErrorReport(errorCallback);
             }

@@ -7,6 +7,7 @@ namespace HittingDetection
         RaycastHit[] _hitBuffer = new RaycastHit[8];
         public RaycastHit[] _hits => _hitBuffer;
         public int HitCount { get; private set; }
+        public bool WillQueryPhysics => (transform.position - _lastFramePos).sqrMagnitude > 0f;
         
         // trail detect
         Vector3 _lastFramePos; //Temporary position of the marker from the last frame

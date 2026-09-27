@@ -7,6 +7,7 @@ public class SensorUnity : MonoBehaviour
     [SerializeField] LayerMask _layers;
 
     private Collider[] _hits;//What was hit in this frame?
+    private int _hitCount;
     private Vector3 _centerPos;
     private float _sensorRadius;
 
@@ -15,7 +16,7 @@ public class SensorUnity : MonoBehaviour
     bool _continuousDetection;
 
     public readonly List<Action> SensorDetectionResultClearProcesses = new List<Action>();
-    public readonly List<Action<Collider[]>> SensorDetectionResultSortProcesses = new List<Action<Collider[]>>();
+    public readonly List<Action<Collider[], int>> SensorDetectionResultSortProcesses = new List<Action<Collider[], int>>();
 
     int DetectionInterval
     {
@@ -33,7 +34,7 @@ public class SensorUnity : MonoBehaviour
                 SensorDetectProcess();//检测
                 foreach (var one in SensorDetectionResultSortProcesses)
                 {
-                    one.Invoke(_hits);
+                    one.Invoke(_hits, _hitCount);
                 }
             }
         }
@@ -102,7 +103,7 @@ public class SensorUnity : MonoBehaviour
 
         foreach (var sortProcess in SensorDetectionResultSortProcesses)
         {
-            sortProcess?.Invoke(_hits);
+            sortProcess?.Invoke(_hits, _hitCount);
         }
 
         if (_detectionInterval != -1)
@@ -144,6 +145,6 @@ public class SensorUnity : MonoBehaviour
 
     void SensorDetectProcess()
     {
-        Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);
+        _hitCount = Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);
     }
 }

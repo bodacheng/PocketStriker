@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -36,6 +36,8 @@ public partial class Data_Center : MonoBehaviour
     public Transform right_hand_t, left_hand_t, right_foot_t, left_foot_t,tail_t, head_t;
     public Transform left_arm_hitbox_t, right_arm_hitbox_t, left_leg_hitbox_t, right_leg_hitbox_t, spine_hitbox_t;
 
+    private IDisposable _resistanceSubscription;
+    private IDisposable _hpSubscription;
     private bool Phase1Initialized;
     private bool Phase2Initialized;
     
@@ -65,6 +67,8 @@ public partial class Data_Center : MonoBehaviour
 
     private void OnDestroy()
     {
+        _hpSubscription?.Dispose();
+        _resistanceSubscription?.Dispose();
         AnimationManger.AnimFreezeSequence?.Kill();
     }
 
@@ -87,20 +91,27 @@ public partial class Data_Center : MonoBehaviour
         return returnValue;
     }
 
-    public async UniTask Step1Initialize(string type, string basicPackName)
+    public async UniTask Step1Initialize(string type, string basicPackName, Action<float> onProgress = null)
     {
         if (!Phase1Initialized)
         {
-            AnimationManger.AnimatorRef =  WholeT.GetComponent<Animator>();
+            if (WholeT == null)
+                throw new InvalidOperationException($"Unit has no model transform: {name}");
+            AnimationManger.AnimatorRef = WholeT.GetComponent<Animator>();
             _facialAnimManager = WholeT.GetComponent<FacialAnimManager>();
             Sensor.Center = this.geometryCenter;
             Sensor.SensorRadius = 15f;
             FightDataRef.Center = this;
-            _BasicPhysicSupport.Rigidbody.useGravity = false;
-            _BasicPhysicSupport.Rigidbody.mass = 500f;
+            if (_BasicPhysicSupport != null && _BasicPhysicSupport.Rigidbody != null)
+            {
+                _BasicPhysicSupport.Rigidbody.useGravity = false;
+                _BasicPhysicSupport.Rigidbody.mass = 500f;
+            }
+            if (_AudioSource != null)
+                _AudioSource.volume = AppSetting.Value.EffectsVolume;
             BodyElementTagAndLayerSet(TeamConfig.DefaultSet);
             bO_Weapon_Animation_Events.hiddenMethods.AssignWeaponsFromDataCenter(FightDataRef,geometryCenter, right_hand_t, left_hand_t, right_foot_t, left_foot_t, head_t, tail_t);
-            await AnimationManger.PreloadBasicPersonalAnims(type, basicPackName, _facialAnimManager);
+            await AnimationManger.PreloadBasicPersonalAnims(type, basicPackName, _facialAnimManager, onProgress);
             _BO_Ani_E.BasicMagicAndEffectsPathDefine(element);
             posCalTrans = new List<Transform>()
             {
@@ -116,6 +127,7 @@ public partial class Data_Center : MonoBehaviour
             //}                
             Phase1Initialized = true;
         }
+        onProgress?.Invoke(1f);
     }
 
     void BodyElementTagAndLayerSet(TeamConfig _TeamConfig)
@@ -136,7 +148,7 @@ public partial class Data_Center : MonoBehaviour
         }
     }
     
-    public async UniTask Step2Initialize(string type, Element element, SkillSet skillSet, int preloadCount)
+    public async UniTask Step2Initialize(string type, Element element, SkillSet skillSet, int preloadCount, Action<float> onProgress = null)
     {
         if (!Phase2Initialized)
         {
@@ -157,7 +169,7 @@ public partial class Data_Center : MonoBehaviour
                 this.FightDataRef.DreamComboGauge.Value = 0;
                 EffectsManager.GenerateEffect("super_combo_explosion", FightGlobalSetting.EffectPathDefine(), WholeT.position, WholeT.rotation, WholeT).Forget();
                 dreamBuffEffect = await EffectsManager.GenerateEffect("dream_buff", FightGlobalSetting.EffectPathDefine(), geometryCenter.position, default, geometryCenter);
-                if (superDreamEnded)
+                if (superDreamEnded && dreamBuffEffect != null)
                     dreamBuffEffect.Phase = -1;
                 this.FightDataRef.DreamComboStart();
             },
@@ -173,8 +185,11 @@ public partial class Data_Center : MonoBehaviour
         
         //这个环节之后我应该有一份列表来展示到底我一个角色一场战斗都能用上什么招
         // 上面这个环节结束后，有这样几个重要情况1. state_Transition_Dictionary的内容就正确了 2.AIStateRunner内的States_Dictionary实例内将有一份正确的skill类key的列表
+        onProgress?.Invoke(0.2f);
         var toLoadSkillAnimsNames = _MyBehaviorRunner.PassSkillTypeKeys();
-        await AnimationManger.PreloadPersonalAnimsResourceMode(type, toLoadSkillAnimsNames, element, preloadCount);
+        await AnimationManger.PreloadPersonalAnimsResourceMode(type, toLoadSkillAnimsNames, element, preloadCount,
+            progress => onProgress?.Invoke(Mathf.Lerp(0.2f, 1f, progress)));
+        onProgress?.Invoke(1f);
     }
 
     /// <summary>
@@ -202,7 +217,8 @@ public partial class Data_Center : MonoBehaviour
         FightDataRef.CriticalGaugeMode = criticalGaugeMode;
 
         
-        FightDataRef.Resistance.Subscribe(x =>
+        _resistanceSubscription?.Dispose();
+        _resistanceSubscription = FightDataRef.Resistance.Subscribe(x =>
         {
             FightDataRef.Resistance.Value = Mathf.Clamp(x, 0, FightGlobalSetting._ResistanceMax);
         }).AddTo(gameObject);
@@ -234,9 +250,9 @@ public partial class Data_Center : MonoBehaviour
             });
         
         BoundaryControlByGod.target.SensorUnity.SensorDetectionResultSortProcesses.Add(
-            (x) =>
+            (hits, hitCount) =>
             {
-                this.Sensor.SensorDetectionResultSortProcess(x);
+                this.Sensor.SensorDetectionResultSortProcess(hits, hitCount);
             });
     }
 
@@ -244,8 +260,9 @@ public partial class Data_Center : MonoBehaviour
     {
         _MyBehaviorRunner.SetAt(unitInfo.level);
         var hp = SkillSet.INI_Hp(unitInfo.set.SkillIDList(), unitInfo.level) * teamHpRate;
+        _hpSubscription?.Dispose();
         FightDataRef.CurrentHp.Value = hp;
-        FightDataRef.CurrentHp.Subscribe(x =>
+        _hpSubscription = FightDataRef.CurrentHp.Subscribe(x =>
         {
             FightDataRef.CurrentHp.Value = Mathf.Clamp(x, 0, hp);
         }).AddTo(gameObject);

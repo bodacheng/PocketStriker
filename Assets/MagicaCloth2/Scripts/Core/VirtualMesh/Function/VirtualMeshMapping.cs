@@ -74,6 +74,7 @@ namespace MagicaCloth2
                     var avgDist = proxyMesh.averageVertexDistance.Value;
                     float weightLength = avgDist * 1.5f;
                     //Debug.Log($"avgDist:{avgDist}, weightLength:{weightLength}");
+                    using var useSet = new NativeParallelHashSet<ushort>(1024, Allocator.Persistent); // Unity2023.1.5対応
                     var calcDirectWeightJob = new Mapping_CalcDirectWeightJob()
                     {
                         vcnt = mappingWorkData.Length,
@@ -86,6 +87,8 @@ namespace MagicaCloth2
                         proxyLocalPositions = proxyMesh.localPositions.GetNativeArray(),
                         proxyVertexToVertexIndexArray = proxyMesh.vertexToVertexIndexArray,
                         proxyVertexToVertexDataArray = proxyMesh.vertexToVertexDataArray,
+
+                        useSet = useSet, // Unity2023.1.5対応
                     };
                     calcDirectWeightJob.Run();
                 }
@@ -95,8 +98,9 @@ namespace MagicaCloth2
                     // 検索半径
                     // これはプロキシメッシュ座標空間での長さとなる
                     float averageDistance = MathUtility.TransformLength(averageVertexDistance.Value, toP);
+                    averageDistance = math.max(averageDistance, Define.System.MinimumGridSize);
                     float searchRadius = averageDistance * 2.5f; // test(2.0?)
-                    Debug.Log($"searchRadius:{searchRadius}");
+                    Develop.DebugLog($"Search Mapping! searchRadius:{searchRadius}");
 
                     // プロキシ頂点インデックスを格納したグリッドマップを作成する
                     float gridSize = averageDistance * 1.5f;
@@ -233,6 +237,7 @@ namespace MagicaCloth2
             }
         }
 
+        [BurstCompile]
         struct Mapping_CalcDirectWeightJob : IJob
         {
             // data
@@ -255,10 +260,12 @@ namespace MagicaCloth2
             [Unity.Collections.ReadOnly]
             public NativeArray<ushort> proxyVertexToVertexDataArray;
 
+            public NativeParallelHashSet<ushort> useSet; // Unity2023.1.5対応
+
             public void Execute()
             {
                 // 処理済みセット
-                var useSet = new NativeParallelHashSet<ushort>(1024, Allocator.Temp);
+                //var useSet = new NativeParallelHashSet<ushort>(1024, Allocator.Temp); // Unity2023.1.5対応
                 var stack = new FixedList4096Bytes<ushort>();
 
                 for (int vindex = 0; vindex < vcnt; vindex++)
@@ -276,10 +283,10 @@ namespace MagicaCloth2
                     // ウエイトバッファ
                     var weights = new ExCostSortedList4(-1);
 
-                    stack.Push(pindex);
+                    stack.MC2Push(pindex);
                     while (stack.IsEmpty == false)
                     {
-                        pindex = stack.Pop();
+                        pindex = stack.MC2Pop();
 
                         if (useSet.Contains(pindex))
                             continue;
@@ -298,8 +305,8 @@ namespace MagicaCloth2
                         weights.Add(1.0f - w, pindex); // ExCostSortedList4は昇順格納なので一旦1.0から引く
 
                         // 次の接続
-                        DataUtility.Unpack10_22(proxyVertexToVertexIndexArray[pindex], out var dcnt, out var dstart);
-                        for (int i = 0; i < dcnt && stack.IsCapacity() == false; i++)
+                        DataUtility.Unpack12_20(proxyVertexToVertexIndexArray[pindex], out var dcnt, out var dstart);
+                        for (int i = 0; i < dcnt && stack.MC2IsCapacity() == false; i++)
                         {
                             ushort tindex = proxyVertexToVertexDataArray[dstart + i];
 
@@ -311,7 +318,7 @@ namespace MagicaCloth2
                             if (dist > weightLength)
                                 continue;
 
-                            stack.Push(tindex);
+                            stack.MC2Push(tindex);
                         }
                     }
 
@@ -375,7 +382,7 @@ namespace MagicaCloth2
             [Unity.Collections.ReadOnly]
             public NativeArray<VirtualMeshBoneWeight> boneWeights;
             [Unity.Collections.ReadOnly]
-            public NativeArray<int> transformIds;
+            public NativeArray<MagicaObjectId> transformIds;
             [Unity.Collections.WriteOnly]
             public NativeArray<VertexAttribute> attributes;
 
@@ -389,7 +396,7 @@ namespace MagicaCloth2
             [Unity.Collections.ReadOnly]
             public NativeArray<VirtualMeshBoneWeight> proxyBoneWeights;
             [Unity.Collections.ReadOnly]
-            public NativeArray<int> proxyTransformIds;
+            public NativeArray<MagicaObjectId> proxyTransformIds;
 
             // out
             [Unity.Collections.WriteOnly]
@@ -407,7 +414,7 @@ namespace MagicaCloth2
                     Debug.Assert(bw.IsValid);
 
                     // もっともウエイトが重いボーンのハッシュ
-                    int boneId = transformIds[bw.boneIndices[0]];
+                    MagicaObjectId boneId = transformIds[bw.boneIndices[0]];
 
 
                     // グリッド範囲を検索する
@@ -434,7 +441,7 @@ namespace MagicaCloth2
                             bool hasBone = false;
                             for (int j = 0; j < tbw.Count && hasBone == false; j++)
                             {
-                                int tboneId = proxyTransformIds[tbw.boneIndices[j]];
+                                MagicaObjectId tboneId = proxyTransformIds[tbw.boneIndices[j]];
                                 if (tboneId == boneId)
                                     hasBone = true;
                             }
@@ -574,7 +581,7 @@ namespace MagicaCloth2
                 // チェックは近傍頂点の接続２レベルのみとする
                 // ★結果：良い。最初のバージョンと結果が同じで負荷は激減した。
                 vertexDist.Add(vertexDistance, pindex);
-                DataUtility.Unpack10_22(proxyVertexToVertexIndexArray[pindex], out var dcnt, out var dstart);
+                DataUtility.Unpack12_20(proxyVertexToVertexIndexArray[pindex], out var dcnt, out var dstart);
                 // レベル１の接続
                 for (int i = 0; i < dcnt; i++)
                 {
@@ -594,7 +601,7 @@ namespace MagicaCloth2
                     }
 
                     // レベル２の接続
-                    DataUtility.Unpack10_22(proxyVertexToVertexIndexArray[index2], out var dcnt2, out var dstart2);
+                    DataUtility.Unpack12_20(proxyVertexToVertexIndexArray[index2], out var dcnt2, out var dstart2);
                     for (int j = 0; j < dcnt2; j++)
                     {
                         int index3 = proxyVertexToVertexDataArray[dstart2 + j];

@@ -25,10 +25,14 @@ namespace Crosstales.BWF.EditorExtension
 
       #region Static constructor
 
-      static BWFManagerEditor()
-      {
-         EditorApplication.hierarchyWindowItemOnGUI += hierarchyItemCB;
-      }
+	      static BWFManagerEditor()
+	      {
+#if UNITY_6000_5_OR_NEWER
+	         EditorApplication.hierarchyWindowItemByEntityIdOnGUI += hierarchyItemCB;
+#else
+	         EditorApplication.hierarchyWindowItemOnGUI += hierarchyItemCB;
+#endif
+	      }
 
       #endregion
 
@@ -121,19 +125,29 @@ namespace Crosstales.BWF.EditorExtension
 
       #region Private methods
 
-      private static void hierarchyItemCB(int instanceID, Rect selectionRect)
-      {
-         if (EditorConfig.HIERARCHY_ICON)
-         {
+#if UNITY_6000_5_OR_NEWER
+	      private static void hierarchyItemCB(EntityId entityId, Rect selectionRect)
+	      {
+	         DrawHierarchyIcon(EditorUtility.EntityIdToObject(entityId) as GameObject, selectionRect);
+	      }
+#else
+	      private static void hierarchyItemCB(int instanceID, Rect selectionRect)
+	      {
+	         DrawHierarchyIcon(EditorUtility.InstanceIDToObject(instanceID) as GameObject, selectionRect);
+	      }
+#endif
+
+	      private static void DrawHierarchyIcon(GameObject go, Rect selectionRect)
+	      {
+	         if (EditorConfig.HIERARCHY_ICON)
+	         {
             //Color cc = GUI.contentColor;
             //Color bc = GUI.backgroundColor;
 
             //GUI.backgroundColor = Color.green;
             //GUI.contentColor = Color.yellow;
 
-            GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-
-            if (go != null && go.GetComponent<BWFManager>())
+	            if (go != null && go.GetComponent<BWFManager>())
             {
                Rect r = new Rect(selectionRect);
                r.x = r.width - 4;

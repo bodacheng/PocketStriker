@@ -54,16 +54,17 @@ namespace HittingDetection
             //BallDetectHitPool = Physics.OverlapSphere(this.transform.position, radius, _layers, QueryTriggerInteraction.Collide);
             if (CombatLayerUtility.ContainsLayer(_layers, other.gameObject.layer))
             {
-                if (!_ballDetectHitPool.Keys.Contains(other))
+                if (!_ballDetectHitPool.ContainsKey(other))
                 {
                     var tempM = HitBoxesProcesser.Instance.GetHitBox(other);
                     var tempWHpCost = tempM != null ? V_Damage.WpHpCost(owner.heavyLevel, tempM.heavyLevel) : 1;
                     var oPosition = other.transform.position;
+                    var hitPoint = HitEffectPointCal(oPosition);
                     var hitPointPara = new HitPointPara
                     {
-                        onBodyPos = HitEffectPointCal(oPosition),
+                        onBodyPos = hitPoint,
                         impactPos = transform.position,
-                        qua = Quaternion.LookRotation(oPosition - HitEffectPointCal(oPosition), Vector3.up),
+                        qua = Quaternion.LookRotation(oPosition - hitPoint, Vector3.up),
                         WeaponHpCost = tempWHpCost
                     };
                     _ballDetectHitPool.Add(other, hitPointPara);
