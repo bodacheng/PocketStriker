@@ -107,10 +107,12 @@ public partial class FightPrepareLayer : UILayer
         editTeamButton.onClick.AddListener(()=> teamEdit());
     }
 
-    public void SetArcadeFeature(Action toArcadeFront, string arcadeStageNo)
+    public void SetArcadeFeature(Action toArcadeFront, string arcadeStageNo, int fightMode)
     {
         arcadeStageNoText.gameObject.SetActive(true);
-        arcadeStageNoText.text = "Stage " + arcadeStageNo;
+        var modeKey = fightMode == AdventureModeRules.EvolutionMode ? "TeamModeE"
+            : fightMode == AdventureModeRules.MultiMode ? "TeamModeM" : "TeamModeR";
+        arcadeStageNoText.text = "Stage " + arcadeStageNo + " · " + Translate.Get(modeKey);
         toArcadeFrontBtn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");
         toArcadeFrontBtn.SetListener(toArcadeFront);
 
@@ -145,7 +147,8 @@ public partial class FightPrepareLayer : UILayer
         {
             hardTxt = "hard";
         }
-        arcadeStageNoText.text = Translate.Get("EventFightTitle")+ " " + hardTxt;
+        var difficultyKey = hardTxt == "easy" ? "EasyMode" : hardTxt == "normal" ? "NormalMode" : "HardMode";
+        arcadeStageNoText.text = Translate.Get("RandomBossMode") + " · " + Translate.Get(difficultyKey);
         toArcadeFrontBtn.gameObject.SetActive(false);
         rewardUI.gameObject.SetActive(false);
         // rewardUI.ShowRewards(award.d,award.g);
@@ -176,7 +179,8 @@ public partial class FightPrepareLayer : UILayer
             },
             myTeamShowT, true, PlayerAccountInfo.Me.tutorialProgress == "Finished");
 
-        bool hasExtraSeat = (stage.EventType != FightEventType.Quest &&
+        bool hasExtraSeat = (!(stage.EventType == FightEventType.Quest &&
+                              AdventureModeRules.UsesSingleHero(stage.ID, stage.EvolutionMode)) &&
                              (dataAccess.Units.Dic.Count > stage.FightMembers.HeroSets.GetValues().Count
                               && stage.FightMembers.HeroSets.GetValues().Count < 3));
 

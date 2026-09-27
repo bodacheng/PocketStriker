@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ModelView;
@@ -20,7 +21,7 @@ public class EventBattleTop : UILayer
         ResizeCameraConnectorAsMaxSquare(camRect, camRect.rect.width, camRect.rect.height);
     }
 
-    public async UniTask IconButtonFeature(UnitInfo unitInfo)
+    public async UniTask IconButtonFeature(UnitInfo unitInfo, CancellationToken token = default)
     {
         UnitConfig unitConfig = Units.GetUnitConfig(unitInfo.r_id);
         
@@ -30,7 +31,8 @@ public class EventBattleTop : UILayer
         await UniTask.WhenAll(
             connector.ShowModel(unitConfig.RECORD_ID), 
             nineForShow.SkillSetInfoOfUnitOnArcadePage(unitInfo.set)
-        );
+        ).AttachExternalCancellation(token);
+        if (this == null || IsClosing || token.IsCancellationRequested) return;
         
         nineForShow.AddOnClickToSlots(
             (RECORD_ID) =>

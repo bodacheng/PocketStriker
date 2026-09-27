@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -6,7 +7,6 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using PlayFab.ClientModels;
-using PlayFab.Json;
 using UnityEngine;
 
 public class EventModeManager
@@ -15,6 +15,12 @@ public class EventModeManager
     private FightInfo easyMode, normalMode, hardMode;
     private readonly StageModeTable _stageModeTable = new StageModeTable();
     private List<string> completedLevels;
+    private readonly Dictionary<string, float> stageRefLevelCache = new Dictionary<string, float>();
+    private readonly List<FightInfo> randomStages = new List<FightInfo>();
+
+    public FightInfo EasyMode => easyMode;
+    public FightInfo NormalMode => normalMode;
+    public FightInfo HardMode => hardMode;
     
     public static readonly EventModeManager Instance = new EventModeManager();
 
@@ -70,6 +76,68 @@ public class EventModeManager
             hardMode = await LoadStage(hardModePath);
     }
 
+    public async UniTask InitializeRandomMode(string uniqueId)
+    {
+        if (string.IsNullOrEmpty(uniqueId))
+            throw new ArgumentException("A daily random Boss identifier is required.", nameof(uniqueId));
+
+        var easyLevel = await GetStageRefLevel("easy", 2f);
+        var normalLevel = await GetStageRefLevel("normal", 5f);
+        var hardLevel = await GetStageRefLevel("hard", 10f);
+        var generated = new List<FightInfo>();
+        try
+        {
+            generated.Add(RandomBossStageFactory.Create("easy_" + uniqueId, CriticalGaugeMode.Normal, 3, easyLevel));
+            generated.Add(RandomBossStageFactory.Create("normal_" + uniqueId, CriticalGaugeMode.DoubleGain, 2, normalLevel));
+            generated.Add(RandomBossStageFactory.Create("hard_" + uniqueId, CriticalGaugeMode.Unlimited, 1, hardLevel));
+        }
+        catch
+        {
+            foreach (var stage in generated)
+                UnityEngine.Object.Destroy(stage);
+            throw;
+        }
+
+        // Re-entering rerolls opponents, while the server date keeps daily rewards stable.
+        foreach (var previous in randomStages)
+            UnityEngine.Object.Destroy(previous);
+        randomStages.Clear();
+        randomStages.AddRange(generated);
+        easyMode = generated[0];
+        normalMode = generated[1];
+        hardMode = generated[2];
+    }
+
+    async UniTask<float> GetStageRefLevel(string address, float fallback)
+    {
+        if (stageRefLevelCache.TryGetValue(address, out var cachedLevel))
+            return cachedLevel;
+
+        AsyncOperationHandle<FightInfo> handle = default;
+        var level = fallback;
+        try
+        {
+            handle = Addressables.LoadAssetAsync<FightInfo>(address);
+            await handle.Task;
+            if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null
+                && handle.Result.stageRefLevel > 0f && !float.IsInfinity(handle.Result.stageRefLevel))
+            {
+                level = handle.Result.stageRefLevel;
+                stageRefLevelCache[address] = level;
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.LogWarning($"[RandomBoss] Unable to read '{address}' difficulty; using level {fallback}. {exception.Message}");
+        }
+        finally
+        {
+            if (handle.IsValid())
+                Addressables.Release(handle);
+        }
+        return level;
+    }
+
     public UnitInfo GetRepresentativeUnit()
     {
         var unit1 = hardMode?.UnitsData.FirstOrDefault();
@@ -92,27 +160,8 @@ public class EventModeManager
     
     public void OnCloudScriptSuccess(ExecuteCloudScriptResult result, EventBattleTop layer)
     {
-        if (result.Error != null) {
-            Debug.LogError("Cloud Script Error: " + result.Error.Message);
+        if (!TryReadCompletedLevels(result))
             return;
-        }
-        
-        Debug.Log("Cloud Script Success: " + result.FunctionResult);
-        JsonObject jsonResult = (JsonObject)result.FunctionResult;
-        if (jsonResult.TryGetValue("completedEventBattles", out var completedBattlesObject))
-        {
-            var objects = (List<object>)completedBattlesObject;
-            CompletedLevels.Clear();
-            foreach (var o in objects)
-            {
-                CompletedLevels.Add(o.ToString());
-            }
-        }
-        else
-        {
-            Debug.Log("No completed event battles found.");
-            return;
-        }
         
         if (easyModePath != null)
         {
@@ -137,5 +186,62 @@ public class EventModeManager
                 PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, hardMode, true);
             }, PlayFabReadClient.EventAwards["hard"],CompletedLevels.Contains(hardMode.ID), hardMode.team2CGMode);
         }
+    }
+
+    public bool TryReadCompletedLevels(ExecuteCloudScriptResult result)
+    {
+        if (result == null || result.Error != null)
+        {
+            Debug.LogWarning("[RandomBoss] Unable to read completed battles: " + result?.Error?.Message);
+            return false;
+        }
+
+        try
+        {
+            var payload = CloudScriptPayloadUtility.Deserialize<CompletedLevelsResponse>(result.FunctionResult);
+            if (payload?.completedEventBattles == null)
+            {
+                Debug.LogWarning("[RandomBoss] The completed-battles response was missing its list.");
+                return false;
+            }
+            CompletedLevels = payload.completedEventBattles.Where(id => !string.IsNullOrEmpty(id)).Distinct().ToList();
+            return true;
+        }
+        catch (Exception exception)
+        {
+            Debug.LogWarning("[RandomBoss] Invalid completed-battles response: " + exception.Message);
+            return false;
+        }
+    }
+
+    public void SetupRandomMode(EventBattleTop layer)
+    {
+        if (layer == null)
+            return;
+        SetupRandomButton(layer.EasyModeBtn, easyMode, "easy");
+        SetupRandomButton(layer.NormalModeBtn, normalMode, "normal");
+        SetupRandomButton(layer.HardModeBtn, hardMode, "hard");
+    }
+
+    void SetupRandomButton(EventBattleButton button, FightInfo stage, string difficulty)
+    {
+        if (button == null)
+            return;
+        var awards = PlayFabReadClient.EventAwards;
+        if (stage == null || awards == null || !awards.TryGetValue(difficulty, out var award) || award == null)
+        {
+            button.gameObject.SetActive(false);
+            Debug.LogWarning("[RandomBoss] Missing stage or reward data for " + difficulty);
+            return;
+        }
+
+        button.Setup(
+            () => PreScene.target.trySwitchToStep(MainSceneStep.QuestInfo, stage, true),
+            award, CompletedLevels.Contains(stage.ID), stage.team2CGMode);
+    }
+
+    sealed class CompletedLevelsResponse
+    {
+        public List<string> completedEventBattles;
     }
 }

@@ -55,6 +55,18 @@ namespace mainMenu
         
         public bool ChangeProcess<T>(MainSceneStep sceneStep, T t)
         {
+            // Old return stacks and saved destinations must not reopen retired modes.
+            if (sceneStep == MainSceneStep.GangBangFront || sceneStep == MainSceneStep.EventFight)
+            {
+                return ChangeProcess(MainSceneStep.FrontPage);
+            }
+
+            if (!_dic.TryGetValue(sceneStep, out var nextProcess))
+            {
+                Debug.Log("empty state key:" + sceneStep);
+                return false;
+            }
+
             if (currentProcess != null)
             {
                 if (!currentProcess.CanEnterOtherProcess())
@@ -72,7 +84,7 @@ namespace mainMenu
             }
             
             lastProcess = currentProcess;
-            _dic.TryGetValue(sceneStep, out currentProcess);
+            currentProcess = nextProcess;
             if (currentProcess != null)
             {
                 _currentStep.Value = sceneStep;

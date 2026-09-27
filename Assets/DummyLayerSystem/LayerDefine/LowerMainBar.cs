@@ -34,7 +34,7 @@ public class LowerMainBar : UILayer
             case MainSceneStep.ArenaAward:
             case MainSceneStep.ArcadeFront:
             case MainSceneStep.QuestInfo:
-            case MainSceneStep.GangBangFront:
+            case MainSceneStep.RandomBoss:
             case MainSceneStep.SelfFightFront:
                 targetBtn = playTab;
                 break;

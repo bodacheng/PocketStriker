@@ -26,6 +26,8 @@ public class FightModeSwitch : MonoBehaviour
 
     public void Setup(int arcadeFightMode, int defaultMode)
     {
+        btn.onClick.RemoveAllListeners();
+        btn.gameObject.SetActive(true);
         switch (arcadeFightMode)
         {
             case 1:
@@ -46,7 +48,7 @@ public class FightModeSwitch : MonoBehaviour
                 btn.onClick.AddListener(OnClick);
                 btn.interactable = true;
                 animator.enabled = true;
-                SetMode((TeamMode)defaultMode);
+                SetMode(defaultMode == (int)TeamMode.MultiRaid ? TeamMode.MultiRaid : TeamMode.Rotation);
             break;
         }
     }

@@ -709,7 +709,7 @@ GameObject:
   - component: {fileID: 3828429348508495400}
   - component: {fileID: 8297290633183388850}
   m_Layer: 5
-  m_Name: EventFight
+  m_Name: RandomBoss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -976,7 +976,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8161839264297942348
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3536,7 +3536,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Event Fight
+  m_Text: Random Boss
 --- !u!114 &5288667377319402267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3564,7 +3564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f69ade8f94e534fe988a129c38348848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  languageCode: EventBattleMode
+  languageCode: RandomBossMode
   target: {fileID: 3523461581764854971}
 --- !u!1 &8800303475791353925
 GameObject:

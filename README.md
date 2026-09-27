@@ -17,6 +17,11 @@ Unity 竖屏战斗游戏，通过 Git 子模块和 UPM 导入 MCombatShared。�
 默认移动键为 WASD；移动端使用项目已有的触控界面。
 不要直接从 FightScene 启动，战斗依赖启动场景初始化的配置和资源索引。
 
+冒险关卡混合团战、轮换和进化模式，前两关保留单人教学；首页提供随机 Boss，
+原「混沌」和固定 Boss 挑战入口已停用。规则和关卡配置见 [战斗模式说明](Tools/BattleModes.md)。
+可运行 `python3 Tools/Validation/validate_battle_modes.py` 检查模式、队伍与奖励请求规则；
+Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes** 验证全部冒险资源和随机 Boss 技能生成。
+
 Unity 的当前目标平台保存在本机缓存中，因此项目提供了启动脚本和首次会话默认平台逻辑。
 显式传入 `-buildTarget`／`-activeBuildProfile`、批处理任务及会话中的手动平台切换都会保留。
 需要桌面调试时使用 `Tools/open_unity.sh mac`；普通项目打开仍默认 iOS。

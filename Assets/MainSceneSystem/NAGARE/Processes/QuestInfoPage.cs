@@ -48,25 +48,28 @@ public class QuestInfoPage : MSceneProcess
 
                     break;
                 case FightEventType.Quest:
-                    _layer.SetLayerAnimatorTrigger("evolution");
+                    _layer.SetLayerAnimatorTrigger(FightLoad.Fight.EvolutionMode ? "evolution" : "normal");
 
-                    var arcadeTeam = TeamSet.GetTargetSet("arcade");
-                    // 处理以前的旧逻辑
-                    if (arcadeTeam.PosNumsWithLocalKeys.Length > 1)
+                    // Tutorial and evolution fights use one starter; mixed battles
+                    // use the three-slot team, preserving both saved lineups.
+                    var adventureTeamKey = AdventureModeRules.GetTeamSetKey(
+                        FightLoad.Fight.ID, FightLoad.Fight.EvolutionMode);
+                    if (AdventureModeRules.UsesSingleHero(FightLoad.Fight.ID, FightLoad.Fight.EvolutionMode))
                     {
-                        for (var index = 0; index < arcadeTeam.PosNumsWithLocalKeys.Length; index++)
+                        var arcadeTeam = TeamSet.GetTargetSet(adventureTeamKey);
+                        foreach (var position in arcadeTeam.PosNumsWithLocalKeys)
                         {
-                            if (index > 0)
+                            if (position.posNum != 0)
                             {
-                                arcadeTeam.SetPosUnitByInstanceID(index, null);
+                                arcadeTeam.SetPosUnitByInstanceID(position.posNum, null);
                             }
                         }
                     }
 
-                    FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arcade").LoadTeamDic();
+                    FightLoad.Fight.LoadMyTeam();
                     void GoToTeamEditArcade()
                     {
-                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "arcade", true);
+                        PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, adventureTeamKey, true);
                     }
                     _layer.SetTeamEditFeature(GoToTeamEditArcade);
                     _layer.SetArcadeFeature(
@@ -74,7 +77,8 @@ public class QuestInfoPage : MSceneProcess
                         {
                             PreScene.target.trySwitchToStep(MainSceneStep.ArcadeFront, false);
                         },
-                        FightLoad.Fight.ID
+                        FightLoad.Fight.ID,
+                        FightLoad.Fight.ArcadeFightMode
                     );
                     break;
                 case FightEventType.Event:
@@ -225,7 +229,8 @@ public class QuestInfoPage : MSceneProcess
                 }
                 break;
             case FightEventType.Quest:
-                if (fight.FightMembers.HeroSets.GetValues().Count != 1)
+                var adventureTeamCount = fight.FightMembers.HeroSets.GetValues().Count;
+                if (!AdventureModeRules.IsValidHeroCount(fight.ID, fight.EvolutionMode, adventureTeamCount))
                 {
                     return false;
                 }
@@ -347,11 +352,19 @@ public class QuestInfoPage : MSceneProcess
                 break;
             case FightEventType.Quest:
                 fightInfo.LoadMyTeam();
-                if (fightInfo.FightMembers.HeroSets.GetValues().Count != 1)
+                if (!CanFightCheck(fightInfo) || fightInfo.FightMembers.EnemySets.GetValues().Count == 0)
+                {
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("TeamNotFull"));
+                    return;
+                }
+                var adventureTeamCount = fightInfo.FightMembers.HeroSets.GetValues().Count;
+                if (!AdventureModeRules.UsesSingleHero(fightInfo.ID, fightInfo.EvolutionMode) &&
+                    adventureTeamCount < 3 &&
+                    dataAccess.Units.Dic.Count > adventureTeamCount)
                 {
                     PopupLayer.ArrangeConfirmWindow(
                         () => { FightLoad.Go(fightInfo);},
-                        Translate.Get("Error"));// 按理说不应该出现这个问题
+                        Translate.Get("HasExtraSeatButFight"));
                     return;
                 }
                 FightLoad.Go(fightInfo);

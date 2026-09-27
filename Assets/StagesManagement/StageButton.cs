@@ -15,6 +15,8 @@ public partial class StageButton : MonoBehaviour
     [SerializeField] RewardUI rewardUI;
     [SerializeField] GameObject enemyDoubleExModeFlg;
     [SerializeField] GameObject enemyInfiniteExModeFlg;
+
+    CanvasGroup _modeFlag;
     
     public Button Button => button;
     public RewardUI RewardUI => rewardUI;
@@ -38,12 +40,46 @@ public partial class StageButton : MonoBehaviour
             id.text = value.ToString();
         }
     }
+
+    public void SetFightMode(int mode)
+    {
+        if (_modeFlag != null)
+        {
+            _modeFlag.gameObject.SetActive(false);
+            Destroy(_modeFlag.gameObject);
+        }
+        var prefabName = mode == AdventureModeRules.EvolutionMode ? "EvolutionModeFlg"
+            : mode == AdventureModeRules.MultiMode ? "MultiModeFlg" : "RotationModeFlg";
+        var prefab = Resources.Load<GameObject>("DummyLayerSystem/Common/" + prefabName);
+        if (prefab == null) return;
+
+        var flag = Instantiate(prefab, id.transform);
+        var rect = flag.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0);
+        rect.anchorMax = new Vector2(0.5f, 0);
+        rect.pivot = new Vector2(0.5f, 0);
+        rect.anchoredPosition = Vector2.zero;
+        rect.sizeDelta = new Vector2(140, 44);
+        rect.localScale = Vector3.one;
+        foreach (var graphic in flag.GetComponentsInChildren<Graphic>(true))
+            graphic.raycastTarget = false;
+        foreach (var text in flag.GetComponentsInChildren<Text>(true))
+        {
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 10;
+            text.resizeTextMaxSize = 24;
+        }
+        _modeFlag = flag.AddComponent<CanvasGroup>();
+        _modeFlag.blocksRaycasts = false;
+    }
     
     public void ChangeColorOfIcons(bool on)
     {
         var buttonImage = GetComponent<Image>();
         buttonImage.color = new Color(buttonImage.color.r, buttonImage.color.g, buttonImage.color.b, on ? 1 : 0.3f);
         id.color = new Color(id.color.r, id.color.g, id.color.b, on ? 1 : 0.3f);
+        if (_modeFlag != null)
+            _modeFlag.alpha = on ? 1 : 0.3f;
         button.interactable = on;
     }
     

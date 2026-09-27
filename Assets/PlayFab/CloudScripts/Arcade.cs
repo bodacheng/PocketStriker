@@ -66,11 +66,7 @@ public partial class CloudScript
                                     PopupLayer.ArrangeWarnWindowUnitIcon(Translate.Get(unitConfig.REAL_NAME) + "\n" + Translate.Get("GotNewUnit"), item.ItemId,
                                     ()=>
                                     {
-                                        PopupLayer.ArrangeWarnWindow(() =>
-                                            {
-                                                PopupLayer.ArrangeWarnWindow(Translate.Get("GangbangUnlocked"));
-                                            },
-                                        Translate.Get("ArenaUnlocked"));
+                                        PopupLayer.ArrangeWarnWindow(Translate.Get("ArenaUnlocked"));
                                     });
                                 }
                                 else

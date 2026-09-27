@@ -40,9 +40,29 @@ public class ArcadeModeManager
         locationKeyDic.TryGetValue(stageNo.ToString(), out var location);
         if (location == null)
             return null;
-        var fightInfo = await AddressablesLogic.LoadT<FightInfo>(location);
+        var stageAsset = await AddressablesLogic.LoadT<FightInfo>(location);
+        if (stageAsset == null)
+            return null;
+
+        // Team selection and evolution generation belong to this visit, not the
+        // Addressables asset shared by the stage list and later retries.
+        var fightInfo = UnityEngine.Object.Instantiate(stageAsset);
+        fightInfo.name = stageAsset.name;
+        fightInfo.OpenAndSetEnemyDataOnPlace();
+        fightInfo.ID = stageNo.ToString();
         fightInfo.EventType = FightEventType.Quest;
-        fightInfo.ArcadeFightMode = 3; //_stageModeTable.GetModeById(fightInfo.ID);
+        fightInfo.ArcadeFightMode = AdventureModeRules.ResolveMode(
+            fightInfo.ID, _stageModeTable.GetModeById(fightInfo.ID));
+        fightInfo.EvolutionMode = fightInfo.ArcadeFightMode == AdventureModeRules.EvolutionMode;
+        var teamMode = fightInfo.ArcadeFightMode == AdventureModeRules.MultiMode
+            ? TeamMode.MultiRaid
+            : TeamMode.Rotation;
+        fightInfo.team1Mode = teamMode;
+        fightInfo.team2Mode = teamMode;
+        // Authored stages can have sparse IDs; evolution may add a new enemy at
+        // one of those IDs. Keep preview and combat lookups unique per encounter.
+        for (var index = 0; index < fightInfo.UnitsData.Count; index++)
+            fightInfo.UnitsData[index].id = index.ToString();
         fightInfo.SetUnitLevelByRefLevel();
         return fightInfo;
     }

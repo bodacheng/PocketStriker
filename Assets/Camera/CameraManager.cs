@@ -9,7 +9,7 @@ public class CameraManager : CameraManagerCore
     {
         return new Dictionary<C_Mode, CameraModeCore>
         {
-            {C_Mode.CertainYAntiVibration, new ChatGptFix(8f, 5f, 40f)},
+            {C_Mode.CertainYAntiVibration, new ChatGptFix(14f, 8f, 45f)},
             {C_Mode.ApproachToCertainDis, new LerpToCertainDistance(5f, 1f)},
             {C_Mode.keepTargetLeft, new keepTargetLeftCamera()},
             {C_Mode.WatchOver, new MCamera(20f, 15f, 25f)},

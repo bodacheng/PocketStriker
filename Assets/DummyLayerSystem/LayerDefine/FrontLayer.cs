@@ -42,16 +42,8 @@ public class FrontLayer : UILayer
                 ArcadeModeManager.Instance.DirectToArcadeStage(PlayerAccountInfo.Me.arcadeProcess + 1, true);
             });
         
-        GangbangBtn.BOButton.onClick.AddListener(
-            ()=>
-            {
-                if (PlayerAccountInfo.Me.arcadeProcess >= 5)
-                    GangbangModeManager.Instance.DirectToGangStage(PlayerAccountInfo.Me.gangbangProcess + 1, true);
-                else
-                {
-                    PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));
-                }
-            });
+        // Keep the legacy prefab reference for compatibility, but retire its entry point.
+        GangbangBtn.gameObject.SetActive(false);
         
         ArenaBtn.BOButton.onClick.AddListener(() =>
         {
@@ -66,12 +58,13 @@ public class FrontLayer : UILayer
         EventFightBtn.SetListener(() =>
         {
             if (PlayerAccountInfo.Me.arcadeProcess >= 5)
-                pre.trySwitchToStep(MainSceneStep.EventFight);
+                pre.trySwitchToStep(MainSceneStep.RandomBoss);
             else
             {
                 PopupLayer.ArrangeWarnWindow(Translate.Get("PlsClearStage5"));
             }
         });
+        EventFightBtn.interactable = PlayerAccountInfo.Me.tutorialProgress == "Finished";
         TrainBtn.onClick.AddListener(() => pre.trySwitchToStep(MainSceneStep.SelfFightFront));
 
         SkillTestRBtn.onClick.AddListener(pre.BeginSkillTest_Rotation);
@@ -85,9 +78,9 @@ public class FrontLayer : UILayer
     public void SetInteractive(bool on)
     {
         ArcadeBtn.BOButton.interactable = on;
-        GangbangBtn.BOButton.interactable = on;
+        GangbangBtn.BOButton.interactable = false;
         ArenaBtn.BOButton.interactable = on;
-        EventFightBtn.interactable = on;
+        EventFightBtn.interactable = on && PlayerAccountInfo.Me.tutorialProgress == "Finished";
         TrainBtn.interactable = on;
         SkillTestRBtn.interactable = on;
         SkillTestMBtn.interactable = on;
@@ -235,9 +228,9 @@ public class FrontLayer : UILayer
     {
         ArcadeBtn.BOButton.interactable = btnCode == MainSceneStep.QuestInfo;
         ArenaBtn.BOButton.interactable = btnCode == MainSceneStep.Arena;
-        GangbangBtn.BOButton.interactable = btnCode == MainSceneStep.GotchaFront;
+        GangbangBtn.BOButton.interactable = false;
         TrainBtn.interactable = btnCode == MainSceneStep.SelfFightFront;
-        EventFightBtn.interactable = btnCode == MainSceneStep.EventFight;
+        EventFightBtn.interactable = false;
         
         ArcadeBtn.Indicator.SetActive(false);
         ArenaBtn.Indicator.SetActive(false);
@@ -252,9 +245,6 @@ public class FrontLayer : UILayer
                 break;
             case MainSceneStep.Arena:
                 ArenaBtn.Indicator.SetActive(true);
-                break;
-            case MainSceneStep.SelfFightFront:
-                GangbangBtn.Indicator.SetActive(true);
                 break;
         }
     }

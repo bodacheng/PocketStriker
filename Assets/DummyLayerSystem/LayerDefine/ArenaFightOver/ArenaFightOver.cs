@@ -129,6 +129,18 @@ public partial class ArenaFightOver : UILayer
         fight.Team2Auto = true;
         if (fight.EventType != FightEventType.Gangbang) // 因为gangbang模式只用NextFight这个函数重开当前战斗，开启下一场战斗是有单独的函数。
             fight.LoadMyTeam();
+        if (fight.EventType == FightEventType.Quest || fight.EventType == FightEventType.Event)
+        {
+            var heroCount = fight.FightMembers.HeroSets.GetValues().Count;
+            var validCount = fight.EventType == FightEventType.Quest
+                ? AdventureModeRules.IsValidHeroCount(fight.ID, fight.EvolutionMode, heroCount)
+                : heroCount > 0 && heroCount <= 3;
+            if (!validCount || !fight.FightMembers.CheckStonesLegal(fight.EventType))
+            {
+                PopupLayer.ArrangeWarnWindow(Translate.Get("TeamNotFull"));
+                return;
+            }
+        }
         FightLoad.Fight = fight;
         FSceneProcessesRunner.Main.ChangeProcess(SceneStep.Preparing);
         UILayerLoader.Remove<ArenaFightOver>();
@@ -185,6 +197,10 @@ public partial class ArenaFightOver : UILayer
             case FightEventType.Gangbang:
                 againTab.SetUp(-1, "Stage " + FightLoad.Fight.ID);
                 break;
+            case FightEventType.Event:
+                againTab.SetUp(FightLoad.Fight.ArcadeFightMode, Translate.Get("RandomBossMode"));
+                againTab.gameObject.SetActive(true);
+                break;
             default:
                 againTab.SetUp(-1, null);
                 break;
@@ -205,7 +221,8 @@ public partial class ArenaFightOver : UILayer
         returnBtn.SetListener(()=>
         {
             CleanupBeforeDestroy();
-            FightScene.FightScene.target.ReturnToFront();
+            FightScene.FightScene.target.ReturnToFront(FightLoad.Fight.EventType == FightEventType.Event
+                ? MainSceneStep.RandomBoss : MainSceneStep.FrontPage);
         });
         
         DiamondText = Currencies.DiamondCount.Value.ToString();

@@ -155,10 +155,14 @@ public class TeamEditPage : MSceneProcess
         switch (teamMode)
         {
             case "arena":
-            case "origin":
                 qualified = qualified && unitCount == 3;
                 break;
             case "arcade":
+                qualified = qualified && unitCount == 1;
+                break;
+            case "origin":
+                qualified = qualified && unitCount > 0 && unitCount <= 3;
+                break;
             case "gangbang":
                 qualified = qualified && unitCount > 0;
                 break;

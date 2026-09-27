@@ -1,10 +1,12 @@
 using PlayFab.ClientModels;
 using System;
+using PlayFab;
 using ExecuteCloudScriptResult = PlayFab.ClientModels.ExecuteCloudScriptResult;
 
 public partial class CloudScript
 {
-    public static void EventBattleProgress(string stage, Action<ExecuteCloudScriptResult> claimQuestRewardSuccess)
+    public static void EventBattleProgress(string stage, Action<ExecuteCloudScriptResult> claimQuestRewardSuccess,
+        Action<PlayFabError> errorCallback = null)
     {
         // 之所以把更新关卡进度和获取报酬分开处理，是因为当时把这些处理写到一个cloud函数里的时候，
         // 竟然有一定概率playfab不给执行关卡进度更新所触发的角色获取rule，于是我们才决定在这个部分不要把各种处理集中在一个瞬间
@@ -13,20 +15,25 @@ public partial class CloudScript
 
         string levelKey;
         
-        if (stage.Contains("easy"))
+        if (stage != null && stage.StartsWith("easy_", StringComparison.Ordinal))
         {
             levelKey = "easy";
         }
-        else if (stage.Contains("normal"))
+        else if (stage != null && stage.StartsWith("normal_", StringComparison.Ordinal))
         {
             levelKey = "normal";
         }
-        else if (stage.Contains("hard"))
+        else if (stage != null && stage.StartsWith("hard_", StringComparison.Ordinal))
         {
             levelKey = "hard";
         }
         else
         {
+            errorCallback?.Invoke(new PlayFabError
+            {
+                Error = PlayFabErrorCode.InvalidParams,
+                ErrorMessage = "Invalid Boss battle ID."
+            });
             return;
         }
         
@@ -50,9 +57,11 @@ public partial class CloudScript
                             level = levelKey,
                         }
                     },
-                    claimQuestRewardSuccess
+                    claimQuestRewardSuccess,
+                    errorCallback
                 );
-            }
+            },
+            errorCallback
         );
     }
 }

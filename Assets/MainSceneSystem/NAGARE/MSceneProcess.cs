@@ -40,6 +40,7 @@
         DropTableInfo = 26,
         Ranking = 25,
         ArenaAward = 27,
+        RandomBoss = 28,
         
         ShopTop = 201,
 

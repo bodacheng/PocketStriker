@@ -361,7 +361,7 @@ public class FightInfo : ScriptableObject
         switch (EventType)
         {
             case FightEventType.Quest:
-                set = TeamSet.Default;
+                set = TeamSet.GetTargetSet(AdventureModeRules.GetTeamSetKey(ID, EvolutionMode));
                 break;
             case FightEventType.Arena:
                 set = TeamSet.Arena3V3;
@@ -378,6 +378,17 @@ public class FightInfo : ScriptableObject
         }
         
         FightMembers.HeroSets = set.LoadTeamDic();
+        if (EventType == FightEventType.Quest)
+        {
+            // Older saves may contain more slots than the selected adventure mode.
+            // Limit the runtime lineup without erasing the saved multi-hero team.
+            var members = FightMembers.HeroSets.mDict.OrderBy(pair => pair.Key.Item2)
+                .Select(pair => pair.Value)
+                .Take(AdventureModeRules.GetHeroLimit(ID, EvolutionMode)).ToList();
+            FightMembers.HeroSets = new MultiDic<int, int, UnitInfo>();
+            for (var index = 0; index < members.Count; index++)
+                FightMembers.HeroSets.Set(0, index, members[index]);
+        }
         Team1ID = PlayerAccountInfo.Me.PlayFabId;
     }
     

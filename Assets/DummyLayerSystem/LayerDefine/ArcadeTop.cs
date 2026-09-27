@@ -167,31 +167,46 @@ public class ArcadeTop : UILayer
     async UniTask LoadStage(int stageNo, bool clickBoss, bool arcade, int version)
     {
         var one = arcade ? await LoadStageMethod(stageNo) : await LoadGangbangMethod(stageNo);
-        if (!IsActiveShowStages(version) || one == null) return;
-        // After the awaited data load, this block is synchronous. Only the active
-        // page may create cards; old requests never append into a newer page.
-        var stageBtn = Instantiate(arcade ? evolutionStagePrefab : normalStagePrefab, container.transform);
-        _stageButtons.Add(stageBtn);
-        stageBtn.Button.onClick.AddListener(() =>
+        try
         {
-            if (IsActiveShowStages(version)) directToStage(stageNo, false);
-        });
-        stageBtn.name = "Stage" + stageNo;
-        stageBtn.StageNo = stageNo;
-        stageBtn.CriticalGaugeMode = one.EvolutionMode ? CriticalGaugeMode.Normal : one.team2CGMode;
-        if (one.FightMembers == null) return;
-        if (one is GangbangInfo gb)
-        {
-            stageBtn.LoadUnitIconsGangbang(one.FightMembers.EnemySets.GetValues(),
-                id => gb.GetTeam2GroupSet(id).Count,
-                info => IconButtonFeature(info, version), clickBoss,
-                () => IsActiveShowStages(version));
+            if (!IsActiveShowStages(version) || one == null) return;
+            // Cards retain plain enemy snapshots. Opening a fight loads its own
+            // stage instance, independent of list previews and later page changes.
+            var stageBtn = Instantiate(arcade && one.EvolutionMode ? evolutionStagePrefab : normalStagePrefab,
+                container.transform);
+            _stageButtons.Add(stageBtn);
+            stageBtn.Button.onClick.AddListener(() =>
+            {
+                if (IsActiveShowStages(version)) directToStage(stageNo, false);
+            });
+            stageBtn.name = "Stage" + stageNo;
+            stageBtn.StageNo = stageNo;
+            if (arcade)
+                stageBtn.SetFightMode(one.ArcadeFightMode);
+            stageBtn.CriticalGaugeMode = one.EvolutionMode ? CriticalGaugeMode.Normal : one.team2CGMode;
+            if (one.FightMembers == null) return;
+            var enemies = one.FightMembers.EnemySets.GetValues()
+                .Where(unit => unit != null).Select(unit => unit.DeepCopy()).ToList();
+            if (one is GangbangInfo gb)
+            {
+                stageBtn.LoadUnitIconsGangbang(enemies,
+                    id => gb.GetTeam2GroupSet(id).Count,
+                    info => IconButtonFeature(info, version), clickBoss,
+                    () => IsActiveShowStages(version));
+            }
+            else
+            {
+                stageBtn.LoadUnitIcons(enemies,
+                    info => IconButtonFeature(info, version), clickBoss,
+                    () => IsActiveShowStages(version));
+            }
         }
-        else
+        finally
         {
-            stageBtn.LoadUnitIcons(one.FightMembers.EnemySets.GetValues(),
-                info => IconButtonFeature(info, version), clickBoss,
-                () => IsActiveShowStages(version));
+            // Only adventure loads return owned clones. Gangbang's legacy loader
+            // still returns a shared asset, and active battle data is never ours.
+            if (arcade && one != null && !ReferenceEquals(one, FightLoad.Fight))
+                Destroy(one);
         }
     }
 
