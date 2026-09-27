@@ -34,6 +34,7 @@ public class QuestInfoPage : MSceneProcess
             switch (FightLoad.Fight.EventType)
             {
                 case FightEventType.Arena:
+                    _layer.SetArenaFeature();
                     FightLoad.Fight.FightMembers.HeroSets = TeamSet.GetTargetSet("arena").LoadTeamDic();
                     void GoToTeamEditArena()
                     {

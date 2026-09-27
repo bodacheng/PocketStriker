@@ -151,7 +151,10 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2952617729705797871}
+  - {fileID: 5714480301587981525}
+  - {fileID: 4944484264897016154}
   m_Father: {fileID: 5714480302156832991}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -577,7 +580,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HIT
+  m_Text:
 --- !u!114 &1622989835171014448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,11 +645,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6957346161429448098}
-  m_Father: {fileID: 893825615776592712}
+  m_Father: {fileID: 5733796883697865556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -150, y: 963}
+  m_AnchoredPosition: {x: -150, y: 163}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &306264421713372559
@@ -1163,7 +1166,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text:
 --- !u!114 &3370894175157690109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2704,7 +2707,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HIT
+  m_Text:
 --- !u!114 &1085140497256891353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3357,11 +3360,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9093339817438267428}
+  m_Father: {fileID: 5733796883697865556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 20, y: -100}
+  m_AnchoredPosition: {x: 20, y: -20}
   m_SizeDelta: {x: 200, y: 780}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &5714480301587981527
@@ -4593,7 +4596,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text:
 --- !u!114 &3070486668166579678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4810,7 +4813,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4944484264897016154}
   - {fileID: 5714480301703364045}
   - {fileID: 5714480301642041439}
   - {fileID: 5714480301408580931}
@@ -5498,8 +5500,6 @@ RectTransform:
   - {fileID: 8550677958554704439}
   - {fileID: 7415628284172283047}
   - {fileID: 3209253034104344678}
-  - {fileID: 2952617729705797871}
-  - {fileID: 5714480301587981525}
   m_Father: {fileID: 5714480302156832991}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -6181,7 +6181,7 @@ PrefabInstance:
     - target: {fileID: 1092142249005713604, guid: e5268fa1ce93f49a1828ca81e1ef65e3,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -62
+      value: -40
       objectReference: {fileID: 0}
     - target: {fileID: 1092142249005713604, guid: e5268fa1ce93f49a1828ca81e1ef65e3,
         type: 3}
@@ -6227,7 +6227,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 9093339817438267428}
+    m_TransformParent: {fileID: 5733796883697865556}
     m_Modifications:
     - target: {fileID: 879005525042198332, guid: e5268fa1ce93f49a1828ca81e1ef65e3,
         type: 3}
@@ -6322,7 +6322,7 @@ PrefabInstance:
     - target: {fileID: 1092142249005713604, guid: e5268fa1ce93f49a1828ca81e1ef65e3,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -336
+      value: -36
       objectReference: {fileID: 0}
     - target: {fileID: 1092142249005713604, guid: e5268fa1ce93f49a1828ca81e1ef65e3,
         type: 3}

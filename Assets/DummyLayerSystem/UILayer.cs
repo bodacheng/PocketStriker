@@ -7,32 +7,82 @@ public class UILayer : MonoBehaviour
     [SerializeField] private RectTransform top;
     [SerializeField] private RectTransform middle;
     [SerializeField] private RectTransform bottom;
+
+    public RectTransform TopArea => top;
+    public RectTransform MiddleArea => middle;
+    public RectTransform BottomArea => bottom;
+    bool _resizingAreas;
+    bool _areasInitialized;
+    bool _middleLayoutCaptured;
+    Vector2 _middleVerticalAnchors;
+    Vector2 _middleVerticalOffsets;
+
+    protected virtual void OnRectTransformDimensionsChange()
+    {
+        if (_areasInitialized && !_resizingAreas) ResizeAreas();
+    }
     
     public void ResizeAreas()
     {
-        if (top == null ||middle == null || bottom == null)
+        if (_resizingAreas || top == null || middle == null || bottom == null ||
+            !(transform is RectTransform root))
         {
             return;
         }
 
-        var midAreaSizeHelper = middle.GetComponent<MidAreaSizeHelper>();
-        if (midAreaSizeHelper != null)
-            midAreaSizeHelper.Resize();
+        _resizingAreas = true;
+        try
+        {
+            float height = root.rect.height;
+            if (height <= 0) return;
+            if (!_middleLayoutCaptured)
+            {
+                _middleVerticalAnchors = new Vector2(middle.anchorMin.y, middle.anchorMax.y);
+                _middleVerticalOffsets = new Vector2(middle.offsetMin.y, middle.offsetMax.y);
+                _middleLayoutCaptured = true;
+            }
 
-        var offsetMinOffsetMax = CalculateOffsetForFullScreenAnchors(middle);
-        var parentRect = transform.parent as RectTransform;
-        var parentHeight = parentRect != null ? parentRect.rect.height : PosCal.CanvasHeight;
-        var useSafeAreaOffsets = parentRect == null || parentRect != PosCal.SafeAreaRect;
-        var topSafeAreaHeight = useSafeAreaOffsets ? PosCal.VTopSafeAreaHeight : 0;
-        var bottomSafeAreaHeight = useSafeAreaOffsets ? PosCal.VBottomSafeAreaHeight : 0;
-        
-        float topAreaHeight = parentHeight - offsetMinOffsetMax.Item1.y - middle.rect.height - topSafeAreaHeight;
-        top.anchoredPosition = new Vector2(0, -topSafeAreaHeight);
-        top.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Max(0, topAreaHeight));
+            // Safe-area children already have the inset in their parent geometry.
+            // Full-screen layers intersect that geometry once, without double insets.
+            float lower = 0, upper = height;
+            var safe = PosCal.SafeAreaRect;
+            if (safe != null && root != safe && !root.IsChildOf(safe))
+            {
+                var corners = new Vector3[4];
+                safe.GetWorldCorners(corners);
+                lower = Mathf.Clamp(root.InverseTransformPoint(corners[0]).y - root.rect.yMin, 0, height);
+                upper = Mathf.Clamp(root.InverseTransformPoint(corners[1]).y - root.rect.yMin, lower, height);
+            }
 
-        float downArenaHeight = parentHeight + offsetMinOffsetMax.Item2.y - middle.rect.height - bottomSafeAreaHeight;
-        bottom.anchoredPosition = new Vector2(0, bottomSafeAreaHeight);
-        bottom.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Max(0, downArenaHeight));
+            // Apply the authored margins to the available safe height. Merely
+            // clipping a full-screen middle would consume the header/footer's
+            // space on notched devices. Reuse the original values on every pass
+            // so resizing or changing the safe area cannot accumulate offsets.
+            float safeHeight = upper - lower;
+            SetVerticalEdges(middle,
+                lower + _middleVerticalAnchors.x * safeHeight + _middleVerticalOffsets.x,
+                lower + _middleVerticalAnchors.y * safeHeight + _middleVerticalOffsets.y, height);
+            middle.GetComponent<MidAreaSizeHelper>()?.Resize();
+            var offsets = CalculateOffsetForFullScreenAnchors(middle);
+            float middleBottom = Mathf.Clamp(offsets.Item1.y, lower, upper);
+            float middleTop = Mathf.Clamp(height + offsets.Item2.y, middleBottom, upper);
+            SetVerticalEdges(middle, middleBottom, middleTop, height);
+            SetVerticalEdges(top, middleTop, upper, height);
+            SetVerticalEdges(bottom, lower, middleBottom, height);
+            _areasInitialized = true;
+        }
+        finally { _resizingAreas = false; }
+    }
+
+    static void SetVerticalEdges(RectTransform rect, float lower, float upper, float parentHeight)
+    {
+        // Preserve horizontal anchors/offsets and the authored pivot.
+        var min = rect.offsetMin;
+        var max = rect.offsetMax;
+        min.y = lower - rect.anchorMin.y * parentHeight;
+        max.y = upper - rect.anchorMax.y * parentHeight;
+        rect.offsetMin = min;
+        rect.offsetMax = max;
     }
     
     (Vector2, Vector2) CalculateOffsetForFullScreenAnchors(RectTransform rectTransform)
@@ -43,9 +93,6 @@ public class UILayer : MonoBehaviour
         // 当前锚点相对于父元素的位置
         Vector2 anchorMin = rectTransform.anchorMin;
         Vector2 anchorMax = rectTransform.anchorMax;
-
-        // 当前RectTransform的尺寸
-        Vector2 sizeDelta = rectTransform.sizeDelta;
 
         // 计算当前锚点对应的偏移量
         Vector2 parentSize = parentRectTransform.rect.size;

@@ -72,6 +72,7 @@ public partial class FightPrepareLayer : UILayer
             fightModeSwitch.gameObject.SetActive(false);
         }
 
+        LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
         arcadeStageNoText.text = "Stage " + gangbangStageNo;
         toArcadeFrontBtn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");

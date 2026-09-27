@@ -40,13 +40,14 @@ public partial class NineForShow : MonoBehaviour
         };
     }
     
-    public static async UniTask RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget, 
-        IDictionary<int, ParticleSystem> slotEffects, float scale = 1, int targetLayer = 0)
+    public static async UniTask RefreshSlotEffects(int slotNum, int eX, RectTransform target, Camera camera,
+        IDictionary<int, ParticleSystem> slotEffects, int targetLayer = 0)
     {
         if (slotEffects.TryGetValue(slotNum, out var existingEffect) && existingEffect != null)
         {
             Destroy(existingEffect.gameObject);
         }
+        if (target == null || camera == null) return;
         
         string effectName;
         switch (eX)
@@ -68,18 +69,19 @@ public partial class NineForShow : MonoBehaviour
         }
         var cts = new CancellationTokenSource();
         ReturnLayer.AddUniTaskCancel(cts);
-        var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, releaseTarget.gameObject, cts);
+        var slotEffect = await AddressablesLogic.LoadTOnObject<ParticleSystem>(effectName, target.gameObject, cts);
         if (slotEffect == null)
             return;
-        var slotT = slotEffect.transform;
-        var oldScale = slotT.localScale;
-        slotT.localScale = new Vector3(oldScale.x * PosCal.TempRate() * scale, oldScale.y * PosCal.TempRate() * scale, oldScale.z);
+        if (target == null || camera == null)
+        {
+            Destroy(slotEffect.gameObject);
+            return;
+        }
+        slotEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        slotEffect.gameObject.AddComponent<SlotEffectLayout>().Initialize(target, camera);
         DicAdd<int, ParticleSystem>.Add(slotEffects, slotNum, slotEffect);
         slotEffect.gameObject.name = "slotEffect"+ slotNum;
         slotEffect.gameObject.layer = targetLayer;
-        slotT.position = pos;
-        if (releaseTarget != null)
-            slotT.SetParent(releaseTarget);
         slotEffect.Play(true);
     }
     
@@ -125,15 +127,7 @@ public partial class NineForShow : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="camera"></param>
-    /// <param name="scale">
-    /// 技能编辑画面的slot特效和格子尺寸的适配关系，前提无非是他们的prefab尺寸正好就是适配起来了，这个是前提，
-    /// 然后技能进化画面里面的那个格子在Canvas上的长度是技能编辑画面中的两倍，把2给撑上正好尺寸也适配了
-    /// </param>
-    public async UniTask RefreshEffects(Camera camera, float scale)
+    public async UniTask RefreshEffects(Camera camera)
     {
         await UniTask.DelayFrame(1);// wait for the UI Layer to be stable.Otherwise pos caculation will be wrong at the start
         var allStones = AllStones();
@@ -144,15 +138,12 @@ public partial class NineForShow : MonoBehaviour
             if (item != null)
             {
                 BOButton parentBtn = item.GetComponentInParent<BOButton>();
-                var worldPos = PosCal.GetWorldPos(camera,
-                    parentBtn.transform.GetComponent<RectTransform>(), 5f);
                 var task = RefreshSlotEffects(
                     index + 1,
                     item != null ? item._SkillConfig.SP_LEVEL : -1,
-                    worldPos,
-                    parentBtn.transform,
+                    parentBtn.GetComponent<RectTransform>(),
+                    camera,
                     _slotEffects,
-                    scale,
                     5
                 );
                 tasks.Add(task);

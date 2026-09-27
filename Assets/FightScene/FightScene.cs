@@ -83,6 +83,7 @@ namespace FightScene
             PosCal.Canvas = this.canvas;
             PosCal.SafeAreaRect = targetSafeArea;
             PosCal.TestIni();
+            safeAreaRect = PosCal.SafeAreaRect;
         }
 
         private void EnsureAIServiceManager()

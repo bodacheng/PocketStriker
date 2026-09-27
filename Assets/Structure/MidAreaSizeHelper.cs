@@ -8,25 +8,18 @@ public class MidAreaSizeHelper : MonoBehaviour
     
     public void Resize()
     {
-        if (!keepTopPos)
-        {
-            SetHeightKeepBottomFixed(height);
-        }
-        else
-        {
-            SetHeightKeepTopFixed(height);
-        }
-    }
-    
-    // 设置高度，保持底部位置不变
-    void SetHeightKeepTopFixed(float newHeight)
-    {
-        rectTransform.offsetMin = new Vector2(rectTransform.offsetMin.x, PosCal.CanvasHeight - (-rectTransform.offsetMax.y) - newHeight);
-    }
+        if (rectTransform == null) rectTransform = transform as RectTransform;
+        if (rectTransform == null || !(rectTransform.parent is RectTransform parent)) return;
 
-    // 设置高度，保持顶部位置不变
-    void SetHeightKeepBottomFixed(float newHeight)
-    {
-        rectTransform.offsetMax = new Vector2(rectTransform.offsetMax.x, -(PosCal.CanvasHeight - rectTransform.offsetMin.y - newHeight));
+        // The parent is normally the safe-area layer, not the full-screen canvas.
+        // Keep the chosen edge fixed even when the rect does not use stretch anchors.
+        float oldHeight = rectTransform.rect.height;
+        float newHeight = Mathf.Clamp(height, 0, parent.rect.height);
+        var position = rectTransform.anchoredPosition;
+        position.y += keepTopPos
+            ? (oldHeight - newHeight) * (1 - rectTransform.pivot.y)
+            : (newHeight - oldHeight) * rectTransform.pivot.y;
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, newHeight);
+        rectTransform.anchoredPosition = position;
     }
 }

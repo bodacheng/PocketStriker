@@ -110,6 +110,24 @@ namespace FightScene
                             {
                                 mePos = new Vector3((mePos.x + Screen.width) / 2 , mePos.y, mePos.z);
                             }
+                            // Floating combat feedback belongs to the play area, away
+                            // from the header and the bottom touch controls.
+                            var layer = _targetCanvasT.GetComponent<FightingStepLayer>();
+                            var area = layer != null ? layer.MiddleArea : null;
+                            if (area != null)
+                            {
+                                var corners = new Vector3[4];
+                                area.GetWorldCorners(corners);
+                                var textRect = rotationModeHitCombo.rectTransform;
+                                float halfWidth = textRect.rect.width * textRect.lossyScale.x * 0.5f;
+                                float halfHeight = textRect.rect.height * textRect.lossyScale.y * 0.5f;
+                                float left = corners[0].x + halfWidth;
+                                float right = Mathf.Max(left, corners[2].x - halfWidth);
+                                float bottom = corners[0].y + halfHeight;
+                                float top = Mathf.Max(bottom, corners[2].y - halfHeight);
+                                mePos.x = Mathf.Clamp(mePos.x, left, right);
+                                mePos.y = Mathf.Clamp(mePos.y, bottom, top);
+                            }
                             return mePos;
                         }
                         

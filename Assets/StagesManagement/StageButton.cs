@@ -17,6 +17,13 @@ public partial class StageButton : MonoBehaviour
     [SerializeField] GameObject enemyInfiniteExModeFlg;
 
     CanvasGroup _modeFlag;
+    bool _layingOutAdventureCard;
+
+    const float CardPadding = 18;
+    const float ModeLabelWidth = 220;
+    const float ModeLabelHeight = 56;
+    const float CardContentBottom = 88;
+    const float CardMinimumHeight = 200;
     
     public Button Button => button;
     public RewardUI RewardUI => rewardUI;
@@ -53,33 +60,120 @@ public partial class StageButton : MonoBehaviour
         var prefab = Resources.Load<GameObject>("DummyLayerSystem/Common/" + prefabName);
         if (prefab == null) return;
 
-        var flag = Instantiate(prefab, id.transform);
+        // Keep the mode in its own footer. Parenting it to the stage number
+        // inherited a tiny text box and let the frame run into the rewards.
+        var flag = Instantiate(prefab, transform);
         var rect = flag.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0);
-        rect.anchorMax = new Vector2(0.5f, 0);
-        rect.pivot = new Vector2(0.5f, 0);
-        rect.anchoredPosition = Vector2.zero;
-        rect.sizeDelta = new Vector2(140, 44);
+        PlaceAtBottom(rect, new Vector2(CardPadding, CardPadding),
+            new Vector2(ModeLabelWidth, ModeLabelHeight));
         rect.localScale = Vector3.one;
+
+        var background = flag.GetComponent<Image>();
+        var accent = background.color;
+        background.sprite = null;
+        background.type = Image.Type.Simple;
+        background.color = new Color(0.025f, 0.05f, 0.085f, 1);
+        var border = flag.AddComponent<Outline>();
+        border.effectColor = accent;
+        border.effectDistance = new Vector2(1.5f, -1.5f);
         foreach (var graphic in flag.GetComponentsInChildren<Graphic>(true))
             graphic.raycastTarget = false;
         foreach (var text in flag.GetComponentsInChildren<Text>(true))
         {
-            text.resizeTextForBestFit = true;
-            text.resizeTextMinSize = 10;
-            text.resizeTextMaxSize = 24;
+            text.rectTransform.anchorMin = Vector2.zero;
+            text.rectTransform.anchorMax = Vector2.one;
+            text.rectTransform.offsetMin = new Vector2(12, 4);
+            text.rectTransform.offsetMax = new Vector2(-12, -4);
+            text.color = Color.white;
+            text.fontStyle = FontStyle.Bold;
+            text.fontSize = 32;
+            text.resizeTextForBestFit = false;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
         }
         _modeFlag = flag.AddComponent<CanvasGroup>();
         _modeFlag.blocksRaycasts = false;
+
+        var layout = GetComponent<LayoutElement>();
+        if (layout == null) layout = gameObject.AddComponent<LayoutElement>();
+        layout.minHeight = CardMinimumHeight;
+        layout.preferredHeight = CardMinimumHeight;
+        LayoutAdventureCard();
+    }
+
+    void OnRectTransformDimensionsChange()
+    {
+        LayoutAdventureCard();
+    }
+
+    static void PlaceAtBottom(RectTransform rect, Vector2 position, Vector2 size)
+    {
+        rect.anchorMin = rect.anchorMax = Vector2.zero;
+        rect.pivot = Vector2.zero;
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+    }
+
+    void LayoutAdventureCard()
+    {
+        if (_modeFlag == null || _layingOutAdventureCard) return;
+        _layingOutAdventureCard = true;
+        try
+        {
+            PlaceAtBottom(id.rectTransform, new Vector2(CardPadding, CardContentBottom), new Vector2(100, 100));
+            id.fontSize = 36;
+            id.resizeTextForBestFit = false;
+            PlaceAtBottom((RectTransform)rewardUI.transform, new Vector2(130, CardContentBottom), new Vector2(120, 100));
+
+            // The metadata column and enemy portraits have separate bounds.
+            // Refit the portraits after the parent layout chooses the card width.
+            iconsT.anchorMin = Vector2.zero;
+            iconsT.anchorMax = Vector2.one;
+            iconsT.offsetMin = new Vector2(CardPadding * 2 + ModeLabelWidth, CardContentBottom);
+            iconsT.offsetMax = new Vector2(-CardPadding, -12);
+            var iconLayout = iconsT.GetComponent<HorizontalLayoutGroup>();
+            if (iconLayout != null) iconLayout.spacing = 16;
+            var visibleIcons = iconsT.Cast<Transform>().Where(child => child.gameObject.activeSelf).ToList();
+            if (visibleIcons.Count > 0)
+            {
+                var availableWidth = iconsT.rect.width - 16 * (visibleIcons.Count - 1);
+                var iconSize = Mathf.Max(1, Mathf.Min(100, iconsT.rect.height, availableWidth / visibleIcons.Count));
+                foreach (var icon in visibleIcons)
+                    ((RectTransform)icon).sizeDelta = new Vector2(iconSize, iconSize);
+            }
+
+            LayoutCriticalGaugeFlag(enemyDoubleExModeFlg);
+            LayoutCriticalGaugeFlag(enemyInfiniteExModeFlg);
+        }
+        finally
+        {
+            _layingOutAdventureCard = false;
+        }
+    }
+
+    static void LayoutCriticalGaugeFlag(GameObject flag)
+    {
+        if (flag == null) return;
+        var rect = (RectTransform)flag.transform;
+        var parent = (RectTransform)rect.parent;
+        parent.anchorMin = parent.anchorMax = new Vector2(1, 0);
+        parent.pivot = new Vector2(1, 0);
+        parent.anchoredPosition = new Vector2(-CardPadding, CardPadding);
+        parent.sizeDelta = new Vector2(120, ModeLabelHeight);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
     
     public void ChangeColorOfIcons(bool on)
     {
         var buttonImage = GetComponent<Image>();
         buttonImage.color = new Color(buttonImage.color.r, buttonImage.color.g, buttonImage.color.b, on ? 1 : 0.3f);
-        id.color = new Color(id.color.r, id.color.g, id.color.b, on ? 1 : 0.3f);
+        id.color = new Color(id.color.r, id.color.g, id.color.b, on ? 1 : 0.65f);
+        // Locked stages still need an opaque, legible battle-type label.
         if (_modeFlag != null)
-            _modeFlag.alpha = on ? 1 : 0.3f;
+            _modeFlag.alpha = 1;
         button.interactable = on;
     }
     
@@ -103,6 +197,7 @@ public partial class StageButton : MonoBehaviour
                 heroIcon.iconButton.onClick.Invoke();
             }
         }
+        LayoutAdventureCard();
     } 
     
     List<HeroIcon> UnitInfosShow(List<UnitInfo> heroSets, Action<string> iconFeature, RectTransform showT)

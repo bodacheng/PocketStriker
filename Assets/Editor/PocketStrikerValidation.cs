@@ -160,9 +160,14 @@ public static class PocketStrikerValidation
     }
 
     // Run without -quit; completion and the 180-second deadline exit batch mode.
+    [MenuItem("PocketStriker/Validation/Startup Smoke")]
     public static void SmokeStartup()
     {
-        RequireSavedScenes();
+        var startupScene = EditorBuildSettings.scenes.First(s => s.enabled).path;
+        var useOpenStartup = SceneManager.sceneCount == 1 && SceneManager.GetActiveScene().path == startupScene;
+        // Entering Play preserves the existing edit-mode scene, including unsaved
+        // work. Only require saved scenes when the test actually has to switch.
+        if (!useOpenStartup) RequireSavedScenes();
         RequireEnvironment();
         ConfigurePortraitGameView();
         var settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -184,7 +189,7 @@ public static class PocketStrikerValidation
         EditorApplication.update += PollSmoke;
         try
         {
-            EditorSceneManager.OpenScene(EditorBuildSettings.scenes.First(s => s.enabled).path);
+            if (!useOpenStartup) EditorSceneManager.OpenScene(startupScene);
             EditorApplication.isPlaying = true;
         }
         catch (Exception exception)
@@ -290,9 +295,19 @@ public static class PocketStrikerValidation
             }
             if (fight && title)
             {
-                if (Screen.width >= Screen.height)
+                if (PosCal.Canvas == null || PosCal.SafeAreaRect == null ||
+                    PosCal.SafeAreaRect == PosCal.Canvas.transform ||
+                    PosCal.SafeAreaRect.parent != PosCal.Canvas.transform)
                 {
-                    FinishSmoke(new[] { $"Startup viewport must remain portrait; found {Screen.width}x{Screen.height}." });
+                    FinishSmoke(new[] { "Battle UI must use a distinct safe-area child of the canvas." });
+                    return;
+                }
+                // EditorApplication.update can expose the editor panel size via
+                // Screen; the live overlay canvas tracks the rendered viewport.
+                var viewport = PosCal.Canvas.pixelRect;
+                if (viewport.width <= 0 || viewport.width >= viewport.height)
+                {
+                    FinishSmoke(new[] { $"Startup viewport must remain portrait; found {viewport.width}x{viewport.height}." });
                     return;
                 }
                 var ready = SessionState.GetString(ReadyKey, "");
@@ -580,8 +595,10 @@ public static class PocketStrikerValidation
             activeBuildTarget = EditorUserBuildSettings.activeBuildTarget.ToString(),
             defaultOrientation = PlayerSettings.defaultInterfaceOrientation.ToString(),
             runtimeOrientation = Screen.orientation.ToString(),
-            screenWidth = Screen.width,
-            screenHeight = Screen.height,
+            screenWidth = EditorApplication.isPlaying && PosCal.Canvas != null
+                ? Mathf.RoundToInt(PosCal.Canvas.pixelRect.width) : Screen.width,
+            screenHeight = EditorApplication.isPlaying && PosCal.Canvas != null
+                ? Mathf.RoundToInt(PosCal.Canvas.pixelRect.height) : Screen.height,
             defaultScreenWidth = PlayerSettings.defaultScreenWidth,
             defaultScreenHeight = PlayerSettings.defaultScreenHeight,
             portraitOnly = PortraitOnly,

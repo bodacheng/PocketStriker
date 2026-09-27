@@ -25,7 +25,6 @@ namespace DummyLayerSystem
             {"TitleScreenLayer", "DummyLayerSystem/TitleScreenLayer"},
             {"TitleBgLayer", "DummyLayerSystem/TitleBgLayer"},
             {"ImageBg", "DummyLayerSystem/ImageBg"},
-            {"FightResultAnimLayer", "DummyLayerSystem/FightResultAnimLayer"},
             {"CountDownLayer", "DummyLayerSystem/CountDownLayer"},
             {"FightingStepLayer", "DummyLayerSystem/FightingStepLayer"},
             {"InBattleEvolution", "DummyLayerSystem/InBattleEvolution"},
@@ -41,7 +40,6 @@ namespace DummyLayerSystem
             {"FightPrepareLayer_gb", "DummyLayerSystem/FightPrepareLayer/FightPrepareLayer_gb"},
             {"TeamEditLayer", "DummyLayerSystem/TeamEditLayer"},
             {"TeamSingleSelectLayer", "DummyLayerSystem/TeamSingleSelectLayer"},
-            {"SkillShowLayer", "DummyLayerSystem/SkillShowLayer"},
             {"GotchaLayer", "DummyLayerSystem/GotchaLayer"},
             {"GotchaResultLayer", "DummyLayerSystem/GotchaResultLayer"},
             {"DropTableInfoLayer", "DummyLayerSystem/DropTableInfoLayer"},
@@ -49,12 +47,8 @@ namespace DummyLayerSystem
             {"SkillEditLayer", "DummyLayerSystem/SkillEditLayer"},
             {"SkillEditTipLayer", "DummyLayerSystem/SkillEditTipLayer"},
             {"UnitOptionLayer", "DummyLayerSystem/UnitOptionLayer"},
-            {"StoneMergeLayer", "DummyLayerSystem/StoneMergeLayer"},
             {"ShopTopLayer", "DummyLayerSystem/ShopTopLayer"},
-            {"BoxExpandHelperLayer", "DummyLayerSystem/BoxExpandHelperLayer"},
-            {"BoxOverLoadFixLayer", "DummyLayerSystem/BoxOverLoadFixLayer"},
             {"ReturnLayer", "DummyLayerSystem/ReturnLayer"},
-            {"LoginLayer", "DummyLayerSystem/LoginLayer"},
             {"FightScenePauseSupport", "DummyLayerSystem/FightScenePauseSupport"},
             {"BuyNoAds", "DummyLayerSystem/BuyNoAds"},
             {"StoneUpdatesConfirm", "DummyLayerSystem/StoneUpdatesConfirm"}
@@ -180,6 +174,7 @@ namespace DummyLayerSystem
                     existed.transform.SetParent(targetHanger.transform, false);
                     ResizeLayerRect(existed);
                 }
+                existed.ResizeAreas();
                 ApplySiblingOrder(existed.transform, insertToTop, loadToFullScreen);
                 EnsureMosakAtBottom(targetHanger);
                 return existed;

@@ -83,6 +83,10 @@ public partial class FightPrepareLayer : UILayer
     public void SetFightMode(int fightMode)
     {
         fightModeSwitch.Setup(fightMode, PlayerPrefs.GetInt("preferAdventureMode",  PlayerPrefs.GetInt("preferAdventureMode", 2)));
+        // Gangbang already exposes its unit-count controls here. Setup enables
+        // the shared button again, so keep this fixed-mode selector hidden while
+        // retaining the configured TeamMode for GetSetFightMode().
+        if (_gangbangStage != null) fightModeSwitch.gameObject.SetActive(false);
     }
 
     public TeamMode GetSetFightMode()
@@ -109,6 +113,8 @@ public partial class FightPrepareLayer : UILayer
 
     public void SetArcadeFeature(Action toArcadeFront, string arcadeStageNo, int fightMode)
     {
+        _gangbangStage = null;
+        LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
         var modeKey = fightMode == AdventureModeRules.EvolutionMode ? "TeamModeE"
             : fightMode == AdventureModeRules.MultiMode ? "TeamModeM" : "TeamModeR";
@@ -133,6 +139,8 @@ public partial class FightPrepareLayer : UILayer
 
     public void SetEventFeature(string arcadeStageNo)
     {
+        _gangbangStage = null;
+        LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
         var hardTxt = string.Empty;
         if (arcadeStageNo.Contains("easy"))
@@ -160,6 +168,71 @@ public partial class FightPrepareLayer : UILayer
                 connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
             }
         );
+    }
+
+    public void SetArenaFeature()
+    {
+        _gangbangStage = null;
+        arcadeStageNoText.gameObject.SetActive(false);
+        rewardUI.gameObject.SetActive(false);
+        toArcadeFrontBtn.gameObject.SetActive(false);
+    }
+
+    void LayoutStageHeader()
+    {
+        // Rewards used to be a child of the title, at a fixed x=210. A title
+        // containing both the stage number and battle type then drew underneath
+        // the reward icons and claimed marks. Reserve independent sibling columns.
+        var headerParent = MiddleArea != null ? MiddleArea : (RectTransform)transform;
+        float topInset = MiddleArea != null ? 20 : 70;
+        var title = arcadeStageNoText.rectTransform;
+        title.SetParent(headerParent, false);
+        title.anchorMin = new Vector2(0, 1);
+        title.anchorMax = Vector2.one;
+        title.pivot = new Vector2(0.5f, 1);
+        title.offsetMin = new Vector2(260, -topInset - 100);
+        title.offsetMax = new Vector2(-300, -topInset);
+        arcadeStageNoText.fontSize = 36;
+        arcadeStageNoText.resizeTextForBestFit = false;
+        arcadeStageNoText.alignment = TextAnchor.MiddleLeft;
+        arcadeStageNoText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        arcadeStageNoText.verticalOverflow = VerticalWrapMode.Truncate;
+
+        PlaceHeaderColumn((RectTransform)rewardUI.transform, headerParent, true, topInset, 220);
+        PlaceHeaderColumn((RectTransform)toArcadeFrontBtn.transform, headerParent, false, topInset, 200);
+        foreach (RectTransform row in rewardUI.transform)
+        {
+            row.sizeDelta = new Vector2(220, 50);
+            foreach (var count in row.GetComponentsInChildren<Text>(true))
+            {
+                PlaceRewardItem(count.rectTransform, 60, 120, 50);
+                count.fontSize = 28;
+                count.resizeTextForBestFit = false;
+                count.alignment = TextAnchor.MiddleLeft;
+            }
+            var icon = row.Find("icon") as RectTransform;
+            if (icon != null) PlaceRewardItem(icon, 0, 50, 50);
+            var claimed = row.Find("GotMark") as RectTransform;
+            if (claimed != null) PlaceRewardItem(claimed, 190, 24, 40);
+        }
+    }
+
+    static void PlaceRewardItem(RectTransform target, float left, float width, float height)
+    {
+        target.anchorMin = target.anchorMax = new Vector2(0, 0.5f);
+        target.pivot = new Vector2(0, 0.5f);
+        target.anchoredPosition = new Vector2(left, 0);
+        target.sizeDelta = new Vector2(width, height);
+    }
+
+    static void PlaceHeaderColumn(RectTransform target, RectTransform parent, bool right, float topInset, float width)
+    {
+        target.SetParent(parent, false);
+        target.anchorMin = target.anchorMax = new Vector2(right ? 1 : 0, 1);
+        target.pivot = new Vector2(right ? 1 : 0, 1);
+        target.anchoredPosition = new Vector2(right ? -40 : 40, -topInset);
+        target.sizeDelta = new Vector2(width, 100);
+        target.localScale = Vector3.one;
     }
 
     public async UniTask StageMembersInfoShow(FightInfo stage, CancellationToken token)

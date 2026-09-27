@@ -24,14 +24,12 @@ public class InBattleEvolution : UILayer
         var gridLayoutGroup = nineForShow.transform.GetComponent<GridLayoutGroup>();
         gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize); 
         
-        await UniTask.WhenAll(
-            nineForShow.ShowStones(
-                set.a1, set.a2, set.a3,
-                set.b1, set.b2, set.b3,
-                set.c1, set.c2, set.c3
-            ),
-            ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution, cellSize)
+        await nineForShow.ShowStones(
+            set.a1, set.a2, set.a3,
+            set.b1, set.b2, set.b3,
+            set.c1, set.c2, set.c3
         );
+        await ShowSkillsToChoose(focusUnit, onFinishedSkillEvolution, cellSize);
         
         nineForShow.AddOnClickToSlots(
             (BOButton btn) =>
@@ -60,7 +58,7 @@ public class InBattleEvolution : UILayer
     async UniTask ShowSkillsToChoose(Data_Center focusUnit, Action onFinishedSkillEvolution, float stoneSize)
     {
         nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
-        await nineForShow.RefreshEffects(FightScene.FightScene.target.fxCamera, stoneSize / 150f);
+        await nineForShow.RefreshEffects(FightScene.FightScene.target.fxCamera);
         var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
         for (var i = 0; i < skillOptions.Length; i++)
         {

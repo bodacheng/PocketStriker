@@ -11,33 +11,17 @@ public static class PosCal
 
     public static void TestIni()
     {
-        // 画面サイズに合わせてUIも拡大する
-        CanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        // キャンバスのサイズが基準の解像度よりも大きくなるようにする
-        CanvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
-
-        // 基準の解像度がセーフエリア内に収まるようにCanvasScalerの解像度を調整
-        Vector2 resolution = CanvasScaler.referenceResolution;
-        resolution.x = (int)(resolution.x * (Screen.width / (float)Screen.safeArea.width));
-        resolution.y = (int)(resolution.y * (Screen.height / (float)Screen.safeArea.height));
-        CanvasScaler.referenceResolution = resolution;
-
-        if (SafeAreaRect != null)
+        if (Canvas == null) return;
+        // Older scenes stored the canvas itself as their hanger. A root canvas
+        // cannot be inset with anchors; give controls a real safe-area parent.
+        if (SafeAreaRect == null || SafeAreaRect == Canvas.transform)
         {
-            Rect safeArea = Screen.safeArea;
-            Vector2 anchorMin = new Vector2(
-                safeArea.xMin / Screen.width,
-                safeArea.yMin / Screen.height
-            );
-            Vector2 anchorMax = new Vector2(
-                (safeArea.xMin + safeArea.width) / Screen.width,
-                (safeArea.yMin + safeArea.height) / Screen.height
-            );
-            SafeAreaRect.anchorMin = anchorMin;
-            SafeAreaRect.anchorMax = anchorMax;
-            SafeAreaRect.offsetMin = Vector2.zero;
-            SafeAreaRect.offsetMax = Vector2.zero;
+            SafeAreaRect = new GameObject("SafeArea", typeof(RectTransform)).GetComponent<RectTransform>();
+            SafeAreaRect.SetParent(Canvas.transform, false);
         }
+        var layout = Canvas.GetComponent<PortraitSafeAreaLayout>();
+        if (layout == null) layout = Canvas.gameObject.AddComponent<PortraitSafeAreaLayout>();
+        layout.Initialize(Canvas, SafeAreaRect);
     }
     
     /// <summary>

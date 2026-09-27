@@ -69,6 +69,123 @@ public class SettingLayer : UILayer
     [SerializeField] BOButton resetNickNameBtn;
     #endregion
 
+    bool _contentCenteringPending;
+    Rect _lastAvailableRect;
+
+    void OnEnable()
+    {
+        _contentCenteringPending = true;
+    }
+
+    protected override void OnRectTransformDimensionsChange()
+    {
+        base.OnRectTransformDimensionsChange();
+        _contentCenteringPending = true;
+    }
+
+    void LateUpdate()
+    {
+        // Safe-area changes can resize only the middle area, leaving the
+        // SettingLayer root dimensions unchanged.
+        if (MiddleArea != null && MiddleArea.rect != _lastAvailableRect)
+            _contentCenteringPending = true;
+        if (!_contentCenteringPending) return;
+        _contentCenteringPending = false;
+        CenterActivePanelContent();
+    }
+
+    void RefreshContentCentering()
+    {
+        // Apply immediately when changing tabs, then once after this frame's
+        // layout pass (for translated text, sliders and newly enabled panels).
+        _contentCenteringPending = true;
+        CenterActivePanelContent();
+    }
+
+    void CenterActivePanelContent()
+    {
+        if (MiddleArea == null) return;
+        _lastAvailableRect = MiddleArea.rect;
+        CenterVisibleContent(volumePanel, MiddleArea);
+        CenterVisibleContent(accountPanel, MiddleArea);
+        CenterVisibleContent(devicePanel, MiddleArea);
+        CenterVisibleContent(supportPanel, MiddleArea);
+        CenterVisibleContent(languagePanel, MiddleArea);
+        CenterVisibleContent(nickNamePanel, MiddleArea);
+    }
+
+    /// <summary>
+    /// Centers a tab's visible labels and controls in the available window,
+    /// preserving all spacing within the tab. The oversized authored panel and
+    /// decorative backgrounds do not contribute to the content bounds.
+    /// </summary>
+    public static bool CenterVisibleContent(RectTransform panel, RectTransform availableArea)
+    {
+        if (panel == null || availableArea == null || !panel.gameObject.activeInHierarchy)
+            return false;
+
+        var groups = panel.GetComponentsInChildren<LayoutGroup>();
+        for (int i = groups.Length - 1; i >= 0; i--)
+        {
+            if (groups[i].isActiveAndEnabled)
+                LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)groups[i].transform);
+        }
+        LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
+
+        float lower = float.PositiveInfinity;
+        float upper = float.NegativeInfinity;
+        var corners = new Vector3[4];
+
+        void Include(RectTransform rect)
+        {
+            if (!IsVisibleContent(rect, panel)) return;
+            rect.GetWorldCorners(corners);
+            foreach (var corner in corners)
+            {
+                float y = availableArea.InverseTransformPoint(corner).y;
+                lower = Mathf.Min(lower, y);
+                upper = Mathf.Max(upper, y);
+            }
+        }
+
+        foreach (var label in panel.GetComponentsInChildren<Text>())
+        {
+            if (label.isActiveAndEnabled && label.color.a > 0 &&
+                !string.IsNullOrWhiteSpace(label.text))
+                Include(label.rectTransform);
+        }
+        foreach (var control in panel.GetComponentsInChildren<Selectable>())
+        {
+            if (control.isActiveAndEnabled)
+                Include((RectTransform)control.transform);
+        }
+
+        if (float.IsInfinity(lower)) return false;
+        float offset = availableArea.rect.center.y - (lower + upper) * 0.5f;
+        if (Mathf.Abs(offset) > 0.01f)
+            panel.position += availableArea.TransformVector(new Vector3(0, offset, 0));
+        return true;
+    }
+
+    static bool IsVisibleContent(RectTransform rect, RectTransform panel)
+    {
+        if (!rect.gameObject.activeInHierarchy) return false;
+        for (Transform parent = rect; parent != null; parent = parent.parent)
+        {
+            bool ignoreParentGroups = false;
+            foreach (var group in parent.GetComponents<CanvasGroup>())
+            {
+                if (!group.enabled) continue;
+                if (group.alpha <= 0) return false;
+                ignoreParentGroups |= group.ignoreParentGroups;
+            }
+            // A fade on the window or its ancestors must not delay laying out
+            // the selected tab. Only visibility within the tab affects bounds.
+            if (ignoreParentGroups || parent == panel) break;
+        }
+        return true;
+    }
+
     public void AccountPhase_EmailToBeSet()
     {
         emailSettingT.gameObject.SetActive(true);
@@ -91,6 +208,7 @@ public class SettingLayer : UILayer
                 ); // 这个方法没有server版，只能客户端主动执行
             }
         });
+        RefreshContentCentering();
     }
     
     public void AccountPhase_EmailSet()
@@ -118,12 +236,14 @@ public class SettingLayer : UILayer
                 );
             }
         );
+        RefreshContentCentering();
     }
 
     void SetSelectedFrame(RectTransform target)
     {
         selectedFrame.position = target.position;
         selectedFrame.gameObject.SetActive(true);
+        RefreshContentCentering();
     }
     
     public void Initialise()
@@ -192,6 +312,7 @@ public class SettingLayer : UILayer
         {
             AppSetting.Value.Language = code;
             LanguageConverterManger.ChangeLanguage();
+            RefreshContentCentering();
             await SkillNameTable.LoadSkillNamesFromConfig();
             SkillConfigTable.RefreshSkillConfigDicForReference();
             LanguageIndicator();
@@ -281,6 +402,7 @@ public class SettingLayer : UILayer
         linkInstruction.text = PlayerAccountInfo.Me.currentLinkedDeviceId == PlayFabReadClient.CustomId ? 
             Translate.Get("DeviceBindInstruction") : 
             Translate.Get("DeviceNotBindInstruction");
+        RefreshContentCentering();
     }
     
     public static void Close()

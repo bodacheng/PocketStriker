@@ -44,6 +44,7 @@ public class StartUpPresentation : MonoBehaviour
         PosCal.Canvas = this.canvas;
         PosCal.SafeAreaRect = safeAreaRoot;
         PosCal.TestIni();
+        safeAreaRoot = PosCal.SafeAreaRect;
         UILayerLoader.SetHanger(safeAreaRoot, canvas.transform);
         PocketStrikerAppSettings.Load();
         AppSetting.BGMSource = audioSource;

@@ -74,6 +74,7 @@ namespace mainMenu
             PosCal.Canvas = this.Canvas;
             PosCal.SafeAreaRect = GetSafeAreaRect();
             PosCal.TestIni();
+            safeAreaRect = PosCal.SafeAreaRect;
             SetBgRenderTexture();
         }
         
