@@ -97,14 +97,18 @@ both parent choices for the six layers used through the full-screen loader route
 
 ## Stage-card readability
 
-Run **PocketStriker → Validation → Check Stage Cards** for 144 combinations of
-normal/evolution cards, narrow/wide cards, three/four-digit stage IDs, lock states,
-three battle modes, and English/Japanese/Chinese labels. The mode badge has its
-own opaque dark footer, a mode-colored outline and fixed bold white text. It stays
-readable on locked cards. Rewards and up to four portraits have separate bounds.
+Run **PocketStriker → Validation → Check Stage Cards** for 432 combinations of
+normal/evolution cards, 600/750 widths, 200/240 heights, one/four portraits,
+three battle modes, three energy states and English/Japanese/Chinese labels.
+Stage number and mode sit together at the left; the mode uses colored text with
+no filled panel. Enemy portraits are centered vertically against the whole card.
+Rewards form a compact group at the lower left, while the optional energy label
+sits immediately beside the battle mode. The validator also checks
+locked/unlocked transitions, large reward amounts, clipping and click targets.
 
-`Logs/UILayout/stage-cards.json` records the result; the three `stage-cards-*.png`
-files use real card prefabs and localized labels, with numbered portrait fixtures.
+`Logs/UILayout/stage-cards.json` records the result. Four `stage-cards-*.png`
+renders use real card and avatar prefabs with local portrait art; the fourth
+sheet exercises the narrow, taller card.
 
 Run **PocketStriker → Validation → Startup Smoke** for two 20-second screensaver
 battles, including reload, safe-area initialization and advancing frames. The
@@ -136,7 +140,7 @@ fixture.
   passed with zero errors or warnings. This includes full-screen parenting,
   Settings visibility variants and the skill combo explanation.
 - Both legacy safe-area initialization paths passed repeated-initialization checks.
-- 144 stage-card cases passed. Both combo explanations fit in all three supported
+- 432 stage-card cases passed, with four rendered previews. Both combo explanations fit in all three supported
   languages at all four test sizes (24 text-height checks).
 - Settings content centering passed all 32 tab/state/size cases with zero center
   offset. The 8 populated arena reward cases passed, including unchanged title
