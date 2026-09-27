@@ -2,6 +2,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.Build;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEngine;
 #endif
@@ -48,19 +49,32 @@ namespace Cocone.ProjectP3
                 }
             }
 
+            SetProfile(assetProfile);
+            VersionSyncUtility.AssertVersionSettingsSynchronized(assetVersion);
+            CleanBuild(); // TODO: TargetPlatform設定は要らない？
+        }
+
+        public static void SetProfile(string assetProfile)
+        {
             var settings = GetSettings();
-            Debug.Log(assetProfile);
+            if (settings == null)
+            {
+                throw new BuildFailedException("AddressableAssetSettings was not found.");
+            }
+
             var profileId = settings.profileSettings.GetProfileId(assetProfile);
-            Debug.Log(profileId);
+            if (string.IsNullOrEmpty(profileId))
+            {
+                throw new BuildFailedException($"Addressables profile does not exist: {assetProfile}");
+            }
+
+            Debug.Log($"Selected Addressables profile: {assetProfile} ({profileId})");
             settings.activeProfileId = profileId;
             
             // save addressable setting
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            
-            VersionSyncUtility.AssertVersionSettingsSynchronized(assetVersion);
-            CleanBuild(); // TODO: TargetPlatform設定は要らない？
         }
 
         [MenuItem("P3/Build/Addressable(テスト用)/iOS/Alpha")]
@@ -141,7 +155,11 @@ namespace Cocone.ProjectP3
         {
             AddressableAssetSettings.CleanPlayerContent();
             BuildCache.PurgeCache(false);
-            AddressableAssetSettings.BuildPlayerContent();
+            AddressableAssetSettings.BuildPlayerContent(out var result);
+            if (result == null || !string.IsNullOrEmpty(result.Error))
+            {
+                throw new BuildFailedException($"Addressables build failed: {result?.Error ?? "No build result was returned."}");
+            }
         }
 
 /*

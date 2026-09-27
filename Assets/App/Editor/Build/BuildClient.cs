@@ -32,6 +32,7 @@ namespace Cocone.ProjectP3
 		public string keyaliasPass;
 		public string buildKind;
 		public string assetKind;
+		public string assetProfile;
 		public string machineName;
 		public HashSet<AndroidArchitecture> androidArchitectures;
 
@@ -283,10 +284,7 @@ namespace Cocone.ProjectP3
 		
 		public static void Build()
 		{
-			var command = Environment.CommandLine;
-			var args = command.Split(' ');
-
-			Build(args);
+			Build(Environment.GetCommandLineArgs());
 		}
 		
 		public static void Build(string[] args)
@@ -364,6 +362,11 @@ namespace Cocone.ProjectP3
 
 					case "-machineName":
 						config.machineName = args[i + 1];
+						i++;
+						break;
+
+					case "-assetProfile":
+						config.assetProfile = args[i + 1];
 						i++;
 						break;
 				}
@@ -446,6 +449,11 @@ namespace Cocone.ProjectP3
 		
 		private static BuildReport Build(PlayerBuildConfig config)
 		{
+			if (config.assetProfile != null)
+			{
+				BuildAddressableAssets.SetProfile(config.assetProfile);
+			}
+
 			// Yamlの読み込みと設定
 			SetPlayerSettingsByBuildConfiguration(GetBuildKind(config.buildKind), config.buildTarget, config.TargetGroup);
 			
