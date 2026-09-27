@@ -45,7 +45,7 @@ public class StartUpPresentation : MonoBehaviour
         PosCal.SafeAreaRect = safeAreaRoot;
         PosCal.TestIni();
         UILayerLoader.SetHanger(safeAreaRoot, canvas.transform);
-        AppSetting.Load();
+        PocketStrikerAppSettings.Load();
         AppSetting.BGMSource = audioSource;
         AppSetting.BGMSource.volume = AppSetting.Value.BgmVolume;
         AppSetting.UiAudioSource = uiAudioSource;
@@ -54,6 +54,32 @@ public class StartUpPresentation : MonoBehaviour
     }
     
     async UniTask OnStart()
+    {
+        try
+        {
+            await PrepareStartup();
+        }
+        catch (Exception exception)
+        {
+            ShowStartupFailure(exception);
+        }
+    }
+
+    void ShowStartupFailure(Exception exception)
+    {
+        Debug.LogException(exception, this);
+        ProgressLayer.Close();
+        UILayerLoader.Remove<ImageBg>();
+        var message = AppSetting.Value.Language switch
+        {
+            SystemLanguage.Japanese => "リソースを読み込めませんでした。接続を確認して、もう一度お試しください。",
+            SystemLanguage.Chinese => "资源加载失败，请检查网络后重试。",
+            _ => "Resources could not be loaded. Check your connection and try again."
+        };
+        PopupLayer.ArrangeWarnWindow(() => SceneManager.LoadScene(0), message);
+    }
+
+    async UniTask PrepareStartup()
     {
         string text = String.Empty;
         switch (AppSetting.Value.Language)
@@ -122,21 +148,15 @@ public class StartUpPresentation : MonoBehaviour
         CommonSetting commonSetting = await AddressablesLogic.GetCommonSetting();
         commonSetting.Initialise();
         
+        string failedLabel = null;
         var bytes = await AddressablesLogic.GetWholeDownLoadSize(
-            label =>
-            {
-                PopupLayer.ArrangeConfirmWindow(
-                    (
-                        () =>
-                        {
-                            SceneManager.LoadScene(0);
-                        }
-                    ),
-                $"Download Failed: {label}"
-                );
-            },
+            label => failedLabel = label,
             commonSetting.DownLoadLabels
         );
+        if (failedLabel != null)
+        {
+            throw new InvalidOperationException($"Failed to inspect required resources: {failedLabel}");
+        }
         
         ProgressLayer.Close();
         if (bytes > 0)
@@ -146,38 +166,40 @@ public class StartUpPresentation : MonoBehaviour
         }
         else
         {
-            Go().Forget(); // no asset to download.begin directly
+            await Go();
         }
     }
     
     void DownLoadConfirm(string msg, float wholeBytes, List<string> downLoadLabels)
     {
         PopupLayer.ArrangeConfirmWindow(
-            async ()=>
-            {
-                HighLightLayer.DarkOff(Color.white, 0);
-                var imageBg = UILayerLoader.Load<ImageBg>();
-                imageBg.Setup();
-                UILayerLoader.Load<ProgressLayer>(true, null, true);
-                await AddressablesLogic.ResourcePrepareProcess(
-                    Complete,
-                    (x) =>
-                    {
-                        ProgressLayer.LoadingPercent(x, AddressablesLogic.DownloadedBytes / wholeBytes);
-                    },
-                    downLoadLabels
-                );
-            },
+            () => DownloadAndStart(wholeBytes, downLoadLabels).Forget(),
             Application.Quit,
             msg
         );
     }
 
-    private async void Complete()
+    async UniTask DownloadAndStart(float wholeBytes, List<string> downLoadLabels)
     {
-        UILayerLoader.Remove<ProgressLayer>();
-        UILayerLoader.Remove<ImageBg>();
-        await Go();
+        try
+        {
+            HighLightLayer.DarkOff(Color.white, 0);
+            var imageBg = UILayerLoader.Load<ImageBg>();
+            imageBg.Setup();
+            UILayerLoader.Load<ProgressLayer>(true, null, true);
+            await AddressablesLogic.ResourcePrepareProcess(
+                null,
+                progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadedBytes / wholeBytes),
+                downLoadLabels
+            );
+            ProgressLayer.Close();
+            UILayerLoader.Remove<ImageBg>();
+            await Go();
+        }
+        catch (Exception exception)
+        {
+            ShowStartupFailure(exception);
+        }
     }
 
     async UniTask Go()

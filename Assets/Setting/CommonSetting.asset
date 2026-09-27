@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   devMode: 0
   maxStoneCount: 1000
-  gangbangModeMaxUnitPerTeam: 24
   gangbangModeMaxUnitPerTeam1: 24
   gangbangModeMaxUnitPerTeam2: 72
   gangbangModeMaxUnitPerTeam3: 100
@@ -28,7 +27,7 @@ MonoBehaviour:
   skillDynamicAnalysis: SkillDynamicAnalysis.csv
   languageCodeFile: LanguageCode
   shortStoryFile: short_story
-  gbShortStoryFile: gb_short_story
+  storyFile: gb_short_story
   admob_interstitial_iosKey: ca-app-pub-9232931129246316/4207035759
   admob_rewarded_iosKey: ca-app-pub-9232931129246316/1852335153
   admob_interstitial_androidKey: ca-app-pub-9232931129246316/6181019442
@@ -47,7 +46,9 @@ MonoBehaviour:
   btnConfirmSound: {fileID: 8300000, guid: 468f662ba85278c419ef967f7c33907b, type: 3}
   exTabSound: {fileID: 8300000, guid: bfc5803fa8fa8924bbeaa34f4f689bb1, type: 3}
   aiDetectInterval: 20
-  characterAnimDuration: 0.15
+  characterAnimDurationList:
+  - type: human
+    duration: 0.15
   shadowMaterial: {fileID: 2100000, guid: ea7a57501503cd74f87a10d974771222, type: 2}
   resistColor: {r: 0, g: 0.5254902, b: 0.7921569, a: 0.49019608}
   speedColor: {r: 0.18431373, g: 1, b: 0.9411765, a: 0.3764706}

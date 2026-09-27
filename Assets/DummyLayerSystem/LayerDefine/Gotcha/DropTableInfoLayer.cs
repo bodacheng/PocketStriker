@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Linq;
-using PlayFab.ServerModels;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,37 +8,52 @@ public class DropTableInfoLayer : UILayer
     [SerializeField] ResultTableNode prefab;
     [SerializeField] VerticalLayoutGroup resultT;
     [SerializeField] RectTransform viewPortRect;
+    readonly List<ResultTableNode> rows = new List<ResultTableNode>();
+    float originalViewPortHeight;
     
-    public void ShowDropTableInfo(RandomResultTableListing tableInfo)
+    public void ShowDropTableInfo(CloudScriptRandomResultTableListing tableInfo)
     {
-        float rectHeight = 0;
-        var wholeWeight = 0;
-        
-        tableInfo.Nodes = tableInfo.Nodes.OrderBy(x=> x.Weight).ToList();
-        
-        for (var i = 0; i < tableInfo.Nodes.Count; i++)
-        {
-            var node = tableInfo.Nodes[i];
-            wholeWeight += node.Weight;
-        }
+        if (this == null)
+            return;
 
-        float itemHeight = -1;
-        foreach (var node in tableInfo.Nodes)
+        foreach (var row in rows)
         {
-            var nodeUI = Instantiate(prefab);
-            nodeUI.Setup(node.ResultItem, (double) node.Weight / wholeWeight);
-            nodeUI.gameObject.transform.SetParent(resultT.transform);
+            if (row == null)
+                continue;
+            row.gameObject.SetActive(false);
+            Destroy(row.gameObject);
+        }
+        rows.Clear();
+
+        var nodes = tableInfo?.Nodes?.Where(node => node != null && node.Weight >= 0 && !string.IsNullOrEmpty(node.ResultItem))
+            .OrderBy(node => node.Weight)
+            .ToList() ?? new List<CloudScriptResultTableNode>();
+        var wholeWeight = nodes.Sum(node => (long)node.Weight);
+        float rectHeight = resultT.padding.vertical;
+        float itemHeight = 0;
+
+        foreach (var node in nodes)
+        {
+            var nodeUI = Instantiate(prefab, resultT.transform, false);
+            rows.Add(nodeUI);
+            nodeUI.Setup(node.ResultItem, wholeWeight > 0 ? (double)node.Weight / wholeWeight : 0);
             nodeUI.gameObject.SetActive(true);
             nodeUI.transform.localScale = Vector3.one;
-            if (itemHeight < 0)
-                itemHeight = nodeUI.GetComponent<RectTransform>().rect.height;
-            rectHeight += (itemHeight + resultT.spacing);
+            itemHeight = nodeUI.GetComponent<RectTransform>().rect.height;
+            rectHeight += itemHeight;
         }
-        
-        rectHeight -= resultT.spacing;
-        resultT.GetComponent<RectTransform>().sizeDelta = new Vector2(resultT.GetComponent<RectTransform>().sizeDelta.x, rectHeight);
-        viewPortRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 
-            PosCal.AdjustedViewPortHeight(viewPortRect.rect.height, itemHeight, resultT.spacing));
+
+        rectHeight += Mathf.Max(0, rows.Count - 1) * resultT.spacing;
+        resultT.GetComponent<RectTransform>().sizeDelta =
+            new Vector2(resultT.GetComponent<RectTransform>().sizeDelta.x, rectHeight);
+
+        if (viewPortRect != null && itemHeight > 0 && itemHeight + resultT.spacing > 0)
+        {
+            if (originalViewPortHeight <= 0)
+                originalViewPortHeight = viewPortRect.rect.height;
+            var adjustedHeight = PosCal.AdjustedViewPortHeight(originalViewPortHeight, itemHeight, resultT.spacing);
+            if (adjustedHeight > 0)
+                viewPortRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, adjustedHeight);
+        }
     }
 }
-

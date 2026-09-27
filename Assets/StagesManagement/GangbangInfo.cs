@@ -27,7 +27,7 @@ public class GangbangInfo : FightInfo
 
     public int SetTeamUnitCount(int team, string instanceID, int count, bool force = false)
     {
-        return SetTeamUnitCount(team, instanceID, count, CommonSetting.GangbangModeMaxUnitPerTeam, force);
+        return SetTeamUnitCount(team, instanceID, count, CommonSetting.GangbangModeMaxUnitPerTeam1, force);
     }
 
     public int SetTeamUnitCount(int team, string instanceID, int count, int teamMaxCount, bool force = false)

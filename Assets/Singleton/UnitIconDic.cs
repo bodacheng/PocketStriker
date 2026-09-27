@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Singleton
@@ -7,11 +7,11 @@ namespace Singleton
         
         public static async UniTask<Sprite> Load(string recordId, GameObject memoryReleaseTarget = null)
         {
-            var unitConfig = Units.GetUnitConfig(recordId);
-            if (unitConfig == null)
-                return null;
-            var sprite = await AddressablesLogic.LoadT<Sprite>("unit/" + recordId, memoryReleaseTarget);
-            return sprite;
+            return await UnitIconLoader.Load(
+                recordId,
+                memoryReleaseTarget,
+                id => Units.GetUnitConfig(id) != null,
+                (key, target) => AddressablesLogic.LoadT<Sprite>(key, target));
         }
     }
 }

@@ -1,6 +1,5 @@
 using UnityEngine;
 using GoogleMobileAds.Api;
-using UnityEngine.PlayerLoop;
 
 public class AdsInitializer : MonoBehaviour
 {
@@ -15,7 +14,9 @@ public class AdsInitializer : MonoBehaviour
     void Awake()
     {
         target = this;
+#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
         InitializeAds();
+#endif
     }
     
     void InitializeAds()

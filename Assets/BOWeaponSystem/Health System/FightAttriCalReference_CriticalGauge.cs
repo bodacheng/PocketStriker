@@ -16,7 +16,7 @@ public partial class FightParamsReference
             Center._MyBehaviorRunner.OnFixedSequence,
             DreamComboGauge.Value,
             add,
-            FightGlobalSetting._DreamComboGaugeMax);
+            FightGlobalSetting.DreamComboGaugeMax);
     }
     
     public void CostCriticalGaugeBySPLevel(int level)
@@ -38,6 +38,6 @@ public partial class FightParamsReference
     {
         return CombatGaugeUtility.HasPlentyDreamGauge(
             DreamComboGauge.Value,
-            FightGlobalSetting._DreamComboGaugeMax);
+            FightGlobalSetting.DreamComboGaugeMax);
     }
 }

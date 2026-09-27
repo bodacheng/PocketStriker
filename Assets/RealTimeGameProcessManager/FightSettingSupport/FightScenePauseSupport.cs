@@ -22,16 +22,18 @@ public class FightScenePauseSupport : UILayer
         this.returnAction = returnToFront;
         runNow.Invoke();
         ResetSliders();
-        autoRoateCamera.onValueChanged.AddListener(x =>
-        {
-            var c = RTFightManager.Target._CameraManager.GetMode(C_Mode.CertainYAntiVibration);
-            var mode = ((ChatGptFix)c);
-            mode.AutoRotateCamera = x;
-            AppSetting.Value.AutoRotateCamera = x;
-        });
+        autoRoateCamera.onValueChanged.RemoveListener(OnAutoRotateCameraChanged);
+        autoRoateCamera.onValueChanged.AddListener(OnAutoRotateCameraChanged);
         
         autoRoateCamera.gameObject.SetActive(FightLoad.Fight.team1Mode == TeamMode.Rotation);
-        autoRoateCamera.isOn = AppSetting.Value.AutoRotateCamera;
+        autoRoateCamera.SetIsOnWithoutNotify(PlayerPrefs.GetInt("AutoRotateCamera", 1) == 1);
+    }
+
+    void OnAutoRotateCameraChanged(bool enabled)
+    {
+        var mode = RTFightManager.Target._CameraManager.GetMode(C_Mode.CertainYAntiVibration) as ChatGptFix;
+        if (mode != null)
+            mode.AutoRotateCamera = enabled;
     }
 
     public void Resume()

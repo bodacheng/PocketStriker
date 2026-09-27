@@ -105,7 +105,7 @@ public class MobileInputsManager : MonoBehaviour {
             watchDreamComboGauge = center.FightDataRef.DreamComboGauge.Subscribe(
                 (x) =>
                 {
-                    var percent = (float)x / FightGlobalSetting._DreamComboGaugeMax;
+                    var percent = (float)x / FightGlobalSetting.DreamComboGaugeMax;
                     if (percent == 1)
                     {
                         DreamComboEffectOn();

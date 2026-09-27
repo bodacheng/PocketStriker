@@ -13,6 +13,7 @@ using UnityEngine.SceneManagement;
 public static class AddressablesLogic
 {
     private static readonly IDictionary<string, List<string>> KeyExists = new Dictionary<string, List<string>>();
+    private static AsyncOperationHandle<CommonSetting> commonSettingHandle;
 
     public static async UniTask CheckExistedKey(string tag)
     {
@@ -20,24 +21,21 @@ public static class AddressablesLogic
         {
             return;
         }
-        KeyExists.Add(tag, new List<string>());
         var locationHandle = Addressables.LoadResourceLocationsAsync(tag);
-        await locationHandle.Task;
-        if (locationHandle.Status == AsyncOperationStatus.Succeeded)
+        try
         {
-            foreach (var weapon in locationHandle.Result)
+            await locationHandle.Task;
+            if (locationHandle.Status != AsyncOperationStatus.Succeeded)
             {
-                if (!KeyExists[tag].Contains(weapon.PrimaryKey))
-                {
-                    KeyExists[tag].Add(weapon.PrimaryKey);
-                }
+                throw new InvalidOperationException($"Failed to index resource label: {tag}", locationHandle.OperationException);
             }
+            KeyExists[tag] = locationHandle.Result.Select(location => location.PrimaryKey).Distinct().ToList();
         }
-        else
+        finally
         {
-            Debug.Log(" error ");
+            if (locationHandle.IsValid())
+                Addressables.Release(locationHandle);
         }
-        Addressables.Release(locationHandle);
     }
 
     public static bool CheckKeyExist(string tag, string primaryKey)
@@ -54,9 +52,12 @@ public static class AddressablesLogic
         return KeyExists.ContainsKey(tag);
     }
 
-    public static async UniTask<bool> VersionConfirm() // false : need to update
+    public static async UniTask<bool> VersionConfirm()
     {
-        await DownLoadMission(AddressablesResourcePolicy.AppVersionKey, (x)=>{});
+        if (!await DownLoadMission(AddressablesResourcePolicy.AppVersionKey, (x)=>{}))
+        {
+            throw new InvalidOperationException("Failed to download the app version configuration.");
+        }
         AsyncOperationHandle<TextAsset> handle = Addressables.LoadAssetAsync<TextAsset>(AddressablesResourcePolicy.AppVersionKey);
         try
         {
@@ -67,7 +68,7 @@ public static class AddressablesLogic
 
             if (handle.Status != AsyncOperationStatus.Succeeded)
             {
-                return false;
+                throw new InvalidOperationException("Failed to load the app version configuration.", handle.OperationException);
             }
 
             var appVersionJson = handle.Result;
@@ -88,25 +89,35 @@ public static class AddressablesLogic
 
     public static async UniTask DownLoadConfig()
     {
-        await DownLoadMission(AddressablesResourcePolicy.ConfigLabel, (x)=>{});
+        if (!await DownLoadMission(AddressablesResourcePolicy.ConfigLabel, (x)=>{}))
+        {
+            throw new InvalidOperationException("Failed to download the game configuration.");
+        }
     }
 
     public static async UniTask<CommonSetting> GetCommonSetting()
     {
         AsyncOperationHandle<CommonSetting> handle = Addressables.LoadAssetAsync<CommonSetting>(AddressablesResourcePolicy.CommonSettingKey);
-        while (!handle.IsDone)
+        try
         {
-            await UniTask.DelayFrame(0);
+            await handle.Task;
+            if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
+            {
+                throw new InvalidOperationException("Failed to load the common game settings.", handle.OperationException);
+            }
+            // CommonSetting owns audio and material references used across scene changes.
+            // Keep its dependency bundle alive when temporary combat assets are released.
+            if (commonSettingHandle.IsValid())
+                Addressables.Release(commonSettingHandle);
+            commonSettingHandle = handle;
+            return handle.Result;
         }
-        if (handle.Status == AsyncOperationStatus.Succeeded)
+        catch
         {
-            CommonSetting commonSetting = handle.Result;
-            LoadingHandlerList.Add(handle);
-            return commonSetting;
+            if (handle.IsValid())
+                Addressables.Release(handle);
+            throw;
         }
-        if (handle.IsValid())
-            Addressables.Release(handle);
-        return null;
     }
     
     public static async UniTask Essentials()
@@ -147,10 +158,9 @@ public static class AddressablesLogic
 
         if (!success)
         {
-            await LoadErrorThenBackToStart();
-            return;
+            throw new InvalidOperationException("Failed to download required game resources.");
         }
-        complete.Invoke();
+        complete?.Invoke();
     }
     
     public static async UniTask<GameObject> LoadObject(string prefabPathName, Vector3 pos = new Vector3())
@@ -346,6 +356,7 @@ public static class AddressablesLogic
                 Addressables.Release(handle);
         }
         LoadingHandlerList.Clear();
+        AddressablesAssetLoader.ReleaseRetainedHandles();
     }
 
     static async UniTask LoadErrorThenBackToStart()

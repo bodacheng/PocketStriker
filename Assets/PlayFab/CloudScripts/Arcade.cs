@@ -2,8 +2,6 @@ using PlayFab.ClientModels;
 using System;
 using System.Collections.Generic;
 using DummyLayerSystem;
-using Newtonsoft.Json;
-using PlayFab.ServerModels;
 using UnityEngine;
 using ExecuteCloudScriptResult = PlayFab.ClientModels.ExecuteCloudScriptResult;
 
@@ -55,10 +53,14 @@ public partial class CloudScript
                     {
                         try
                         {
-                            var unitAward = JsonConvert.DeserializeObject<List<GrantedItemInstance>>(award_unit.ToString());
-                            foreach (var item in unitAward)
+                            var unitAward = CloudScriptPayloadUtility.Deserialize<List<CloudScriptGrantedItemInstance>>(award_unit);
+                            foreach (var item in unitAward ?? new List<CloudScriptGrantedItemInstance>())
                             {
+                                if (item == null || string.IsNullOrEmpty(item.ItemId))
+                                    continue;
                                 var unitConfig = Units.GetUnitConfig(item.ItemId);
+                                if (unitConfig == null)
+                                    continue;
                                 if (stageNo == "5")
                                 {
                                     PopupLayer.ArrangeWarnWindowUnitIcon(Translate.Get(unitConfig.REAL_NAME) + "\n" + Translate.Get("GotNewUnit"), item.ItemId,

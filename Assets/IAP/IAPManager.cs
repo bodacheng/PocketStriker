@@ -24,6 +24,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     private string StoneProductCatalogVersion = "stone";
     private bool productCatalogInitialised = false;
     private bool stoneCatalogInitialised = false;
+    private readonly List<PurchaseEventArgs> purchasesAwaitingInitialization = new List<PurchaseEventArgs>();
 
     public static List<CatalogItem> StoneProductCatalog => _stoneProductCatalog;
 
@@ -112,7 +113,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
 
     public string GetProductLocalPriceString(string productId)
     {
-        var productInfo = _mStoreController.products.WithID(productId);
+        var productInfo = _mStoreController?.products?.WithID(productId);
         if (productInfo != null)
             return productInfo.metadata.localizedPriceString;
         return "Not Available";
@@ -124,14 +125,8 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
         
         if (IsInitialized.Value) return;
         
-#if UNITY_IOS
-        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance(AppStore.AppleAppStore));
-#endif
-
-#if UNITY_ANDROID
-        // Create a builder for IAP service
-        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance(AppStore.GooglePlay));
-#endif
+        // IAP 5 selects the platform store itself (and the fake store in the editor).
+        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
         // Register each item from the catalog
         foreach (var item in _productCatalog) {
             if (item.ItemClass == productClassName)
@@ -157,14 +152,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
 
     void InitializePurchasingNoAds()
     {
-#if UNITY_IOS
-        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance(AppStore.AppleAppStore));
-#endif
-
-#if UNITY_ANDROID
-        // Create a builder for IAP service
-        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance(AppStore.GooglePlay));
-#endif
+        var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
         
         builder.AddProduct(noAdsServiceName, ProductType.Consumable);
         
@@ -178,8 +166,13 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     // This is automatically invoked automatically when IAP service is initialized
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions) {
         Debug.Log("Initialized ：" + controller);
-        IsInitialized.SetValueAndForceNotify(true);
         _mStoreController = controller;
+        IsInitialized.SetValueAndForceNotify(true);
+        // IAP 5 fetches outstanding purchases before notifying OnInitialized.
+        var restoredPurchases = purchasesAwaitingInitialization.ToArray();
+        purchasesAwaitingInitialization.Clear();
+        foreach (var purchase in restoredPurchases)
+            ProcessPurchase(purchase);
     }
 
     // This is automatically invoked automatically when IAP service failed to initialized
@@ -208,30 +201,40 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
     
     // This is invoked automatically when successful purchase is ready to be processed
     public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs e) {
-        // NOTE: this code does not account for purchases that were pending and are
-        // delivered on application start.
-        // Production code should account for such case:
-        // More: https://docs.unity3d.com/ScriptReference/Purchasing.PurchaseProcessingResult.Pending.html
-
         Debug.Log("ProcessPurchase");
-        
-        if (!IsInitialized.Value) {
-            return PurchaseProcessingResult.Complete;
-        }
-        
+
         // Test edge case where product is unknown
-        if (e.purchasedProduct == null) {
+        if (e?.purchasedProduct == null) {
             Debug.LogWarning("Attempted to process purchase with unknown product. Ignoring");
-            return PurchaseProcessingResult.Complete;
+            ProgressLayer.Close();
+            return PurchaseProcessingResult.Pending;
+        }
+
+        if (!IsInitialized.Value) {
+            if (!purchasesAwaitingInitialization.Any(purchase => ReferenceEquals(purchase.purchasedProduct, e.purchasedProduct)))
+                purchasesAwaitingInitialization.Add(e);
+            return PurchaseProcessingResult.Pending;
         }
 
         // Test edge case where purchase has no receipt
         if (string.IsNullOrEmpty(e.purchasedProduct.receipt)) {
             Debug.LogWarning("Attempted to process purchase with no receipt: ignoring");
-            return PurchaseProcessingResult.Complete;
+            ProgressLayer.Close();
+            return PurchaseProcessingResult.Pending;
         }
-        
+
+#if UNITY_EDITOR || (!UNITY_IOS && !UNITY_ANDROID)
+        Debug.LogWarning("PlayFab receipt validation requires an iOS or Android player build. Purchase remains pending.");
+        ProgressLayer.Close();
+        return PurchaseProcessingResult.Pending;
+#else
         var boughtItemCatalog = ProductCatalog(e.purchasedProduct.definition.id);
+        if (string.IsNullOrEmpty(boughtItemCatalog))
+        {
+            Debug.LogWarning("No PlayFab catalog found for product " + e.purchasedProduct.definition.id);
+            ProgressLayer.Close();
+            return PurchaseProcessingResult.Pending;
+        }
         
         void ValidateSuccess()
         {
@@ -361,7 +364,6 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
         Debug.Log("CatalogVersion:"+ boughtItemCatalog);
         Debug.Log("CurrencyCode:"+ e.purchasedProduct.metadata.isoCurrencyCode);
         Debug.Log("PurchasePrice:"+ (int)(e.purchasedProduct.metadata.localizedPrice * 100));
-        Debug.Log("ReceiptData:"+ payload);
         
         PlayFabClientAPI.ValidateIOSReceipt(
             validateIOSReceiptRequest,
@@ -372,7 +374,6 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
         
         #if UNITY_ANDROID
         // Deserialize receipt
-        Debug.Log("e.purchasedProduct.receipt :" + e.purchasedProduct.receipt);
         var googleReceipt = GooglePurchase.FromJson(e.purchasedProduct.receipt);
 
         // Invoke receipt validation
@@ -399,7 +400,10 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
         );
         #endif
         
-        return PurchaseProcessingResult.Complete;
+        // Receipt validation is asynchronous. Acknowledge only in ValidateSuccess so
+        // a failed/offline validation can be retried when the store redelivers it.
+        return PurchaseProcessingResult.Pending;
+#endif
     }
         
     // This is invoked manually to initiate purchase

@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;

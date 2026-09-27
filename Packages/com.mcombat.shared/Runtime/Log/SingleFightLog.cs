@@ -80,7 +80,7 @@ namespace Soul
             {
                 if (_skillNoBenefitLog.Get(keyValuePair.Key.Item1, keyValuePair.Key.Item2) > 2)
                 {
-                    conditionAndRespondPriority.Set(keyValuePair.Key.Item1, keyValuePair.Key.Item2, keyValuePair.Value + 1);
+                    conditionAndRespondPriority.SetRuntime(keyValuePair.Key.Item1, keyValuePair.Key.Item2, keyValuePair.Value + 1);
                 }
             }
         }
@@ -104,7 +104,7 @@ namespace Soul
                 return;
             }
 
-            _skillNoBenefitLog.Set(
+            _skillNoBenefitLog.SetRuntime(
                 behaviourFightRecord.whyIDidThis,
                 fightRecord.stateKey,
                 _skillNoBenefitLog.Get(behaviourFightRecord.whyIDidThis, fightRecord.stateKey, 0) + 1);

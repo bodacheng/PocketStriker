@@ -3,7 +3,9 @@
   "rootNamespace": "MCombat.Shared.Editor",
   "references": [
     "MCombat.Shared",
-    "Unity.Addressables.Editor"
+    "Unity.Addressables.Editor",
+    "UnityEditor.UI",
+    "YamlDotNet"
   ],
   "includePlatforms": [
     "Editor"

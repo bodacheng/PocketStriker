@@ -48,6 +48,13 @@ public class MultiDic<Key1, Key2, Value>
         ConvertDictionaryToSerializableArray();
     }
 
+    // Runtime-only dictionaries do not need to rebuild their serialized mirror after
+    // every write. This avoids allocating a list, one object per entry, and an array.
+    public void SetRuntime(Key1 key1, Key2 key2, Value value)
+    {
+        mDict[(key1, key2)] = value;
+    }
+
     public Value Get(Key1 key1, Key2 key2, Value defaultValue = default)
     {
         return mDict.TryGetValue((key1, key2), out var value) ? value : defaultValue;
@@ -72,28 +79,34 @@ public class SSIMultiDictionary
 {
     public readonly MultiDic<string, string, int> Main = new MultiDic<string, string, int>();
 
-    public List<(string, string)> GiveOutMin()
+    public void Set(string key1, string key2, int value)
     {
-        var min = 999999999;
-        List<(string, string)> minKeys = null;
+        Main.SetRuntime(key1, key2, value);
+    }
+
+    public void GiveOutMin(List<(string, string)> results)
+    {
+        results.Clear();
+        var min = int.MaxValue;
         foreach (var pair in Main.mDict)
         {
             if (pair.Value < min)
             {
-                minKeys = new List<(string, string)> { pair.Key };
+                results.Clear();
+                results.Add(pair.Key);
                 min = pair.Value;
             }
             else if (pair.Value == min)
             {
-                if (minKeys == null)
-                {
-                    minKeys = new List<(string, string)>();
-                }
-
-                minKeys.Add(pair.Key);
+                results.Add(pair.Key);
             }
         }
+    }
 
-        return minKeys;
+    public List<(string, string)> GiveOutMin()
+    {
+        var results = new List<(string, string)>();
+        GiveOutMin(results);
+        return results.Count > 0 ? results : null;
     }
 }

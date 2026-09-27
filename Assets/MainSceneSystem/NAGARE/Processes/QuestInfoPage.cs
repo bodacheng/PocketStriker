@@ -288,7 +288,7 @@ public class QuestInfoPage : MSceneProcess
                 fightInfo.team2Mode = TeamMode.MultiRaid;
                 if (maxTeamUnitCount <= 0)
                 {
-                    maxTeamUnitCount = CommonSetting.GangbangModeMaxUnitPerTeam;
+                    maxTeamUnitCount = CommonSetting.GangbangModeMaxUnitPerTeam1;
                 }
 
                 void RealFight()

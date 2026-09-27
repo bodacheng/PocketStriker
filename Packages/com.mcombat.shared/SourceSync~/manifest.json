@@ -1,0 +1,170 @@
+{
+  "roots": [
+    {
+      "path": "Behaviour",
+      "exclude": [
+        "BtnUI/MobileInputsManager.cs"
+      ]
+    },
+    {
+      "path": "P3"
+    },
+    {
+      "path": "Structure/SingleThreadProcesser"
+    },
+    {
+      "path": "Camera"
+    },
+    {
+      "path": "TheNineSlot"
+    },
+    {
+      "path": "SkillStoneBox"
+    },
+    {
+      "path": "SimpleDragAndDrop/Scripts"
+    },
+    {
+      "path": "Remote/Stone"
+    },
+    {
+      "path": "UnitBox",
+      "exclude": [
+        "UnitFilter.cs",
+        "SSLevelUpManager/Execution.cs",
+        "SSLevelUpManager/UpdateAll.cs",
+        "SSLevelUpManager/SSLevelUpManager.Project.cs"
+      ]
+    },
+    {
+      "path": "DummyLayerSystem/LayerDefine/FrontLayer"
+    },
+    {
+      "path": "MainSceneSystem/NAGARE/Processes/Mail"
+    },
+    {
+      "path": "MainSceneSystem/NAGARE/Processes/Shop"
+    },
+    {
+      "path": "Remote/API/Dto"
+    },
+    {
+      "path": "POS_Sys"
+    },
+    {
+      "path": "ResourceLoading"
+    },
+    {
+      "path": "EffectsSystem",
+      "exclude": [
+        "hjk.jpeg"
+      ]
+    },
+    {
+      "path": "BOWeaponSystem",
+      "exclude": [
+        "Decompositioner_Life.cs",
+        "Health System/AbstractShaderMesh.cs",
+        "Health System/FightAttriCalReference_CriticalGauge.cs",
+        "Health System/ResistanceManager.cs",
+        "Health System/ShaderManager.cs",
+        "Health System/CharacterShadow.shader",
+        "Weapon Marker Systems/BO_Marker.cs",
+        "Weapon Marker Systems/HitBoxesProcesser.cs"
+      ]
+    },
+    {
+      "path": "PlayFab",
+      "exclude": [
+        "SkillAnalyzer.prefab",
+        "Client/Item.cs",
+        "Client/LinkDevice.cs",
+        "Client/Login.cs",
+        "Client/UserData.cs"
+      ]
+    },
+    {
+      "path": "UI",
+      "exclude": [
+        ".idea",
+        "AutoSwitch.cs",
+        "ExBarBurn.cs",
+        "SideUnitIcon.cs",
+        "TimeLimitedBundleCell.cs",
+        "SizeAdjustBySpriteSize.cs"
+      ]
+    }
+  ],
+  "files": [
+    "AIStory/AIStoryProjectContext.cs",
+    "DummyLayerSystem/LayerDefine/ArenaAwardLayer.cs",
+    "DummyLayerSystem/LayerDefine/ArenaLayer.cs",
+    "DummyLayerSystem/LayerDefine/ArenaNewSeason.cs",
+    "DummyLayerSystem/LayerDefine/AskIfLinkDeviceLayer.cs",
+    "DummyLayerSystem/LayerDefine/BattleGroundSwitch.cs",
+    "DummyLayerSystem/LayerDefine/BuyNoAds.cs",
+    "DummyLayerSystem/LayerDefine/CountDownLayer.cs",
+    "DummyLayerSystem/LayerDefine/StoneListLayer.cs",
+    "DummyLayerSystem/LayerDefine/StoneUpdatesConfirm.cs",
+    "DummyLayerSystem/LayerDefine/Shop/StoneContentCell.cs",
+    "DummyLayerSystem/LayerDefine/EventBattle/EventBattleButton.cs",
+    "DummyLayerSystem/LayerDefine/FightOver/IconAndSKillShowUISet.cs",
+    "DummyLayerSystem/LayerDefine/Gotcha/DropTableInfoLayer.cs",
+    "DummyLayerSystem/LayerDefine/Gotcha/GotchaLayer.cs",
+    "DummyLayerSystem/LayerDefine/Gotcha/GotchaResultLayer/GotchaResultLayer_StarFall.cs",
+    "DummyLayerSystem/LayerDefine/Gotcha/GotchaResultLayer/GotchaResultLayer_Detail.cs",
+    "DummyLayerSystem/LayerDefine/ImageBg.cs",
+    "DummyLayerSystem/LayerDefine/InBattleEnvolve/EvolutionSkill.cs",
+    "DummyLayerSystem/LayerDefine/Mail/MailItemInstance.cs",
+    "DummyLayerSystem/LayerDefine/Mail/MailListView.cs",
+    "DummyLayerSystem/LayerDefine/MailDetailView.cs",
+    "DummyLayerSystem/LayerDefine/SkillEditLayer/SkillEditLayerTutorial.cs",
+    "DummyLayerSystem/LayerDefine/Tutorial/SkillEditTutorial11.cs",
+    "DummyLayerSystem/LayerDefine/Tutorial/SkillEditTutorial12.cs",
+    "DummyLayerSystem/LayerDefine/Tutorial/TutorialLayerSpecialEvent.cs",
+    "FightSceneSystem/FSceneProcess.cs",
+    "FightingSceneUISystem/HeroCell.cs",
+    "FightingSceneUISystem/UnitListItem.cs",
+    "Language/LanguageConverter.cs",
+    "Language/LanguageConverterManger.cs",
+    "MainSceneSystem/MainSceneLogger.cs",
+    "MainSceneSystem/NAGARE/ProcessesRunner.cs",
+    "MainSceneSystem/NAGARE/SceneProcess.cs",
+    "MainSceneSystem/NAGARE/Processes/PopupLayer/PopupLayer.cs",
+    "MainSceneSystem/NAGARE/Processes/RankingPage.cs",
+    "MainSceneSystem/NAGARE/Processes/Gacha/DropTableInfoDetail.cs",
+    "MainSceneSystem/NAGARE/Processes/Gacha/GotchaBtn.cs",
+    "MainSceneSystem/NAGARE/Processes/ArenaPage/ArenaPageLoading.cs",
+    "MainSceneSystem/NAGARE/Processes/ArenaPage/ArenaPageTimeCheck.cs",
+    "ImportantDefinition/Skill/AIDataBase.cs",
+    "ImportantDefinition/Skill/HitBoxLogTable.cs",
+    "MasterDataTool/Monster_PF.cs",
+    "MasterDataTool/Skill_PF.cs"
+  ],
+  "obsolete": [
+    "Behaviour/Soul/BehaviorRunner_unused.cs",
+    "Behaviour/Soul/BehaviorRunner_unused.cs.meta",
+    "Behaviour/Soul/BehaviorRunner_EditorData.cs",
+    "Behaviour/Soul/BehaviorRunner_EditorData.cs.meta",
+    "Behaviour/Soul/Sensor/Sensor_Get.cs",
+    "Behaviour/Soul/Sensor/Sensor_Get.cs.meta",
+    "Behaviour/GUI/SkillOptions.cs",
+    "Behaviour/GUI/SkillOptions.cs.meta",
+    "Behaviour/Soul/SkillSet/SkillSet_Validation.cs",
+    "Behaviour/Soul/SkillSet/SkillSet_Validation.cs.meta",
+    "Behaviour/Soul/BehaviorRunner_Form.cs",
+    "Behaviour/Soul/BehaviorRunner_Form.cs.meta",
+    "Behaviour/Soul/SkillSet/SkillSet_Tools.cs",
+    "Behaviour/Soul/SkillSet/SkillSet_Tools.cs.meta",
+    "Behaviour/Soul/SkillSet/RandomSet/RandomSkillSet.cs",
+    "Behaviour/Soul/SkillSet/RandomSet/RandomSkillSet.cs.meta",
+    "Camera/Modes/GangV.cs",
+    "Camera/Modes/GangV.cs.meta",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_selectBaseMonster.cs",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_selectBaseMonster.cs.meta",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_selectMaterialMonster.cs",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_selectMaterialMonster.cs.meta",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_waitForConfirm.cs",
+    "MainSceneSystem/NAGARE/Processes/notusinganymore/JiNengRongLian_waitForConfirm.cs.meta"
+  ]
+}
