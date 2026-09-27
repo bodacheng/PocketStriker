@@ -29,6 +29,8 @@
 - iOS：执行资源构建、Unity Xcode 导出、CocoaPods 和未签名原生编译，跳过钥匙串、IPA 导出和 App Store 上传。
 - 资源：执行所选 iOS／Android 资源构建并检查输出，跳过 S3 上传。
 
+`CustomIOSBuild_V` 还提供 `SIGNING_VALIDATE_ONLY`：保持 `VALIDATE_ONLY=false` 并勾选该项，将执行签名归档及 IPA 导出，但跳过 App Store 验证和上传。该参数默认为 false。
+
 该参数默认为 false，保留原有正常构建／上传行为。正常 Release iOS 构建仍会上传 App Store；正常资源构建仍会上传目标 S3 路径。
 
 ## 验证结果
@@ -38,14 +40,20 @@
 - C# 构建入口的 17 项行为检查和 13 项版本回归检查通过。
 - AWS 只读检查通过：`mcombatDev` 身份有效，`mcombat` 桶可访问，Dev／Release 路径与项目配置一致。未写入对象，未验证 PutObject 权限。
 - [`CustomIOSBuild_V #14`](http://localhost:8080/job/CustomIOSBuild_V/14/) 验证构建成功：Unity iOS 资源、Xcode 工程导出、CocoaPods 和未签名原生编译均通过，未执行签名、IPA 导出或上传。
+- [`CustomIOSBuild_V #17`](http://localhost:8080/job/CustomIOSBuild_V/17/) 使用新 App Store profile 通过正式 Xcode 归档和 IPA 导出；归档 app 中嵌入的 profile 及实际代码签名均包含 `com.apple.developer.applesignin=[Default]`。构建结果为 `SUCCESS`，`SIGNING_VALIDATE_ONLY=true` 跳过了 App Store 上传。
 - [`AssetDev_V #4`](http://localhost:8080/job/AssetDev_V/4/) 的 iOS 资源阶段已通过；按项目不上线 Android 的要求，中止其正在进行的 Android 阶段。
 - [`AssetDev_V #5`](http://localhost:8080/job/AssetDev_V/5/) 以 `IOS=true`、`ANDROID=false`、`VALIDATE_ONLY=true` 完整通过，生成 399 个 iOS bundle 文件及 catalog/hash；Android 阶段和 S3 上传均跳过。
 
 ## 正式签名的剩余前提
 
-机器 `rudel` 的旧 Dev profile `test_v` 已于 2025-05-05 过期。本机另有有效的 Ad Hoc 和 App Store profile，但两者均不含 Unity 工程要求的 `com.apple.developer.applesignin`；Apple Developer 中 `com.PocketStriker.BO` 的 Sign In with Apple 当前也未启用。因此正式签名、IPA 导出和上传尚未验证，预计会受该配置影响。
+`CustomIOSBuild_V #15` 和 `#16` 的正式归档在 Xcode 签名检查阶段失败：旧 `release_v` profile 不含 `com.apple.developer.applesignin`。按用户后续授权，已在 Apple Developer 为 `com.PocketStriker.BO` 启用 Sign In with Apple，并使用原有有效的 Apple Distribution 证书生成、下载和安装两份新 profile：
 
-根据本次暂缓上线相关改动的要求，Apple Developer 账号、profile 和项目中的 `ExportOptions_{Dev,Release}.plist` 均保持原状。后续若要正式发布，需先处理 App ID 能力与 profile，再单独验证签名及上传。
+| 用途 | profile 名称 | UUID | 到期日（UTC） |
+| --- | --- | --- | --- |
+| Dev / Ad Hoc | `PocketStriker Ad Hoc 2026-09-27` | `193b8c1b-510f-4d78-98c2-43484bb457b8` | 2027-03-13 |
+| Release / App Store | `PocketStriker App Store 2026-09-27` | `5140a08c-ea4b-4605-ab10-c124fd517267` | 2027-03-13 |
+
+两份 profile 均已验证 Bundle ID、团队、分发证书和 `com.apple.developer.applesignin=[Default]`；`ExportOptions_{Dev,Release}.plist` 分别使用唯一名称选中。旧 `release_v` 在 Apple Developer 中已变为 Invalid。Release 正式签名归档及 IPA 导出已通过；Dev profile 已完成静态校验，尚未执行 Dev 完整构建。App Store 上传未执行。
 
 ## 回退与工作区
 
