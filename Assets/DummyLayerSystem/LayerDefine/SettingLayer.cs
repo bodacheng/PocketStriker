@@ -55,6 +55,8 @@ public class SettingLayer : UILayer
     #region Support
     [SerializeField] BOButton privacyBtn;
     [SerializeField] BOButton contactBtn;
+    [SerializeField] BOButton privacyOptionsBtn;
+    [SerializeField] Text privacyOptionsLabel;
     #endregion
     
     #region Support
@@ -75,6 +77,13 @@ public class SettingLayer : UILayer
     void OnEnable()
     {
         _contentCenteringPending = true;
+        AdsInitializer.PrivacyOptionsAvailabilityChanged += RefreshPrivacyOptionsButton;
+        RefreshPrivacyOptionsButton();
+    }
+
+    void OnDisable()
+    {
+        AdsInitializer.PrivacyOptionsAvailabilityChanged -= RefreshPrivacyOptionsButton;
     }
 
     protected override void OnRectTransformDimensionsChange()
@@ -286,6 +295,7 @@ public class SettingLayer : UILayer
         {
             CloseAllPanels();
             supportPanel.gameObject.SetActive(true);
+            RefreshPrivacyOptionsButton();
             SetSelectedFrame(supportBtn.GetComponent<RectTransform>());
         });
 
@@ -312,6 +322,7 @@ public class SettingLayer : UILayer
         {
             AppSetting.Value.Language = code;
             LanguageConverterManger.ChangeLanguage();
+            RefreshPrivacyOptionsButton();
             RefreshContentCentering();
             await SkillNameTable.LoadSkillNamesFromConfig();
             SkillConfigTable.RefreshSkillConfigDicForReference();
@@ -372,12 +383,17 @@ public class SettingLayer : UILayer
         
         privacyBtn.onClick.AddListener(() =>
         {
-            Application.OpenURL("https://mugencombat.webnode.jp/purofiru/");
+            var language = AppSetting.Value != null ? AppSetting.Value.Language : Application.systemLanguage;
+            string section = language == SystemLanguage.Japanese ? "ja" :
+                language == SystemLanguage.English ? "en" : "zh";
+            Application.OpenURL("https://personal-site.hotaru-studio.workers.dev/privacy/pocket-striker/#" + section);
         });
+
+        privacyOptionsBtn.onClick.AddListener(AdsInitializer.ShowPrivacyOptionsForm);
         
         contactBtn.onClick.AddListener(() =>
         {
-            Application.OpenURL("https://mugencombat.webnode.jp/o-weni-hewase/");
+            Application.OpenURL("https://personal-site.hotaru-studio.workers.dev/#contact");
         });
         
         deleteAccountBtn.SetListener(() =>
@@ -393,6 +409,36 @@ public class SettingLayer : UILayer
                 );
             });
         });
+    }
+
+    void RefreshPrivacyOptionsButton()
+    {
+        if (privacyOptionsBtn == null) return;
+
+        // UMP may finish updating after the settings window has already opened.
+        bool required = AdsInitializer.PrivacyOptionsRequired;
+        if (privacyOptionsBtn.gameObject.activeSelf != required)
+        {
+            privacyOptionsBtn.gameObject.SetActive(required);
+            RefreshContentCentering();
+        }
+
+        if (privacyOptionsLabel == null) return;
+        var language = AppSetting.Value != null ? AppSetting.Value.Language : Application.systemLanguage;
+        switch (language)
+        {
+            case SystemLanguage.Japanese:
+                privacyOptionsLabel.text = "広告のプライバシー設定";
+                break;
+            case SystemLanguage.Chinese:
+            case SystemLanguage.ChineseSimplified:
+            case SystemLanguage.ChineseTraditional:
+                privacyOptionsLabel.text = "广告隐私选项";
+                break;
+            default:
+                privacyOptionsLabel.text = "Ad Privacy Choices";
+                break;
+        }
     }
 
     public void RefreshLinkDeviceBtn()

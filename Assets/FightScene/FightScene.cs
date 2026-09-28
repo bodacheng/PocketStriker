@@ -34,11 +34,12 @@ namespace FightScene
         public static List<GangbangInfo.SoldierGroupSet> team1GroupSet;
         
         private AdmobAdsButton watchBtn;
+        private AdmobAdsButton postBattleInterstitial;
         public void ShowAds(int extraAdReward, RectTransform btnTarget, Action afterWatched, int finishedStage = -1)
         {
             if (extraAdReward > 0 && watchBtn != null)
             {
-                watchBtn.transform.SetParent(btnTarget);
+                watchBtn.transform.SetParent(btnTarget, false);
                 watchBtn.transform.localPosition = Vector3.zero;
                 
                 string awardText = "x2"; // 简化处理 
@@ -55,21 +56,17 @@ namespace FightScene
                         );
                     }
                 );
-                if (watchBtn.AdIsReady && finishedStage >= 3)
-                {
-                    watchBtn.ShowAd();
-                }
                 watchBtn.gameObject.SetActive(true);
             }
         }
 
         public void JustShowAds()
         {
-            if (watchBtn != null)
+            if (postBattleInterstitial != null)
             {
-                if (watchBtn.AdIsReady)
+                if (postBattleInterstitial.AdIsReady)
                 {
-                    watchBtn.ShowAd();
+                    postBattleInterstitial.ShowAd();
                 }
             }
         }
@@ -224,11 +221,33 @@ namespace FightScene
 
         public void LoadAds()
         {
-            watchBtn = Instantiate(watchAdBtnPrefab);
-            watchBtn.HasTicket = true;
-            watchBtn.LoadAd();
-            watchBtn.gameObject.SetActive(false);
-            watchBtn.transform.SetParent(transform);
+            if (watchAdBtnPrefab == null || FightLoad.Fight == null ||
+                (PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState))
+                return;
+
+            switch (FightLoad.Fight.EventType)
+            {
+                case FightEventType.Quest:
+                case FightEventType.Gangbang:
+                    if (watchBtn == null)
+                    {
+                        watchBtn = Instantiate(watchAdBtnPrefab, transform, false);
+                        watchBtn.HasTicket = true;
+                        watchBtn.gameObject.SetActive(false);
+                    }
+                    watchBtn.LoadAd();
+                    break;
+                case FightEventType.Event:
+                    if (postBattleInterstitial == null)
+                    {
+                        postBattleInterstitial = Instantiate(watchAdBtnPrefab, transform, false);
+                        postBattleInterstitial.UseInterstitialAd();
+                        postBattleInterstitial.HasTicket = true;
+                        postBattleInterstitial.gameObject.SetActive(false);
+                    }
+                    postBattleInterstitial.LoadAd();
+                    break;
+            }
         }
         
         void Update()

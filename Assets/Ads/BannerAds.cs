@@ -7,32 +7,55 @@ public class BannerAds : MonoBehaviour
     public static BannerAds target;
     private string _adUnitId;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetState()
+    {
+        target = null;
+    }
+
     void Awake()
     {
         target = this;
         IniUnitId();
     }
 
+    void OnEnable()
+    {
+        AdsInitializer.AdsReady += LoadAd;
+        if (AdsInitializer.IsReady)
+            LoadAd();
+    }
+
     void Start()
     {
-        if (AdsInitializer.target != null && AdsInitializer.target.Initialized && _bannerView == null)
-        {
+        if (AdsInitializer.IsReady && _bannerView == null)
             LoadAd();
-        }
+    }
+
+    void OnDisable()
+    {
+        AdsInitializer.AdsReady -= LoadAd;
+        DestroyBannerView();
     }
 
     void OnDestroy()
     {
         DestroyBannerView();
+        if (target == this)
+            target = null;
     }
 
     void IniUnitId()
     {
         // Get the Ad Unit ID for the current platform:
 #if UNITY_IOS
-        _adUnitId = CommonSetting.Admob_banner_iosKey;
+        _adUnitId = Debug.isDebugBuild
+            ? "ca-app-pub-3940256099942544/2435281174"
+            : CommonSetting.Admob_banner_iosKey;
 #elif UNITY_ANDROID
-        _adUnitId = CommonSetting.Admob_banner_androidKey;
+        _adUnitId = Debug.isDebugBuild
+            ? "ca-app-pub-3940256099942544/9214589741"
+            : CommonSetting.Admob_banner_androidKey;
 #endif
     }
 
@@ -40,11 +63,12 @@ public class BannerAds : MonoBehaviour
     public BannerView BannerView => _bannerView;
 
     /// <summary>
-    /// Creates a 320x50 banner view at top of the screen.
+    /// Creates a current-orientation adaptive banner at the top left.
     /// </summary>
     public void CreateBannerView()
     {
-        if (!AdsInitializer.ShouldEnableAds() || string.IsNullOrEmpty(_adUnitId))
+        if (!AdsInitializer.IsReady || PlayerAccountInfo.Me == null ||
+            PlayerAccountInfo.Me.noAdsState || string.IsNullOrEmpty(_adUnitId))
             return;
         // If we already have a banner, destroy the old one.
         if (_bannerView != null)
@@ -54,7 +78,7 @@ public class BannerAds : MonoBehaviour
 
         // Use the AdSize argument to set a custom size for the ad.
 
-        var adSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(200);
+        var adSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(200);
         // Debug.Log(adSize.Width + ":"+ adSize.Height);
         _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);
         ListenToAdEvents();
@@ -65,7 +89,11 @@ public class BannerAds : MonoBehaviour
     /// </summary>
     public void LoadAd()
     {
-        if (!AdsInitializer.ShouldEnableAds() || string.IsNullOrEmpty(_adUnitId))
+        if (string.IsNullOrEmpty(_adUnitId))
+            IniUnitId();
+
+        if (!isActiveAndEnabled || !AdsInitializer.IsReady || PlayerAccountInfo.Me == null ||
+            PlayerAccountInfo.Me.noAdsState || string.IsNullOrEmpty(_adUnitId))
             return;
         // create an instance of a banner view first.
         if(_bannerView == null)
@@ -81,47 +109,57 @@ public class BannerAds : MonoBehaviour
         _bannerView.LoadAd(adRequest);
     }
 
+    void Update()
+    {
+        // A no-ads purchase can complete while this screen is still open.
+        if (_bannerView != null && PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState)
+            DestroyBannerView();
+    }
+
     /// <summary>
     /// listen to events the banner view may raise.
     /// </summary>
     private void ListenToAdEvents()
     {
+        var bannerView = _bannerView;
         // Raised when an ad is loaded into the banner view.
-        _bannerView.OnBannerAdLoaded += () =>
+        bannerView.OnBannerAdLoaded += () =>
         {
+            if (_bannerView != bannerView)
+                return;
             Debug.Log("Banner view loaded an ad with response : "
-                      + _bannerView.GetResponseInfo());
+                      + bannerView.GetResponseInfo());
         };
         // Raised when an ad fails to load into the banner view.
-        _bannerView.OnBannerAdLoadFailed += (LoadAdError error) =>
+        bannerView.OnBannerAdLoadFailed += (LoadAdError error) =>
         {
             Debug.LogError("Banner view failed to load an ad with error : "
                            + error);
         };
         // Raised when the ad is estimated to have earned money.
-        _bannerView.OnAdPaid += (AdValue adValue) =>
+        bannerView.OnAdPaid += (AdValue adValue) =>
         {
             Debug.Log(String.Format("Banner view paid {0} {1}.",
                 adValue.Value,
                 adValue.CurrencyCode));
         };
         // Raised when an impression is recorded for an ad.
-        _bannerView.OnAdImpressionRecorded += () =>
+        bannerView.OnAdImpressionRecorded += () =>
         {
             Debug.Log("Banner view recorded an impression.");
         };
         // Raised when a click is recorded for an ad.
-        _bannerView.OnAdClicked += () =>
+        bannerView.OnAdClicked += () =>
         {
             Debug.Log("Banner view was clicked.");
         };
         // Raised when an ad opened full screen content.
-        _bannerView.OnAdFullScreenContentOpened += () =>
+        bannerView.OnAdFullScreenContentOpened += () =>
         {
             Debug.Log("Banner view full screen content opened.");
         };
         // Raised when the ad closed full screen content.
-        _bannerView.OnAdFullScreenContentClosed += () =>
+        bannerView.OnAdFullScreenContentClosed += () =>
         {
             Debug.Log("Banner view full screen content closed.");
         };

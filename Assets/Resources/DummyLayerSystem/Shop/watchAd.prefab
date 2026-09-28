@@ -124,7 +124,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2428006664992226319}
-        m_TargetAssemblyTypeName: RewardedAdsButton, Assembly-CSharp
+        m_TargetAssemblyTypeName: AdmobAdsButton, Assembly-CSharp
         m_MethodName: ShowAd
         m_Mode: 1
         m_Arguments:
@@ -147,10 +147,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8091de1d489514e8c86752203dca68e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  adType: 1
   _showAdButton: {fileID: 1730796717693479287}
-  _androidAdUnitId: ca-app-pub-9232931129246316/7800743321
-  _iOSAdUnitId: ca-app-pub-9232931129246316/2104157226
-  reloadAfterWatched: 0
+  reloadAfterWatched: 1
   text: {fileID: 0}
   colorImages:
   - {fileID: 1731719026924713651}
