@@ -11,8 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a2fc58dd8a094ee2b1e75230d7aeca8, type: 3}
   m_Name: CommonSetting
-  m_EditorClassIdentifier:
-  devMode: 0
+  m_EditorClassIdentifier: 
+  devMode: 1
+  pcMode: 0
+  demoMode: 0
+  demoMaxQuestStage: 4
+  mosaikCameraScreenScale: 7
   maxStoneCount: 1000
   gangbangModeMaxUnitPerTeam1: 24
   gangbangModeMaxUnitPerTeam2: 72
