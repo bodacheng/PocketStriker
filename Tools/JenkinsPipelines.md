@@ -1,6 +1,14 @@
 # PocketStriker Jenkins 管线维护记录
 
-检查日期：2026-09-27。
+检查日期：2026-09-28。
+
+## iOS 资源与安装包配对
+
+手机上的 Jenkins iOS 包会在启动时检查远端 Addressables catalog。`CustomIOSBuild_V` 的 Unity Player 导出会再次构建 Addressables，因此**导出完成后的** `ServerData` 才与 IPA 内的 catalog 和本地 bundle 配套。单独运行 `AssetDev_V` 全量构建并上传到同一个 Release URL，会替换 catalog，也可能让包内本地 bundle 的 CRC 与新 catalog 不符。
+
+2026-09-28 核对：`CustomIOSBuild_V #17–#19` IPA 内的 catalog hash 为 `bab01537e03d30abf8047a41c068f9d8`；随后 `AssetDev_V #6` 上传的 `release/v/3.0.0/iOS` catalog hash 为 `95503727c36c16b946de7ffcc64ed39b`。两次构建使用同一 Git 提交，但 96 个同名本地 bundle 中有 52 个内容不同。截图中的启动失败弹窗是统一异常提示；真机日志仍需确认失败的具体资源。
+
+发布前用 `python3 Tools/Validation/verify_ios_addressables_pair.py --player-aa <Xcode导出目录>/Data/Raw/aa --server-dir <同一次Player构建的ServerData>/iOS --check-remote` 检查 IPA 对应 catalog 与线上 catalog；去掉 `--check-remote` 可先核对本地配对。Release 资源需要从与 IPA 同次构建的快照发布；对已安装客户端更新资源时使用 Addressables content update 流程。不要在已发布版本的 URL 上上传另一轮独立全量构建。
 
 ## 生效配置
 
