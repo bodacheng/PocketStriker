@@ -25,6 +25,8 @@ public class TitleBgLayer : UILayer
     public async UniTask Setup(float scrollValue) // false: titleMode
     {
         var targetSprite = await AddressablesLogic.LoadT<Sprite>("TitleBg", this.gameObject);
+        if (targetSprite == null)
+            throw new InvalidOperationException("Required title background asset is missing: TitleBg");
         var parentRect = transform.GetComponent<RectTransform>();
         content.sizeDelta = new Vector2(parentRect.rect.width ,  targetSprite.rect.height * parentRect.rect.width / targetSprite.rect.width);
         content.anchoredPosition = Vector2.zero;

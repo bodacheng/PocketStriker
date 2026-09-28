@@ -8,6 +8,16 @@ using UnityEngine.Serialization;
 
 public class StartUpPresentation : MonoBehaviour
 {
+    enum StartupStage
+    {
+        VersionCheck,
+        Configuration,
+        ConfigurationInitialization,
+        ResourceInspection,
+        DownloadUi,
+        ResourceDownload
+    }
+
     [SerializeField] Starter starter;
     [FormerlySerializedAs("t")]
     [SerializeField] RectTransform safeAreaRect;
@@ -15,6 +25,8 @@ public class StartUpPresentation : MonoBehaviour
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioSource uiAudioSource;
     [SerializeField] Canvas canvas;
+    StartupStage startupStage;
+    bool startupInProgress;
     
     void OpenAppStoreLink()
     {
@@ -62,20 +74,54 @@ public class StartUpPresentation : MonoBehaviour
         }
         catch (Exception exception)
         {
-            ShowStartupFailure(exception);
+            ShowResourceFailure(exception);
         }
     }
 
-    void ShowStartupFailure(Exception exception)
+    void ShowResourceFailure(Exception exception)
     {
-        Debug.LogException(exception, this);
+        Debug.LogError($"[Startup] {startupStage} failed: {exception}", this);
         ProgressLayer.Close();
-        UILayerLoader.Remove<ImageBg>();
+        string message;
+        if (startupStage == StartupStage.ConfigurationInitialization)
+        {
+            message = AppSetting.Value.Language switch
+            {
+                SystemLanguage.Japanese => "ゲーム設定の初期化に失敗しました。再試行してください。",
+                SystemLanguage.Chinese => "游戏配置初始化失败，请重试。",
+                _ => "Game configuration initialization failed. Please try again."
+            };
+        }
+        else if (startupStage == StartupStage.DownloadUi)
+        {
+            message = AppSetting.Value.Language switch
+            {
+                SystemLanguage.Japanese => "ダウンロード画面の初期化に失敗しました。再試行してください。",
+                SystemLanguage.Chinese => "下载界面初始化失败，请重试。",
+                _ => "Download screen initialization failed. Please try again."
+            };
+        }
+        else
+        {
+            message = AppSetting.Value.Language switch
+            {
+                SystemLanguage.Japanese => "起動に必要なリソースを準備できませんでした。再試行してください。",
+                SystemLanguage.Chinese => "启动资源准备失败，请重试。",
+                _ => "Could not prepare startup resources. Please try again."
+            };
+        }
+        PopupLayer.ArrangeWarnWindow(() => SceneManager.LoadScene(0), message);
+    }
+
+    void ShowInitializationFailure(Exception exception)
+    {
+        Debug.LogError($"[Startup] GameInitialization failed: {exception}", this);
+        ProgressLayer.Close();
         var message = AppSetting.Value.Language switch
         {
-            SystemLanguage.Japanese => "リソースを読み込めませんでした。接続を確認して、もう一度お試しください。",
-            SystemLanguage.Chinese => "资源加载失败，请检查网络后重试。",
-            _ => "Resources could not be loaded. Check your connection and try again."
+            SystemLanguage.Japanese => "ゲームの初期化に失敗しました。再試行してください。",
+            SystemLanguage.Chinese => "游戏初始化失败，请重试。",
+            _ => "Game initialization failed. Please try again."
         };
         PopupLayer.ArrangeWarnWindow(() => SceneManager.LoadScene(0), message);
     }
@@ -97,6 +143,7 @@ public class StartUpPresentation : MonoBehaviour
         }
         
         ProgressLayer.Loading(text);
+        startupStage = StartupStage.VersionCheck;
         bool needToUpdate = await AddressablesLogic.VersionConfirm();
         ProgressLayer.Close();
         
@@ -145,10 +192,13 @@ public class StartUpPresentation : MonoBehaviour
         ProgressLayer.Loading(text);
         
         // 告诉用户检查资源中，其实也把config文件下载了，合起来几十kb而已。
+        startupStage = StartupStage.Configuration;
         await AddressablesLogic.DownLoadConfig();
         CommonSetting commonSetting = await AddressablesLogic.GetCommonSetting();
+        startupStage = StartupStage.ConfigurationInitialization;
         commonSetting.Initialise();
         
+        startupStage = StartupStage.ResourceInspection;
         string failedLabel = null;
         var bytes = await AddressablesLogic.GetWholeDownLoadSize(
             label => failedLabel = label,
@@ -184,43 +234,69 @@ public class StartUpPresentation : MonoBehaviour
     {
         try
         {
-            HighLightLayer.DarkOff(Color.white, 0);
-            var imageBg = UILayerLoader.Load<ImageBg>();
-            imageBg.Setup();
-            UILayerLoader.Load<ProgressLayer>(true, null, true);
+            startupStage = StartupStage.DownloadUi;
+            HighLightLayer.Close();
+            // Download UI uses only the bundled progress layer, with no character art.
+            ProgressLayer.Downloading(AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+            startupStage = StartupStage.ResourceDownload;
             await AddressablesLogic.ResourcePrepareProcess(
                 null,
                 progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadedBytes / wholeBytes),
                 downLoadLabels
             );
             ProgressLayer.Close();
-            UILayerLoader.Remove<ImageBg>();
             await Go();
         }
         catch (Exception exception)
         {
-            ShowStartupFailure(exception);
+            ShowResourceFailure(exception);
         }
     }
 
     async UniTask Go()
     {
-        HighLightLayer.Close();
-        Application.targetFrameRate = 70;
-        FightGlobalSetting.SceneStep = 1;
-        await starter.Initialise();
-        if (frontSceneFight && PlayFabReadClient.DontShowFrontFight == "False")
+        if (startupInProgress)
+            return;
+
+        startupInProgress = true;
+        try
         {
-            starter.EnterFrontScene();
+            HighLightLayer.Close();
+            Application.targetFrameRate = 70;
+            FightGlobalSetting.SceneStep = 1;
+            var text = AppSetting.Value.Language switch
+            {
+                SystemLanguage.Japanese => "ゲームデータを初期化中...",
+                SystemLanguage.Chinese => "正在初始化游戏数据...",
+                _ => "Initializing game data..."
+            };
+            ProgressLayer.Loading(text);
+            await UniTask.NextFrame();
+
+            await starter.Initialise();
+            if (frontSceneFight && PlayFabReadClient.DontShowFrontFight == "False")
+            {
+                ProgressLayer.Close();
+                starter.EnterFrontScene();
+            }
+            else
+            {
+                await AppSetting.PlayBGM(CommonSetting.StartThemeAddressKey);
+                var titleBgLayer = UILayerLoader.Load<TitleBgLayer>(true, null, true);
+                await titleBgLayer.Setup(1);
+                titleBgLayer.Rotate(false);
+                var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>(true, null, true);
+                titleScreenLayer.Initialise();
+                ProgressLayer.Close();
+            }
         }
-        else
+        catch (Exception exception)
         {
-            await AppSetting.PlayBGM(CommonSetting.StartThemeAddressKey);
-            var titleBgLayer= UILayerLoader.Load<TitleBgLayer>(true, null, true);
-            await titleBgLayer.Setup(1);
-            titleBgLayer.Rotate(false);
-            var titleScreenLayer = UILayerLoader.Load<TitleScreenLayer>(true, null, true);
-            titleScreenLayer.Initialise();
+            ShowInitializationFailure(exception);
+        }
+        finally
+        {
+            startupInProgress = false;
         }
     }
 }

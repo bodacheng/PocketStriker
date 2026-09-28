@@ -12,6 +12,7 @@ using UnityEditor.Build.Player;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using FightScene;
 
 /// <summary>Repeatable local checks; does not log in, purchase, or publish content.</summary>
@@ -26,6 +27,7 @@ public static class PocketStrikerValidation
     const string ReadyFrameKey = SmokeKey + ".ReadyFrame";
     const string ReentryKey = SmokeKey + ".ReentryObserved";
     const string PoolCheckKey = SmokeKey + ".PoolChecked";
+    const string DownloadCheckKey = SmokeKey + ".DownloadUiChecked";
     const string PlayModeBuilderKey = SmokeKey + ".PlayModeBuilder";
     const string ReportDirectory = "Logs/Revival";
 
@@ -68,6 +70,7 @@ public static class PocketStrikerValidation
         public FightRunReport[] fightRuns;
         public bool reentryObserved;
         public bool poolLifecyclePassed;
+        public bool downloadPresentationPassed;
     }
 
     static PocketStrikerValidation()
@@ -125,6 +128,7 @@ public static class PocketStrikerValidation
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 if (prefab != null) CheckScripts(prefab, path, errors);
             }
+            CheckDownloadProgressAssets(errors);
         }
         finally
         {
@@ -143,6 +147,58 @@ public static class PocketStrikerValidation
             var count = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(child.gameObject);
             if (count > 0) errors.Add($"{path}: {child.name} has {count} missing script(s).");
         }
+    }
+
+    static void CheckDownloadProgressAssets(List<string> errors)
+    {
+        const string path = "Assets/Resources/DummyLayerSystem/ProgressLayer.prefab";
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        var progress = prefab != null ? prefab.GetComponent<ProgressLayer>() : null;
+        if (progress == null)
+        {
+            errors.Add(path + ": bundled download progress layer is missing.");
+            return;
+        }
+
+        var serialized = new SerializedObject(progress);
+        foreach (var field in new[] { "progressBar", "percentage", "info", "bigCurtain" })
+        {
+            if (serialized.FindProperty(field)?.objectReferenceValue == null)
+                errors.Add(path + ": missing download UI reference: " + field);
+        }
+    }
+
+    static void CheckDownloadPresentation()
+    {
+        const string description = "Downloading resources...";
+        try
+        {
+            // AssetDatabase play mode skips downloading. Exercise its real UI entry
+            // separately, including reuse while a previous progress tween is active.
+            ProgressLayer.Downloading(description);
+            var layer = UnityEngine.Object.FindFirstObjectByType<ProgressLayer>();
+            if (layer == null) throw new InvalidOperationException("Download progress did not open.");
+            ProgressLayer.LoadingPercent("Previous download", 0.75f);
+            ProgressLayer.Downloading(description);
+
+            var serialized = new SerializedObject(layer);
+            var bar = (Slider)serialized.FindProperty("progressBar").objectReferenceValue;
+            var percentage = (Text)serialized.FindProperty("percentage").objectReferenceValue;
+            var info = (Text)serialized.FindProperty("info").objectReferenceValue;
+            var curtain = (Image)serialized.FindProperty("bigCurtain").objectReferenceValue;
+            if (layer.transform.parent != PosCal.Canvas.transform ||
+                !bar.gameObject.activeInHierarchy || bar.value != 0 || percentage.text != "0%" ||
+                info.text != description || curtain.color != Color.black || !curtain.raycastTarget ||
+                curtain.transform.GetSiblingIndex() != 0 ||
+                UnityEngine.Object.FindObjectsByType<ProgressLayer>(FindObjectsSortMode.None).Length != 1)
+                throw new InvalidOperationException("Download UI must show a single full-screen progress layer at 0% with an opaque background.");
+
+            ProgressLayer.Close();
+            if (layer.gameObject.activeInHierarchy || !layer.IsClosing)
+                throw new InvalidOperationException("Download progress remained active after closing.");
+            Debug.Log("POCKETSTRIKER_DOWNLOAD_UI_PASSED: initialized, reset and closed without character backgrounds.");
+        }
+        finally { ProgressLayer.Close(); }
     }
 
     public static void PrepareEditor()
@@ -183,6 +239,7 @@ public static class PocketStrikerValidation
         SessionState.SetString(RunsKey, JsonUtility.ToJson(new FightRuns()));
         SessionState.SetBool(ReentryKey, false);
         SessionState.SetBool(PoolCheckKey, false);
+        SessionState.SetBool(DownloadCheckKey, false);
         Application.logMessageReceived -= CaptureError;
         Application.logMessageReceived += CaptureError;
         EditorApplication.update -= PollSmoke;
@@ -321,6 +378,11 @@ public static class PocketStrikerValidation
                     if (!SessionState.GetBool(PoolCheckKey, false))
                     {
                         try { CheckPoolLifecycle(); SessionState.SetBool(PoolCheckKey, true); }
+                        catch (Exception exception) { FinishSmoke(new[] { exception.ToString() }); return; }
+                    }
+                    if (!SessionState.GetBool(DownloadCheckKey, false))
+                    {
+                        try { CheckDownloadPresentation(); SessionState.SetBool(DownloadCheckKey, true); }
                         catch (Exception exception) { FinishSmoke(new[] { exception.ToString() }); return; }
                     }
                     SessionState.SetString(ReadyKey, DateTime.UtcNow.ToString("O"));
@@ -610,7 +672,8 @@ public static class PocketStrikerValidation
             errors = errorArray,
             fightRuns = check == "startup" ? ReadFightRuns().items.ToArray() : Array.Empty<FightRunReport>(),
             reentryObserved = check == "startup" && SessionState.GetBool(ReentryKey, false),
-            poolLifecyclePassed = check == "startup" && SessionState.GetBool(PoolCheckKey, false)
+            poolLifecyclePassed = check == "startup" && SessionState.GetBool(PoolCheckKey, false),
+            downloadPresentationPassed = check == "startup" && SessionState.GetBool(DownloadCheckKey, false)
         }, true);
         File.WriteAllText(Path.Combine(ReportDirectory, check + "-report.json"), json);
         File.WriteAllText(Path.Combine(ReportDirectory, check + "-" + EditorUserBuildSettings.activeBuildTarget + "-report.json"), json);

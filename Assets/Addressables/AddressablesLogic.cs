@@ -218,11 +218,12 @@ public static class AddressablesLogic
 
     static async UniTask LoadErrorThenBackToStart()
     {
+        // The launcher owns its failure popup while scene 0 is active.
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            return;
+
         ProgressLayer.Loading("download error");
         await UniTask.Delay(TimeSpan.FromSeconds(2));
-        if (SceneManager.GetActiveScene().buildIndex != 0)
-        {
-            SceneManager.LoadScene(0);
-        }
+        SceneManager.LoadScene(0);
     }
 }

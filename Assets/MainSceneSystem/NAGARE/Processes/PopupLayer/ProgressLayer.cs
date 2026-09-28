@@ -25,7 +25,24 @@ public class ProgressLayer : UILayer
             layer.percentage.text = "0%";
         }
     }
-    
+
+    // Downloads must be presentable before any remote resources are available.
+    public static void Downloading(string description)
+    {
+        var layer = UILayerLoader.Load<ProgressLayer>(true, null, true);
+        if (layer == null) return;
+
+        currentTween?.Kill();
+        currentTween = null;
+        layer.bigCurtain.DOKill();
+        layer.bigCurtain.color = Color.black;
+        layer.bigCurtain.raycastTarget = true;
+        layer.bigCurtain.transform.SetAsFirstSibling();
+        layer.info.text = description;
+        layer.progressBar.gameObject.SetActive(true);
+        SetProgressValue(layer, 0);
+    }
+
     #region 黑幕
     void DarkOff(float darkness, float duration)
     {

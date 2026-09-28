@@ -6,7 +6,17 @@
 
 手机上的 Jenkins iOS 包会在启动时检查远端 Addressables catalog。`CustomIOSBuild_V` 的 Unity Player 导出会再次构建 Addressables，因此**导出完成后的** `ServerData` 才与 IPA 内的 catalog 和本地 bundle 配套。单独运行 `AssetDev_V` 全量构建并上传到同一个 Release URL，会替换 catalog，也可能让包内本地 bundle 的 CRC 与新 catalog 不符。
 
-2026-09-28 核对：`CustomIOSBuild_V #17–#19` IPA 内的 catalog hash 为 `bab01537e03d30abf8047a41c068f9d8`；随后 `AssetDev_V #6` 上传的 `release/v/3.0.0/iOS` catalog hash 为 `95503727c36c16b946de7ffcc64ed39b`。两次构建使用同一 Git 提交，但 96 个同名本地 bundle 中有 52 个内容不同。截图中的启动失败弹窗是统一异常提示；真机日志仍需确认失败的具体资源。
+2026-09-28 核对：`CustomIOSBuild_V #17–#19` IPA 内的 catalog hash 为 `bab01537e03d30abf8047a41c068f9d8`；随后 `AssetDev_V #6` 上传的 `release/v/3.0.0/iOS` catalog hash 为 `95503727c36c16b946de7ffcc64ed39b`。两次构建使用同一 Git 提交，但 96 个同名本地 bundle 中有 52 个内容不同。旧版启动弹窗把所有异常都描述为网络错误，不能用它判断根因。
+
+3.0.1 仍重现了这个发布风险：`CustomIOSBuild_V #20` IPA 内的 catalog hash 为 `265491fbe1eeec297ee64da83a7ed3cf`，随后 `AssetDev_V #7` 发布的线上 catalog hash 为 `36a1d5584927a58834b0f37046ac15a7`。正常联网且成功更新 catalog 时，#20 会使用 #7 catalog；线上 `config` 标签的 15 个 bundle 均与 #7 匹配。若远端 hash 请求失败而回退到 #20 包内 catalog，则旧 MonoScripts bundle 的 URL 已返回 HTTP 403，另有 3 个配置 bundle 被同名异字节内容覆盖；在手机缺少旧 bundle 缓存时，`DownLoadConfig()` 会失败。
+
+已连接真机复现了 #20 的同一弹窗，实际堆栈是 `ImageBg.Setup()` 调用 `AdjustSize()` 时访问空的 `p1.sprite`。版本、配置和 130.3 MB 下载量检查均已通过；点击下载确认后，在下载开始前就抛空引用。`ImageBg.prefab` 的 `p1/p2` Sprite GUID 所对应图片在整理资源时被删除。该真机错误与上面的 catalog 回退风险是两个独立问题。
+
+PocketStriker 不使用这些人物贴图。最终修复删除下载流程中的 `ImageBg` 加载、注册、脚本和 prefab，改为直接打开包内 `ProgressLayer`，立即显示纯色背景、0% 进度及本地化下载文案。未恢复已删除的人物图片；下载界面不再读取它们的 Sprite 或尺寸。配置初始化、下载界面、资源下载、游戏初始化分别记录错误阶段，避免把空引用等程序错误误报成断网。此修复需要重新构建并安装 iOS 客户端，仅更新远端资源不会改变旧安装包的代码。
+
+回归入口为 `bash Tools/validate_unity.sh check ios`、`compile ios` 和 `startup ios`。启动 smoke 在 AssetDatabase 模式下运行，另行调用实际下载 UI 入口，检查纯色背景位于内容后方、全屏进度层从 0% 开始、重复打开时重置进度、关闭时移除遮挡。`startup-report.json` 的 `downloadPresentationPassed` 记录此结果；该检查不代表新 IPA 已在真机完成 CDN 下载。
+
+另对 #7 catalog 的 9 个启动下载标签（384 个唯一 bundle）逐项核对线上对象：全部 HTTP 200，长度及 MD5 与 #7 工作区文件相同。修复下载界面后，目前未发现该轮资源发布的缺包。
 
 发布前用 `python3 Tools/Validation/verify_ios_addressables_pair.py --player-aa <Xcode导出目录>/Data/Raw/aa --server-dir <同一次Player构建的ServerData>/iOS --check-remote` 检查 IPA 对应 catalog 与线上 catalog；去掉 `--check-remote` 可先核对本地配对。Release 资源需要从与 IPA 同次构建的快照发布；对已安装客户端更新资源时使用 Addressables content update 流程。不要在已发布版本的 URL 上上传另一轮独立全量构建。
 

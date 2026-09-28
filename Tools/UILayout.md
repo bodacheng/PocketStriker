@@ -25,7 +25,7 @@ changes. Validation checks both the center offset and repeated-call stability.
 
 | Flow | Main layers | Shared layers / additional states |
 | --- | --- | --- |
-| Startup, title, story, loading | `TitleScreenLayer`, `TitleBgLayer`, `ProgressLayer`, `ImageBg` | Login, nickname, story skip, loading percent |
+| Startup, title, story, loading | `TitleScreenLayer`, `TitleBgLayer`, `ProgressLayer` | Login, nickname, story skip, loading percent |
 | Home | `FrontLayer` | `UpperInfoBar`, `LowerMainBar`; developer skill-test buttons |
 | Adventure chapters | `ArcadeTop` | `LowerMainBar`, `ReturnLayer`; three stage rows and the preview skill grid |
 | Random boss / event | `EventBattleTop` | `LowerMainBar`, `ReturnLayer` |
