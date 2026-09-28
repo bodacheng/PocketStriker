@@ -43,8 +43,13 @@ public class ShaderManager : MonoBehaviour
                 continue;
             }
 
-            shadowRenderer.sharedMaterial = CommonSetting.ShadowMaterial;
-            shadowRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            var shadowMaterials = shadowRenderer.sharedMaterials;
+            for (var i = 0; i < shadowMaterials.Length; i++)
+            {
+                shadowMaterials[i] = CommonSetting.ShadowMaterial;
+            }
+            shadowRenderer.sharedMaterials = shadowMaterials;
+            shadowRenderer.shadowCastingMode = ShadowCastingMode.On;
             shadowRenderer.receiveShadows = false;
             shadowRenderer.lightProbeUsage = LightProbeUsage.Off;
             shadowRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
