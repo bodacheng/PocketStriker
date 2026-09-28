@@ -34,8 +34,62 @@ internal static class RuntimeLoadingTests
         }
     }
 
+    static async UniTask CheckBattleGroundLoading()
+    {
+        var controller = new BoundaryControlByGod();
+        var firstLoad = controller.ChangeBackGround(0);
+        var first = new GameObject("valid") { BattleGround = new BattleGround() };
+        AddressablesLogic.Complete("battleGround/0", first);
+        await firstLoad;
+        Check(first.BattleGround.SetCalls == 1, "valid battlefield applies placement");
+        await controller.ChangeBackGround(0);
+        Check(AddressablesLogic.Calls("battleGround/0") == 1, "same battlefield is reused");
+
+        var legacyLoad = controller.ChangeBackGround(1);
+        Check(!first.Destroyed, "previous battlefield survives while replacement loads");
+        var legacy = new GameObject("missing settings component");
+        AddressablesLogic.Complete("battleGround/1", legacy);
+        await legacyLoad;
+        Check(first.Destroyed && !legacy.Destroyed, "missing component does not abort battle preparation");
+
+        var nullLoad = controller.ChangeBackGround(2);
+        AddressablesLogic.Complete("battleGround/2", null);
+        await nullLoad;
+        Check(!legacy.Destroyed, "empty load preserves current battlefield");
+        var retry = controller.ChangeBackGround(2);
+        Check(AddressablesLogic.Calls("battleGround/2") == 2, "empty load remains retryable");
+        AddressablesLogic.Fail("battleGround/2");
+        Check(await ObserveFailure(retry) && !legacy.Destroyed, "failed load preserves current battlefield");
+
+        var staleLoad = controller.ChangeBackGround(3);
+        var latestLoad = controller.ChangeBackGround(4);
+        var latest = new GameObject("latest") { BattleGround = new BattleGround() };
+        AddressablesLogic.Complete("battleGround/4", latest);
+        await latestLoad;
+        var stale = new GameObject("stale") { BattleGround = new BattleGround() };
+        AddressablesLogic.Complete("battleGround/3", stale);
+        await staleLoad;
+        Check(stale.Destroyed && !latest.Destroyed && stale.BattleGround.SetCalls == 0,
+            "late completion cannot overwrite newer battlefield");
+
+        var abandonedLoad = controller.ChangeBackGround(5);
+        await controller.ChangeBackGround(4);
+        var abandoned = new GameObject("abandoned");
+        AddressablesLogic.Complete("battleGround/5", abandoned);
+        await abandonedLoad;
+        Check(abandoned.Destroyed && !latest.Destroyed, "reselecting current battlefield cancels pending replacement");
+
+        var exitLoad = controller.ChangeBackGround(6);
+        UnityEngine.Object.Destroy(controller);
+        var afterExit = new GameObject("scene already exited");
+        AddressablesLogic.Complete("battleGround/6", afterExit);
+        await exitLoad;
+        Check(afterExit.Destroyed, "scene exit releases late Addressables instance");
+    }
+
     static async UniTask Run()
     {
+        await CheckBattleGroundLoading();
         var first = AnimationResourceLoader.LoadAnim("unit", "shared");
         var second = AnimationResourceLoader.LoadAnim("unit", "shared");
         Check(AddressablesLogic.Calls("unit/skill/shared.anim") == 1, "simultaneous clips share one I/O request");
@@ -320,6 +374,7 @@ public static class AddressablesLogic
     public static int Calls(string key) => counts.TryGetValue(key, out var count) ? count : 0;
     public static bool HasIndexedTag(string tag) => true;
     public static bool CheckKeyExist(string tag, string key) => !Missing.Contains(key);
+    public static UniTask<GameObject> LoadObject(string key) => LoadT<GameObject>(key);
     public static async UniTask<T> LoadT<T>(string key)
     {
         counts[key] = Calls(key) + 1;
@@ -394,9 +449,20 @@ public sealed class Decomposition
 }
 namespace UnityEngine
 {
+    public sealed class SerializeField : Attribute { }
+    public class MonoBehaviour : Object { }
+    public class ParticleSystem : Object { public GameObject gameObject = new GameObject("particle"); }
+    public static class Random { public static int Range(int min, int max) => min; }
     public class Object
     {
         public string name;
+        public bool Destroyed;
+        public static void Destroy(Object value) { if (value != null) value.Destroyed = true; }
+        public static bool operator ==(Object a, Object b) =>
+            (ReferenceEquals(a, null) || a.Destroyed) ? (ReferenceEquals(b, null) || b.Destroyed) : ReferenceEquals(a, b);
+        public static bool operator !=(Object a, Object b) => !(a == b);
+        public override bool Equals(object other) => ReferenceEquals(this, other);
+        public override int GetHashCode() => base.GetHashCode();
         public static implicit operator bool(Object value) => value != null;
     }
     public class AnimationClip : Object { public AnimationEvent[] events = Array.Empty<AnimationEvent>(); }
@@ -419,8 +485,10 @@ namespace UnityEngine
     {
         public Decomposition Decomposition = new Decomposition();
         public UniTaskCompletionSource<bool> PreloadGate;
+        public BattleGround BattleGround;
         public GameObject(string name) { this.name = name; }
-        public T GetComponent<T>() where T : class => Decomposition as T;
+        public void SetActive(bool active) { }
+        public T GetComponent<T>() where T : class => BattleGround as T ?? Decomposition as T;
     }
     public class Transform { public Vector3 position; public Quaternion rotation; }
     public struct Vector3 { public static Vector3 zero => default; }
@@ -466,3 +534,18 @@ namespace UnityEngine.Animations
         public void SetSources(List<ConstraintSource> sources) { }
     }
 }
+
+// Minimal battle setup types for executing the actual boundary loader above.
+public class BattleGround { public int SetCalls; public void Set() { SetCalls++; } }
+public class SensorUnity { public void Setup(float radius, Vector3 center, int count) { } }
+public enum FightEventType { Gangbang }
+public enum TeamMode { MultiRaid }
+public static class FightLoad { public static TestFightInfo Fight = new TestFightInfo(); }
+public class TestFightInfo
+{
+    public FightEventType EventType;
+    public TeamMode team1Mode;
+    public TestMembers FightMembers = new TestMembers();
+}
+public class TestMembers { public TestSets HeroSets = new TestSets(), EnemySets = new TestSets(); }
+public class TestSets { public List<object> GetValues() => new List<object>(); }

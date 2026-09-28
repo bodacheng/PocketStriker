@@ -154,3 +154,23 @@ fixture.
 All authored screen previews and the added Settings/combo-state previews were
 visually reviewed. Dynamic network-loaded lists, all animation frames and device
 hardware behavior remain outside this local validation result.
+
+## Battle loading screen
+
+Run **PocketStriker → Validation → Battle Loading Screen** for both the tip
+background and progress overlay at five portrait sizes, including 1206×2622
+with simulated notch/home-indicator insets. `Logs/UILayout/battle-loading.json`
+checks full-canvas background coverage, safe content regions, repeat resizing,
+the screenshot's Chinese glyphs, and the three local battlefield prefab root
+components. Device-specific previews are saved under `Logs/UILayout/previews`.
+The tip layer uses the full-screen loader route; its content still uses the
+shared safe-area regions. Both loading prefabs use the bundled OFL Noto CJK font
+and nonzero transform scales for reliable text positioning.
+
+`python3 Tools/Validation/validate_runtime_loading.py` additionally covers
+battlefield replacements with missing components, null/failed loads, out-of-order
+completion and scene exits. A legacy bundle without `BattleGround` can finish
+loading using its instantiated transform; it cannot apply the missing component's
+placement data. Rebuild and publish Addressables alongside the matching player
+to restore the configured placement for such bundles. Local prefab validation
+does not certify a previously published remote bundle or an installed iOS app.

@@ -113,6 +113,12 @@ public static class PocketStrikerValidation
                     entriesCount++;
                     addresses.Add(entry.address);
                     if (string.IsNullOrEmpty(entry.AssetPath)) errors.Add("Unresolved Addressable: " + entry.address);
+                    if (entry.address.StartsWith("battleGround/", StringComparison.Ordinal))
+                    {
+                        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(entry.AssetPath);
+                        if (prefab == null || prefab.GetComponent<BattleGround>() == null)
+                            errors.Add("BattleGround component missing at prefab root: " + entry.address);
+                    }
                 }
                 foreach (var key in new[] { "app_version", "Config/commonSetting" })
                     if (!addresses.Contains(key)) errors.Add("Missing startup address: " + key);

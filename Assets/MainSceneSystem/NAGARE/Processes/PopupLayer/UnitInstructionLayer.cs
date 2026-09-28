@@ -22,8 +22,8 @@ public class UnitInstructionLayer : UILayer
         
         var tip = Translate.GetRandomGameTip();
 
-        gameTipTitle.text = tip[0];
-        gameTip.text = tip[1];
+        gameTipTitle.text = tip.Length > 0 ? tip[0] : string.Empty;
+        gameTip.text = tip.Length > 1 ? tip[1] : string.Empty;
     }
     
     public void LoadUnitImage()

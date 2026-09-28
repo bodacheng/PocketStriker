@@ -229,7 +229,9 @@ public class PreparingProcess : FSceneProcess
     public override void ProcessEnter()
     {
         //HighLightLayer.DarkOff(Color.white, 0, true);
-        var unitInstructionLayer = UILayerLoader.Load<UnitInstructionLayer>();
+        // Background covers the notch/home-indicator area; UILayer keeps text safe.
+        // Place it above battle UI, then EnterProcess puts the progress bar on top.
+        var unitInstructionLayer = UILayerLoader.Load<UnitInstructionLayer>(true, null, true);
         unitInstructionLayer.LoadUnitImage();
         EnterProcess().Forget();
     }

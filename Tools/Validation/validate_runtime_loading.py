@@ -31,6 +31,7 @@ def main():
         if not dependency.is_file():
             raise SystemExit(f"Import the project first; missing compiler dependency: {dependency}")
     sources = [
+        "Assets/BoundaryControl/BoundaryControlByGod.cs",
         "Assets/ResourceLoading/AnimationResourceLoader.cs",
         "Assets/AnimControl/AnimationManger_ResourceLoad.cs",
         "Assets/ResourceLoading/AudioResourceLoading.cs",

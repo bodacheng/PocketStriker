@@ -46,9 +46,12 @@ MonoBehaviour:
   wallCrackEffectCode: wallCrack
   breakFreeEffectCode: breakFree
   memberShiftEffectCode: membershift
+  subMemberShiftEffectCode: 
+  clothesBurstEffectCode: clothesBurst
   btnTapSound: {fileID: 8300000, guid: a6473f5264a14804e992a7a4a29cd744, type: 3}
   btnConfirmSound: {fileID: 8300000, guid: 468f662ba85278c419ef967f7c33907b, type: 3}
   exTabSound: {fileID: 8300000, guid: bfc5803fa8fa8924bbeaa34f4f689bb1, type: 3}
+  cameraSpeed: 20
   aiDetectInterval: 20
   characterAnimDurationList:
   - type: human
@@ -79,3 +82,4 @@ MonoBehaviour:
   blueFrameColor: {r: 0, g: 1, b: 0.9529412, a: 1}
   greenBgColor: {r: 0.20784314, g: 0.6431373, b: 0.41568628, a: 1}
   greenFrameColor: {r: 0, g: 1, b: 0.043137256, a: 1}
+  changeToSubHpPercent: 0.3

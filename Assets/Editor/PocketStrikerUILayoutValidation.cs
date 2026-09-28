@@ -23,7 +23,7 @@ public static class PocketStrikerUILayoutValidation
     // Actual Load(..., loadToFullScreen: true) call sites in StartUpPresentation,
     // FightingProcess, PreparingProcess, FrontPage and the shared modal helpers.
     static readonly HashSet<string> FullScreenLayers = new HashSet<string> {
-        "TitleScreenLayer", "TitleBgLayer", "ProgressLayer", "PopupLayer", "AskIfLinkDeviceLayer", "HighLightLayer"
+        "TitleScreenLayer", "TitleBgLayer", "ProgressLayer", "UnitInstructionLayer", "PopupLayer", "AskIfLinkDeviceLayer", "HighLightLayer"
     };
     static readonly string[] AuthoredState = { "authored" };
     static readonly string[] SettingStates = {
@@ -169,6 +169,51 @@ public static class PocketStrikerUILayoutValidation
         public Scene scene;
         public bool dirty;
         public string path;
+    }
+
+    [MenuItem("PocketStriker/Validation/Battle Loading Screen")]
+    public static void ValidateBattleLoading()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            throw new InvalidOperationException("Stop Play mode before checking the loading screen.");
+        var previousCanvas = PosCal.Canvas;
+        var previousSafeArea = PosCal.SafeAreaRect;
+        var report = new Report { unityVersion = Application.unityVersion, utcTime = DateTime.UtcNow.ToString("O") };
+        try
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/ExternalAssets/BattleGround" }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab.GetComponent<BattleGround>() == null)
+                    report.failures.Add("BattleGround component missing at prefab root: " + path);
+            }
+            foreach (var layerName in new[] { "UnitInstructionLayer", "ProgressLayer" })
+            foreach (var device in new[] {
+                new Device("Phone 540x960", 540, 960),
+                new Device("Small phone 375x667", 375, 667),
+                new Device("Notched phone 390x844", 390, 844, 34, 47),
+                new Device("Screenshot phone 1206x2622", 1206, 2622, 102, 186),
+                new Device("iPad 768x1024", 768, 1024)
+            })
+            {
+                var source = Resources.Load<GameObject>("DummyLayerSystem/" + layerName);
+                var result = new CaseResult { layer = layerName, device = device.name,
+                    parenting = "full-screen canvas (runtime route)", state = "authored", screenPixels = device.size,
+                    safeAreaPixels = device.safe };
+                CheckCase(source, device, result, true);
+                report.cases.Add(result);
+            }
+            report.errors = report.failures.Count + report.cases.Sum(item => item.findings.Count(finding => finding.severity == "error"));
+            report.warnings = report.cases.Sum(item => item.findings.Count(finding => finding.severity == "warning"));
+            report.casesChecked = report.expectedCases = report.cases.Count;
+            report.passed = report.errors == 0 && report.warnings == 0;
+            Directory.CreateDirectory("Logs/UILayout");
+            File.WriteAllText("Logs/UILayout/battle-loading.json", JsonUtility.ToJson(report, true));
+            if (!report.passed) throw new InvalidOperationException("Battle loading layout failed; see Logs/UILayout/battle-loading.json.");
+            Debug.Log("[BattleLoading] PASS: ten layout cases, full-screen backgrounds, safe content, Chinese glyphs, repeated resize and battlefield prefab components.");
+        }
+        finally { PosCal.Canvas = previousCanvas; PosCal.SafeAreaRect = previousSafeArea; }
     }
 
     [MenuItem("PocketStriker/Validation/UI Layout")]
@@ -396,6 +441,14 @@ public static class PocketStrikerUILayoutValidation
             var areaNames = new[] { "top", "middle", "bottom" };
             var areas = areaNames.Select(name => new SerializedObject(layer).FindProperty(name).objectReferenceValue as RectTransform).ToArray();
             result.safeBounds = Bounds(safe, root);
+            if (fullScreen && (sourceLayer is UnitInstructionLayer || sourceLayer is ProgressLayer))
+            {
+                var background = sourceFields.FindProperty(sourceLayer is UnitInstructionLayer ? "bgImage" : "bigCurtain").objectReferenceValue as Graphic;
+                var backgroundRect = background != null ? copies[background.transform] as RectTransform : null;
+                if (backgroundRect == null || !Contains(Bounds(backgroundRect, root), Bounds(canvasRect, root)))
+                    Add(result, "error", "loading-background-not-fullscreen", source.name, "", default,
+                        Bounds(canvasRect, root), "Loading background must cover the entire canvas, including device safe-area insets.");
+            }
             var firstBounds = areas.Select(area => area != null ? Bounds(area, root) : default).ToArray();
             layer.ResizeAreas();
             Rebuild(root);
@@ -438,7 +491,35 @@ public static class PocketStrikerUILayoutValidation
             }
             if (sourceLayer is SkillEditLayer comboLayer && result.state == "combo-explanation")
                 CheckComboExplanationState(comboLayer, root, copies, result);
-            if (device.name == "Phone 540x960") RenderPreview(canvas, scene, result);
+            if (sourceLayer is UnitInstructionLayer)
+            {
+                // Use the screenshot's localized tip so the preview also exposes missing glyphs.
+                var title = (Text)sourceFields.FindProperty("gameTipTitle").objectReferenceValue;
+                var tip = (Text)sourceFields.FindProperty("gameTip").objectReferenceValue;
+                const string titleText = "战争模式相机操作";
+                const string tipText = "・战争模式下，单指划动屏幕中央可旋转相机";
+                copies[title.transform].GetComponent<Text>().text = titleText;
+                copies[tip.transform].GetComponent<Text>().text = tipText;
+                foreach (var label in new[] { title, tip })
+                foreach (var character in (titleText + tipText).Distinct())
+                    if (label.font == null || !label.font.HasCharacter(character))
+                        Add(result, "error", "loading-font-missing-glyph", label.name, "", default, default,
+                            "Loading font is missing U+" + ((int)character).ToString("X4"));
+                Rebuild(root);
+            }
+            if (sourceLayer is ProgressLayer)
+            {
+                var label = (Text)sourceFields.FindProperty("info").objectReferenceValue;
+                const string progressText = "生成中";
+                copies[label.transform].GetComponent<Text>().text = progressText;
+                foreach (var character in progressText)
+                    if (label.font == null || !label.font.HasCharacter(character))
+                        Add(result, "error", "loading-font-missing-glyph", label.name, "", default, default,
+                            "Progress font is missing U+" + ((int)character).ToString("X4"));
+                Rebuild(root);
+            }
+            if (device.name == "Phone 540x960" || sourceLayer is UnitInstructionLayer || sourceLayer is ProgressLayer)
+                RenderPreview(canvas, scene, result);
         }
         finally { EditorSceneManager.ClosePreviewScene(scene); }
     }
@@ -772,7 +853,8 @@ public static class PocketStrikerUILayoutValidation
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.055f, 0.065f, 0.09f, 1);
         canvas.worldCamera = camera;
-        var texture = new RenderTexture(540, 960, 24, RenderTextureFormat.ARGB32);
+        int width = (int)result.screenPixels.x, height = (int)result.screenPixels.y;
+        var texture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         var previous = RenderTexture.active;
         Texture2D image = null;
         try
@@ -783,7 +865,7 @@ public static class PocketStrikerUILayoutValidation
             // for capture: the project's URP renderer draws these UI materials in its camera UI pass.
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.planeDistance = 1;
-            canvas.scaleFactor = 0.5f;
+            canvas.scaleFactor = width / result.canvasSize.x;
             canvas.pixelPerfect = true;
             foreach (var graphic in canvas.GetComponentsInChildren<Graphic>(true))
             {
@@ -795,8 +877,8 @@ public static class PocketStrikerUILayoutValidation
             if (RenderPipeline.SupportsRenderRequest(camera, request)) RenderPipeline.SubmitRenderRequest(camera, request);
             else camera.Render();
             RenderTexture.active = texture;
-            image = new Texture2D(540, 960, TextureFormat.RGBA32, false);
-            image.ReadPixels(new Rect(0, 0, 540, 960), 0, 0);
+            image = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            image.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             image.Apply();
             var pixels = image.GetPixels32();
             var background = pixels[0];
@@ -811,7 +893,8 @@ public static class PocketStrikerUILayoutValidation
             var directory = Path.Combine(Path.GetDirectoryName(ReportPath), "previews");
             Directory.CreateDirectory(directory);
             result.previewPng = Path.Combine(directory, result.layer + (result.parenting.StartsWith("full-screen", StringComparison.Ordinal) ? "-fullscreen" : "")
-                + (result.state == "authored" ? "" : "-" + result.state) + ".png");
+                + (result.state == "authored" ? "" : "-" + result.state)
+                + (width == 540 && height == 960 ? "" : $"-{width}x{height}") + ".png");
             File.WriteAllBytes(result.previewPng, image.EncodeToPNG());
         }
         catch (Exception exception)

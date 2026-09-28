@@ -65,20 +65,42 @@ public class BoundaryControlByGod : MonoBehaviour {
     }
     
     private int _currentBackGroundNum = -1;
+    private int _backgroundRequest;
     public async UniTask ChangeBackGround(int number)
     {
-        if (_currentBackGroundNum != number)
+        var request = ++_backgroundRequest;
+        if (_currentBackGroundNum == number && battleGround != null)
+            return;
+
+        // Keep the current environment until its replacement has finished loading.
+        var loaded = await AddressablesLogic.LoadObject("battleGround/" + number);
+        if (loaded == null)
+            return;
+
+        // A scene exit or a newer selection can occur while Addressables is loading.
+        if (this == null || request != _backgroundRequest)
         {
-            if (battleGround != null)
-                Destroy(this.battleGround);
-            
-            battleGround = await AddressablesLogic.LoadObject("battleGround/" +number);
-            if (battleGround != null)
-            {
-                battleGround.GetComponent<BattleGround>().Set();
-                _currentBackGroundNum = number;
-            }
+            Destroy(loaded);
+            return;
         }
+
+        var settings = loaded.GetComponent<BattleGround>();
+        if (settings != null)
+            settings.Set();
+        else
+            Debug.LogWarning($"[BattleGround] battleGround/{number} has no BattleGround component. " +
+                "Keeping the instantiated transform. Rebuild and publish Addressables with the current player scripts.");
+
+        if (battleGround != null)
+            Destroy(battleGround);
+        battleGround = loaded;
+        _currentBackGroundNum = number;
+    }
+
+    void OnDestroy()
+    {
+        if (target == this)
+            target = null;
     }
 }
 
