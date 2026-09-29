@@ -12,6 +12,7 @@ public class ClickNextTutorial : MonoBehaviour
     public Button Button => Btn;
     
     private int pageIndex = 0;
+    private int pageVersion;
     void Awake()
     {
         Btn.onClick.AddListener(NextPage);
@@ -19,6 +20,9 @@ public class ClickNextTutorial : MonoBehaviour
 
     public void Open()
     {
+        // The transparent full-screen button owns all clicks, including those
+        // over tutorial labels, masks and the battle controls underneath.
+        Btn.transform.SetAsLastSibling();
         gameObject.SetActive(true);
         pageIndex = -1;
         NextPage();
@@ -26,6 +30,7 @@ public class ClickNextTutorial : MonoBehaviour
     
     async void NextPage()
     {
+        var version = ++pageVersion;
         Btn.interactable = false;
         void ClosePages()
         {
@@ -48,9 +53,18 @@ public class ClickNextTutorial : MonoBehaviour
         {
             ClosePages();
             gameObject.SetActive(false);
+            return;
         }
 
-        await UniTask.Delay(TimeSpan.FromSeconds(clickDelay));
-        Btn.interactable = true;
+        var cancelled = await UniTask.Delay(TimeSpan.FromSeconds(clickDelay), ignoreTimeScale: true,
+            cancellationToken: this.GetCancellationTokenOnDestroy()).SuppressCancellationThrow();
+        if (!cancelled && version == pageVersion && isActiveAndEnabled)
+            Btn.interactable = true;
+    }
+
+    void OnDisable()
+    {
+        ++pageVersion;
+        Btn.interactable = false;
     }
 }

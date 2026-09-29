@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class FightingStepLayer : UILayer
 {
     const int TopButtonSortingOrder = 1000;
+    const int TutorialSortingOrder = TopButtonSortingOrder + 2;
     const float TeamMoveJoystickTouchWidth = 40f;
     const float TeamMoveJoystickTouchHeight = 35f;
     const float RotateCameraJoystickTouchWidth = 45f;
@@ -140,6 +141,9 @@ public class FightingStepLayer : UILayer
     {
         pauseButton.gameObject.SetActive(false);
         clickNextTutorial.Open();
+        // Set sorting after activation: Unity resets a newly added inactive
+        // Canvas when it first joins its parent canvas.
+        PromoteToOverlayCanvas(clickNextTutorial.transform, TutorialSortingOrder);
     }
 
     public bool Initialized { get; set; } = false;
@@ -198,9 +202,9 @@ public class FightingStepLayer : UILayer
     void KeepTopButtonsClickable()
     {
         NormalizeJoystickTouchAreas();
-        PromoteButtonToOverlayCanvas(pauseButton.transform, TopButtonSortingOrder);
-        PromoteButtonToOverlayCanvas(team1UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
-        PromoteButtonToOverlayCanvas(team2UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
+        PromoteToOverlayCanvas(pauseButton.transform, TopButtonSortingOrder);
+        PromoteToOverlayCanvas(team1UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
+        PromoteToOverlayCanvas(team2UI.AutoSwitch.transform, TopButtonSortingOrder + 1);
         pauseButton.transform.parent.SetAsLastSibling();
         DisableRaycastTarget(transform.Find("top"));
         DisableRaycastTarget(transform.Find("middle"));
@@ -250,7 +254,7 @@ public class FightingStepLayer : UILayer
         }
     }
 
-    static void PromoteButtonToOverlayCanvas(Transform target, int sortingOrder)
+    static void PromoteToOverlayCanvas(Transform target, int sortingOrder)
     {
         if (target == null)
         {
@@ -299,6 +303,7 @@ public class FightingStepLayer : UILayer
     {
         preTeam1AIState = Team1UI.AutoSwitch.CurrentState();
         clickTriggerDreamCombo.SetActive(true);
+        PromoteToOverlayCanvas(clickTriggerDreamCombo.transform, TutorialSortingOrder);
     }
 
     private void OnDisable()

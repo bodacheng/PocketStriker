@@ -22,6 +22,10 @@ Unity 竖屏战斗游戏，通过 Git 子模块和 UPM 导入 MCombatShared。�
 可运行 `python3 Tools/Validation/validate_battle_modes.py` 检查模式、队伍与奖励请求规则；
 Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes** 验证全部冒险资源和随机 Boss 技能生成。
 
+**PocketStriker → Validation → Tutorial** 检查六页战斗教程的点击拦截、翻页、自动战斗引导和关闭后恢复输入，
+以及第 1、2 关跳过 AI 故事的规则。报告位于 `Logs/Tutorial/report.json`；此检查使用隔离的战斗 UI，
+不登录账号或请求 AI 服务，不代替完整战斗和真机触控验证。
+
 UI 修改后，在停止播放的编辑器中运行 **PocketStriker → Validation → UI Layout** 和
 **Check Stage Cards**：前者检查所有注册画面及常用导航组合在手机、刘海屏、iPad 下的区域边界，
 后者检查三种语言、锁定状态和四位关卡编号的卡片排版。报告和预览图位于 `Logs/UILayout`。

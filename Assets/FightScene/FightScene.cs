@@ -25,7 +25,7 @@ namespace FightScene
         public AIServiceManager AIServiceManager => aiServiceManager;
         private StoryInfo aiStoryInfo;
         private UniTaskCompletionSource<StoryInfo> aiStoryLoadSource;
-        public StoryInfo AIStoryInfo => aiStoryInfo;
+        public StoryInfo AIStoryInfo => ShouldLoadAIStory() ? aiStoryInfo : null;
 
         public static FightScene target;
         
@@ -162,7 +162,8 @@ namespace FightScene
         private bool ShouldLoadAIStory()
         {
             var fight = FightLoad.Fight;
-            if (fight == null)
+            if (fight == null || fight.RunTutorial ||
+                (fight.EventType == FightEventType.Quest && AdventureModeRules.IsTutorialStage(fight.ID)))
             {
                 return false;
             }
@@ -180,14 +181,14 @@ namespace FightScene
 
         public UniTask<StoryInfo> EnsureAIStory()
         {
-            if (aiStoryInfo != null)
-            {
-                return UniTask.FromResult(aiStoryInfo);
-            }
-
             if (!ShouldLoadAIStory())
             {
                 return UniTask.FromResult<StoryInfo>(null);
+            }
+
+            if (aiStoryInfo != null)
+            {
+                return UniTask.FromResult(aiStoryInfo);
             }
 
             if (aiStoryLoadSource == null)
