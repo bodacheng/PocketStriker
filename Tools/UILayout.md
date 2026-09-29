@@ -1,5 +1,26 @@
 # UI layout coverage
 
+## Battle tutorial callouts
+
+Run **PocketStriker → Validation → Tutorial Layout** or the batch entry
+`PocketStrikerTutorialValidation.ValidateLayoutBatch` (without `-quit`).
+`Logs/Tutorial/Layout/report.json` and 84 PNGs cover the six battle tutorial
+pages plus the Dream Combo explanation in English, Japanese, and Chinese at
+540×960, 375×667, notched 390×844, and 768×1024.
+
+Battle explanations follow the actual joystick base, attack buttons, player
+auto switch, and Dream Combo button. HP/energy uses the combined bounds of the
+current player's real health bar and charge container. The layout updates after
+language, control-position, and safe-area changes. Wrapped CJK text has explicit
+leading space; the validation compares complete generated text against visible
+glyphs, rather than trusting `preferredHeight` alone. Panels and arrows must
+stay in the safe area, and explanation panels must not overlap.
+
+The preview copies the real battle UI and one player icon without loading
+accounts or combat. Runtime-generated skill gem effects and battlefield models
+are omitted; the highlighted rectangles identify the actual controls. The
+separate **Tutorial** check still validates click interception and page flow.
+
 Run **PocketStriker → Validation → UI Layout** in the Unity Editor, or call
 `PocketStrikerUILayoutValidation.Validate` from the existing Unity validation
 runner. The generated report is `Logs/UILayout/report.json`.

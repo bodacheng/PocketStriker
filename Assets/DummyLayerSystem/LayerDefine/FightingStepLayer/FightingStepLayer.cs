@@ -34,6 +34,7 @@ public class FightingStepLayer : UILayer
 
     [Header("教程强制点自动环节黑幕")]
     [SerializeField] GameObject forceClickAutoBtnBlackMask;
+    BattleTutorialLayout tutorialLayout;
 
     public TeamUIManager Team1UI => team1UI;
     public TeamUIManager Team2UI => team2UI;
@@ -139,11 +140,32 @@ public class FightingStepLayer : UILayer
 
     public void OpenTutorial()
     {
+        PrepareTutorialLayout();
         pauseButton.gameObject.SetActive(false);
         clickNextTutorial.Open();
         // Set sorting after activation: Unity resets a newly added inactive
         // Canvas when it first joins its parent canvas.
         PromoteToOverlayCanvas(clickNextTutorial.transform, TutorialSortingOrder);
+        tutorialLayout.RefreshLayout();
+    }
+
+    void PrepareTutorialLayout()
+    {
+        if (tutorialLayout == null)
+            tutorialLayout = gameObject.AddComponent<BattleTutorialLayout>();
+        tutorialLayout.Initialize((RectTransform)transform,
+            () => TutorialUnitIcon()?.HealthBarRect, () => TutorialUnitIcon()?.EnergyBarRect);
+    }
+
+    SideUnitIcon TutorialUnitIcon()
+    {
+        bool Visible(SideUnitIcon icon) => icon != null && icon.HealthBarRect != null &&
+            icon.HealthBarRect.gameObject.activeInHierarchy;
+        var focus = inputsManager != null ? inputsManager.CurrentFocus.Value : null;
+        if (focus != null && team1UI.UnitIconDic.TryGetValue(focus, out var focusedIcon) && Visible(focusedIcon)) return focusedIcon;
+        foreach (var icon in team1UI.UnitIconDic.Values)
+            if (Visible(icon)) return icon;
+        return null;
     }
 
     public bool Initialized { get; set; } = false;
@@ -301,9 +323,11 @@ public class FightingStepLayer : UILayer
 
     public void ForceClickDreamComboBtn()
     {
+        PrepareTutorialLayout();
         preTeam1AIState = Team1UI.AutoSwitch.CurrentState();
         clickTriggerDreamCombo.SetActive(true);
         PromoteToOverlayCanvas(clickTriggerDreamCombo.transform, TutorialSortingOrder);
+        tutorialLayout.RefreshLayout();
     }
 
     private void OnDisable()

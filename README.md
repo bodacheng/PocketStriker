@@ -26,6 +26,9 @@ Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes**
 以及第 1、2 关跳过 AI 故事的规则。报告位于 `Logs/Tutorial/report.json`；此检查使用隔离的战斗 UI，
 不登录账号或请求 AI 服务，不代替完整战斗和真机触控验证。
 
+**Tutorial Layout** 另检查教程全部说明页在四种竖屏尺寸和中／英／日文下的完整文字、
+安全区、箭头目标与重复排版；逐页预览和报告位于 `Logs/Tutorial/Layout`。
+
 UI 修改后，在停止播放的编辑器中运行 **PocketStriker → Validation → UI Layout** 和
 **Check Stage Cards**：前者检查所有注册画面及常用导航组合在手机、刘海屏、iPad 下的区域边界，
 后者检查三种语言、锁定状态和四位关卡编号的卡片排版。报告和预览图位于 `Logs/UILayout`。

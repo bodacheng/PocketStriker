@@ -17,6 +17,12 @@ public class SideUnitIcon : MonoBehaviour {
     public HeroIcon Icon => focusingCharIcon;
     public Text TeamIndicator => teamIndicator;
     public GameObject DreamComboFlg => dreamComboFlg;
+    public RectTransform HealthBarRect => hpBar != null ? hpBar.transform as RectTransform : null;
+    // The charge images can be inactive at zero energy; their common parent
+    // still describes the HUD area that the tutorial needs to point at.
+    public RectTransform EnergyBarRect => charges != null && charges.Length > 0 && charges[0] != null
+        ? charges[0].transform.parent as RectTransform
+        : null;
     private Tweener resistBarTweener;
     public void RefreshResistanceBar(float resistance)
     {

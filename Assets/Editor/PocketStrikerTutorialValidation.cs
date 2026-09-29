@@ -16,7 +16,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>Actual prefab UI raycasts and tutorial callbacks, without account or battle startup.</summary>
-public static class PocketStrikerTutorialValidation
+public static partial class PocketStrikerTutorialValidation
 {
     const string PrefabPath = "Assets/Resources/DummyLayerSystem/FightingStepLayer.prefab";
     const string ReportPath = "Logs/Tutorial/report.json";
@@ -343,6 +343,7 @@ public static class PocketStrikerTutorialValidation
         || component is LayoutGroup || component is LayoutElement || component is ContentSizeFitter
         || component is AspectRatioFitter || component is Mask || component is RectMask2D
         || component is EventTrigger || component is ClickNextTutorial || component is TutorialLayerSpecialEvent
+        || component is UIPosClamper
         || component is TeamUIManager || component is AutoSwitch
         || (component is Animator && component.GetComponentInParent<AutoSwitch>(true) != null);
 
