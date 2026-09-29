@@ -124,8 +124,25 @@ namespace Soul
                 Sensor.GetSuddenThreatInRange(0, 8) != null);
         }
 
-        // 缓存方法名与委托的映射
-        private static readonly Dictionary<string, Func<Behavior, bool>> _methodCache = new Dictionary<string, Func<Behavior, bool>>();
+        // These names are supplied by AI rules. Explicit references keep their
+        // methods reachable in IL2CPP players, where reflection-only methods can
+        // be stripped even though the same battle works in the Editor.
+        private static readonly Dictionary<string, Func<Behavior, bool>> _methodCache = new Dictionary<string, Func<Behavior, bool>>
+        {
+            { nameof(SpareOption), behavior => behavior.SpareOption() },
+            { nameof(LosingDefendStrength), behavior => behavior.LosingDefendStrength() },
+            { nameof(DangerousNearby), behavior => behavior.DangerousNearby() },
+            { nameof(DangerousClose), behavior => behavior.DangerousClose() },
+            { nameof(CounterComingEnergy), behavior => behavior.CounterComingEnergy() },
+            { nameof(CT), behavior => behavior.CT() },
+            { nameof(OnBuff), behavior => behavior.OnBuff() },
+            { nameof(DangerousVeryClose), behavior => behavior.DangerousVeryClose() },
+            { nameof(EnemyClose), behavior => behavior.EnemyClose() },
+            { nameof(TimeToAttack), behavior => behavior.TimeToAttack() },
+            { nameof(TimeToAttack_Reluctant), behavior => behavior.TimeToAttack_Reluctant() },
+            { nameof(TimeToRespond), behavior => behavior.TimeToRespond() },
+            { nameof(TimeToStopRunning), behavior => behavior.TimeToStopRunning() }
+        };
         public bool CheckTriggerCondition(string conditionFunctionName)
         {
             return BehaviorTriggerConditionUtility.InvokeCondition(this, _methodCache, conditionFunctionName);

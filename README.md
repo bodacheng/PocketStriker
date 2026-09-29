@@ -41,6 +41,7 @@ Unity 的当前目标平台保存在本机缓存中，因此项目提供了启�
 Tools/validate_unity.sh check
 Tools/validate_unity.sh startup
 Tools/validate_unity.sh compile
+python3 Tools/Validation/validate_ai_condition_bindings.py
 Tools/validate_unity.sh build
 python3 Tools/Validation/validate_cloudscript_contracts.py
 python3 Tools/Validation/validate_dependency_upgrade.py
@@ -80,6 +81,11 @@ python3 Tools/Validation/validate_ios_pods.py
 
 编辑器的启动验证可以检查 iOS 条件编译下的场景和资源；Xcode 导出验证并不等同于真机运行。
 真机安装、Apple 登录、广告和内购仍需要签名、原生依赖、设备及相应服务环境。
+
+标题战斗的 AI 条件使用显式委托绑定，避免只有字符串反射引用的方法在 IL2CPP 中被裁剪。
+`validate_ai_condition_bindings.py` 检查已编译 iOS 玩家程序集里的直接引用是否覆盖共享包的 AI 规则；
+它检查裁剪前代码，不能代替真机运行。开发模式的日志窗口按竖屏宽度缩放并避开安全区，
+点击错误行可展开完整消息和调用堆栈，拖动列表可查看后续内容。
 
 ## 独立 macOS 包辅助验证
 
