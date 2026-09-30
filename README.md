@@ -92,7 +92,11 @@ python3 Tools/Validation/validate_ios_pods.py
 标题战斗的 AI 条件使用显式委托绑定，避免只有字符串反射引用的方法在 IL2CPP 中被裁剪。
 `validate_ai_condition_bindings.py` 检查已编译 iOS 玩家程序集里的直接引用是否覆盖共享包的 AI 规则；
 它检查裁剪前代码，不能代替真机运行。开发模式的日志窗口按竖屏宽度缩放并避开安全区，
-点击错误行可展开完整消息和调用堆栈，拖动列表可查看后续内容。
+点击错误行可展开消息和调用堆栈，拖动列表可查看后续内容；展开行的 **Copy** 按钮复制完整日志。
+控制台通过 Package Manager 固定到官方 v1.9.0，使用支持中／日／英文的 TMP 字体；迁移说明见
+[依赖升级记录](Tools/DependencyUpgrade.md#debug-console-migration-2026-09-30)。
+**PocketStriker → Validation → Debug Console** 检查超长堆栈的展开、复制和竖屏显示，
+`python3 Tools/Validation/validate_model_loading.py` 检查角色加载失败的具体诊断与取消行为。
 
 ## 独立 macOS 包辅助验证
 

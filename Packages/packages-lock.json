@@ -109,6 +109,15 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.inputsystem": {
+      "version": "1.20.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.localization": {
       "version": "1.5.13",
       "depth": 0,
@@ -301,6 +310,13 @@
         "com.unity.modules.physics2d": "1.0.0",
         "com.unity.modules.physics": "1.0.0"
       }
+    },
+    "com.yasirkula.ingamedebugconsole": {
+      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#73c1d9c582e0b49d63ddcd6efb48b0059f33d43c",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "73c1d9c582e0b49d63ddcd6efb48b0059f33d43c"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
