@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
@@ -31,24 +30,59 @@ internal static class UpgradeRegressionTests
                 throw new InvalidOperationException("Pass the imported Assembly-CSharp-Editor.dll to test the actual VersionSyncUtility.");
             var editorAssembly = Assembly.LoadFrom(args[0]);
             var utility = editorAssembly.GetType("Cocone.ProjectP3.VersionSyncUtility", true);
-            var replace = utility.GetMethod("ReplaceProfileVersion", BindingFlags.NonPublic | BindingFlags.Static);
-            var collect = utility.GetMethod("CollectProfileVersionErrors", BindingFlags.NonPublic | BindingFlags.Static);
-            if (replace == null || collect == null)
+            var normalize = utility.GetMethod("NormalizePath", BindingFlags.NonPublic | BindingFlags.Static);
+            var validateYaml = utility.GetMethod("ValidateYaml", BindingFlags.NonPublic | BindingFlags.Static);
+            var isValidVersion = utility.GetMethod("IsValidVersion", BindingFlags.Public | BindingFlags.Static);
+            var client = editorAssembly.GetType("Cocone.ProjectP3.Client", true);
+            var profileForBuild = client.GetMethod("GetAssetProfileForBuildKind", BindingFlags.NonPublic | BindingFlags.Static);
+            if (normalize == null || validateYaml == null || isValidVersion == null || profileForBuild == null)
                 throw new InvalidOperationException("Import the upgraded project in Unity before running this test.");
 
-            const string yaml = "BuildDev: ServerData/dev/v/3.0.0/\nUploadDev: s3://mcombat/dev/v/3.0.0\nBuildRelease: ServerData/release/v/3.0.0/\nUploadRelease: s3://mcombat/release/v/3.0.0\n";
-            var replaced = (string)replace.Invoke(null, new object[] { yaml, "dev", "3.1.0", true, "test" });
-            Check(replaced.Contains("UploadDev: s3://mcombat/dev/v/3.1.0\n"), "version bump includes non-final LF-terminated upload URL");
-            var crlf = (string)replace.Invoke(null, new object[] { yaml.Replace("\n", "\r\n"), "dev", "3.1.0", true, "test" });
-            Check(crlf.Contains("UploadDev: s3://mcombat/dev/v/3.1.0\r\n"), "version bump includes CRLF-terminated upload URL");
+            const string versionToken = "[UnityEditor.PlayerSettings.bundleVersion]";
+            const string yaml = "ProfileDev: dev\nBuildDev: ServerData/dev/v/3.0.0/\nUploadDev: s3://mcombat/dev/v/3.0.0\nProfileRelease: release\nBuildRelease: ServerData/release/v/3.0.0/\nUploadRelease: s3://mcombat/release/v/3.0.0\n";
+            foreach (var newline in new[] { "\n", "\r\n" })
+            {
+                var input = yaml.Replace("\n", newline);
+                var migrated = (string)normalize.Invoke(null, new object[] { input, "dev", "{version}" });
+                migrated = (string)normalize.Invoke(null, new object[] { migrated, "release", "{version}" });
+                Check(migrated == input.Replace("3.0.0", "{version}"), "all four YAML paths migrate without changing their endpoints or line endings");
+                validateYaml.Invoke(null, new object[] { migrated });
+                Check(true, "migrated YAML validates");
+                Check((string)normalize.Invoke(null, new object[] { migrated, "dev", "{version}" }) == migrated,
+                    "migration is idempotent for existing YAML templates");
+                foreach (var key in new[] { "BuildDev", "UploadDev", "BuildRelease", "UploadRelease" })
+                {
+                    var lines = migrated.Split(new[] { newline }, StringSplitOptions.None);
+                    var line = Array.Find(lines, value => value.StartsWith(key + ":", StringComparison.Ordinal));
+                    ExpectRejected(validateYaml, new object[] { migrated.Replace(line + newline, "") }, typeof(InvalidOperationException), "missing YAML path " + key);
+                    ExpectRejected(validateYaml, new object[] { migrated + line + newline }, typeof(InvalidOperationException), "duplicate YAML path " + key);
+                    ExpectRejected(validateYaml, new object[] { migrated.Replace(line, key + ":") }, typeof(InvalidOperationException), "empty YAML path " + key);
+                }
+                ExpectRejected(validateYaml, new object[] { input }, typeof(InvalidOperationException), "literal YAML versions are rejected");
+            }
 
-            var errors = new List<string>();
-            var staleUploadOnly = yaml.Replace("ServerData/dev/v/3.0.0/", "ServerData/dev/v/3.1.0/");
-            collect.Invoke(null, new object[] { staleUploadOnly, "dev", "3.1.0", "test", errors });
-            Check(errors.Count == 1 && errors[0].Contains("3.0.0"), "validation rejects stale dev upload when build path is current");
-            errors.Clear();
-            collect.Invoke(null, new object[] { replaced, "dev", "3.1.0", "test", errors });
-            Check(errors.Count == 0, "synchronized dev build/upload paths validate");
+            foreach (var profile in new[] { "dev", "release" })
+            foreach (var prefix in new[] { "ServerData", "https://mcombat.s3.ap-northeast-1.amazonaws.com", "s3://mcombat" })
+            {
+                var address = prefix + "/" + profile + "/v/3.0.0/[BuildTarget]";
+                var templated = (string)normalize.Invoke(null, new object[] { address, profile, versionToken });
+                Check(templated == address.Replace("3.0.0", versionToken), "asset address preserves its endpoint while adopting the project version token");
+                Check((string)normalize.Invoke(null, new object[] { templated, profile, versionToken }) == templated,
+                    "profile token migration is idempotent");
+                Check((string)normalize.Invoke(null, new object[] { address.Replace("3.0.0", "{version}"), profile, versionToken }) == templated,
+                    "existing YAML tokens migrate to profile tokens");
+            }
+            ExpectRejected(normalize, new object[] { "ServerData/release/v/3.0.0/iOS", "dev", versionToken }, typeof(InvalidOperationException), "mismatched endpoint profile");
+            ExpectRejected(normalize, new object[] { "ServerData/dev/iOS", "dev", versionToken }, typeof(InvalidOperationException), "missing version path");
+            ExpectRejected(normalize, new object[] { null, "dev", versionToken }, typeof(InvalidOperationException), "missing input path");
+            foreach (var version in new[] { "0.0.0", "3.0.2", "12.34.56" })
+                Check((bool)isValidVersion.Invoke(null, new object[] { version }), "valid project version " + version);
+            foreach (var version in new[] { null, "", "3.0", "3.0.2.1", "v3.0.2", "3.-1.2", "3.0.2-beta", "3.0.2 " })
+                Check(!(bool)isValidVersion.Invoke(null, new object[] { version }), "invalid project version is rejected");
+            Check((string)profileForBuild.Invoke(null, new object[] { "Dev" }) == "dev", "Dev clients use dev assets");
+            Check((string)profileForBuild.Invoke(null, new object[] { "Release" }) == "release", "Release clients use release assets");
+            foreach (var kind in new[] { null, "", "Beta", "invalid" })
+                ExpectRejected(profileForBuild, new object[] { kind }, null, "unsupported client build kind");
 
             Console.WriteLine("PASS: " + checks + " time-window and version-sync regression checks");
             return 0;
@@ -65,5 +99,18 @@ internal static class UpgradeRegressionTests
         if (!condition)
             throw new InvalidOperationException("FAILED: " + message);
         checks++;
+    }
+
+    private static void ExpectRejected(MethodInfo method, object[] arguments, Type exceptionType, string message)
+    {
+        try { method.Invoke(null, arguments); }
+        catch (TargetInvocationException exception)
+        {
+            Check(exceptionType == null
+                    ? exception.InnerException?.GetType().FullName == "UnityEditor.Build.BuildFailedException"
+                    : exceptionType.IsInstanceOfType(exception.InnerException), message);
+            return;
+        }
+        throw new InvalidOperationException("FAILED: accepted " + message);
     }
 }

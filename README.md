@@ -131,3 +131,7 @@ Unity 版本及竖屏视口，旧版本编译的包不能替代当前版本的�
 
 更多依赖版本与回归检查见 [依赖升级记录](Tools/DependencyUpgrade.md)；
 移植范围和最终验证结果见 [Unity 6000.5 升级记录](Tools/Unity6000.5Upgrade.md)。
+
+### 程序与资源版本
+
+在 `MCombat/Version Sync` 设置一个版本号。程序、资源 URL、catalog 名称共用此版本；Jenkins 构建号自动生成。iOS 只选择 Dev/Release 一次，随程序构建并发布同次资源。Release 目录禁止被另一轮完整构建覆盖，新完整发布需增加版本。详细流程和 Jenkins 工具仓库位置见 [Tools/JenkinsPipelines.md](Tools/JenkinsPipelines.md)。

@@ -60,7 +60,7 @@ MonoBehaviour:
   m_CustomContentStateBuildPath: 
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 1
-  m_overridePlayerVersion: v2
+  m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
   - {fileID: 11400000, guid: 1ac9141ffe41041f597365de0370dc81, type: 2}
   - {fileID: 11400000, guid: d62213ee1321e3547be20dd1c3886e0b, type: 2}
@@ -117,9 +117,9 @@ MonoBehaviour:
       - m_Id: 8b470904cb666498391e21708d37dff3
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: b06b7dac454e04a1b8447caade86f7fc
-        m_Value: 'https://mcombat.s3.ap-northeast-1.amazonaws.com/release/v/3.0.1/[BuildTarget]'
+        m_Value: 'https://mcombat.s3.ap-northeast-1.amazonaws.com/release/v/[UnityEditor.PlayerSettings.bundleVersion]/[BuildTarget]'
       - m_Id: cd58eb709aef248a0a61cfcf5029d3c5
-        m_Value: 'ServerData/release/v/3.0.1/[BuildTarget]'
+        m_Value: 'ServerData/release/v/[UnityEditor.PlayerSettings.bundleVersion]/[BuildTarget]'
       - m_Id: eda21008cba8e428482d4e8f9aadebdf
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
     - m_InheritedParent: 
@@ -131,9 +131,9 @@ MonoBehaviour:
       - m_Id: 8b470904cb666498391e21708d37dff3
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: b06b7dac454e04a1b8447caade86f7fc
-        m_Value: 'https://mcombat.s3.ap-northeast-1.amazonaws.com/dev/v/3.0.1/[BuildTarget]'
+        m_Value: 'https://mcombat.s3.ap-northeast-1.amazonaws.com/dev/v/[UnityEditor.PlayerSettings.bundleVersion]/[BuildTarget]'
       - m_Id: cd58eb709aef248a0a61cfcf5029d3c5
-        m_Value: 'ServerData/dev/v/3.0.1/[BuildTarget]'
+        m_Value: 'ServerData/dev/v/[UnityEditor.PlayerSettings.bundleVersion]/[BuildTarget]'
       - m_Id: eda21008cba8e428482d4e8f9aadebdf
         m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
     m_ProfileEntryNames:

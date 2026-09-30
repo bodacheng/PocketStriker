@@ -24,23 +24,12 @@ namespace Cocone.ProjectP3
         {
             // 引数取得
             string assetProfile = "dev";
-            string assetVersion = null;
-            BuildTarget buildTarget = BuildTarget.iOS;
-            BuildTargetGroup buildTargetGroup = BuildTargetGroup.iOS;
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
                     case "-assetVersion":
-                        assetVersion = args[i + 1];
-                        i++;
-                        break;
-                    
-                    case "-buildTarget":
-                        buildTarget = (BuildTarget) System.Enum.Parse(typeof(BuildTarget), args[i + 1]);
-                        buildTargetGroup = (BuildTargetGroup) System.Enum.Parse(typeof(BuildTargetGroup), args[i + 1]);
-                        i++;
-                        break;
+                        throw new BuildFailedException("-assetVersion is no longer supported. Set the project version in MCombat/Version Sync.");
 
                     case "-assetProfile":
                         assetProfile = args[i + 1];
@@ -50,12 +39,16 @@ namespace Cocone.ProjectP3
             }
 
             SetProfile(assetProfile);
-            VersionSyncUtility.AssertVersionSettingsSynchronized(assetVersion);
-            CleanBuild(); // TODO: TargetPlatform設定は要らない？
+            CleanBuild();
         }
 
         public static void SetProfile(string assetProfile)
         {
+            if (assetProfile != "dev" && assetProfile != "release")
+            {
+                throw new BuildFailedException("Asset builds require the dev or release Addressables profile.");
+            }
+
             var settings = GetSettings();
             if (settings == null)
             {
@@ -126,7 +119,7 @@ namespace Cocone.ProjectP3
                 "-quit", "-batchmode",
                 "-executeMethod", unityMethod,
                 "-buildTarget", buildTarget,
-                "-assetProfile", "P3Dev"
+                "-assetProfile", "release"
             };
             BatchBuildInternal(args);
         }
@@ -153,6 +146,17 @@ namespace Cocone.ProjectP3
         [MenuItem("Tools/Asset/CleanBuild")]
         public static void CleanBuild()
         {
+            var settings = GetSettings();
+            if (settings == null)
+            {
+                throw new BuildFailedException("AddressableAssetSettings was not found.");
+            }
+            var profile = settings.profileSettings.GetProfileName(settings.activeProfileId);
+            if (profile != "dev" && profile != "release")
+            {
+                throw new BuildFailedException("Select the dev or release Addressables profile before building assets.");
+            }
+            VersionSyncUtility.AssertVersionSettingsSynchronized();
             AddressableAssetSettings.CleanPlayerContent();
             BuildCache.PurgeCache(false);
             AddressableAssetSettings.BuildPlayerContent(out var result);

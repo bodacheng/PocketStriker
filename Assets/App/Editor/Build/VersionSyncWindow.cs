@@ -1,479 +1,160 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine;
 
 namespace Cocone.ProjectP3
 {
     public sealed class VersionSyncWindow : EditorWindow
     {
-        private const string P3MenuPath = "P3/Version/Sync Version Settings";
-        private const string MCombatMenuPath = "MCombat/Version Sync";
-        private const string WindowTitle = "Version Sync";
-
         private string versionText;
-        private string buildNumberText;
-        private string resourceVersionText;
 
-        [MenuItem(P3MenuPath)]
-        [MenuItem(MCombatMenuPath, priority = 5)]
+        [MenuItem("MCombat/Version Sync", priority = 5)]
+        [MenuItem("P3/Version/Sync Version Settings")]
         public static void Open()
         {
-            var window = GetWindow<VersionSyncWindow>();
-            window.titleContent = new GUIContent(WindowTitle);
-            window.minSize = new Vector2(520f, 360f);
-            window.Refresh();
+            var window = GetWindow<VersionSyncWindow>("Version Sync");
+            window.minSize = new Vector2(440, 180);
         }
 
-        private void OnEnable()
-        {
-            Refresh();
-        }
+        private void OnEnable() => versionText = PlayerSettings.bundleVersion;
 
         private void OnGUI()
         {
-            EditorGUILayout.LabelField("Current", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Program Version", PlayerSettings.bundleVersion);
-            EditorGUILayout.LabelField("Resource Version", string.IsNullOrEmpty(resourceVersionText) ? "(missing)" : resourceVersionText);
-            EditorGUILayout.LabelField("Android Version Code", PlayerSettings.Android.bundleVersionCode.ToString());
-            EditorGUILayout.LabelField("iOS Build Number", PlayerSettings.iOS.buildNumber);
-
-            if (string.IsNullOrEmpty(resourceVersionText))
-            {
-                EditorGUILayout.HelpBox("当前资源版本文件不存在，或 version 字段为空。", MessageType.Warning);
-            }
-            else if (!string.Equals(PlayerSettings.bundleVersion, resourceVersionText, StringComparison.Ordinal))
-            {
-                EditorGUILayout.HelpBox("当前程序版本和资源版本不同步。", MessageType.Warning);
-            }
-
-            if (PlayerSettings.Android.bundleVersionCode.ToString() != PlayerSettings.iOS.buildNumber)
-            {
-                EditorGUILayout.HelpBox("当前 Android Version Code 和 iOS Build Number 不同。", MessageType.Warning);
-            }
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Apply", EditorStyles.boldLabel);
-            versionText = EditorGUILayout.TextField("Version", versionText);
-            buildNumberText = EditorGUILayout.TextField("Build Number", buildNumberText);
-
+            EditorGUILayout.LabelField("当前版本", PlayerSettings.bundleVersion);
+            versionText = EditorGUILayout.TextField("版本", versionText);
+            EditorGUILayout.HelpBox("程序、资源路径和 catalog 共用此版本。Jenkins 自动生成构建号，并随程序构建、发布配套资源。", MessageType.Info);
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Patch +1"))
+                if (GUILayout.Button("Patch +1") && VersionSyncUtility.IsValidVersion(versionText))
                 {
-                    BumpVersion(VersionBumpKind.Patch);
-                }
-
-                if (GUILayout.Button("Minor +1"))
-                {
-                    BumpVersion(VersionBumpKind.Minor);
-                }
-
-                if (GUILayout.Button("Major +1"))
-                {
-                    BumpVersion(VersionBumpKind.Major);
-                }
-
-                if (GUILayout.Button("Build +1"))
-                {
-                    buildNumberText = VersionSyncUtility.GetNextBuildNumber(buildNumberText).ToString();
-                }
-            }
-
-            EditorGUILayout.HelpBox(
-                "会同时更新 PlayerSettings、app_version.json、Addressables Profile，以及 AddressablesProfileSettings.yaml。",
-                MessageType.Info);
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                if (GUILayout.Button("Reload"))
-                {
-                    Refresh();
-                }
-
-                using (new EditorGUI.DisabledScope(!VersionSyncUtility.TryValidate(versionText, buildNumberText, out var buildNumber, out _)))
-                {
-                    if (GUILayout.Button("Apply"))
+                    var parts = versionText.Split('.');
+                    if (int.TryParse(parts[parts.Length - 1], out var patch) && patch < int.MaxValue)
                     {
-                        try
-                        {
-                            VersionSyncUtility.Apply(versionText, buildNumber);
-                            Refresh();
-                            EditorUtility.DisplayDialog(WindowTitle, "版本同步完成。", "OK");
-                        }
-                        catch (Exception exception)
-                        {
-                            Debug.LogException(exception);
-                            EditorUtility.DisplayDialog(WindowTitle, exception.Message, "OK");
-                        }
+                        parts[parts.Length - 1] = (patch + 1).ToString();
+                        versionText = string.Join(".", parts);
+                    }
+                }
+                using (new EditorGUI.DisabledScope(!VersionSyncUtility.IsValidVersion(versionText)))
+                {
+                    if (GUILayout.Button("应用"))
+                    {
+                        try { VersionSyncUtility.Apply(versionText); }
+                        catch (Exception exception) { Debug.LogException(exception); }
                     }
                 }
             }
-
-            if (!VersionSyncUtility.TryValidate(versionText, buildNumberText, out _, out var validationError))
-            {
-                EditorGUILayout.HelpBox(validationError, MessageType.Error);
-            }
         }
-
-        private void Refresh()
-        {
-            versionText = PlayerSettings.bundleVersion;
-            buildNumberText = VersionSyncUtility.GetSuggestedBuildNumber().ToString();
-            resourceVersionText = VersionSyncUtility.ReadResourceVersion();
-        }
-
-        private void BumpVersion(VersionBumpKind bumpKind)
-        {
-            if (VersionSyncUtility.TryBumpVersion(versionText, bumpKind, out var bumpedVersion, out var errorMessage))
-            {
-                versionText = bumpedVersion;
-                return;
-            }
-
-            EditorUtility.DisplayDialog(WindowTitle, errorMessage, "OK");
-        }
-    }
-
-    internal enum VersionBumpKind
-    {
-        Patch,
-        Minor,
-        Major
     }
 
     internal static class VersionSyncUtility
     {
+        internal const string VersionToken = "[UnityEditor.PlayerSettings.bundleVersion]";
         private const string AppVersionJsonPath = "Assets/ExternalAssets/Config/app_version.json";
-        private const string AddressablesProfileSettingsPath = "Assets/App/Editor/Build/Configs/AddressablesProfileSettings.yaml";
-        private const string DevProfileName = "dev";
-        private const string ReleaseProfileName = "release";
-        private const string RemoteBuildPathName = "Remote.BuildPath";
-        private const string RemoteLoadPathName = "Remote.LoadPath";
+        private const string ProfileYamlPath = "Assets/App/Editor/Build/Configs/AddressablesProfileSettings.yaml";
+        private static readonly string[] Profiles = { "dev", "release" };
+        private static readonly string[] PathVariables = { "Remote.BuildPath", "Remote.LoadPath" };
 
         [Serializable]
-        private sealed class AppVersionPayload
-        {
-            public string version;
-        }
+        private sealed class AppVersionPayload { public string version; }
 
-        public static int GetSuggestedBuildNumber()
-        {
-            var androidBuildNumber = PlayerSettings.Android.bundleVersionCode;
-            var iosBuildNumber = 0;
-            int.TryParse(PlayerSettings.iOS.buildNumber, out iosBuildNumber);
-            return Math.Max(androidBuildNumber, iosBuildNumber);
-        }
-
-        public static int GetNextBuildNumber(string buildNumberText)
-        {
-            if (int.TryParse(buildNumberText, out var buildNumber) && buildNumber >= 0)
-            {
-                return buildNumber + 1;
-            }
-
-            return GetSuggestedBuildNumber() + 1;
-        }
+        public static bool IsValidVersion(string version) =>
+            !string.IsNullOrEmpty(version) && Regex.IsMatch(version, @"^\d+\.\d+\.\d+$");
 
         public static string ReadResourceVersion()
         {
-            if (!File.Exists(AppVersionJsonPath))
-            {
-                return string.Empty;
-            }
-
-            var payload = JsonUtility.FromJson<AppVersionPayload>(File.ReadAllText(AppVersionJsonPath));
-            return payload == null ? string.Empty : payload.version ?? string.Empty;
+            if (!File.Exists(AppVersionJsonPath)) return string.Empty;
+            return JsonUtility.FromJson<AppVersionPayload>(File.ReadAllText(AppVersionJsonPath))?.version ?? string.Empty;
         }
 
-        public static bool TryValidate(string versionText, string buildNumberText, out int buildNumber, out string errorMessage)
+        public static void Apply(string version)
         {
-            buildNumber = 0;
-
-            if (string.IsNullOrWhiteSpace(versionText))
+            if (!IsValidVersion(version)) throw new ArgumentException("版本格式应为 3.0.2。", nameof(version));
+            var settings = BuildAddressableAssets.GetSettings();
+            if (settings == null) throw new InvalidOperationException("AddressableAssetSettings was not found.");
+            // Validate all templates before changing the project version or files.
+            var updates = new List<(string profileId, string variable, string value)>();
+            foreach (var profile in Profiles)
             {
-                errorMessage = "Version 不能为空。";
-                return false;
+                var id = settings.profileSettings.GetProfileId(profile);
+                if (string.IsNullOrEmpty(id)) throw new InvalidOperationException($"Missing Addressables profile: {profile}");
+                foreach (var variable in PathVariables)
+                    updates.Add((id, variable, NormalizePath(settings.profileSettings.GetValueByName(id, variable), profile, VersionToken)));
             }
+            var yaml = File.ReadAllText(ProfileYamlPath);
+            foreach (var profile in Profiles) yaml = NormalizePath(yaml, profile, "{version}");
+            ValidateYaml(yaml);
 
-            if (!Regex.IsMatch(versionText, @"^\d+(?:\.\d+)+$"))
-            {
-                errorMessage = "Version 需要是纯数字点分格式，例如 2.3.4。";
-                return false;
-            }
-
-            if (!int.TryParse(buildNumberText, out buildNumber) || buildNumber < 0)
-            {
-                errorMessage = "Build Number 需要是大于等于 0 的整数。";
-                return false;
-            }
-
-            errorMessage = string.Empty;
-            return true;
-        }
-
-        public static bool TryBumpVersion(string versionText, VersionBumpKind bumpKind, out string bumpedVersion, out string errorMessage)
-        {
-            bumpedVersion = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(versionText))
-            {
-                errorMessage = "Version 不能为空。";
-                return false;
-            }
-
-            var segments = versionText.Split('.');
-            if (segments.Length == 0)
-            {
-                errorMessage = "Version 不能为空。";
-                return false;
-            }
-
-            var normalizedSegments = new int[Math.Max(segments.Length, 3)];
-            for (var i = 0; i < normalizedSegments.Length; i++)
-            {
-                if (i >= segments.Length)
-                {
-                    normalizedSegments[i] = 0;
-                    continue;
-                }
-
-                if (!int.TryParse(segments[i], out normalizedSegments[i]) || normalizedSegments[i] < 0)
-                {
-                    errorMessage = "Version 需要是纯数字点分格式，例如 2.3.4。";
-                    return false;
-                }
-            }
-
-            switch (bumpKind)
-            {
-                case VersionBumpKind.Major:
-                    normalizedSegments[0] += 1;
-                    for (var i = 1; i < normalizedSegments.Length; i++)
-                    {
-                        normalizedSegments[i] = 0;
-                    }
-                    break;
-
-                case VersionBumpKind.Minor:
-                    normalizedSegments[1] += 1;
-                    for (var i = 2; i < normalizedSegments.Length; i++)
-                    {
-                        normalizedSegments[i] = 0;
-                    }
-                    break;
-
-                default:
-                    normalizedSegments[normalizedSegments.Length - 1] += 1;
-                    break;
-            }
-
-            bumpedVersion = string.Join(".", normalizedSegments);
-            errorMessage = string.Empty;
-            return true;
-        }
-
-        public static void Apply(string version, int buildNumber)
-        {
             PlayerSettings.bundleVersion = version;
-            PlayerSettings.Android.bundleVersionCode = buildNumber;
-            PlayerSettings.iOS.buildNumber = buildNumber.ToString();
-
-            WriteAppVersionJson(version);
-            UpdateAddressablesProfileSettings(version);
-            UpdateAddressablesProfileYaml(version);
-
-            AssetDatabase.ImportAsset(AppVersionJsonPath);
-            AssetDatabase.ImportAsset(AddressablesProfileSettingsPath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            Debug.Log($"[VersionSync] Version={version}, BuildNumber={buildNumber}");
-        }
-
-        private static void WriteAppVersionJson(string version)
-        {
-            var directoryPath = Path.GetDirectoryName(AppVersionJsonPath);
-            if (!string.IsNullOrEmpty(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-
-            var content = "{\n" +
-                          $"    \"version\": \"{version}\"\n" +
-                          "}\n";
-            File.WriteAllText(AppVersionJsonPath, content);
-        }
-
-        private static void UpdateAddressablesProfileSettings(string version)
-        {
-            var settings = BuildAddressableAssets.GetSettings();
-            if (settings == null)
-            {
-                throw new InvalidOperationException("AddressableAssetSettings が見つかりません。");
-            }
-
-            UpdateAddressableProfileValue(settings, DevProfileName, RemoteBuildPathName, version);
-            UpdateAddressableProfileValue(settings, DevProfileName, RemoteLoadPathName, version);
-            UpdateAddressableProfileValue(settings, ReleaseProfileName, RemoteBuildPathName, version);
-            UpdateAddressableProfileValue(settings, ReleaseProfileName, RemoteLoadPathName, version);
-
+            AddressablesRuntimeProperties.ClearCachedPropertyValues();
+            File.WriteAllText(AppVersionJsonPath, JsonUtility.ToJson(new AppVersionPayload { version = version }, true) + "\n");
+            File.WriteAllText(ProfileYamlPath, yaml);
+            foreach (var update in updates) settings.profileSettings.SetValue(update.profileId, update.variable, update.value);
+            settings.OverridePlayerVersion = VersionToken;
+            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
             EditorUtility.SetDirty(settings);
+            AssetDatabase.ImportAsset(AppVersionJsonPath);
+            AssetDatabase.ImportAsset(ProfileYamlPath);
+            AssetDatabase.SaveAssets();
+            AssertVersionSettingsSynchronized();
+            Debug.Log($"[VersionSync] Project and Addressables version: {version}");
         }
 
-        private static void UpdateAddressableProfileValue(AddressableAssetSettings settings, string profileName, string variableName, string version)
+        private static string NormalizePath(string input, string profile, string token)
         {
-            var profileId = settings.profileSettings.GetProfileId(profileName);
-            if (string.IsNullOrEmpty(profileId))
-            {
-                throw new InvalidOperationException($"Addressables Profile 不存在: {profileName}");
-            }
-
-            var currentValue = settings.profileSettings.GetValueByName(profileId, variableName);
-            var updatedValue = ReplaceProfileVersion(currentValue, profileName, version, false, $"Addressables {profileName} {variableName}");
-            settings.profileSettings.SetValue(profileId, variableName, updatedValue);
+            var pattern = $@"(/{Regex.Escape(profile)}/v/)(?:\d+\.\d+\.\d+|\[UnityEditor\.PlayerSettings\.bundleVersion\]|\{{version\}})(?=/|[\r\n]|$)";
+            var regex = new Regex(pattern, RegexOptions.CultureInvariant);
+            if (!regex.IsMatch(input ?? string.Empty)) throw new InvalidOperationException($"Missing versioned {profile} resource path.");
+            return regex.Replace(input, match => match.Groups[1].Value + token);
         }
 
-        private static void UpdateAddressablesProfileYaml(string version)
+        private static void ValidateYaml(string yaml)
         {
-            if (!File.Exists(AddressablesProfileSettingsPath))
+            foreach (var profile in Profiles)
+            foreach (var kind in new[] { "Build", "Upload" })
             {
-                throw new FileNotFoundException("AddressablesProfileSettings.yaml 不存在。", AddressablesProfileSettingsPath);
+                var key = kind + (profile == "dev" ? "Dev" : "Release");
+                var matches = Regex.Matches(yaml, $@"^{key}:[ \t]*([^\r\n]+)", RegexOptions.Multiline);
+                if (matches.Count != 1 || !matches[0].Groups[1].Value.Contains($"/{profile}/v/{{version}}"))
+                    throw new InvalidOperationException($"Jenkins {key} must contain one {{version}} path template.");
             }
-
-            var content = File.ReadAllText(AddressablesProfileSettingsPath);
-            content = ReplaceProfileVersion(content, DevProfileName, version, true, AddressablesProfileSettingsPath);
-            content = ReplaceProfileVersion(content, ReleaseProfileName, version, true, AddressablesProfileSettingsPath);
-            File.WriteAllText(AddressablesProfileSettingsPath, content);
         }
 
-        private static string ReplaceProfileVersion(string input, string profileName, string version, bool replaceAll, string context)
+        public static void AssertVersionSettingsSynchronized()
         {
-            var regex = new Regex($@"(/{Regex.Escape(profileName)}/(?:v/)?)\d+(?:\.\d+)+(?=/|[\r\n]|$)", RegexOptions.CultureInvariant);
-            var replaceCount = 0;
-
-            var output = regex.Replace(input, match =>
-            {
-                if (!replaceAll && replaceCount > 0)
-                {
-                    return match.Value;
-                }
-
-                replaceCount += 1;
-                return match.Groups[1].Value + version;
-            });
-
-            if (replaceCount == 0)
-            {
-                throw new InvalidOperationException($"{context} 中没有找到 {profileName} 的版本号片段。");
-            }
-
-            return output;
-        }
-
-        public static void AssertVersionSettingsSynchronized(string expectedVersion = null)
-        {
-            var version = string.IsNullOrWhiteSpace(expectedVersion) ? PlayerSettings.bundleVersion : expectedVersion;
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                throw new InvalidOperationException("PlayerSettings.bundleVersion 为空，无法校验 Addressables 版本。");
-            }
-
+            AddressablesRuntimeProperties.ClearCachedPropertyValues();
+            var version = PlayerSettings.bundleVersion;
             var errors = new List<string>();
-            if (!string.Equals(PlayerSettings.bundleVersion, version, StringComparison.Ordinal))
-            {
-                errors.Add($"PlayerSettings.bundleVersion={PlayerSettings.bundleVersion}, expected={version}");
-            }
-
-            var resourceVersion = ReadResourceVersion();
-            if (!string.Equals(version, resourceVersion, StringComparison.Ordinal))
-            {
-                errors.Add($"app_version.json={resourceVersion}, expected={version}");
-            }
-
+            if (!IsValidVersion(version)) errors.Add($"Invalid project version: {version}");
+            if (ReadResourceVersion() != version) errors.Add("app_version.json differs from the project version.");
             var settings = BuildAddressableAssets.GetSettings();
-            if (settings == null)
-            {
-                errors.Add("AddressableAssetSettings が見つかりません。");
-            }
+            if (settings == null) errors.Add("AddressableAssetSettings was not found.");
             else
             {
-                CollectAddressableProfileVersionError(settings, DevProfileName, RemoteBuildPathName, version, errors);
-                CollectAddressableProfileVersionError(settings, DevProfileName, RemoteLoadPathName, version, errors);
-                CollectAddressableProfileVersionError(settings, ReleaseProfileName, RemoteBuildPathName, version, errors);
-                CollectAddressableProfileVersionError(settings, ReleaseProfileName, RemoteLoadPathName, version, errors);
+                if (settings.OverridePlayerVersion != VersionToken) errors.Add("Catalog version must derive from PlayerSettings.bundleVersion.");
+                if (settings.BuildAddressablesWithPlayerBuild != AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer)
+                    errors.Add("Addressables must be built with the player.");
+                foreach (var profile in Profiles)
+                {
+                    var id = settings.profileSettings.GetProfileId(profile);
+                    if (string.IsNullOrEmpty(id)) { errors.Add($"Missing Addressables profile: {profile}"); continue; }
+                    foreach (var variable in PathVariables)
+                    {
+                        var value = settings.profileSettings.GetValueByName(id, variable);
+                        if (!(value ?? string.Empty).Contains($"/{profile}/v/{VersionToken}/"))
+                            errors.Add($"{profile} {variable} must use the project version token.");
+                        else if (!settings.profileSettings.EvaluateString(id, value).Contains($"/{profile}/v/{version}/"))
+                            errors.Add($"Cannot resolve project version in {profile} {variable}.");
+                    }
+                }
             }
-
-            CollectAddressablesProfileYamlVersionErrors(version, errors);
-
-            if (errors.Count > 0)
-            {
-                throw new InvalidOperationException(
-                    "Version settings are not synchronized. Run P3/Version/Sync Version Settings first.\n" +
-                    string.Join("\n", errors));
-            }
-        }
-
-        private static void CollectAddressableProfileVersionError(
-            AddressableAssetSettings settings,
-            string profileName,
-            string variableName,
-            string version,
-            ICollection<string> errors)
-        {
-            var profileId = settings.profileSettings.GetProfileId(profileName);
-            if (string.IsNullOrEmpty(profileId))
-            {
-                errors.Add($"Addressables Profile 不存在: {profileName}");
-                return;
-            }
-
-            var value = settings.profileSettings.GetValueByName(profileId, variableName);
-            CollectProfileVersionErrors(value, profileName, version, $"Addressables {profileName} {variableName}", errors);
-        }
-
-        private static void CollectAddressablesProfileYamlVersionErrors(string version, ICollection<string> errors)
-        {
-            if (!File.Exists(AddressablesProfileSettingsPath))
-            {
-                errors.Add($"AddressablesProfileSettings.yaml 不存在: {AddressablesProfileSettingsPath}");
-                return;
-            }
-
-            var content = File.ReadAllText(AddressablesProfileSettingsPath);
-            CollectProfileVersionErrors(content, DevProfileName, version, AddressablesProfileSettingsPath, errors);
-            CollectProfileVersionErrors(content, ReleaseProfileName, version, AddressablesProfileSettingsPath, errors);
-        }
-
-        private static void CollectProfileVersionErrors(
-            string input,
-            string profileName,
-            string version,
-            string context,
-            ICollection<string> errors)
-        {
-            var regex = new Regex($@"/{Regex.Escape(profileName)}/(?:v/)?(?<version>\d+(?:\.\d+)+)(?=/|[\r\n]|$)", RegexOptions.CultureInvariant);
-            var matches = regex.Matches(input ?? string.Empty);
-            if (matches.Count <= 0)
-            {
-                errors.Add($"{context} 中没有找到 {profileName} 的版本号片段。");
-                return;
-            }
-
-            var staleVersions = matches
-                .Cast<Match>()
-                .Select(match => match.Groups["version"].Value)
-                .Where(foundVersion => !string.Equals(foundVersion, version, StringComparison.Ordinal))
-                .Distinct()
-                .ToArray();
-            if (staleVersions.Length > 0)
-            {
-                errors.Add($"{context} {profileName} contains stale version(s): {string.Join(", ", staleVersions)}; expected {version}");
-            }
+            try { ValidateYaml(File.ReadAllText(ProfileYamlPath)); }
+            catch (Exception exception) { errors.Add(exception.Message); }
+            if (errors.Count > 0) throw new InvalidOperationException("Run MCombat/Version Sync to synchronize the project.\n" + string.Join("\n", errors));
         }
     }
 }

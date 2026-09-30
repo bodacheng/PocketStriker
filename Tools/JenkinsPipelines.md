@@ -1,10 +1,24 @@
 # PocketStriker Jenkins 管线维护记录
 
-检查日期：2026-09-28。
+检查日期：2026-09-30。
+
+## 当前修复与版本入口
+
+2026-09-30 已定位 #24 真机角色缺少 OutsideDataLink 的原因：#24 安装包 catalog hash 为 `9dc81134426c96d24388223dd0f7128f`，线上仍是资源任务 #12 的 `f9f6528ac83f3527c17fbd6dccc51bff`。新包内 tetsuya 引用 `CAB-5d02b076…` 中的脚本，旧线上 catalog 提供 `CAB-a46040fd…`；源 prefab 和最新 IL2CPP 均有 OutsideDataLink。这是两轮构建资源混用，不是源 prefab 丢组件。
+
+项目只有一个版本入口：`MCombat/Version Sync` 的版本号（本轮准备为 3.0.2）。工具不再编辑 CI 构建号或独立资源版本；Jenkins 构建号由任务生成。Addressables 路径及 catalog 名称使用 `[UnityEditor.PlayerSettings.bundleVersion]`，Jenkins YAML 使用 `{version}` 模板，从同一 `ProjectSettings.bundleVersion` 解析，禁止另行填写资产版本。`app_version.json` 是由此版本生成的客户端升级信息。
+
+iOS Jenkins 仅以 `BUILD_KIND` 选择环境，旧 `AssetKind`、`buildAsset` 不再参与；Player 导出一次并同时构建 Addressables。导出后保存配对快照及 manifest；普通 Release 从该快照发布资源，校验线上 catalog 后才上传 App Store。两个验证模式都不发布。独立资源任务禁止完整重建并发布 Release。
+
+`Tools/publish_ios_addressables.py` 默认只生成只读计划，`--publish` 才写入 S3。它从安装包内配置推导目标地址，拒绝覆盖不同构建已占用的 Release 目录，先上传 bundle、最后上传 catalog hash，随后校验。重试只接受字节相同的已上传文件；S3 条件写入 manifest 先占用目标版本，防止两轮构建同时发布到空目录。已占用目录必须先增加项目版本，再重新构建整套资源和安装包。
+
+这些管线源码位于 `/Users/daisei/MCombat_tool/pipeline_script/PocketStriker/`，Jenkins 仍从工具仓库 master 读取。未提交、推送到工具仓库的修改不会生效。本轮没有修改线上资源，也没有发布新安装包。
+
+验证：`python3 Tools/Validation/test_ios_addressables_publication.py` 检查配对、目标隔离、失败和重试；`python3 Tools/Validation/test_jenkins_pipelines.py --tool-repo /Users/daisei/MCombat_tool` 检查真实 Groovy 路由及 Bash 语法；`PocketStrikerVersionValidation.Validate` 检查 Unity 中的版本变量解析。
 
 ## iOS 资源与安装包配对
 
-手机上的 Jenkins iOS 包会在启动时检查远端 Addressables catalog。`CustomIOSBuild_V` 的 Unity Player 导出会再次构建 Addressables，因此**导出完成后的** `ServerData` 才与 IPA 内的 catalog 和本地 bundle 配套。单独运行 `AssetDev_V` 全量构建并上传到同一个 Release URL，会替换 catalog，也可能让包内本地 bundle 的 CRC 与新 catalog 不符。
+手机上的 Jenkins iOS 包会在启动时检查远端 Addressables catalog。`CustomIOSBuild_V` 的 Unity Player 导出会构建 Addressables，因此**导出完成后的** `ServerData` 才与 IPA 内的 catalog 和本地 bundle 配套。单独运行 `AssetDev_V` 全量构建并上传到同一个 Release URL，会替换 catalog，也可能让包内本地 bundle 的 CRC 与新 catalog 不符。
 
 2026-09-28 核对：`CustomIOSBuild_V #17–#19` IPA 内的 catalog hash 为 `bab01537e03d30abf8047a41c068f9d8`；随后 `AssetDev_V #6` 上传的 `release/v/3.0.0/iOS` catalog hash 为 `95503727c36c16b946de7ffcc64ed39b`。两次构建使用同一 Git 提交，但 96 个同名本地 bundle 中有 52 个内容不同。旧版启动弹窗把所有异常都描述为网络错误，不能用它判断根因。
 

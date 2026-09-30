@@ -8,6 +8,8 @@ import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
+from urllib.parse import urlsplit
+import re
 
 
 def digest(path):
@@ -23,15 +25,8 @@ def read_remote(url):
         return response.read()
 
 
-def verify(player_aa, server_dir, check_remote, manifest_path):
+def player_catalog_url(player_aa):
     settings_path = player_aa / "settings.json"
-    local_hash_path = player_aa / "catalog.hash"
-    remote_hash_path = server_dir / "catalog_v2.hash"
-    remote_catalog_path = server_dir / "catalog_v2.bin"
-    for path in (settings_path, local_hash_path, remote_hash_path, remote_catalog_path):
-        if not path.is_file() or path.stat().st_size == 0:
-            raise ValueError(f"Required Addressables file is missing or empty: {path}")
-
     settings = json.loads(settings_path.read_text(encoding="utf-8"))
     remote_urls = [
         location["m_InternalId"]
@@ -41,8 +36,28 @@ def verify(player_aa, server_dir, check_remote, manifest_path):
     if len(remote_urls) != 1 or not remote_urls[0].startswith("https://"):
         raise ValueError("Player must contain exactly one HTTPS remote catalog hash URL")
     remote_url = remote_urls[0]
-    if not remote_url.endswith("/catalog_v2.hash"):
+    name = urlsplit(remote_url).path.rsplit("/", 1)[-1]
+    if not re.fullmatch(r"catalog_[A-Za-z0-9._-]+\.hash", name):
         raise ValueError(f"Unexpected remote catalog URL: {remote_url}")
+    return remote_url
+
+
+def verify(player_aa, server_dir, check_remote, manifest_path):
+    remote_url = player_catalog_url(player_aa)
+    hash_name = urlsplit(remote_url).path.rsplit("/", 1)[-1]
+    local_hash_path = player_aa / "catalog.hash"
+    remote_hash_path = server_dir / hash_name
+    catalogs = [server_dir / (hash_name[:-5] + extension) for extension in (".bin", ".json")]
+    catalogs = [path for path in catalogs if path.is_file()]
+    if len(catalogs) != 1:
+        raise ValueError(f"Expected one remote catalog matching {hash_name}")
+    remote_catalog_path = catalogs[0]
+    for path in (local_hash_path, remote_hash_path, remote_catalog_path):
+        if not path.is_file() or path.stat().st_size == 0:
+            raise ValueError(f"Required Addressables file is missing or empty: {path}")
+    player_catalog = player_aa / ("catalog" + remote_catalog_path.suffix)
+    if not player_catalog.is_file() or digest(player_catalog) != digest(remote_catalog_path):
+        raise ValueError("Remote catalog bytes differ from the catalog embedded in this player")
 
     player_hash = local_hash_path.read_text(encoding="ascii").strip()
     server_hash = remote_hash_path.read_text(encoding="ascii").strip()
@@ -59,7 +74,7 @@ def verify(player_aa, server_dir, check_remote, manifest_path):
     if check_remote:
         try:
             published_hash = read_remote(remote_url).decode("ascii").strip()
-            published_catalog = read_remote(remote_url[:-5] + ".bin")
+            published_catalog = read_remote(remote_url.rsplit("/", 1)[0] + "/" + remote_catalog_path.name)
         except (urllib.error.URLError, UnicodeError) as error:
             raise ValueError(f"Could not read published catalog: {error}") from error
         if published_hash != player_hash:

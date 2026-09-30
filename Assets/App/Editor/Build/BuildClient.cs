@@ -7,6 +7,8 @@ using System.Text;
 //using DG.DemiEditor;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.Callbacks;
 #if UNITY_IOS
@@ -31,7 +33,6 @@ namespace Cocone.ProjectP3
 		public string keystorePass;
 		public string keyaliasPass;
 		public string buildKind;
-		public string assetKind;
 		public string assetProfile;
 		public string machineName;
 		public HashSet<AndroidArchitecture> androidArchitectures;
@@ -369,11 +370,15 @@ namespace Cocone.ProjectP3
 						config.assetProfile = args[i + 1];
 						i++;
 						break;
+
+					case "-assetVersion":
+						throw new BuildFailedException("-assetVersion is no longer supported. Set the project version in MCombat/Version Sync.");
 				}
 			}
 			
 			// configの設定
 			playerBuildConfig = config;
+			buildConfigurations = null;
 			var report = Build(config);
 			
 			if (!manual)
@@ -447,12 +452,32 @@ namespace Cocone.ProjectP3
 			return result;
 		}
 		
+		internal static string GetAssetProfileForBuildKind(string buildKind)
+		{
+			switch (GetBuildKind(buildKind))
+			{
+				case PlayerBuildConfig.BuildKind.Dev:
+					return "dev";
+				case PlayerBuildConfig.BuildKind.Release:
+					return "release";
+				default:
+					throw new BuildFailedException("Client builds require -buildKind Dev or Release.");
+			}
+		}
+
 		private static BuildReport Build(PlayerBuildConfig config)
 		{
-			if (config.assetProfile != null)
+			var assetProfile = GetAssetProfileForBuildKind(config.buildKind);
+			if (config.assetProfile != null && !string.Equals(config.assetProfile, assetProfile, StringComparison.Ordinal))
 			{
-				BuildAddressableAssets.SetProfile(config.assetProfile);
+				throw new BuildFailedException($"Client {config.buildKind} builds require the {assetProfile} Addressables profile; remove -assetProfile or use {assetProfile}.");
 			}
+			BuildAddressableAssets.SetProfile(assetProfile);
+			VersionSyncUtility.AssertVersionSettingsSynchronized();
+			var addressableSettings = BuildAddressableAssets.GetSettings();
+			addressableSettings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
+			EditorUtility.SetDirty(addressableSettings);
+			AssetDatabase.SaveAssets();
 
 			// Yamlの読み込みと設定
 			SetPlayerSettingsByBuildConfiguration(GetBuildKind(config.buildKind), config.buildTarget, config.TargetGroup);
