@@ -26,9 +26,13 @@ public static partial class PocketStrikerTutorialValidation
         public int labelsChecked;
         public int pointersChecked;
         public int stableLayoutsChecked;
+        public int initialPagesChecked;
+        public int hudTargetsChecked;
+        public int animationResetsChecked;
+        public int panelsClearOfControls;
         public bool sourcePrefabsUnchanged;
-        public string scope = "Actual FightingStepLayer and SideUnitIcon prefab UI copies, production BattleTutorialLayout and UILayer.ResizeAreas; 540x960, 375x667, 390x844 with top/bottom safe insets, 768x1024; English, Japanese and Chinese; all six tutorial pages and the dormant Dream Combo overlay. Verifies actual generated glyph bounds, preferred text height, safe-area containment, callout target identity and pointer endpoint, non-overlapping text panels, and repeated layout stability. Screenshots use the authored sprites and fonts.";
-        public string limitation = "UI-only preview fixture: battle models, accounts, network, joystick behavior, animations and live combat are omitted. A real copied player icon supplies populated HP/energy UI. Canvas geometry reproduces PortraitSafeAreaLayout's Expand scaling; device safe-area values are fixture inputs.";
+        public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel UI copies; production OpenTutorial/ForceClickDreamComboBtn callers, BattleHUDPresentation, BattleTutorialLayout and UILayer.ResizeAreas. Four phone/tablet viewports and three languages, six tutorial pages plus dormant Dream overlay. Verifies generated glyph bounds, final wrapped lines, safe area, pointer target identity/endpoints, explanation panels clear of live control geometry, initial page and HUD recovery after native Animator.Rebind. Screenshots use actual portrait/skill sprites and fonts.";
+        public string limitation = "UI-only preview fixture: combat models, accounts, network, live animations and battle execution are omitted. A native player icon supplies HP/energy targets before the combat dictionary is populated. Three local authored skill sprites and empty initial Dream gauge represent available control geometry. Canvas scaling reproduces PortraitSafeAreaLayout Expand; device safe insets are explicit fixture inputs. Native animation bindings are rebound, then production tutorial entry restores presentation.";
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
         public List<LayoutPage> pages = new List<LayoutPage>();
@@ -94,9 +98,12 @@ public static partial class PocketStrikerTutorialValidation
         Require(!EditorApplication.isPlayingOrWillChangePlaymode, "Tutorial layout validation requires a stopped editor.");
         var report = new LayoutReport { unityVersion = Application.unityVersion };
         Directory.CreateDirectory(LayoutOutput);
-        var sourceFiles = new[] { PrefabPath, SideIconPath }.ToDictionary(path => path, File.ReadAllText);
+        var sourceFiles = new[] { PrefabPath, SideIconPath, HUDStonePath }.ToDictionary(path => path, File.ReadAllText);
         var oldCanvas = PosCal.Canvas;
         var oldSafe = PosCal.SafeAreaRect;
+        var oldLanguage = AppSetting.Value.Language;
+        var dragCanvasField = typeof(HeroIcon).GetField("canvas", BindingFlags.Static | BindingFlags.NonPublic);
+        var oldDragCanvas = dragCanvasField.GetValue(null);
         var scene = EditorSceneManager.NewPreviewScene();
         var rig = new GameObject("Tutorial Layout Validation");
         rig.SetActive(false);
@@ -130,6 +137,7 @@ public static partial class PocketStrikerTutorialValidation
             var canvasRect = (RectTransform)canvas.transform;
             canvasRect.sizeDelta = new Vector2(1080, 1920);
             PosCal.Canvas = canvas;
+            dragCanvasField.SetValue(null, canvas);
             var safe = new GameObject("Safe Area", typeof(RectTransform)).GetComponent<RectTransform>();
             safe.SetParent(canvas.transform, false);
             safe.anchorMin = Vector2.zero;
@@ -148,7 +156,7 @@ public static partial class PocketStrikerTutorialValidation
             root.localScale = Vector3.one;
             var sourceLayer = source.GetComponent<FightingStepLayer>();
             var layer = root.gameObject.AddComponent<PocketStrikerTutorialValidationLayer>();
-            foreach (var name in new[] { "pauseButton", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask", "top", "middle", "bottom" })
+            foreach (var name in new[] { "pauseButton", "inputsManager", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask", "top", "middle", "bottom" })
                 SetField(layer, name, map[(UnityEngine.Object)FindField(sourceLayer, name).GetValue(sourceLayer)]);
             Invoke(layer, "ResetOverlayStates");
             Invoke(layer, "KeepTopButtonsClickable");
@@ -171,11 +179,20 @@ public static partial class PocketStrikerTutorialValidation
             hp.value = 0.8f;
             foreach (var graphic in energy.GetComponentsInChildren<Graphic>(true)) graphic.gameObject.SetActive(true);
             PopulateLayoutPortrait(iconSource, iconMap);
+            icon.GetComponent<SideUnitIcon>().ApplyBattleHUDStyle(false, false);
+            HUDPopulateSkills(layer.InputsManager);
+            layer.InputsManager.DreamComboGauge.SetPercent(0);
             layer.Team1UI.AutoSwitch.gameObject.SetActive(true);
             layer.Team2UI.AutoSwitch.gameObject.SetActive(false);
             Field<BOButton>(layer, "pauseButton").gameObject.SetActive(false);
-            var layout = root.gameObject.AddComponent<BattleTutorialLayout>();
-            layout.Initialize(root, () => health, () => energy);
+            foreach (var team in new[] { layer.Team1UI, layer.Team2UI })
+            {
+                team.LiveUnitCount.gameObject.SetActive(false);
+                Field<Text>(team, "rotationModeHitCombo").gameObject.SetActive(false);
+                team.SelectedFrame.gameObject.SetActive(false);
+            }
+            Invoke(layer, "PrepareTutorialLayout");
+            var layout = root.GetComponent<BattleTutorialLayout>();
             var rows = CsvParser2.Parse(File.ReadAllText("Assets/ExternalAssets/Config/LanguageCode.csv"));
             var viewports = new[]
             {
@@ -185,6 +202,8 @@ public static partial class PocketStrikerTutorialValidation
                 new LayoutViewport(768, 1024, new Rect(0, 0, 768, 1024))
             };
             rig.SetActive(true);
+            var automatic = false;
+            layer.Team1UI.AutoSwitch.Initialize(() => automatic, value => automatic = value);
             foreach (var animator in root.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
             foreach (var viewport in viewports)
             {
@@ -204,7 +223,18 @@ public static partial class PocketStrikerTutorialValidation
                 layer.ResizeAreas();
                 for (int language = 0; language < LayoutLanguages.Length; language++)
                 {
+                    AppSetting.Value.Language = new[] { SystemLanguage.English, SystemLanguage.Japanese, SystemLanguage.ChineseSimplified }[language];
                     LocalizeLayoutUI(source, map, rows, language);
+                    layer.RefreshPresentation();
+                    foreach (var animator in root.GetComponentsInChildren<Animator>(true)) animator.Rebind();
+                    Invoke(layer, "ResetOverlayStates");
+                    layer.OpenTutorial();
+                    Require(pages[0].activeSelf && pages.Count(page => page.activeSelf) == 1,
+                        "Real OpenTutorial caller does not begin at the first page.");
+                    report.initialPagesChecked++;
+                    Rebuild(root, camera, texture);
+                    CheckTutorialHUDTargets(root, layer, LayoutBounds(root, safe), report);
+                    report.animationResetsChecked++;
                     foreach (var page in pages.Concat(new[] { dream.gameObject }))
                     {
                         foreach (var item in pages) item.SetActive(false);
@@ -212,6 +242,7 @@ public static partial class PocketStrikerTutorialValidation
                         tutorial.gameObject.SetActive(!isDream);
                         dream.gameObject.SetActive(isDream);
                         page.SetActive(true);
+                        if (isDream) layer.ForceClickDreamComboBtn();
                         // Match OpenTutorial/ForceClickDreamComboBtn after activation:
                         // nested HUD canvases must never draw over the explanation.
                         typeof(FightingStepLayer).GetMethod("PromoteToOverlayCanvas", BindingFlags.Static | BindingFlags.NonPublic)
@@ -264,6 +295,8 @@ public static partial class PocketStrikerTutorialValidation
         {
             PosCal.Canvas = oldCanvas;
             PosCal.SafeAreaRect = oldSafe;
+            AppSetting.Value.Language = oldLanguage;
+            dragCanvasField.SetValue(null, oldDragCanvas);
             foreach (var raycaster in rig.GetComponentsInChildren<GraphicRaycaster>(true))
                 typeof(BaseRaycaster).GetMethod("OnDisable", Private).Invoke(raycaster, null);
             UnityEngine.Object.DestroyImmediate(rig);
@@ -273,7 +306,8 @@ public static partial class PocketStrikerTutorialValidation
             report.sourcePrefabsUnchanged = sourceFiles.All(pair => File.ReadAllText(pair.Key) == pair.Value);
             report.passed = report.errors.Count == 0 && report.sourcePrefabsUnchanged
                 && report.pagesChecked == 84 && report.screenshots.Count == 84 && report.stableLayoutsChecked == 84
-                && report.labelsChecked >= 108 && report.pointersChecked == 84;
+                && report.labelsChecked >= 108 && report.pointersChecked == 84 && report.initialPagesChecked == 12
+                && report.animationResetsChecked == 12 && report.hudTargetsChecked == 84 && report.panelsClearOfControls == 84;
             File.WriteAllText(Path.Combine(LayoutOutput, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
@@ -282,26 +316,9 @@ public static partial class PocketStrikerTutorialValidation
     static RectTransform CopyLayoutUI(GameObject source, Transform parent, Dictionary<UnityEngine.Object, UnityEngine.Object> map)
     {
         Require(source != null, "Missing layout fixture prefab.");
-        var root = (RectTransform)CopyHierarchy(source.transform, parent, map);
-        foreach (var original in source.GetComponentsInChildren<Component>(true))
-        {
-            if (original == null || !(CopyComponent(original) || original is MidAreaSizeHelper)) continue;
-            var copy = ((Transform)map[original.transform]).gameObject.AddComponent(original.GetType());
-            EditorUtility.CopySerialized(original, copy);
-            map.Add(original, copy);
-        }
-        foreach (var pair in map.ToArray())
-            if (pair.Key is Component && !(pair.Key is Transform)) RemapReferences((Component)pair.Value, map);
-        foreach (var clamper in root.GetComponentsInChildren<UIPosClamper>(true)) clamper.enabled = false;
-        foreach (var animator in root.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
-        foreach (var button in root.GetComponentsInChildren<Button>(true))
-        {
-            button.onClick = new Button.ButtonClickedEvent();
-            button.transition = Selectable.Transition.None;
-        }
-        foreach (var trigger in root.GetComponentsInChildren<EventTrigger>(true)) trigger.triggers.Clear();
-        foreach (var group in root.GetComponentsInChildren<CanvasGroup>(true)) group.alpha = 1;
-        return root;
+        // Include the actual input manager, joysticks, gauge and portrait controller,
+        // so tutorial targets follow the same production HUD geometry as live combat.
+        return HUDCopyUI(source, parent, map);
     }
 
     static void PopulateLayoutPortrait(GameObject source, Dictionary<UnityEngine.Object, UnityEngine.Object> map)
@@ -358,6 +375,10 @@ public static partial class PocketStrikerTutorialValidation
         var panels = new List<Rect>();
         foreach (var callout in layout.Callouts.Where(item => item.Label != null && item.Label.gameObject.activeInHierarchy))
         {
+            var overlay = callout.Label.GetComponentInParent<ClickNextTutorial>()?.GetComponent<Canvas>()
+                ?? root.Find("DreamComboTutorial").GetComponent<Canvas>();
+            Require(overlay != null && overlay.overrideSorting && overlay.sortingOrder > 1001,
+                "Tutorial explanation is below an active HUD canvas.");
             var expected = ExpectedLayoutTarget(root, callout.Label, health);
             Require(callout.Target == expected, callout.Label.name + " points at the wrong UI target.");
             var expectedBounds = LayoutBounds(root, expected);
@@ -381,6 +402,10 @@ public static partial class PocketStrikerTutorialValidation
             var panel = LayoutBounds(root, callout.Panel);
             Require(LayoutContains(pageReport.safeBounds, panel), "Callout panel escapes safe area.");
             Require(panels.All(previous => !previous.Overlaps(panel)), "Tutorial explanation panels overlap.");
+            var layer = root.GetComponent<FightingStepLayer>();
+            foreach (var control in HUDControlRects(layer).Where(control => control.gameObject.activeInHierarchy))
+                Require(!panel.Overlaps(LayoutBounds(root, control)), "Tutorial explanation covers an actual HUD control: " + control.name);
+            report.panelsClearOfControls++;
             panels.Add(panel);
             pageReport.pointers.Add(new LayoutPointer
             {
@@ -389,6 +414,22 @@ public static partial class PocketStrikerTutorialValidation
             });
             report.pointersChecked++;
         }
+    }
+
+    static void CheckTutorialHUDTargets(RectTransform root, FightingStepLayer layer, Rect safe, LayoutReport report)
+    {
+        var controls = HUDControlRects(layer).Skip(2).ToArray();
+        foreach (var control in controls)
+        {
+            Require(LayoutContains(safe, LayoutBounds(root, control)), "Tutorial HUD target is outside its safe area: " + control.name);
+            Require(LayoutBounds(root, control).yMax < LayoutBounds(root, layer.MiddleArea).yMin + 2,
+                "Tutorial HUD target enters the battle camera area: " + control.name);
+            report.hudTargetsChecked++;
+        }
+        foreach (var animator in layer.Team1UI.AutoSwitch.GetComponentsInChildren<Animator>(true))
+            Require(!animator.enabled, "A legacy AUTO animation controls the tutorial HUD geometry.");
+        Require(Vector2.Distance(LayoutBounds(root, (RectTransform)layer.InputsManager.AttackButton.transform).size,
+            Vector2.one * 156 * Mathf.Clamp(safe.width / 1200, .72f, 1.1f)) < 2, "Tutorial is showing legacy oversized skill controls.");
     }
 
     static RectTransform ExpectedLayoutTarget(RectTransform root, Text label, RectTransform health)
@@ -421,12 +462,17 @@ public static partial class PocketStrikerTutorialValidation
                 settings.verticalOverflow = VerticalWrapMode.Overflow;
                 complete.Populate(text.text, settings);
                 Require(vertices.Count == complete.verts.Count,
-                    LayoutPath(root, text.transform) + " truncates glyphs: rendered=" + (vertices.Count / 4 - 1)
-                    + ", complete=" + (complete.verts.Count / 4 - 1) + ", height=" + text.rectTransform.rect.height
+                    LayoutPath(root, text.transform) + " truncates glyphs: rendered=" + (vertices.Count / 4)
+                    + ", complete=" + (complete.verts.Count / 4) + ", height=" + text.rectTransform.rect.height
                     + ", preferred=" + text.preferredHeight);
             }
-            Require(vertices.Count > 4, "No generated text geometry: " + text.name);
-            var points = vertices.Take(vertices.Count - 4)
+            // Unity 6 uGUI Text.OnPopulateMesh consumes every quad. There is no
+            // trailing placeholder quad to remove; a one-character label has four vertices.
+            Require(vertices.Count >= 4, "No generated text geometry: " + text.name + "; caption=" + text.text
+                + "; font=" + (text.font != null ? text.font.name : "null") + "; fontSize=" + text.fontSize
+                + "; rect=" + text.rectTransform.rect + "; scale=" + text.transform.lossyScale
+                + "; active=" + text.gameObject.activeInHierarchy + "; verts=" + vertices.Count);
+            var points = vertices
                 .Select(vertex => root.InverseTransformPoint(text.transform.TransformPoint(vertex.position / text.pixelsPerUnit))).ToArray();
             return Rect.MinMaxRect(points.Min(point => point.x), points.Min(point => point.y), points.Max(point => point.x), points.Max(point => point.y));
         }

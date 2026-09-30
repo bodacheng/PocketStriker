@@ -35,14 +35,29 @@ public class FightingStepLayer : UILayer
     [Header("教程强制点自动环节黑幕")]
     [SerializeField] GameObject forceClickAutoBtnBlackMask;
     BattleTutorialLayout tutorialLayout;
+    BattleHUDPresentation hudPresentation;
 
     public TeamUIManager Team1UI => team1UI;
     public TeamUIManager Team2UI => team2UI;
+    public BOButton PauseButton => pauseButton;
+
+    public void RefreshPresentation()
+    {
+        if (hudPresentation == null)
+        {
+            hudPresentation = GetComponent<BattleHUDPresentation>();
+            if (hudPresentation == null) hudPresentation = gameObject.AddComponent<BattleHUDPresentation>();
+        }
+        hudPresentation.Initialize(this);
+        hudPresentation.RefreshLayout();
+    }
+
+    protected override void OnAreasResized() => RefreshPresentation();
 
     private int _wholeLiveUnitCountNum = -1;
     public void SetSensor()
     {
-        if (FightLoad.Fight.EventType != FightEventType.Gangbang)
+        if (!FightLoad.Fight.IsGroupBattle)
         {
             return;
         }
@@ -151,6 +166,7 @@ public class FightingStepLayer : UILayer
 
     void PrepareTutorialLayout()
     {
+        RefreshPresentation();
         if (tutorialLayout == null)
             tutorialLayout = gameObject.AddComponent<BattleTutorialLayout>();
         tutorialLayout.Initialize((RectTransform)transform,
@@ -165,6 +181,9 @@ public class FightingStepLayer : UILayer
         if (focus != null && team1UI.UnitIconDic.TryGetValue(focus, out var focusedIcon) && Visible(focusedIcon)) return focusedIcon;
         foreach (var icon in team1UI.UnitIconDic.Values)
             if (Visible(icon)) return icon;
+        if (team1UI.SideIconsContainer != null)
+            foreach (var icon in team1UI.SideIconsContainer.GetComponentsInChildren<SideUnitIcon>(true))
+                if (Visible(icon)) return icon;
         return null;
     }
 
@@ -174,6 +193,7 @@ public class FightingStepLayer : UILayer
     {
         Initialized = false;
         ResetOverlayStates();
+        RefreshPresentation();
 
         RTFightManager.Target.team1.InputsManager = inputsManager;
         RTFightManager.Target.team2.InputsManager = inputsManager;
@@ -193,19 +213,22 @@ public class FightingStepLayer : UILayer
         team1UI.InsTeamUI(RTFightManager.Target.team1.ReadyForNextMember, (() => RTFightManager.Target.team1.Auto),switchTeam1Auto, RTFightManager.Target.team1.RMode_Unit);
         team2UI.InsTeamUI(RTFightManager.Target.team2.ReadyForNextMember, (() => RTFightManager.Target.team2.Auto),switchTeam2Auto, RTFightManager.Target.team2.RMode_Unit);
 
-        team1UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
-        team2UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.EventType == FightEventType.Gangbang);
+        if (FightLoad.Fight.IsGroupBattle) inputsManager.FocusUnit(null);
+
+        team1UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.IsGroupBattle);
+        team2UI.LiveUnitCount.gameObject.SetActive(FightLoad.Fight.IsGroupBattle);
+        RefreshPresentation();
 
         var members = RTFightManager.Target.team1.teamMembers.GetValues();
         var inputEffectsLoading = new List<UniTask>();
-        foreach (var d in members)
-        {
-            inputEffectsLoading.Add(inputsManager.ElementRegister(d.element, RTFightManager.Target.UnitInfoRef[d]));
-        }
+        if (!FightLoad.Fight.IsGroupBattle)
+            foreach (var d in members)
+                inputEffectsLoading.Add(inputsManager.ElementRegister(d.element, RTFightManager.Target.UnitInfoRef[d]));
 
         await UniTask.WhenAll(inputEffectsLoading);
         inputsManager.GroupSkillIcons();
         KeepTopButtonsClickable();
+        RefreshPresentation();
 
         // foreach (var d in RTFightManager.Target.team2.teamMembers.GetValues())
         // {
@@ -332,16 +355,14 @@ public class FightingStepLayer : UILayer
 
     private void OnDisable()
     {
-        var c = RTFightManager.Target._CameraManager.GetMode(C_Mode.CertainYAntiVibration);
-        var mode = ((ChatGptFix)c);
-        mode.CanSetH = false;
+        var camera = RTFightManager.Target?._CameraManager;
+        if (camera?.GetMode(C_Mode.CertainYAntiVibration) is ChatGptFix mode) mode.CanSetH = false;
     }
 
     public override void OnDestroy()
     {
-        var c = RTFightManager.Target._CameraManager.GetMode(C_Mode.CertainYAntiVibration);
-        var mode = ((ChatGptFix)c);
-        mode.CanSetH = false;
+        var camera = RTFightManager.Target?._CameraManager;
+        if (camera?.GetMode(C_Mode.CertainYAntiVibration) is ChatGptFix mode) mode.CanSetH = false;
         base.OnDestroy();
     }
 }

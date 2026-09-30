@@ -47,6 +47,7 @@ public partial class FightPrepareLayer : UILayer
         GangbangInfo stage, Action toGangbangFront, string gangbangStageNo,
         Func<int, string ,int, int, int> setTeamUnitCount, Func<int, string, int> getTeamUnitCount)
     {
+        HidePreparationSkillDetails();
         _gangbangStage = stage;
         SelectedMaxTeamCount = GetConfiguredMaxTeamCount();
 
@@ -74,32 +75,22 @@ public partial class FightPrepareLayer : UILayer
 
         LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
-        arcadeStageNoText.text = "Stage " + gangbangStageNo;
+        arcadeStageNoText.text = "Stage " + gangbangStageNo + " · " + Translate.Get("TeamModeG");
         toArcadeFrontBtn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");
         toArcadeFrontBtn.SetListener(toGangbangFront);
 
-        var rewardDic = PlayFabReadClient.GangbangAwards;
+        var adventure = stage.EventType == FightEventType.Quest;
+        var rewardDic = adventure ? PlayFabReadClient.StageAwards : PlayFabReadClient.GangbangAwards;
         var reward = rewardDic[gangbangStageNo];
         rewardUI.ShowRewards(reward.d,reward.g);
         int.TryParse(gangbangStageNo, out var arcadeStageNoInt);
-        rewardUI.AwardRender(PlayerAccountInfo.Me.gangbangProcess + 1 > arcadeStageNoInt);
+        var progress = adventure ? PlayerAccountInfo.Me.arcadeProcess : PlayerAccountInfo.Me.gangbangProcess;
+        rewardUI.AwardRender(progress + 1 > arcadeStageNoInt);
         rewardUI.gameObject.SetActive(true);
-        nineForShow.AddOnClickToSlots(
-            (RECORD_ID) =>
-            {
-                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
-                connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
-            }
-        );
+        BindPreparationSkillSlots(nineForShow, connector);
         if (nineForShowE != null && connectorE != null)
         {
-            nineForShowE.AddOnClickToSlots(
-                (RECORD_ID) =>
-                {
-                    var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
-                    connectorE.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
-                }
-            );
+            BindPreparationSkillSlots(nineForShowE, connectorE);
         }
 
         _setTeamUnitCount = (i, s, arg3, maxCount) =>
@@ -109,10 +100,12 @@ public partial class FightPrepareLayer : UILayer
             return returnValue;
         };
         _getTeamUnitCount = getTeamUnitCount;
+        RefreshPreparationLayout();
     }
 
     public async UniTask GangbangStageUnitsDisplay(GangbangInfo stage, CancellationToken token)
     {
+        HidePreparationSkillDetails();
         var version = ++_displayVersion;
         var heroUnits = stage.FightMembers.HeroSets.GetValues();
         var enemyUnits = stage.FightMembers.EnemySets.GetValues();
@@ -164,6 +157,7 @@ public partial class FightPrepareLayer : UILayer
         var defaultEnemyId = _gangbangHeroIconsE.FirstOrDefault()?.InstanceID;
 
         ApplySelectedCountOption();
+        RefreshPreparationLayout();
 
         if (!string.IsNullOrEmpty(defaultHeroId))
         {
@@ -184,7 +178,7 @@ public partial class FightPrepareLayer : UILayer
 
         WarmupUnitModels(heroUnits, defaultHeroId, connector, _preparedHeroModelIds, token);
         WarmupUnitModels(enemyUnits, defaultEnemyId, enemyConnector, _preparedEnemyModelIds, token);
-        team1Name.text = "YOU";
+        RefreshPreparationLayout();
     }
 
     List<GangbangHeroIcon> GangbangInfosShow(List<UnitInfo> unitSets, Action<string> iconBehaviour, RectTransform showT,
@@ -287,6 +281,10 @@ public partial class FightPrepareLayer : UILayer
 
         RefreshCountDisplay(1, team1UnitCount, SelectedMaxTeamCount);
         RefreshCountDisplay(2, team2UnitCount, SelectedMaxTeamCount);
+        _gangbangStage.RecordTeamLimit(SelectedMaxTeamCount);
+        var canFight = _gangbangStage.GetGroupWholeUnitCount(1) > 0 && _gangbangStage.GetGroupWholeUnitCount(2) > 0
+            && _gangbangStage.FightMembers.CheckStonesLegal(_gangbangStage.EventType, _gangbangStage.GetNonZeroInstanceIds(1));
+        SetFightBeginEnableRender(canFight);
     }
 
     void RefreshCountDisplay(int teamID, int currentTeamUnitCount, int maxTeamCount)

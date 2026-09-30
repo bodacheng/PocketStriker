@@ -17,6 +17,32 @@ public class ElementEffectsGroup
     ParticleSystem _rushBtn;
     ParticleSystem _dreamComboBtn;
     ParticleSystem _pressingExplosion; // 这个不需要对象池。
+    readonly Dictionary<ParticleSystem, Vector3> _authoredScales = new Dictionary<ParticleSystem, Vector3>();
+
+    public void ApplyHUDScale()
+    {
+        void Scale(ParticleSystem effect, float factor)
+        {
+            if (effect == null) return;
+            if (!_authoredScales.TryGetValue(effect, out var authored))
+            {
+                authored = effect.transform.localScale;
+                _authoredScales.Add(effect, authored);
+            }
+            effect.transform.localScale = authored * factor;
+        }
+        foreach (var pair in _btnRefreshEffects) Scale(pair.Value, 156f / 220f);
+        if (_buttonSlotEffects != null)
+            foreach (var pair in _buttonSlotEffects) Scale(pair.Value, pair.Key.name == "DreamCombo" ? 112f / 250f : 156f / 220f);
+        Scale(_pressingExplosion, 156f / 220f);
+        Scale(_triggerExplosion0, 156f / 220f);
+        Scale(_triggerExplosion1, 156f / 220f);
+        Scale(_triggerExplosion2, 156f / 220f);
+        Scale(_triggerExplosion3, 156f / 220f);
+        Scale(_defendBtn, 100f / 250f);
+        Scale(_rushBtn, 100f / 220f);
+        Scale(_dreamComboBtn, 112f / 250f);
+    }
 
     public void DreamComboEffectOn(bool on)
     {

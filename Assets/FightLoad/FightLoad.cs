@@ -12,34 +12,24 @@ public static class FightLoad
 
     public static FightInfo Fight;
 
+    public static void ConfigureBattleControl(FightInfo fightInfo)
+    {
+        if (fightInfo == null) return;
+        fightInfo.Team1Auto = fightInfo.ShouldForceAutoBattle || PlayerPrefs.GetInt("auto", 0) == 1;
+        fightInfo.Team2Auto = true;
+        fightInfo.RunTutorial = fightInfo.ShouldRunFirstQuestTutorial;
+        if (fightInfo.RunTutorial)
+        {
+            fightInfo.Team1Auto = false;
+            fightInfo.Team2Auto = false;
+        }
+    }
+
     public static void Go(FightInfo fightInfo, bool inSceneLoad = false)
     {
         if (fightInfo == null || (!inSceneLoad && sceneLoadInProgress))
             return;
-        switch (fightInfo.EventType)
-        {
-            case FightEventType.Screensaver:
-            case FightEventType.SkillTest:
-            case FightEventType.Gangbang:
-                fightInfo.Team1Auto = true;
-                fightInfo.Team2Auto = true;
-                break;
-            default:
-                fightInfo.Team1Auto = PlayerPrefs.GetInt("auto", 0) == 1;
-                fightInfo.Team2Auto = true;
-                break;
-        }
-
-        if (fightInfo.ID == "1" && fightInfo.EventType == FightEventType.Quest)
-        {
-            fightInfo.RunTutorial = true;
-            fightInfo.Team1Auto = false;
-            fightInfo.Team2Auto = false;
-        }
-        else
-        {
-            fightInfo.RunTutorial = false;
-        }
+        ConfigureBattleControl(fightInfo);
 
         Fight = fightInfo is GangbangInfo gangbangInfo
             ? GangbangInfo.Copy(gangbangInfo)

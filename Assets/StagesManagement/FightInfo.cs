@@ -7,6 +7,7 @@ using dataAccess;
 using System.IO;
 using System.Linq;
 using mainMenu;
+using MCombat.Shared.Combat;
 using NoSuchStudio.Common;
 using PlayFab.ClientModels;
 
@@ -60,11 +61,17 @@ public class FightInfo : ScriptableObject
     public int dumbAIDecisionDelay = 20;
     public int dreamComboAIRateNum = 5;
 
+    // Group is a battle mechanism; Quest remains the progression/reward contract.
+    public bool IsGroupBattle => this is GangbangInfo || EventType == FightEventType.Gangbang;
+    public bool AllowsManualUnitControl => !IsGroupBattle;
+    public bool ShouldForceAutoBattle => FightControlPolicy.ShouldForceAutoBattle(FightMode, EventType);
+    public bool ShouldRunFirstQuestTutorial => FightControlPolicy.ShouldRunFirstQuestTutorial(FightMode, ID, EventType);
+
     public FightMode FightMode
     {
         get
         {
-            if (EventType == FightEventType.Gangbang)
+            if (IsGroupBattle)
                 return FightMode.Group;
             if (EvolutionMode)
                 return FightMode.Evolve;
@@ -75,18 +82,18 @@ public class FightInfo : ScriptableObject
         set
         {
             evolutionMode = value == FightMode.Evolve;
-            if (value == FightMode.Multi)
+            if (value is FightMode.Multi or FightMode.Group)
             {
                 team1Mode = TeamMode.MultiRaid;
                 team2Mode = TeamMode.MultiRaid;
             }
-            else if (value is FightMode.Rotate or FightMode.Group)
+            else if (value == FightMode.Rotate)
             {
                 team1Mode = TeamMode.Rotation;
                 team2Mode = TeamMode.Rotation;
             }
 
-            if (value == FightMode.Group)
+            if (value == FightMode.Group && this is not GangbangInfo)
                 EventType = FightEventType.Gangbang;
         }
     }
@@ -361,7 +368,8 @@ public class FightInfo : ScriptableObject
         switch (EventType)
         {
             case FightEventType.Quest:
-                set = TeamSet.GetTargetSet(AdventureModeRules.GetTeamSetKey(ID, EvolutionMode));
+                set = IsGroupBattle ? TeamSet.Gangbang
+                    : TeamSet.GetTargetSet(AdventureModeRules.GetTeamSetKey(ID, EvolutionMode));
                 break;
             case FightEventType.Arena:
                 set = TeamSet.Arena3V3;
@@ -378,7 +386,7 @@ public class FightInfo : ScriptableObject
         }
         
         FightMembers.HeroSets = set.LoadTeamDic();
-        if (EventType == FightEventType.Quest)
+        if (EventType == FightEventType.Quest && !IsGroupBattle)
         {
             // Older saves may contain more slots than the selected adventure mode.
             // Limit the runtime lineup without erasing the saved multi-hero team.
@@ -405,6 +413,7 @@ public class FightInfo : ScriptableObject
 
     public static FightInfo Copy(FightInfo source)
     {
+        if (source is GangbangInfo group) return GangbangInfo.Copy(group);
         var stage = CreateInstance<FightInfo>();
         
         stage.ID = source.ID;

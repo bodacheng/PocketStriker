@@ -50,7 +50,7 @@ namespace FightScene
                 _layer.OpenTutorial();
             RTFightManager.Target.ModeStart();
             _layer.SetSensor();
-
+            Physics.SyncTransforms();
             BoundaryControlByGod.target.SensorUnity.DetectionStart(CommonSetting.AIDetectInterval, true);
         }
 
@@ -74,7 +74,9 @@ namespace FightScene
             RTFightManager.Target.ClearUnitData();
             HitBoxesProcesser.Instance.AllProcessingFade();
             RTFightManager.Target.EvolutionManager.EvolutionCount = 0;
-            FightLogger.value.WatchMissionsAbandon();
+            // FightOver consumes the winner for the result and rewards. Reset it
+            // when the next battle is prepared, rather than on leaving Fighting.
+            FightLogger.value.StopWatchingDeaths();
             BoundaryControlByGod.target.SensorUnity.Stop();
         }
 
@@ -86,7 +88,7 @@ namespace FightScene
                 RTFightManager.Target.team2.LocalUpdate();
             }
 
-            if (FightLoad.Fight.EventType != FightEventType.Gangbang && FightLoad.Fight.team1Mode != TeamMode.MultiRaid)
+            if (!FightLoad.Fight.IsGroupBattle && FightLoad.Fight.team1Mode != TeamMode.MultiRaid)
                 RTFightManager.Target._CameraManager.VisibilityControl.LocalUpdate();
         }
 

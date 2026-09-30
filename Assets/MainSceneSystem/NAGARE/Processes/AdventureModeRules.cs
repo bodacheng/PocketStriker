@@ -3,6 +3,7 @@ public static class AdventureModeRules
     public const int MultiMode = 1;
     public const int RotationMode = 2;
     public const int EvolutionMode = 3;
+    public const int GroupMode = 4;
 
     public static bool IsTutorialStage(string stageId)
     {
@@ -14,7 +15,7 @@ public static class AdventureModeRules
         // The opening fights teach one hero's controls against the authored enemies.
         if (IsTutorialStage(stageId))
             return RotationMode;
-        return configuredMode >= MultiMode && configuredMode <= EvolutionMode
+        return configuredMode >= MultiMode && configuredMode <= GroupMode
             ? configuredMode
             : RotationMode;
     }

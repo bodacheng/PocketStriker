@@ -116,9 +116,9 @@ public class SensorUnity : MonoBehaviour
     {
         var detectColliderCount = 0;
 
-        if (FightLoad.Fight.FightMode == FightMode.Group)
+        if (FightLoad.Fight.IsGroupBattle)
         {
-            detectColliderCount = groupFightRemainUnitCount * 2;
+            detectColliderCount = groupFightRemainUnitCount * 10;
         }
         else
         {
@@ -140,11 +140,24 @@ public class SensorUnity : MonoBehaviour
     {
         _sensorRadius = radius;
         _centerPos = center;
-        _hits = new Collider[detectColliderCount] ; //What was hit in this frame?
+        // Body parts, shields and weapons all occupy query slots. Keep the
+        // high-water capacity when casualties arrive; shrinking can hide the
+        // last enemy behind an arbitrary subset of friendly colliders.
+        var capacity = Mathf.Max(16, detectColliderCount);
+        if (_hits == null || _hits.Length < capacity)
+            _hits = new Collider[capacity];
     }
 
     void SensorDetectProcess()
     {
-        _hitCount = Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);
+        if (_hits == null) _hits = new Collider[16];
+        while (true)
+        {
+            _hitCount = Physics.OverlapSphereNonAlloc(_centerPos, _sensorRadius, _hits, _layers);
+            if (_hitCount < _hits.Length) return;
+            // A full NonAlloc buffer does not say how many results were omitted.
+            // Grow and repeat until every collider is available to each sensor.
+            Array.Resize(ref _hits, checked(_hits.Length * 2));
+        }
     }
 }

@@ -10,6 +10,55 @@ public class GangbangHeroIcon : HeroIcon
 
     private Func<int> countGet;
 
+    /// <summary>Portrait above a regular minus/count/plus row for the portrait preparation rails.</summary>
+    public void ApplyVerticalPreparationStyle(float portraitSize, float railWidth, Font font, Color accent)
+    {
+        var rect = (RectTransform)transform;
+        rect.sizeDelta = Vector2.one * portraitSize;
+        ApplyPreparationStyle();
+        SetPreparationScrollRect(GetComponentInParent<ScrollRect>());
+        RefreshPresentationSize();
+        float buttonWidth = 50;
+        float rowLeft = (portraitSize - railWidth) * 0.5f;
+        StyleCountButton(minusBtn, "-", rowLeft, portraitSize + 12, buttonWidth, font, accent);
+        StyleCountButton(plusBtn, "+", rowLeft + railWidth - buttonWidth, portraitSize + 12, buttonWidth, font, accent);
+        var countRect = count.rectTransform;
+        PlaceControl(countRect, rowLeft + buttonWidth + 2, portraitSize + 12, railWidth - buttonWidth * 2 - 4, 48);
+        count.fontSize = 28;
+        count.resizeTextForBestFit = false;
+        count.alignment = TextAnchor.MiddleCenter;
+        count.color = new Color(0.88f, 0.93f, 0.95f);
+        count.raycastTarget = false;
+        foreach (var shadow in count.GetComponents<Shadow>()) shadow.enabled = false;
+    }
+
+    static void StyleCountButton(BOButton button, string caption, float left, float top, float width, Font font, Color accent)
+    {
+        if (button == null) return;
+        PlaceControl((RectTransform)button.transform, left, top, width, 48);
+        var label = button.transform.Find("PreparationCountLabel")?.GetComponent<Text>();
+        if (label == null)
+        {
+            foreach (var image in button.GetComponentsInChildren<Image>(true)) image.enabled = false;
+            var node = new GameObject("PreparationCountLabel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            node.layer = button.gameObject.layer;
+            node.transform.SetParent(button.transform, false);
+            label = node.GetComponent<Text>();
+            label.font = font;
+        }
+        label.text = caption;
+        PreparationButtonSkin.Apply(button, label, accent, false, 28);
+        PreparationButtonSkin.Fit(label.rectTransform, 4, 2);
+    }
+
+    static void PlaceControl(RectTransform rect, float left, float top, float width, float height)
+    {
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
+        rect.anchoredPosition = new Vector2(left, -top);
+        rect.sizeDelta = new Vector2(width, height);
+        rect.localScale = Vector3.one;
+    }
+
     void SetUp(Func<int, int> countSet, Func<int> countGet, bool enableCountSet = true)
     {
         this.countGet = countGet;

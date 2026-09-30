@@ -25,6 +25,25 @@ public class MobileInputsManager : MonoBehaviour {
     
     public Camera FXCamera { get; set; }
     public BOButton DreamComboBtn => dreamComboBtn;
+    public BOButton AttackButton => a1Btn;
+    public BOButton Fire1Button => a2Btn;
+    public BOButton Fire2Button => a3Btn;
+    public BOButton DefendButton => defendBtn;
+    public BOButton DashButton => dashBtn;
+    public UltimateJoystick MovementJoystick => joystick;
+    public RadialSegmentedHealthBar DreamComboGauge => radialSegmentedHealthBar;
+
+    public void RefreshHUDPresentation()
+    {
+        buttonStretchEdgeDis = 14f;
+        foreach (var pair in btnIcons)
+            foreach (var icon in pair.Value.Values)
+                if (icon != null && icon.transform is RectTransform rect)
+                    PreparationButtonSkin.Fit(rect, buttonStretchEdgeDis, buttonStretchEdgeDis);
+        foreach (var effects in _elementEffects.Values) effects.ApplyHUDScale();
+        if (focus.Value != null && FXCamera != null && _elementEffects.ContainsKey(focus.Value.element))
+            SwitchElementEffects(focus.Value.element);
+    }
     
     //攻击键系成员
     readonly IDictionary<string, GameObject> _aIcons = new Dictionary<string, GameObject>();
@@ -78,6 +97,7 @@ public class MobileInputsManager : MonoBehaviour {
         a2Btn.interactable = !preparingMode;
         a3Btn.interactable = !preparingMode;
         dashBtn.interactable = !preparingMode;
+        defendBtn.interactable = !preparingMode;
         dreamComboBtn.interactable = !preparingMode;
         joystick.enabled = !preparingMode;
     }
@@ -171,6 +191,7 @@ public class MobileInputsManager : MonoBehaviour {
         {
             var elementEffect = new ElementEffectsGroup();
             await elementEffect.InitializeCommon(effectsParent, element, a1Btn, a2Btn, a3Btn, dreamComboBtn);
+            elementEffect.ApplyHUDScale();
             DicAdd<Element,ElementEffectsGroup>.Add(_elementEffects, element, elementEffect);
         }
         
@@ -441,6 +462,7 @@ public class MobileInputsManager : MonoBehaviour {
         a2Btn.gameObject.SetActive(false);
         a3Btn.gameObject.SetActive(false);
         dashBtn.gameObject.SetActive(false);
+        defendBtn.gameObject.SetActive(false);
         dreamComboBtn.gameObject.SetActive(false);
         
         attack = false;

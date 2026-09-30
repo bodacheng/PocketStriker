@@ -111,7 +111,8 @@ namespace ModelView
             wid = rect.rect.width;
             hei = rect.rect.height;
             camera.transform.SetParent(camerasHolder);
-            PreScene.target.CameraStackToPostProcess(camera);
+            if (_uiPresentationEnabled) ConfigureUIPresentationCamera();
+            else PreScene.target.CameraStackToPostProcess(camera);
             
             // 初始化工作全部完成后才启用相机，否则会在之前造成黑屏
             camera.gameObject.SetActive(true);
@@ -133,6 +134,8 @@ namespace ModelView
         private void OnDestroy()
         {
             _rotateTo?.Kill();
+            ReleaseUIPresentationTexture();
+            ReleaseUIPresentationSlot(false);
         }
 
         private Renderer _parentNodeRenderer;
@@ -174,6 +177,11 @@ namespace ModelView
         
         void CameraTreat(Camera _camera, bool resetPos)
         {
+            if (_uiPresentationEnabled)
+            {
+                UpdateUIPresentationCamera(resetPos);
+                return;
+            }
             var viewCenter = GetCenterPosition(rect);
             _camera.orthographicSize = _basicOrthographicSize * (PosCal.CanvasHeight / rect.rect.height);
             var cViewWidth = _camera.orthographicSize * 2 * _camera.aspect;

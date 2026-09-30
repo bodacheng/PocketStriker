@@ -8,6 +8,10 @@ public class Sensor
     TeamConfig _teamConfig = TeamConfig.DefaultSet;
     static readonly CombatUnitRegistry<Data_Center> SharedUnitRegistry = new CombatUnitRegistry<Data_Center>();
     static readonly CombatUnitRegistry<Data_Center> SharedDeadUnitRegistry = new CombatUnitRegistry<Data_Center>();
+    static readonly Dictionary<Collider, Component> ColliderOwnerComponents = new Dictionary<Collider, Component>();
+    static int liveRegistryVersion;
+    int enemyRegistryVersion = -1;
+    int allyRegistryVersion = -1;
     readonly List<Collider> _detectedEnemies = new List<Collider>();
     Collider _nearestEnemyCollider;
     readonly List<Collider> _damagingWeaponAround = new List<Collider>();
@@ -37,17 +41,24 @@ public class Sensor
         _meAndEnemyLayerMask = teamConfig.myTeamAndMyEnemy;
         _selfDataCenter = self;
         _selfTeam[0] = teamConfig.myTeam;
+        _enemiesByDistance.Clear();
+        _alliesByDistance.Clear();
+        enemyRegistryVersion = allyRegistryVersion = -1;
+        SensorDetectionResultClearProcess();
     }
 
     public static void ClearFightingMember()
     {
         SharedUnitRegistry.Clear();
         SharedDeadUnitRegistry.Clear();
+        ColliderOwnerComponents.Clear();
+        liveRegistryVersion++;
     }
 
     public static void AddOrRemoveSharedUnitInfo(Data_Center member, Team team, bool add) // add:true remove: false
     {
         SharedUnitRegistry.AddOrRemove(member, team, add);
+        liveRegistryVersion++;
     }
 
     public static void AddOrRemoveSharedDeadUnitInfo(Data_Center member, Team team, bool add) // add:true remove: false
@@ -59,9 +70,13 @@ public class Sensor
     {
         _detectedEnemies.Clear();
         _damagingWeaponAround.Clear();
+        _nearestEnemyCollider = null;
+        _nearestDamagingWeapon = null;
+        _targetRangeEnemies.Clear();
     }
 
-    void FindTargetsByDistance(IReadOnlyList<Team> tags, CombatUnitRegistry<Data_Center> targetRegistry, List<GameObject> targetList)
+    void FindTargetsByDistance(IReadOnlyList<Team> tags, CombatUnitRegistry<Data_Center> targetRegistry,
+        List<GameObject> targetList, bool onlyLive = true)
     {
         targetList.Clear();
         if (tags == null || targetRegistry == null)
@@ -80,13 +95,10 @@ public class Sensor
             for (var k = 0; k < searchingMembers.Count; k++)
             {
                 var member = searchingMembers[k];
-                if (member != null && member.WholeT != null)
+                if (member != null && member.WholeT != null
+                    && (!onlyLive || (!member.FightDataRef.IsDead.Value && member.WholeT.gameObject.activeInHierarchy)))
                 {
                     targetList.Add(member.WholeT.gameObject);
-                }
-                else
-                {
-                    Debug.Log("检测逻辑错误");
                 }
             }
         }
@@ -122,13 +134,16 @@ public class Sensor
         for (var i = 0; i < count; i++)
         {
             var hit = hits[i];
-            if (hit == null || (hit.transform.position - centerPosition).sqrMagnitude > sensorRadiusSqr)
+            if (hit == null || !hit.enabled || !hit.gameObject.activeInHierarchy
+                || (hit.transform.position - centerPosition).sqrMagnitude > sensorRadiusSqr)
             {
                 continue;
             }
 
             var hitLayer = hit.gameObject.layer;
-            if (CombatLayerUtility.ContainsLayer(_teamConfig.enemyLayerMask, hitLayer) || CombatLayerUtility.ContainsLayer(_teamConfig.enemyShieldLayerMask, hitLayer))
+            if ((CombatLayerUtility.ContainsLayer(_teamConfig.enemyLayerMask, hitLayer)
+                 || CombatLayerUtility.ContainsLayer(_teamConfig.enemyShieldLayerMask, hitLayer))
+                && IsLiveEnemyCollider(hit))
             {
                 _detectedEnemies.Add(hit);
             }
@@ -153,7 +168,7 @@ public class Sensor
         for (var i = 0; i < _detectedEnemies.Count; i++)
         {
             var enemy = _detectedEnemies[i];
-            if (enemy == null)
+            if (!IsLiveEnemyCollider(enemy))
             {
                 continue;
             }
@@ -170,7 +185,30 @@ public class Sensor
 
     public Collider GetClosestEnemyColliderInSensorRange()
     {
+        // Death and collider deactivation can happen between shared queries.
+        if (!IsLiveEnemyCollider(_nearestEnemyCollider))
+        {
+            _detectedEnemies.RemoveAll(collider => !IsLiveEnemyCollider(collider));
+            _nearestEnemyCollider = FindNearestCollider(_detectedEnemies);
+        }
         return _nearestEnemyCollider;
+    }
+
+    static bool IsLiveEnemyCollider(Collider collider)
+    {
+        if (collider == null || !collider.enabled || !collider.gameObject.activeInHierarchy) return false;
+        // Cache the marker, not its owner: pooled/rebound limbs and shields can
+        // acquire a different owner, including after their initial null binding.
+        if (!ColliderOwnerComponents.TryGetValue(collider, out var marker) || marker == null)
+        {
+            if (collider.TryGetComponent<BO_Limb>(out var limb)) marker = limb;
+            else if (collider.TryGetComponent<BO_Shield>(out var shield)) marker = shield;
+            if (marker != null) ColliderOwnerComponents[collider] = marker;
+        }
+        var owner = marker is BO_Limb body ? body.Center
+            : marker is BO_Shield shieldMarker ? shieldMarker.OwnerFightParamsReference?.Center
+            : collider.GetComponentInParent<Data_Center>();
+        return owner == null || !owner.FightDataRef.IsDead.Value;
     }
 
     public Collider GetSuddenThreatInRange(float min,float max)
@@ -193,7 +231,8 @@ public class Sensor
 
     Collider GetClosestEnemyHitBoxColliderInSensorRange()
     {
-        if (_nearestDamagingWeapon != null)
+        if (_nearestDamagingWeapon != null && _nearestDamagingWeapon.enabled
+            && _nearestDamagingWeapon.gameObject.activeInHierarchy)
         {
             var returnValue = _nearestDamagingWeapon;
             _nearestDamagingWeapon = null;
@@ -214,8 +253,11 @@ public class Sensor
             _enemiesByDistance.Clear();
             return _enemiesByDistance;
         }
-        if (refresh)
+        if (refresh || enemyRegistryVersion != liveRegistryVersion)
+        {
             FindTargetsByDistance(_teamConfig.myEnemies, SharedUnitRegistry, _enemiesByDistance);
+            enemyRegistryVersion = liveRegistryVersion;
+        }
         return _enemiesByDistance;
     }
 
@@ -226,8 +268,11 @@ public class Sensor
             _alliesByDistance.Clear();
             return _alliesByDistance;
         }
-        if (refresh)
+        if (refresh || allyRegistryVersion != liveRegistryVersion)
+        {
             FindTargetsByDistance(_selfTeam, SharedUnitRegistry, _alliesByDistance);
+            allyRegistryVersion = liveRegistryVersion;
+        }
         return _alliesByDistance;
     }
 
@@ -238,7 +283,7 @@ public class Sensor
             return null;
         }
 
-        FindTargetsByDistance(_teamConfig.myEnemies, SharedDeadUnitRegistry, _deadEnemiesByDistance);
+        FindTargetsByDistance(_teamConfig.myEnemies, SharedDeadUnitRegistry, _deadEnemiesByDistance, false);
         return _deadEnemiesByDistance.Count > 0 ? _deadEnemiesByDistance[_deadEnemiesByDistance.Count - 1] : null;
     }
 

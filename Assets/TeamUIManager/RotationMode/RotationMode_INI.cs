@@ -14,22 +14,16 @@ namespace FightScene
                 var sideIcon = Instantiate(unitIconPrefab);
                 sideIcon.name = center.UnitInfo.r_id + "_icon";
                 sideIcon.Icon.iconButton.onClick.RemoveAllListeners();
-                sideIcon.Icon.iconButton.onClick.AddListener(() => { ChangeUnit(center); });
+                sideIcon.Icon.iconButton.onClick.AddListener(() =>
+                {
+                    if (!IsGroupBattle) ChangeUnit(center);
+                });
                 var info = RTFightManager.Target.UnitInfoRef[center];
                 sideIcon.Icon.ChangeIcon(info);
                 sideIcon.gameObject.SetActive(true);
                 sideIcon.Icon.CooldownCurtainUpdate(0);
                 
-                if (TeamConfig.myTeam == RTFightManager.playerTeam)
-                {
-                    sideIcon.transform.SetParent(sideIconsContainer.transform);
-                    sideIcon.transform.localScale = Vector3.one;
-                }
-                else
-                {
-                    sideIcon.transform.SetParent(_targetCanvasT.transform);
-                    sideIcon.transform.localScale = Vector3.one;
-                }
+                ArrangeSideIcon(center, sideIcon);
                 DicAdd<Data_Center, SideUnitIcon>.Add(UnitIconDic, center, sideIcon);
                 
                 RTFightManager.Target.RefreshTimeDic[center].Subscribe((x) =>
@@ -84,6 +78,7 @@ namespace FightScene
         
         void IniComboHit(ReactiveProperty<Data_Center> RMode_Unit)
         {
+            if (RMode_Unit == null) return;
             RMode_Unit.Subscribe(x =>
             {
                 if (x != null)

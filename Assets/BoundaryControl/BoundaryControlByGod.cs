@@ -14,6 +14,67 @@ public class BoundaryControlByGod : MonoBehaviour {
     public static float _BattleRingRadius;
     public static BoundaryControlByGod target;
     public SensorUnity SensorUnity => sensorUnity;
+    public float DefaultBattleRadius => BattleRingRadius;
+    public float EffectiveBattleRadius => currentRadius > 0 ? currentRadius : BattleRingRadius;
+    public float ArenaScale => EffectiveBattleRadius / Mathf.Max(0.1f, BattleRingRadius);
+    public GameObject CurrentBattleGround => battleGround;
+    float currentRadius;
+    Vector3 battleGroundDefaultScale;
+    readonly Dictionary<ParticleSystem, Vector3> ringDefaultScales = new Dictionary<ParticleSystem, Vector3>();
+    readonly Dictionary<ParticleSystem, Vector3> ringDefaultParticleSizes = new Dictionary<ParticleSystem, Vector3>();
+
+    public void ConfigureBattleRadius(bool groupBattle, float requiredRadius = 0f)
+    {
+        float previousRadius = EffectiveBattleRadius;
+        currentRadius = groupBattle ? Mathf.Max(BattleRingRadius, requiredRadius) : BattleRingRadius;
+        _BattleRingRadius = currentRadius;
+        int count = FightLoad.Fight?.FightMembers != null
+            ? FightLoad.Fight.FightMembers.HeroSets.Count + FightLoad.Fight.FightMembers.EnemySets.Count : 2;
+        sensorUnity?.Setup(currentRadius, Vector3.zero, Mathf.Max(20, count * 10));
+        if (BattleRingPSs != null)
+            foreach (var ring in BattleRingPSs)
+            {
+                if (ring == null) continue;
+                if (!ringDefaultScales.TryGetValue(ring, out var scale))
+                {
+                    scale = ring.transform.localScale;
+                    ringDefaultScales.Add(ring, scale);
+                }
+                ring.transform.localScale = scale * ArenaScale;
+                foreach (var particles in ring.GetComponentsInChildren<ParticleSystem>(true))
+                {
+                    var main = particles.main;
+                    if (main.scalingMode == ParticleSystemScalingMode.Hierarchy) continue;
+                    if (!ringDefaultParticleSizes.TryGetValue(particles, out var sizes))
+                    {
+                        sizes = new Vector3(main.startSizeXMultiplier, main.startSizeYMultiplier, main.startSizeZMultiplier);
+                        ringDefaultParticleSizes.Add(particles, sizes);
+                    }
+                    // Shape/Local scaling ignores the parent's scale for particle sizes.
+                    // Keep the authored mode and size at the ordinary radius.
+                    main.startSizeXMultiplier = sizes.x * ArenaScale;
+                    if (main.startSize3D)
+                    {
+                        main.startSizeYMultiplier = sizes.y * ArenaScale;
+                        main.startSizeZMultiplier = sizes.z * ArenaScale;
+                    }
+                }
+                if (!Mathf.Approximately(previousRadius, currentRadius) && ring.gameObject.activeInHierarchy)
+                {
+                    // World-space particles retain their old size until they are emitted again.
+                    ring.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    ring.Play(true);
+                }
+            }
+        ApplyGroundScale();
+    }
+
+    void ApplyGroundScale()
+    {
+        if (battleGround != null)
+            battleGround.transform.localScale = new Vector3(battleGroundDefaultScale.x * ArenaScale,
+                battleGroundDefaultScale.y, battleGroundDefaultScale.z * ArenaScale);
+    }
     
     void Awake()
     {
@@ -61,7 +122,7 @@ public class BoundaryControlByGod : MonoBehaviour {
                 break;
         }
         
-        SensorUnity.Setup(BattleRingRadius, Vector3.zero, detectColliderCount);
+        SensorUnity.Setup(EffectiveBattleRadius, Vector3.zero, detectColliderCount);
     }
     
     private int _currentBackGroundNum = -1;
@@ -94,6 +155,8 @@ public class BoundaryControlByGod : MonoBehaviour {
         if (battleGround != null)
             Destroy(battleGround);
         battleGround = loaded;
+        battleGroundDefaultScale = loaded.transform.localScale;
+        ApplyGroundScale();
         _currentBackGroundNum = number;
     }
 

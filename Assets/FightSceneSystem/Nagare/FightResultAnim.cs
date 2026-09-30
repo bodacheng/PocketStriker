@@ -86,13 +86,18 @@ namespace FightScene
                 return;
             }
 
-            var fightScene = global::FightScene.FightScene.target;
-            if (fightScene != null)
+            // Story generation runs in the background. Results consume only a
+            // ready story and never await the network, its retries or images.
+            bool hasStory = false;
+            try
             {
-                await fightScene.EnsureAIStory();
+                hasStory = arenaFightOver.LoadStory();
             }
-
-            if (arenaFightOver.LoadStory())
+            catch (Exception exception)
+            {
+                Debug.LogWarning("[FightResult] Optional story skipped: " + exception.Message);
+            }
+            if (hasStory)
             {
                 arenaFightOver.Setup(async () =>
                 {

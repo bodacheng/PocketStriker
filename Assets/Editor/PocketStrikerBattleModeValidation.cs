@@ -8,6 +8,8 @@ using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 /// <summary>Exercises local battle data without entering Play mode or accessing an account.</summary>
 public static class PocketStrikerBattleModeValidation
@@ -35,6 +37,7 @@ public static class PocketStrikerBattleModeValidation
         public int multiStages;
         public int rotationStages;
         public int evolutionStages;
+        public int groupStages;
         public string addressablesBuilder;
         public List<StageResult> stages = new List<StageResult>();
         public List<string> errors = new List<string>();
@@ -59,6 +62,30 @@ public static class PocketStrikerBattleModeValidation
         public FightInfo asset;
     }
 
+    public static async void ValidateBatch()
+    {
+        if (running || EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogError("Battle Modes batch validation requires a stopped editor and no active validation run.");
+            EditorApplication.Exit(1);
+            return;
+        }
+
+        try
+        {
+            Validate();
+            await UniTask.WaitUntil(() => !running);
+            var report = File.Exists(ReportPath)
+                ? JsonUtility.FromJson<Report>(File.ReadAllText(ReportPath)) : null;
+            EditorApplication.Exit(report != null && report.passed ? 0 : 1);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            EditorApplication.Exit(1);
+        }
+    }
+
     [MenuItem("PocketStriker/Validation/Battle Modes")]
     public static async void Validate()
     {
@@ -79,6 +106,10 @@ public static class PocketStrikerBattleModeValidation
         }
 
         Application.logMessageReceived += CaptureError;
+        // Stopped editors tick UniTask's runners, but Addressables dispatches
+        // completion callbacks from an ExecuteInEditMode MonoBehaviour.Update.
+        // Request editor player-loop ticks for the lifetime of this validation.
+        EditorApplication.update += EditorApplication.QueuePlayerLoopUpdate;
         try
         {
             Debug.Log("[BattleModes] Validating local tables, 90 random Boss battles, published adventure stages, and menu prefab entries.");
@@ -119,11 +150,27 @@ public static class PocketStrikerBattleModeValidation
             {
                 var configured = modes.FindAll_STAGE_ID(number.ToString());
                 Require(configured.Count == 1 && int.TryParse(configured[0].MODE_NUM, out var mode)
-                    && mode >= AdventureModeRules.MultiMode && mode <= AdventureModeRules.EvolutionMode,
+                    && mode >= AdventureModeRules.MultiMode && mode <= AdventureModeRules.GroupMode,
                     "Missing, duplicate, or invalid mode configuration for published stage " + number);
+                if (modes.GetModeById(number.ToString()) == AdventureModeRules.GroupMode)
+                    Require(snapshots[number].asset is GangbangInfo && snapshots[number].asset.IsGroupBattle,
+                        "Published Group quest points to an ordinary stage asset: " + number);
             }
             Debug.Log($"[BattleModes] Found {report.expectedStages} published quests and {report.configuredStages} configured stages; "
                 + $"{report.unpublishedConfiguredStages.Length} unpublished configurations are excluded from runtime checks.");
+            Debug.Log("[BattleModes] Initializing Addressables with editor player-loop updates enabled.");
+            var initialization = Addressables.InitializeAsync(false);
+            try
+            {
+                await initialization.ToUniTask().Timeout(TimeSpan.FromSeconds(10));
+                Require(initialization.Status == AsyncOperationStatus.Succeeded,
+                    "Addressables initialization failed: " + initialization.OperationException);
+            }
+            finally
+            {
+                if (initialization.IsValid()) Addressables.Release(initialization);
+            }
+            Debug.Log("[BattleModes] Addressables initialized; loading all published quests through ArcadeModeManager.");
             var manager = new ArcadeModeManager();
             await manager.Initialize().Timeout(TimeSpan.FromSeconds(45));
             Require(manager.MaxStageNum == report.expectedStages, "Adventure runtime did not discover every published quest.");
@@ -137,7 +184,8 @@ public static class PocketStrikerBattleModeValidation
                     Require(stage != source.asset, "Runtime returned the source asset for stage " + number);
                     var expectedMode = AdventureModeRules.ResolveMode(number.ToString(), modes.GetModeById(number.ToString()));
                     var expectedFightMode = expectedMode == AdventureModeRules.MultiMode ? FightMode.Multi
-                        : expectedMode == AdventureModeRules.EvolutionMode ? FightMode.Evolve : FightMode.Rotate;
+                        : expectedMode == AdventureModeRules.EvolutionMode ? FightMode.Evolve
+                        : expectedMode == AdventureModeRules.GroupMode ? FightMode.Group : FightMode.Rotate;
                     Require(stage.ID == number.ToString() && stage.EventType == FightEventType.Quest,
                         "Incorrect adventure routing for stage " + number);
                     Require(stage.ArcadeFightMode == expectedMode && stage.FightMode == expectedFightMode,
@@ -150,6 +198,15 @@ public static class PocketStrikerBattleModeValidation
                         "Empty or duplicate enemy identity for stage " + number);
                     if (expectedFightMode == FightMode.Multi) report.multiStages++;
                     else if (expectedFightMode == FightMode.Evolve) report.evolutionStages++;
+                    else if (expectedFightMode == FightMode.Group)
+                    {
+                        report.groupStages++;
+                        Require(stage is GangbangInfo group && group.Team2GroupSet.Count > 0
+                            && group.Team2GroupSet.All(set => stage.UnitsData.Any(unit => unit.id == set.id)),
+                            "Group quest is missing its authored fighter counts: " + number);
+                        Require(stage.IsGroupBattle && !stage.AllowsManualUnitControl && stage.ShouldForceAutoBattle,
+                            "Group quest was treated as a normal team fight: " + number);
+                    }
                     else report.rotationStages++;
 
                     // A runtime visit may change levels and skills. Such writes must not reach the authored asset.
@@ -195,6 +252,7 @@ public static class PocketStrikerBattleModeValidation
                 report.errors.Add("Source asset changed: " + source.path);
             }
             Application.logMessageReceived -= CaptureError;
+            EditorApplication.update -= EditorApplication.QueuePlayerLoopUpdate;
             UnityEngine.Random.state = randomState;
             running = false;
             report.passed = report.errors.Count == 0 && report.expectedStages > 0 && report.stagesChecked == report.expectedStages
@@ -203,7 +261,7 @@ public static class PocketStrikerBattleModeValidation
             File.WriteAllText(ReportPath, JsonUtility.ToJson(report, true));
             var summary = $"[BattleModes] {(report.passed ? "PASS" : "FAIL")}: adventure {report.stagesChecked}/{report.expectedStages} published "
                 + $"({report.configuredStages} configured), "
-                + $"(multi {report.multiStages}, rotation {report.rotationStages}, evolution {report.evolutionStages}), "
+                + $"(multi {report.multiStages}, rotation {report.rotationStages}, evolution {report.evolutionStages}, group {report.groupStages}), "
                 + $"Boss battles {report.bossBattlesChecked}/90, skill sets {report.bossSkillSetsChecked}, "
                 + $"source assets unchanged={report.sourceAssetsUnchanged}. Report: {Path.GetFullPath(ReportPath)}";
             if (report.passed) Debug.Log(summary);

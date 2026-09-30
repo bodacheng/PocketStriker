@@ -42,6 +42,10 @@ public class BasicPhysicSupport : MonoBehaviour
     private int coordinatedDisplacementCount;
     private float contactCorrectionBlockedUntil;
 
+    // SceneStep becomes 1 before preparation starts, while active models still
+    // occupy their isolated loading positions outside the battle ring.
+    static bool IsPreparingBattle => FightScene.FSceneProcessesRunner.Main.currentProcess is PreparingProcess;
+
     bool atRing
     {
         get
@@ -105,6 +109,7 @@ public class BasicPhysicSupport : MonoBehaviour
 
     public Vector3 ClampPositionToBattleRange(Vector3 targetPosition)
     {
+        if (IsPreparingBattle) return targetPosition;
         return BehaviorMotionUtility.ClampPositionToBattleRange(
             targetPosition,
             FightGlobalSetting.SceneStep == 1,
@@ -461,7 +466,7 @@ public class BasicPhysicSupport : MonoBehaviour
 
     void Update()
     {
-        if (FightGlobalSetting.SceneStep == 1)
+        if (FightGlobalSetting.SceneStep == 1 && !IsPreparingBattle)
         {
             hiddenMethods.AutoSwitchGravity();
             AtRing = atRing;
@@ -480,7 +485,7 @@ public class BasicPhysicSupport : MonoBehaviour
 
     void LateUpdate()
     {
-        if (FightGlobalSetting.SceneStep != 1)
+        if (FightGlobalSetting.SceneStep != 1 || IsPreparingBattle)
         {
             ResetContactStabilizer();
             return;
@@ -546,6 +551,7 @@ public class BasicPhysicSupport : MonoBehaviour
 
     bool ShouldSkipEnemyContactCorrection()
     {
+        if (IsPreparingBattle) return true;
         if (hiddenMethods.HasSkillContactDragOverride)
         {
             return true;

@@ -136,11 +136,11 @@ namespace mainMenu
 
             if (PlayerAccountInfo.Me.TitleDisplayName != null && PlayerAccountInfo.Me.TitleDisplayName.Contains("IconDev"))
             {
-                showName.text = config.RECORD_ID +"."+ SkillNameTable.GetSkillName(config.RECORD_ID);
+                showName.text = config.RECORD_ID +"."+ SkillDescription.GetName(config);
             }
             else
             {
-                showName.text = SkillNameTable.GetSkillName(config.RECORD_ID);
+                showName.text = SkillDescription.GetName(config);
             }
 
             ATTitle.text = Translate.Get("at_title");
@@ -151,8 +151,7 @@ namespace mainMenu
             atIcon.SetActive(BehaviorTypeUtility.IsAttackIconState(config.STATE_TYPE));
             defenceIcon.SetActive(BehaviorTypeUtility.IsDefenceIconState(config.STATE_TYPE));
 
-            var intro = SkillNameTable.GetSkillIntro(config.RECORD_ID);
-            skillIntro.text = intro;
+            skillIntro.text = SkillDescription.GetIntro(config);
 
             PowerShow(config.RECORD_ID, 1);
         }

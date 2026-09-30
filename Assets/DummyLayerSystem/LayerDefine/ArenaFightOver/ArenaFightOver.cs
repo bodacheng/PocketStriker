@@ -112,6 +112,28 @@ public partial class ArenaFightOver : UILayer
 
     void NextFight(TeamMode mode, FightInfo fight)
     {
+        if (fight is GangbangInfo group)
+        {
+            // Newly loaded quests contain group leaders. Retries already contain
+            // expanded fighters and must retain those counts without multiplication.
+            if (!group.GroupsExpanded)
+            {
+                group.LoadMyTeam();
+                group.ApplyTeamLimit(GangbangInfo.GetConfiguredTeamLimit());
+                if (group.GetGroupWholeUnitCount(1) <= 0 || group.GetGroupWholeUnitCount(2) <= 0
+                    || !group.FightMembers.CheckStonesLegal(group.EventType, group.GetNonZeroInstanceIds(1)))
+                {
+                    PopupLayer.ArrangeWarnWindow(Translate.Get("TeamNotFull"));
+                    return;
+                }
+                group.ConvertTeamToGangbang();
+            }
+            group.team1Mode = group.team2Mode = TeamMode.MultiRaid;
+            FightScene.FightScene.team1GroupSet = GangbangInfo.CopyGroupSets(group.Team1GroupSet);
+            FightLoad.Go(group, true);
+            UILayerLoader.Remove<ArenaFightOver>();
+            return;
+        }
         switch (mode)
         {
             case TeamMode.Keep:
@@ -127,7 +149,7 @@ public partial class ArenaFightOver : UILayer
         fight.team2Mode = fight.team1Mode;
         fight.Team1Auto = FightLoad.Fight.Team1Auto;
         fight.Team2Auto = true;
-        if (fight.EventType != FightEventType.Gangbang) // 因为gangbang模式只用NextFight这个函数重开当前战斗，开启下一场战斗是有单独的函数。
+        if (!fight.IsGroupBattle)
             fight.LoadMyTeam();
         if (fight.EventType == FightEventType.Quest || fight.EventType == FightEventType.Event)
         {
@@ -158,7 +180,8 @@ public partial class ArenaFightOver : UILayer
             nextTab.SetUpAction(
                 () =>
                 {
-                    NextFight(nextFight.EvolutionMode ? TeamMode.Rotation: (TeamMode)nextFight.ArcadeFightMode, nextFight);
+                    NextFight(nextFight.IsGroupBattle ? TeamMode.MultiRaid
+                        : nextFight.EvolutionMode ? TeamMode.Rotation : (TeamMode)nextFight.ArcadeFightMode, nextFight);
                 },
                 () =>
                 {

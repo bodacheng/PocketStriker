@@ -86,7 +86,12 @@ namespace Soul
 
         public bool IfRunning()
         {
-            return _nowBehavior != _emptyState;
+            // Loading keeps animated models active; it must not run combat decisions
+            // or movement before ModeStart authorizes them after the countdown.
+            var process = FightScene.FSceneProcessesRunner.Main.currentProcess;
+            return process is not PreparingProcess && process is not FightScene.CountDownProcess
+                   && process is not FightScene.FightOverProcess
+                   && _nowBehavior != null && _nowBehavior != _emptyState;
         }
 
         public Behavior GetNowState()

@@ -1,5 +1,73 @@
 # UI layout coverage
 
+## Battle HUD proportions
+
+`BattleHUDPresentation` lays out the live `FightingStepLayer` within its safe
+area. At a 1200-unit safe width, pause is 76×72, AUTO is 164×72, player
+portraits are 108×108 with 108×12 HP bars, and the three skill controls form
+a 156×156 row at the bottom right. Dash and guard are 100×100 above that row;
+Dream Combo keeps a 112×112 charge gauge. The movement pad is 216×216 with a
+68×68 thumb knob. Dash and Dream Combo retain their elemental effects and
+transparent touch targets, with no captions or UI boxes. Dream Combo's charge
+ring remains visible. Other button skins use the regular rounded-rectangle MCombat
+Shift assets also used by preparation. Pause uses two drawn bars, independent
+of font glyph support. Generated gems have a 14-unit inset;
+existing elemental particle effects shrink with their controls.
+The joystick, skill row, dash/guard and Dream Combo move together 48 reference
+units upward, multiplied by the same safe-width scale. Their centers are now
+208, 162, 322 and 330 units above the safe bottom, respectively. The reserved
+bottom control area rises from 344 to 392 units; the battle camera's middle
+area starts above it. Control sizes and transparent effect-only touch targets
+stay the same.
+
+World status uses compact 94-unit bars with warm enemy and green player
+colors; Group battles use 60-unit bars and omit the floating EX chips. World
+widgets follow the current camera directly, hide outside its viewport, and
+avoid the fixed portrait rail. Rotation reserve units do not display floating
+HP bars. Player markers are independent of the portrait grid.
+
+Run `PocketStrikerBattleHUDValidation.ValidateBatch` without `-quit` for local
+HUD geometry, input/raycast checks and rendered previews. Its report and PNGs
+are saved under `Logs/UILayout/BattleHUD`. The fixture uses production layout
+and UI components with local posed fighters, without a live account or battle
+simulation. Run `PocketStrikerGroupBattleValidation.ValidateBatch` for the
+restored adventure Group data, count expansion, clone ownership and automatic
+control contracts. Live startup is checked separately by
+`PocketStrikerValidation.SmokeStartup`.
+
+Battle cameras frame the complete model bounds of every living, fielded unit;
+rotation reserves are excluded. `AllUnitsBattleCamera` fits perspective against
+portrait aspect ratio, safe area and the space between the HUD header and controls,
+excluding the player portrait rail. Focus does not narrow the target collection.
+Independent profiles use a 25° pitch for duels, 33° for normal multiplayer and
+46° for Group battles. Either team's MultiRaid mode selects the multiplayer
+profile. Preparing never fits remote loading positions; the first CountDown
+frame immediately fits the final models, with no inherited staging distance.
+Expansion is immediate, while inward motion eases over two seconds. Camera
+updates run after animated models and HUD layout. `PocketStrikerBattleCameraValidation`
+projects full bounds through the production pose, including 200-unit formations.
+`PocketStrikerBattleCameraSmoke.StartBatch` runs the actual fight scene in local
+Play mode, covering 1v1, rotation, six-unit combat, 100-versus-100 Group combat and
+an in-scene retry. It checks the initial CountDown pose and every model corner
+after live camera updates. Its invulnerable fighters isolate camera behavior;
+it does not validate battle outcomes.
+Its local account fixture excludes shop/login services; reports and screenshots
+are saved under `Logs/CameraFraming/Playmode`.
+
+Models initialize at separate temporary positions while their animation setup
+requires them to remain active. Normal starting placement then synchronizes root
+and Rigidbody positions. Large Group rosters expand beyond the authored 30-slot
+formation instead of indexing outside its array.
+Group preparation sizes the arena from the placed models, synchronizing its
+physics boundary, sensor, ring and ground. Cached original scales prevent retry
+growth; ordinary combat restores the authored radius and scales. Loading skips
+battle boundary correction until the countdown so temporary positions remain
+isolated. `PocketStrikerGroupFormationValidation.ValidateBatch` checks real scene
+formations, model footprints, arena capacity and restoration.
+Shape/Local ring particles also scale their original size multipliers and restart
+on radius changes; changing only the parent transform leaves World-space glow
+particles at the old radius. The validator samples actual emitted particle sizes.
+
 ## Battle tutorial callouts
 
 Run **PocketStriker → Validation → Tutorial Layout** or the batch entry
@@ -15,11 +83,27 @@ language, control-position, and safe-area changes. Wrapped CJK text has explicit
 leading space; the validation compares complete generated text against visible
 glyphs, rather than trusting `preferredHeight` alone. Panels and arrows must
 stay in the safe area, and explanation panels must not overlap.
+The three skill explanations read left to right in equal-width columns above
+the entire lower control area. Direction and Dream Combo explanations also
+move above that area when a side placement would cover a control. The checks
+reject panels over any live HUD target, including on narrow phones and with
+wrapped Japanese text. Tutorial entry refreshes the HUD before positioning
+callouts, including after legacy AUTO animation bindings are rebound.
 
 The preview copies the real battle UI and one player icon without loading
-accounts or combat. Runtime-generated skill gem effects and battlefield models
+accounts or combat. Three local native skill sprites populate the real buttons;
+the Dream gauge begins empty. Runtime particle effects and battlefield models
 are omitted; the highlighted rectangles identify the actual controls. The
 separate **Tutorial** check still validates click interception and page flow.
+
+`PocketStrikerTutorialPlaymodeSmoke.StartBatch` exercises the actual published
+first quest through `FightLoad.Go` and its production tutorial caller. It checks
+all six pages, the first click lock while paused, later pages with live animated
+models, callout targets, overlay sorting, real raycasts, force-AUTO and the Dream
+Combo overlay. Reports and native screenshots are under `Logs/Tutorial/Playmode`.
+This smoke uses a local account and Addressables Fast Mode, removes shop startup
+services, and makes both teams invulnerable to isolate tutorial UI; it is separate
+from combat victory/reward checks and physical-device testing.
 
 Run **PocketStriker → Validation → UI Layout** in the Unity Editor, or call
 `PocketStrikerUILayoutValidation.Validate` from the existing Unity validation
@@ -82,8 +166,8 @@ screen and should be checked independently.
 - Navigation labels stay above the safe bottom edge. Arena ticket content,
   stone filters, skill-editor model preview and purchase icon stay in their
   respective regions.
-- The retained legacy group-battle preparation prefab fits its two wide columns
-  into portrait width locally; its title and start button retain their size.
+- Group preparation uses opposite vertical portrait rails, central model and
+  skill previews, and a horizontal population selector above the start action.
 - The account reset-password button's label stays within the button. The skill
   editor's combo explanation has a dedicated text area and close-button row,
   both inside the middle region, with readable 32-point text.
@@ -148,12 +232,58 @@ scrolling viewport below a fixed title. Results and images are saved as
 
 **PocketStriker → Validation → Check Fight Preparation** invokes the actual
 adventure, event, legacy group-battle and arena preparation paths with localized
-text, six-digit rewards and claimed/unclaimed states. It also samples the actual
-mode-layout animations. The return button, stage/mode heading and rewards have
-independent columns; reusing the layer for arena clears the adventure header.
-The 72 cases and 18 previews are saved under `Logs/UILayout/FightPrepare`.
-No live account data, models, purchases or network calls are required by either
-fixture.
+text, six-digit rewards and claimed/unclaimed states. The current 160 cases and
+26 previews use local portrait and gem art, the shared menu background/navigation,
+and four phone/tablet safe-area shapes. A Stage 55 evolution fixture shows four
+enemies and one hero. Its character uses a local idle-pose model; the remotely
+supplied skeletal enemy from the reference screenshot is not loaded.
+
+The standard preparation page places the stage heading and a compact reward row
+above the character/skill preview. Enemy and player rosters have separate dark
+panels with aligned headings and portraits; the edit action sits in the player
+header, and FIGHT has a centered action area below both teams. Element colors
+remain visible in softened portrait borders. Slot styling addresses only the
+authored frames, preserving gem artwork and status effects. Layout responds to
+safe-area, viewport, roster and language changes; the legacy mode animations
+retain visibility while their positions are corrected after sampling. FIGHT,
+Edit, the battle mode selector and the stage-list button use a shared sliced fill/outline pair imported
+from MCombat's Shift UI pack. The symmetric rectangular buttons have modest
+rounded corners and a clean thin outline. A warm gold outline marks the primary action; muted
+cyan marks the secondary actions. The actual selectable owns the entire new
+rectangular hit area, pressed/disabled tints and tutorial guide outline pulse.
+Group preparation adapts the original prefab through `FightPrepareLayer.GroupPresentation`.
+The two rosters occupy the left and right sides directly below the header;
+each player portrait has rectangular minus/count/plus controls. Long rosters
+scroll vertically, including drags that start on a portrait. The center contains
+two independent character previews and skill grids; population choices and FIGHT
+sit above the main navigation bar. Counts come from the live configured limits.
+
+Preparation characters use `DedicatedCameraConnector.EnableUIPresentation`:
+each camera renders transparent output into its own RawImage above the panel.
+This prevents overlay background panels from darkening models. Separate world
+slots isolate simultaneous previews, and resize/disable/destroy manages textures.
+Other model viewers keep the original camera-stack path unless explicitly enabled.
+`PocketStrikerCameraLoadingValidation` checks real 3D output, transparent composition,
+two-model isolation and texture cleanup, including a deliberately darkened control.
+
+Tapping a skill gem opens a scrollable localized detail sheet with its name,
+category, EX tier, authored introduction and AI activation distance. Preview
+closes the sheet and plays that skill on the selected character. All preparation
+entry routes bind the detail action, including Arena and both group-battle skill
+grids; changing the character or route clears a stale selection. MCombat's
+`SkillManagement.md`, `mst_skill.csv`, `skill_ai_attrs.csv` and `skill_name.csv`
+provide the reference. The original 84 populated localized introductions are
+retained, and the 12 missing dragon skills now have conservative descriptions
+of their defined actions. All 96 master skill IDs have English/Japanese/Chinese
+names and introductions. AI activation distance is labeled separately from a
+skill's hit area, and static analysis damage/HP estimates are not presented as
+combat rules. Future absent introductions fall back to configuration metadata.
+
+`PocketStrikerFightPrepareValidation.ValidateDesignBatch` runs preparation,
+bundled fonts, global UI and stage-card checks together and returns a failing
+exit code if any report fails. Its summary is saved under
+`Logs/UILayout/FightPrepare/design-summary.txt`. The fixtures require no live
+account data, purchases or network calls.
 
 ## Verified result (2026-09-27, Unity 6000.5.1f1)
 
@@ -187,6 +317,11 @@ components. Device-specific previews are saved under `Logs/UILayout/previews`.
 The tip layer uses the full-screen loader route; its content still uses the
 shared safe-area regions. Both loading prefabs use the bundled OFL Noto CJK font
 and nonzero transform scales for reliable text positioning.
+
+`LoadingScreenLayout` gives the title, measured localized body and progress footer
+separate safe-area regions. The compact rectangular progress bar stays below
+the tip text. `PocketStrikerCameraLoadingValidation` also checks all six loading
+tips in three languages at six screen/safe-area shapes.
 
 `python3 Tools/Validation/validate_runtime_loading.py` additionally covers
 battlefield replacements with missing components, null/failed loads, out-of-order

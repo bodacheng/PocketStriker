@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
@@ -22,7 +23,21 @@ namespace FightScene
 
         public void ToStartPosMulti()
         {
-            Data_Center unit = null;
+            var authored = new List<Pose>();
+            if (TeamStandPoints != null)
+                foreach (var point in TeamStandPoints)
+                    if (point != null) authored.Add(new Pose(point.position, point.rotation));
+            if (authored.Count == 0) authored.Add(new Pose(transform.position, transform.rotation));
+            int capacity = teamMembers.mDict.Count;
+            foreach (var key in teamMembers.mDict.Keys) capacity = Mathf.Max(capacity, key.Item2 + 1);
+            bool expanded = capacity > authored.Count;
+            float spacing = 1f;
+            if (expanded)
+                foreach (var center in teamMembers.mDict.Values)
+                    if (BattleFormationPlacement.TryGetBodyBounds(center, out var bounds))
+                        spacing = Mathf.Max(spacing, Mathf.Max(bounds.size.x, bounds.size.z) + 0.2f);
+            var formation = BattleFormationPlacement.Build(authored, capacity, spacing);
+            int ordinal = 0;
             foreach (var kv in teamMembers.mDict)
             {
                 var dataCenter = teamMembers.Get(kv.Key.Item1, kv.Key.Item2);
@@ -31,18 +46,15 @@ namespace FightScene
                     continue;
                 }
 
-                if (unit == null)
-                    unit = kv.Value;
-                if (TeamStandPoints[kv.Key.Item2] != null)
-                {
-                    dataCenter.WholeT.parent = null;
-                    PlaceUnitAtStandPoint(dataCenter, TeamStandPoints[kv.Key.Item2]);
-                    dataCenter.WholeT.gameObject.SetActive(true);
-                }
-                else
-                {
-                    Debug.Log("站位逻辑错误。出现了系统未安排的站位点");
-                }
+                int slot = expanded ? ordinal : kv.Key.Item2 >= 0 ? kv.Key.Item2 : ordinal;
+                var pose = formation[Mathf.Clamp(slot, 0, formation.Length - 1)];
+                // Preserve each original indexed point for normal/sparse teams.
+                if (!expanded && TeamStandPoints != null && slot < TeamStandPoints.Length && TeamStandPoints[slot] != null)
+                    pose = new Pose(TeamStandPoints[slot].position, TeamStandPoints[slot].rotation);
+                dataCenter.WholeT.parent = null;
+                PlaceUnitByGeometryCenter(dataCenter, pose.position, pose.rotation);
+                dataCenter.WholeT.gameObject.SetActive(true);
+                ordinal++;
             }
         }
 
@@ -59,7 +71,7 @@ namespace FightScene
                     {
                         Sensor.AddOrRemoveSharedDeadUnitInfo(center, teamConfig.myTeam, true);
                         Sensor.AddOrRemoveSharedUnitInfo(center, teamConfig.myTeam, false);
-                        if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+                        if (FightLoad.Fight.IsGroupBattle)
                         {
                             FightingStepLayer.Open()?.SetSensor();
                         }

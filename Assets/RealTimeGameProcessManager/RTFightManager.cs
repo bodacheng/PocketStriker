@@ -48,7 +48,7 @@ namespace FightScene
                 onProgress?.Invoke(totalUnits > 0 ? Mathf.Clamp01(loadedProgress / totalUnits) : 1f);
             }
             onProgress?.Invoke(0f);
-            var concurrentLoads = info.EventType == FightEventType.Gangbang ? 2 : 1;
+            var concurrentLoads = info.IsGroupBattle ? 2 : 1;
             await UniTask.WhenAll(
                 team1._UnitsLoad(info.FightMembers.HeroSets, UnitInfoRef, ReportProgressDelta, concurrentLoads),
                 team2._UnitsLoad(info.FightMembers.EnemySets, UnitInfoRef, ReportProgressDelta, concurrentLoads)
@@ -96,13 +96,8 @@ namespace FightScene
         // 战斗模式相机。根据选择队伍做相应调整。
         public void CameraAdjustment(Team myTeam, TeamMode teamMode, FightEventType eventType, Transform me = null)
         {
-            C_Mode cMode;
-            if (teamMode == TeamMode.Rotation)
-                cMode = C_Mode.CertainYAntiVibration;
-            else
-            {
-                cMode = eventType == FightEventType.Gangbang ? C_Mode.TopDown : C_Mode.WatchOver;
-            }
+            var cMode = BattleCameraProfiles.ResolveMode(FightLoad.Fight.IsGroupBattle,
+                FightLoad.Fight.team1Mode, FightLoad.Fight.team2Mode);
             
             var ts = myTeam == Team.player1 ? team1.GetFightingUnitTs() : team2.GetFightingUnitTs();
             var tsOpponents = GetOpponents();
@@ -125,27 +120,9 @@ namespace FightScene
                 return returnValue;
             }
             
-            if (eventType == FightEventType.Gangbang)
-            {
-                _CameraManager.Assign_Camera(cMode, null, null);
-            }
-            else
-            {
-                if (cMode == C_Mode.WatchOver)
-                {
-                    var center = (me != null ? me : null);
-                    _CameraManager.Assign_Camera(cMode, center, tsOpponents, ts);
-                }
-                else
-                {
-                    var center = (me != null ? me : ( ts.Count > 0 ? ts[0]: null ));
-                    _CameraManager.Assign_Camera(
-                        cMode,
-                        center,
-                        tsOpponents
-                    );
-                }
-            }
+            // Focus selects controls; it must not narrow the camera target set.
+            // The active mode reads both teams' live model bounds every frame.
+            _CameraManager.Assign_Camera(cMode, me, tsOpponents, ts);
         }
         
         public void ClearUnitData()

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DummyLayerSystem;
 using mainMenu;
+using System.Threading;
 using UnityEngine.SceneManagement;
 
 namespace FightScene
@@ -25,7 +26,12 @@ namespace FightScene
         public AIServiceManager AIServiceManager => aiServiceManager;
         private StoryInfo aiStoryInfo;
         private UniTaskCompletionSource<StoryInfo> aiStoryLoadSource;
-        public StoryInfo AIStoryInfo => ShouldLoadAIStory() ? aiStoryInfo : null;
+        private FightInfo aiStoryFight;
+        private CancellationTokenSource aiStoryCancellation;
+#if UNITY_EDITOR
+        internal Func<UniTask<StoryInfo>> StoryLoaderForValidation;
+#endif
+        public StoryInfo AIStoryInfo => ShouldLoadAIStory() && ReferenceEquals(aiStoryFight, FightLoad.Fight) ? aiStoryInfo : null;
 
         public static FightScene target;
         
@@ -151,7 +157,7 @@ namespace FightScene
             PreloadAIStory();
         }
 
-        private void PreloadAIStory()
+        public void PreloadAIStory()
         {
             if (ShouldLoadAIStory())
             {
@@ -186,6 +192,14 @@ namespace FightScene
                 return UniTask.FromResult<StoryInfo>(null);
             }
 
+            if (!ReferenceEquals(aiStoryFight, FightLoad.Fight))
+            {
+                CancelAIStory();
+                aiStoryFight = FightLoad.Fight;
+                aiStoryInfo = null;
+                aiStoryLoadSource = null;
+            }
+
             if (aiStoryInfo != null)
             {
                 return UniTask.FromResult(aiStoryInfo);
@@ -195,29 +209,42 @@ namespace FightScene
             {
                 EnsureAIServiceManager();
                 aiStoryLoadSource = new UniTaskCompletionSource<StoryInfo>();
-                LoadAIStory(aiStoryLoadSource).Forget();
+                aiStoryCancellation = new CancellationTokenSource();
+                LoadAIStory(aiStoryLoadSource, aiStoryFight, aiStoryCancellation.Token).Forget();
             }
 
             return aiStoryLoadSource.Task;
         }
 
-        private async UniTaskVoid LoadAIStory(UniTaskCompletionSource<StoryInfo> loadSource)
+        private async UniTask LoadAIStory(UniTaskCompletionSource<StoryInfo> loadSource, FightInfo fight, CancellationToken cancellationToken)
         {
-            StoryInfo story = null;
-            try
+            UniTask<StoryInfo> Request()
             {
-                if (aiServiceManager != null)
-                {
-                    story = await aiServiceManager.LoadAIStory();
-                }
+#if UNITY_EDITOR
+                if (StoryLoaderForValidation != null) return StoryLoaderForValidation();
+#endif
+                return aiServiceManager != null ? aiServiceManager.LoadAIStory() : UniTask.FromResult<StoryInfo>(null);
             }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[FightScene] Failed to load AI story: {ex.Message}");
-            }
-
-            aiStoryInfo = story;
+            var story = await BattleStoryRequest.Load(Request, cancellationToken);
+            // A late reply from the previous battle cannot replace the current story.
+            if (this != null && !cancellationToken.IsCancellationRequested && ReferenceEquals(fight, FightLoad.Fight)
+                && ReferenceEquals(loadSource, aiStoryLoadSource)) aiStoryInfo = story;
             loadSource.TrySetResult(story);
+        }
+
+        void CancelAIStory()
+        {
+            aiStoryLoadSource?.TrySetResult(null);
+            if (aiStoryCancellation == null) return;
+            aiStoryCancellation.Cancel();
+            aiStoryCancellation.Dispose();
+            aiStoryCancellation = null;
+        }
+
+        void OnDestroy()
+        {
+            CancelAIStory();
+            if (target == this) target = null;
         }
 
         public void LoadAds()
@@ -264,6 +291,7 @@ namespace FightScene
 
         public void ReturnToFront(MainSceneStep mainSceneStep = MainSceneStep.FrontPage)
         {
+            CancelAIStory();
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.None);
             var cameraManager = RTFightManager.Target?._CameraManager;
             if (cameraManager != null)

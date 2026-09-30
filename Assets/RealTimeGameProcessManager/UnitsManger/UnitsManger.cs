@@ -65,7 +65,10 @@ namespace FightScene
                     var aiChanged = dataCenter._MyBehaviorRunner.AI != targetAIState;
                     dataCenter._MyBehaviorRunner.AI = targetAIState;
 
-                    if (autoChanged && aiChanged && dataCenter.FightDataRef != null && !dataCenter.FightDataRef.IsDead.Value)
+                    // Preparing configures control before Step3 and the countdown.
+                    // Only an in-fight toggle may restart a fighter's behavior.
+                    if (autoChanged && aiChanged && FSceneProcessesRunner.Main.currentProcess is FightingProcess
+                        && dataCenter.FightDataRef != null && !dataCenter.FightDataRef.IsDead.Value)
                     {
                         dataCenter._MyBehaviorRunner.ChangeToWaitingState();
                     }
@@ -78,7 +81,7 @@ namespace FightScene
         public async UniTask _UnitsLoad(MultiDic<int, int, UnitInfo> membersSets, IDictionary<Data_Center, UnitInfo> unitInfoRef,
             Action<float> onUnitProgressDelta = null, int maxConcurrentLoads = 1)
         {
-            async UniTask LoadOneUnit(int key1, int key2, UnitInfo info, int preloadCount)
+            async UniTask LoadOneUnit(int key1, int key2, UnitInfo info, int preloadCount, Vector3 stagingPosition)
             {
                 float unitProgress = 0f;
                 void ReportProgress(float progress)
@@ -95,7 +98,7 @@ namespace FightScene
                 var center = teamMembers.Get(key1, key2);
                 if (center == null)
                 {
-                    center = await UnitCreator.CreateUnit(info, preloadCount, ReportProgress);
+                    center = await UnitCreator.CreateUnit(info, preloadCount, ReportProgress, stagingPosition);
                 }
                 else
                 {
@@ -122,11 +125,14 @@ namespace FightScene
 
             maxConcurrentLoads = Mathf.Max(1, maxConcurrentLoads);
             var tasks = new List<UniTask>(maxConcurrentLoads);
+            bool secondTeam = RTFightManager.Target != null && RTFightManager.Target.team2 == this;
+            int stagingOrdinal = 0;
             foreach (var kv in membersSets.mDict)
             {
                 var unitKey = (kv.Value.r_id, kv.Value.level);
                 // 这个统计相同种类角色的逻辑并不精确。如果一个队伍里有两个同masterid角色，等级还一样，问题就出来了，但现在我们的代码构造造成没有别的做法。
-                tasks.Add(LoadOneUnit(kv.Key.Item1, kv.Key.Item2, kv.Value, sameUnitCounts[unitKey]));
+                tasks.Add(LoadOneUnit(kv.Key.Item1, kv.Key.Item2, kv.Value, sameUnitCounts[unitKey],
+                    PreparationStagingPosition(stagingOrdinal++, secondTeam)));
                 if (tasks.Count < maxConcurrentLoads)
                 {
                     continue;
@@ -140,6 +146,18 @@ namespace FightScene
             {
                 await UniTask.WhenAll(tasks);
             }
+        }
+
+        static Vector3 PreparationStagingPosition(int ordinal, bool secondTeam)
+        {
+            // Models must remain active while their animation overrides are prepared.
+            // Spawning every collider at the origin makes large teams spend their
+            // loading frames in quadratic contact simulation. Separate both teams
+            // from the arena and one another until the normal starting placement.
+            const int columns = 16;
+            const float spacing = 64f;
+            return new Vector3(4096f + (secondTeam ? 2048f : 0f) + (ordinal % columns) * spacing,
+                64f, 4096f + (ordinal / columns) * spacing);
         }
 
         public bool IfAllUnitsPreparedForBattle()
@@ -219,6 +237,12 @@ namespace FightScene
                 dataCenter?.geometryCenter,
                 targetGeometryCenterPosition,
                 targetRotation);
+            var body = dataCenter?._BasicPhysicSupport?.Rigidbody;
+            if (body != null && !body.isKinematic)
+            {
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
         }
 
         public void FacePreparedUnitsToward(UnitsManger opponent)

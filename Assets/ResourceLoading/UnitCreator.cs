@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class UnitCreator {
     
-    public static async UniTask<Data_Center> CreateUnit(UnitInfo info, int preloadCount, Action<float> onProgress = null)
+    public static async UniTask<Data_Center> CreateUnit(UnitInfo info, int preloadCount, Action<float> onProgress = null,
+        Vector3? stagingPosition = null)
     {
         onProgress?.Invoke(0f);
         var unitConfig = Units.RowToUnitConfigInfo(Units.Find_RECORD_ID(info.r_id));
@@ -16,6 +17,7 @@ public class UnitCreator {
         var modelKey = unitConfig.TYPE + "/" + unitConfig.REAL_NAME;
         var dataCenter = await GeneralModelPool.GetModel(
             info.r_id,
+            pos: stagingPosition ?? Vector3.zero,
             onProgress: progress => onProgress?.Invoke(Mathf.Lerp(0f, 0.45f, progress)));
         if (dataCenter == null)
         {

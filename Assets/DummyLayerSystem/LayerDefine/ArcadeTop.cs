@@ -189,8 +189,10 @@ public class ArcadeTop : UILayer
                 .Where(unit => unit != null).Select(unit => unit.DeepCopy()).ToList();
             if (one is GangbangInfo gb)
             {
+                var groupCounts = GangbangInfo.CopyGroupSets(gb.Team2GroupSet)
+                    .ToDictionary(set => set.id, set => set.Count);
                 stageBtn.LoadUnitIconsGangbang(enemies,
-                    id => gb.GetTeam2GroupSet(id).Count,
+                    id => groupCounts.TryGetValue(id, out var count) ? count : 0,
                     info => IconButtonFeature(info, version), clickBoss,
                     () => IsActiveShowStages(version));
             }

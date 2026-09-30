@@ -7,6 +7,27 @@ public class GangbangInfo : FightInfo
 {
     private List<SoldierGroupSet> team1GroupSet = new List<SoldierGroupSet>();
     [SerializeField] private List<SoldierGroupSet> team2GroupSet = new List<SoldierGroupSet>();
+    public bool GroupsExpanded { get; private set; }
+    public int TeamUnitLimit { get; private set; }
+
+    public static int GetConfiguredTeamLimit()
+    {
+        switch (PlayerPrefs.GetInt("gangbangCountOption", 1))
+        {
+            case 2: return CommonSetting.GangbangModeMaxUnitPerTeam2;
+            case 3: return CommonSetting.GangbangModeMaxUnitPerTeam3;
+            default: return CommonSetting.GangbangModeMaxUnitPerTeam1;
+        }
+    }
+
+    public void ApplyTeamLimit(int limit)
+    {
+        RecordTeamLimit(limit);
+        GangbangAutoAdjustTeamUnitByMaxCount(1, FightMembers.HeroSets.GetValues(), TeamUnitLimit, true);
+        GangbangAutoAdjustTeamUnitByMaxCount(2, FightMembers.EnemySets.GetValues(), TeamUnitLimit, true);
+    }
+
+    public void RecordTeamLimit(int limit) => TeamUnitLimit = Mathf.Max(1, limit);
 
     public List<SoldierGroupSet> Team1GroupSet
     {
@@ -105,6 +126,8 @@ public class GangbangInfo : FightInfo
 
     public void ConvertTeamToGangbang()
     {
+        // FightLoad copies expanded battles for retries. Never multiply them twice.
+        if (GroupsExpanded) return;
         var id = 0;
         var newHeroSets = new MultiDic<int, int, UnitInfo>();
         foreach (var unitInfo in this.FightMembers.HeroSets.GetValues())
@@ -134,6 +157,7 @@ public class GangbangInfo : FightInfo
             }
         }
         this.FightMembers.EnemySets = newEnemySets;
+        GroupsExpanded = true;
     }
 
     public int GangbangAutoAdjustTeamUnitByMaxCount(int team, List<UnitInfo> unitSets, int selectedMaxTeamCount, bool adaptMode = false)
@@ -162,6 +186,7 @@ public class GangbangInfo : FightInfo
     {
         var stage = CreateInstance<GangbangInfo>();
 
+        stage.name = source.name;
         stage.ID = source.ID;
         stage.ArcadeFightMode = source.ArcadeFightMode;
         stage.FightMembers = CopyFightMembers(source.FightMembers);
@@ -184,9 +209,14 @@ public class GangbangInfo : FightInfo
         stage.Team2LeaderboardEntry = source.Team2LeaderboardEntry;
         stage.RunTutorial = false;
         stage.EventType = source.EventType;
-        stage.UnitsData = new List<UnitInfo>(source.UnitsData);
+        stage.UnitsData = new List<UnitInfo>();
+        foreach (var unit in source.UnitsData) stage.UnitsData.Add(unit?.DeepCopy());
         stage.team1GroupSet = CopyGroupSets(source.team1GroupSet);
         stage.team2GroupSet = CopyGroupSets(source.team2GroupSet);
+        stage.dumbAIDecisionDelay = source.dumbAIDecisionDelay;
+        stage.dreamComboAIRateNum = source.dreamComboAIRateNum;
+        stage.GroupsExpanded = source.GroupsExpanded;
+        stage.TeamUnitLimit = source.TeamUnitLimit;
         return stage;
     }
 

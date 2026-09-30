@@ -70,9 +70,12 @@ public class UILayer : MonoBehaviour
             SetVerticalEdges(top, middleTop, upper, height);
             SetVerticalEdges(bottom, lower, middleBottom, height);
             _areasInitialized = true;
+            OnAreasResized();
         }
         finally { _resizingAreas = false; }
     }
+
+    protected virtual void OnAreasResized() { }
 
     static void SetVerticalEdges(RectTransform rect, float lower, float upper, float parentHeight)
     {

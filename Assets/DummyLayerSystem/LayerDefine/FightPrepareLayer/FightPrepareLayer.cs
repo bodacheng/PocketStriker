@@ -82,11 +82,13 @@ public partial class FightPrepareLayer : UILayer
 
     public void SetFightMode(int fightMode)
     {
+        ApplyPreparationButtons();
         fightModeSwitch.Setup(fightMode, PlayerPrefs.GetInt("preferAdventureMode",  PlayerPrefs.GetInt("preferAdventureMode", 2)));
         // Gangbang already exposes its unit-count controls here. Setup enables
         // the shared button again, so keep this fixed-mode selector hidden while
         // retaining the configured TeamMode for GetSetFightMode().
         if (_gangbangStage != null) fightModeSwitch.gameObject.SetActive(false);
+        if (connectorE != null) RefreshPreparationLayout();
     }
 
     public TeamMode GetSetFightMode()
@@ -113,6 +115,7 @@ public partial class FightPrepareLayer : UILayer
 
     public void SetArcadeFeature(Action toArcadeFront, string arcadeStageNo, int fightMode)
     {
+        HidePreparationSkillDetails();
         _gangbangStage = null;
         LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
@@ -128,17 +131,12 @@ public partial class FightPrepareLayer : UILayer
         int.TryParse(arcadeStageNo, out var arcadeStageNoInt);
         rewardUI.AwardRender(PlayerAccountInfo.Me.arcadeProcess + 1 > arcadeStageNoInt);
         rewardUI.gameObject.SetActive(true);
-        nineForShow.AddOnClickToSlots(
-            (RECORD_ID) =>
-            {
-                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
-                connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
-            }
-        );
+        BindPreparationSkillSlots(nineForShow, connector);
     }
 
     public void SetEventFeature(string arcadeStageNo)
     {
+        HidePreparationSkillDetails();
         _gangbangStage = null;
         LayoutStageHeader();
         arcadeStageNoText.gameObject.SetActive(true);
@@ -161,25 +159,26 @@ public partial class FightPrepareLayer : UILayer
         rewardUI.gameObject.SetActive(false);
         // rewardUI.ShowRewards(award.d,award.g);
         // rewardUI.AwardRender(cleared);
-        nineForShow.AddOnClickToSlots(
-            (RECORD_ID) =>
-            {
-                var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(RECORD_ID);
-                connector.SkillShowRunWithPrepare(skillConfig.REAL_NAME).Forget();
-            }
-        );
+        BindPreparationSkillSlots(nineForShow, connector);
     }
 
     public void SetArenaFeature()
     {
+        HidePreparationSkillDetails();
         _gangbangStage = null;
         arcadeStageNoText.gameObject.SetActive(false);
         rewardUI.gameObject.SetActive(false);
         toArcadeFrontBtn.gameObject.SetActive(false);
+        BindPreparationSkillSlots(nineForShow, connector);
     }
 
     void LayoutStageHeader()
     {
+        if (connectorE == null)
+        {
+            RefreshPreparationLayout();
+            return;
+        }
         // Rewards used to be a child of the title, at a fixed x=210. A title
         // containing both the stage number and battle type then drew underneath
         // the reward icons and claimed marks. Reserve independent sibling columns.
@@ -237,6 +236,7 @@ public partial class FightPrepareLayer : UILayer
 
     public async UniTask StageMembersInfoShow(FightInfo stage, CancellationToken token)
     {
+        HidePreparationSkillDetails();
         var version = ++_displayVersion;
         var heroUnits = stage.FightMembers.HeroSets.GetValues();
         var enemyUnits = stage.FightMembers.EnemySets.GetValues();
@@ -285,7 +285,9 @@ public partial class FightPrepareLayer : UILayer
         }
         else
         {
-            team1Name.text = "YOU";
+            team1Name.text = Translate.Get("Player");
+            team2Name.text = Translate.Get("Enemy");
+            team1OneWord.text = team2OneWord.text = string.Empty;
         }
 
         enemyDoubleExModeFlg.SetActive(stage.team2CGMode == CriticalGaugeMode.DoubleGain);
@@ -301,6 +303,8 @@ public partial class FightPrepareLayer : UILayer
         if (targetConnector == null) targetConnector = connector;
         if (targetNineForShow == null) targetNineForShow = nineForShow;
         if (targetConnector == null || targetNineForShow == null) return;
+
+        HidePreparationSkillDetails();
 
         _previewVersions.TryGetValue(targetNineForShow, out var previousVersion);
         var previewVersion = previousVersion + 1;
@@ -340,9 +344,11 @@ public partial class FightPrepareLayer : UILayer
         foreach(var oneMember in heroSets)
         {
             var v = HeroIcon.ArrangeHeroIconToParent(fighterIcon, oneMember, iconBehaviour, _showT, unitIconSize, withSkillCheck, true);
+            v.ApplyPreparationStyle();
             v.iconButton.interactable = btnInteractive;
             icons.Add(v);
         }
+        RefreshPreparationLayout();
         return icons;
     }
 

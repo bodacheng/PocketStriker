@@ -60,6 +60,9 @@ public static partial class PocketStrikerTutorialValidation
         var oldCanvas = PosCal.Canvas;
         var oldSafe = PosCal.SafeAreaRect;
         var oldFight = FightLoad.Fight;
+        var oldEventSystem = EventSystem.current;
+        var dragCanvasField = typeof(HeroIcon).GetField("canvas", BindingFlags.Static | BindingFlags.NonPublic);
+        var oldDragCanvas = dragCanvasField.GetValue(null);
         var scene = EditorSceneManager.NewPreviewScene();
         var rig = new GameObject("Tutorial Validation");
         rig.SetActive(false);
@@ -97,6 +100,7 @@ public static partial class PocketStrikerTutorialValidation
             canvasRect.sizeDelta = new Vector2(1080, 1920);
             PosCal.Canvas = canvas;
             PosCal.SafeAreaRect = canvasRect;
+            dragCanvasField.SetValue(null, canvas);
             var eventObject = new GameObject("EventSystem", typeof(EventSystem));
             eventObject.transform.SetParent(rig.transform, false);
             eventSystem = eventObject.GetComponent<EventSystem>();
@@ -104,21 +108,12 @@ public static partial class PocketStrikerTutorialValidation
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             Require(source != null, "FightingStepLayer prefab is missing.");
             var map = new Dictionary<UnityEngine.Object, UnityEngine.Object>();
-            var root = (RectTransform)CopyHierarchy(source.transform, canvas.transform, map);
+            var root = HUDCopyUI(source, canvas.transform, map);
             root.anchorMin = Vector2.zero;
             root.anchorMax = Vector2.one;
             root.offsetMin = root.offsetMax = Vector2.zero;
             root.localPosition = Vector3.zero;
             root.localScale = Vector3.one;
-            foreach (var original in source.GetComponentsInChildren<Component>(true))
-            {
-                if (original == null || !CopyComponent(original)) continue;
-                var target = ((Transform)map[original.transform]).gameObject.AddComponent(original.GetType());
-                EditorUtility.CopySerialized(original, target);
-                map.Add(original, target);
-            }
-            foreach (var pair in map.ToArray())
-                if (pair.Key is Component && !(pair.Key is Transform)) RemapReferences((Component)pair.Value, map);
             foreach (var button in root.GetComponentsInChildren<Button>(true))
             {
                 button.onClick = new Button.ButtonClickedEvent();
@@ -131,7 +126,7 @@ public static partial class PocketStrikerTutorialValidation
             var sourceLayer = source.GetComponent<FightingStepLayer>();
             // Runtime teardown expects a live RTFightManager. The subclass changes only teardown.
             var layer = root.gameObject.AddComponent<PocketStrikerTutorialValidationLayer>();
-            foreach (var name in new[] { "pauseButton", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask" })
+            foreach (var name in new[] { "pauseButton", "inputsManager", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask" })
             {
                 var field = typeof(FightingStepLayer).GetField(name, Private);
                 field.SetValue(layer, map[(UnityEngine.Object)field.GetValue(sourceLayer)]);
@@ -179,6 +174,7 @@ public static partial class PocketStrikerTutorialValidation
             Invoke(eventSystem, "OnEnable");
             foreach (var animator in root.GetComponentsInChildren<Animator>(true)) animator.Rebind();
             auto.Initialize(() => automatic, value => automatic = value);
+            layer.RefreshPresentation();
             Rebuild(root, camera, texture);
             Vector2 blank = camera.WorldToScreenPoint(root.TransformPoint(new Vector3(0, 120, 0)));
             var skillPoint = Center(skill.transform, camera);
@@ -248,12 +244,14 @@ public static partial class PocketStrikerTutorialValidation
             PosCal.Canvas = oldCanvas;
             PosCal.SafeAreaRect = oldSafe;
             FightLoad.Fight = oldFight;
+            dragCanvasField.SetValue(null, oldDragCanvas);
             if (eventSystem != null) Invoke(eventSystem, "OnDisable");
             foreach (var raycaster in rig.GetComponentsInChildren<GraphicRaycaster>(true))
                 typeof(BaseRaycaster).GetMethod("OnDisable", Private).Invoke(raycaster, null);
             UnityEngine.Object.DestroyImmediate(rig);
             if (texture != null) { texture.Release(); UnityEngine.Object.DestroyImmediate(texture); }
             EditorSceneManager.ClosePreviewScene(scene);
+            if (oldEventSystem != null) EventSystem.current = oldEventSystem;
             Application.logMessageReceived -= CaptureError;
             report.sourcePrefabUnchanged = sourceText == File.ReadAllText(PrefabPath);
             report.passed = report.errors.Count == 0 && report.sourcePrefabUnchanged && report.pagesChecked == 6

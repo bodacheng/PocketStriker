@@ -13,9 +13,54 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] Image frame;
     [SerializeField] Image cooldownCurtain;
     [SerializeField] GameObject warnFlag;
+
+    bool _preparationStyle;
+    ScrollRect _preparationScroll;
+
+    public void SetPreparationScrollRect(ScrollRect scroll) => _preparationScroll = scroll;
     
     public UnitConfig unitConfig;
     public GameObject WarnFlag => warnFlag;
+
+    /// <summary>Softens this preparation portrait while keeping its elemental color and status signals.</summary>
+    public void ApplyPreparationStyle()
+    {
+        if (_preparationStyle) return;
+        _preparationStyle = true;
+        StylePreparationColors();
+    }
+
+    /// <summary>Fits loaded portrait art to its current presentation dimensions.</summary>
+    public void RefreshPresentationSize()
+    {
+        AdjustSize(icon);
+    }
+
+    void StylePreparationColors()
+    {
+        if (frame != null)
+        {
+            var original = frame.color;
+            Color.RGBToHSV(original, out var hue, out var saturation, out var brightness);
+            var muted = Color.HSVToRGB(hue, saturation * 0.55f, brightness * 0.82f);
+            muted.a = original.a;
+            frame.color = muted;
+            DisableDecorativeEffects(frame);
+        }
+        if (iconBg != null)
+        {
+            var original = iconBg.color;
+            iconBg.color = new Color(original.r * 0.48f, original.g * 0.48f, original.b * 0.48f, original.a);
+            DisableDecorativeEffects(iconBg);
+        }
+    }
+
+    static void DisableDecorativeEffects(Image target)
+    {
+        // Outline derives from Shadow. Limit this to the frame/background so
+        // warnings, skill legality indicators and portrait art retain their effects.
+        foreach (var effect in target.GetComponents<Shadow>()) effect.enabled = false;
+    }
 
     public string InstanceID
     {
@@ -161,6 +206,7 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         }
         frame.color = frameColor;
         iconBg.color = color;
+        if (_preparationStyle) StylePreparationColors();
         icon.sprite = sprite;
         try
         {
@@ -225,6 +271,11 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     static readonly int canvasSortOrder = 100;                                  // Sort order for canvas
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (_preparationScroll != null)
+        {
+            _preparationScroll.OnBeginDrag(eventData);
+            return;
+        }
         if (dragging != null)
         {
             DestroyImmediate(dragging);
@@ -263,6 +314,11 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     /// <param name="data"></param>
     public void OnDrag(PointerEventData data)
     {
+        if (_preparationScroll != null)
+        {
+            _preparationScroll.OnDrag(data);
+            return;
+        }
         if (dragging != null)
         {
             dragging.transform.position = Input.mousePosition;                          // Item's icon follows to cursor in screen pixels
@@ -278,6 +334,11 @@ public class HeroIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     /// 这个空白区域应该覆盖技能石头盒子，因为玩家想撤销添加技能操作的时候会本能的把石头向盒子方向移动。
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (_preparationScroll != null)
+        {
+            _preparationScroll.OnEndDrag(eventData);
+            return;
+        }
         ResetConditions();
     }
     

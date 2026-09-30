@@ -44,25 +44,35 @@ public class ArcadeModeManager
         if (stageAsset == null)
             return null;
 
+        return PrepareStage(stageAsset, stageNo, _stageModeTable.GetModeById(stageNo.ToString()));
+    }
+
+    /// <summary>Creates an owned stage visit from authored data without loading any resources.</summary>
+    public static FightInfo PrepareStage(FightInfo stageAsset, int stageNo, int configuredMode)
+    {
+        if (stageAsset == null) return null;
+
         // Team selection and evolution generation belong to this visit, not the
         // Addressables asset shared by the stage list and later retries.
-        var fightInfo = UnityEngine.Object.Instantiate(stageAsset);
+        var fightInfo = stageAsset is GangbangInfo group
+            ? GangbangInfo.Copy(group) : UnityEngine.Object.Instantiate(stageAsset);
         fightInfo.name = stageAsset.name;
         fightInfo.OpenAndSetEnemyDataOnPlace();
         fightInfo.ID = stageNo.ToString();
         fightInfo.EventType = FightEventType.Quest;
         fightInfo.ArcadeFightMode = AdventureModeRules.ResolveMode(
-            fightInfo.ID, _stageModeTable.GetModeById(fightInfo.ID));
+            fightInfo.ID, configuredMode);
         fightInfo.EvolutionMode = fightInfo.ArcadeFightMode == AdventureModeRules.EvolutionMode;
-        var teamMode = fightInfo.ArcadeFightMode == AdventureModeRules.MultiMode
+        var teamMode = fightInfo.IsGroupBattle || fightInfo.ArcadeFightMode == AdventureModeRules.MultiMode
             ? TeamMode.MultiRaid
             : TeamMode.Rotation;
         fightInfo.team1Mode = teamMode;
         fightInfo.team2Mode = teamMode;
         // Authored stages can have sparse IDs; evolution may add a new enemy at
         // one of those IDs. Keep preview and combat lookups unique per encounter.
-        for (var index = 0; index < fightInfo.UnitsData.Count; index++)
-            fightInfo.UnitsData[index].id = index.ToString();
+        if (!fightInfo.IsGroupBattle)
+            for (var index = 0; index < fightInfo.UnitsData.Count; index++)
+                fightInfo.UnitsData[index].id = index.ToString();
         fightInfo.SetUnitLevelByRefLevel();
         return fightInfo;
     }

@@ -25,13 +25,13 @@ public sealed class BattleTutorialLayout : MonoBehaviour
     const float Margin = 24;
     const float Padding = 20;
     const float Gap = 80;
-    static readonly Color Accent = new Color(1f, 0.9f, 0.36f, 1f);
+    static readonly Color Accent = new Color(0.92f, 0.83f, 0.53f, 1f);
     readonly List<Callout> callouts = new List<Callout>();
     readonly List<Text> centeredLabels = new List<Text>();
     readonly List<RectTransform> centeredPanels = new List<RectTransform>();
     readonly List<Callout> skills = new List<Callout>();
     readonly List<Vector2> skillSizes = new List<Vector2>();
-    readonly List<Vector2> skillCenters = new List<Vector2>();
+    readonly List<RectTransform> lowerControls = new List<RectTransform>();
     readonly Vector3[] corners = new Vector3[4];
     RectTransform root;
     Func<RectTransform> healthTarget;
@@ -47,6 +47,13 @@ public sealed class BattleTutorialLayout : MonoBehaviour
         energyTarget = energyBarTarget;
         if (root != null) return;
         root = battleRoot;
+        var inputs = root.GetComponent<FightingStepLayer>()?.InputsManager;
+        if (inputs != null)
+        {
+            foreach (var button in new[] { inputs.AttackButton, inputs.Fire1Button, inputs.Fire2Button, inputs.DashButton, inputs.DefendButton, inputs.DreamComboBtn })
+                if (button != null) lowerControls.Add((RectTransform)button.transform);
+            if (inputs.MovementJoystick?.joystickBase != null) lowerControls.Add(inputs.MovementJoystick.joystickBase);
+        }
         foreach (var name in new[] { "Tutorial", "DreamComboTutorial" })
         {
             var overlay = root.Find(name);
@@ -143,28 +150,26 @@ public sealed class BattleTutorialLayout : MonoBehaviour
             if (callout.Skill) { skills.Add(callout); continue; }
             LayoutCallout(callout, area);
         }
-        // The three staggered attack controls are closer than wrapped labels in some languages.
-        // Keep their reading order aligned with the buttons without allowing label overlap.
-        skills.Sort((a, b) => b.TargetBounds.center.y.CompareTo(a.TargetBounds.center.y));
+        // Match the compact HUD's left-to-right skill row. Put explanations
+        // above the complete control area so they never conceal the next action.
+        skills.Sort((a, b) => a.TargetBounds.center.x.CompareTo(b.TargetBounds.center.x));
         skillSizes.Clear();
-        skillCenters.Clear();
-        float ceiling = area.yMax;
+        const float columnGap = 18;
+        float columnWidth = skills.Count > 0 ? (area.width - columnGap * (skills.Count - 1)) / skills.Count : area.width;
+        float height = 0;
         foreach (var callout in skills)
         {
-            float width = Mathf.Clamp(callout.TargetBounds.xMin - Gap - area.xMin, 280, 640);
-            var size = Measure(callout.Label, Mathf.Min(width, area.width), area.height);
-            var center = new Vector2(area.xMin + size.x / 2,
-                Mathf.Min(callout.TargetBounds.center.y, ceiling - size.y / 2));
+            var size = Measure(callout.Label, columnWidth, area.height);
             skillSizes.Add(size);
-            skillCenters.Add(center);
-            ceiling = center.y - size.y / 2 - 18;
+            height = Mathf.Max(height, size.y);
         }
-        float lift = skills.Count == 0 ? 0 : Mathf.Max(0, area.yMin - (ceiling + 18));
         for (int i = 0; i < skills.Count; i++)
         {
-            var center = skillCenters[i] + Vector2.up * lift;
-            PlacePanel(skills[i].Label, skills[i].Panel, center, skillSizes[i]);
-            DrawPointer(skills[i], center, skillSizes[i]);
+            var size = new Vector2(columnWidth, height);
+            var center = Clamp(new Vector2(area.xMin + columnWidth / 2 + i * (columnWidth + columnGap),
+                ControlsCeiling() + Gap + height / 2), size, area);
+            PlacePanel(skills[i].Label, skills[i].Panel, center, size);
+            DrawPointer(skills[i], center, size);
         }
     }
 
@@ -180,8 +185,25 @@ public sealed class BattleTutorialLayout : MonoBehaviour
             center = new Vector2(area.center.x, target.center.y < area.center.y
                 ? target.yMax + Gap + size.y / 2 : target.yMin - Gap - size.y / 2);
         center = Clamp(center, size, area);
+        if (ObscuresControls(new Rect(center - size / 2, size)))
+            center = Clamp(new Vector2(center.x, ControlsCeiling() + Gap + size.y / 2), size, area);
         PlacePanel(callout.Label, callout.Panel, center, size);
         DrawPointer(callout, center, size);
+    }
+
+    float ControlsCeiling()
+    {
+        float ceiling = SafeBounds.yMin;
+        foreach (var control in lowerControls)
+            if (control != null && control.gameObject.activeInHierarchy) ceiling = Mathf.Max(ceiling, Bounds(control).yMax);
+        return ceiling;
+    }
+
+    bool ObscuresControls(Rect panel)
+    {
+        foreach (var control in lowerControls)
+            if (control != null && control.gameObject.activeInHierarchy && panel.Overlaps(Bounds(control))) return true;
+        return false;
     }
 
     Vector2 Measure(Text label, float width, float maxHeight)
@@ -274,14 +296,21 @@ public sealed class BattleTutorialLayout : MonoBehaviour
     static RectTransform MakeImage(Transform parent, string name, Color color)
     {
         var obj = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        obj.layer = parent.gameObject.layer;
         obj.transform.SetParent(parent, false);
         var image = obj.GetComponent<Image>();
         image.color = color; image.raycastTarget = false;
+        if (name == "ExplanationPanel")
+        {
+            image.sprite = Resources.Load<Sprite>("UI/Preparation/PreparationButtonFill");
+            image.type = Image.Type.Sliced;
+        }
         return (RectTransform)obj.transform;
     }
     static RectTransform MakeFrame(Transform parent)
     {
         var obj = new GameObject("TargetFrame", typeof(RectTransform), typeof(CanvasRenderer), typeof(BattleTutorialFrame));
+        obj.layer = parent.gameObject.layer;
         obj.transform.SetParent(parent, false);
         var graphic = obj.GetComponent<BattleTutorialFrame>();
         graphic.color = Accent; graphic.raycastTarget = false;

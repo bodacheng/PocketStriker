@@ -8,7 +8,18 @@ public class FightModeSwitch : MonoBehaviour
     [SerializeField] private Animator animator;
     
     private TeamMode _teamMode;
+    PreparationButtonSkin _preparationSkin;
     public TeamMode TeamMode => _teamMode;
+
+    public void ApplyPreparationSkin()
+    {
+        if (_preparationSkin != null) return;
+        _preparationSkin = PreparationButtonSkin.Apply(btn, modeText, new Color(0.42f, 0.65f, 0.73f, 0.75f), false, 28);
+        if (_preparationSkin == null) return;
+        animator.enabled = false;
+        var oldBackground = btn.GetComponent<Image>();
+        if (oldBackground != null) oldBackground.enabled = false;
+    }
     
     void OnClick()
     {
@@ -47,10 +58,11 @@ public class FightModeSwitch : MonoBehaviour
             default:
                 btn.onClick.AddListener(OnClick);
                 btn.interactable = true;
-                animator.enabled = true;
+                animator.enabled = _preparationSkin == null;
                 SetMode(defaultMode == (int)TeamMode.MultiRaid ? TeamMode.MultiRaid : TeamMode.Rotation);
             break;
         }
+        _preparationSkin?.RefreshState();
     }
 
     void SetMode(TeamMode mode)

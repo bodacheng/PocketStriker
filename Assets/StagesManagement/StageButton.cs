@@ -21,6 +21,8 @@ public partial class StageButton : MonoBehaviour
 
     const float CardPadding = 28;
     const float MetadataWidth = 175;
+    // Noto CJK needs 40.544 units for a 28-point line, including font descent.
+    const float ModeRowHeight = 42;
     const float PortraitGap = 14;
     const float FooterBottom = 22;
     const float FooterHeight = 34;
@@ -58,6 +60,7 @@ public partial class StageButton : MonoBehaviour
             Destroy(_modeFlag.gameObject);
         }
         var prefabName = mode == AdventureModeRules.EvolutionMode ? "EvolutionModeFlg"
+            : mode == AdventureModeRules.GroupMode ? "GroupModeFlg"
             : mode == AdventureModeRules.MultiMode ? "MultiModeFlg" : "RotationModeFlg";
         var prefab = Resources.Load<GameObject>("DummyLayerSystem/Common/" + prefabName);
         if (prefab == null) return;
@@ -165,7 +168,7 @@ public partial class StageButton : MonoBehaviour
             id.resizeTextForBestFit = false;
             id.alignment = TextAnchor.MiddleLeft;
             PlaceAtBottom((RectTransform)_modeFlag.transform,
-                new Vector2(CardPadding, centerY - 20), new Vector2(MetadataWidth, 38));
+                new Vector2(CardPadding, centerY - 1 - ModeRowHeight * 0.5f), new Vector2(MetadataWidth, ModeRowHeight));
 
             // The enemy row is centered against the whole card, independently of rewards.
             iconsT.anchorMin = Vector2.zero;
@@ -254,8 +257,8 @@ public partial class StageButton : MonoBehaviour
         var rect = (RectTransform)flag.transform;
         var parent = (RectTransform)rect.parent;
         var root = (RectTransform)transform;
-        PlaceAtBottom(parent, new Vector2(CardPadding + MetadataWidth + 8, root.rect.height * 0.5f - 20),
-            new Vector2(EnergyLabelWidth, 38));
+        PlaceAtBottom(parent, new Vector2(CardPadding + MetadataWidth + 8, root.rect.height * 0.5f - 1 - ModeRowHeight * 0.5f),
+            new Vector2(EnergyLabelWidth, ModeRowHeight));
         Stretch(rect);
     }
 

@@ -13,6 +13,24 @@ public partial class NineForShow : MonoBehaviour
     [SerializeField] string notQualifiedEffectKey = "defaultmagic/skillSetWarn.prefab";
     [SerializeField] GameObject editSkillIndicator;
     SKStoneItem _a1S, _a2S, _a3S, _b1S, _b2S, _b3S, _c1S, _c2S, _c3S;
+
+    // Presentation is opt-in for preparation pages. Address the authored frames
+    // explicitly so already loaded stone artwork and status effects stay intact.
+    public void StylePreparationSlots(Color color)
+    {
+        foreach (var frame in new[] { A1Frame, A2Frame, A3Frame, B1Frame, B2Frame, B3Frame, C1Frame, C2Frame, C3Frame })
+            StylePreparationFrame(frame, color);
+        foreach (var button in new[] { A1T, A2T, A3T, B1T, B2T, B3T, C1T, C2T, C3T })
+            if (button != null) StylePreparationFrame(button.GetComponent<Image>(), color);
+    }
+
+    static void StylePreparationFrame(Image frame, Color color)
+    {
+        if (frame == null) return;
+        color.a = Mathf.Min(frame.color.a, color.a);
+        frame.color = color;
+        foreach (var shadow in frame.GetComponents<Shadow>()) shadow.enabled = false;
+    }
     
     public void ClearCurrent()
     {

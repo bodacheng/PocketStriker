@@ -1,5 +1,4 @@
 ﻿using System;
-using DG.Tweening;
 using UnityEngine;
 using UniRx;
 using UnityEngine.UI;
@@ -41,7 +40,7 @@ namespace FightScene
                 // SideIcon整备
                 void ClickUnitIcon(Data_Center c)
                 {
-                    if (c.FightDataRef.IsDead.Value)
+                    if (c.FightDataRef.IsDead.Value || IsGroupBattle)
                     {
                         return;
                     }
@@ -72,23 +71,7 @@ namespace FightScene
                 sideIcon.gameObject.SetActive(true);
                 sideIcon.Icon.CooldownCurtainUpdate(0);
 
-                if (TeamConfig.myTeam == RTFightManager.playerTeam)
-                {
-                    sideIcon.transform.SetParent(sideIconsContainer.transform);
-                }
-                else
-                {
-                    sideIcon.transform.SetParent(_targetCanvasT.transform);
-                }
-
-                if (FightLoad.Fight.EventType == FightEventType.Gangbang)
-                {
-                    sideIcon.transform.localScale = Vector3.one / 2f;
-                }
-                else
-                {
-                    sideIcon.transform.localScale = Vector3.one;
-                }
+                ArrangeSideIcon(center, sideIcon);
 
                 DicAdd<Data_Center, SideUnitIcon>.Add(UnitIconDic, center, sideIcon);
 
@@ -127,55 +110,29 @@ namespace FightScene
                 ).AddTo(sideIcon.gameObject);
             }
 
-            inputsManager.CurrentFocus.Subscribe(
-                (x) =>
-                {
-                    if (x != null)
-                    {
-                        UnitIconDic.TryGetValue(x, out var targetIcon);
-                        if (targetIcon != null)
-                        {
-                            selectedFrame.SetParent(targetIcon.Icon.transform);
-                            selectedFrame.transform.localPosition = Vector3.zero;
-                            selectedFrame.transform.localScale = Vector3.one;
-                            selectedFrame.gameObject.SetActive(true);
-                            selectedFrame.SetAsFirstSibling();
-                        }
-                    }
-                    else
-                    {
-                        selectedFrame.SetParent(transform);
-                        selectedFrame.gameObject.SetActive(false);
-                    }
-
-                    if (TeamConfig.myTeam == RTFightManager.playerTeam)
-                    {
-                        RTFightManager.Target.CameraAdjustment(Team.player1, TeamMode.MultiRaid, FightLoad.Fight.EventType,x != null ? x.geometryCenter : null);
-                        _teamIndicatorCloseDisposable?.Dispose();
-                        _barPosUpdate?.Dispose();
-                        foreach (var one in _teamMembers.GetValues())
-                        {
-                            UnitIconDic.TryGetValue(one, out var tempSi);
-                            tempSi.TeamIndicator.gameObject.SetActive(inputsManager.CurrentFocus.Value == one);
-                            if (x == one)
-                            {
-                                _barPosUpdate = Observable.IntervalFrame(barPosUpdateInterval).Subscribe(_ =>
-                                {
-                                    UnitIconDic.TryGetValue(one, out var tempSi);
-                                    _textScaleManager.AddNew(tempSi.TeamIndicator.transform,
-                                        tempSi.TeamIndicator.transform.DOMove(
-                                            CameraManager._camera.WorldToScreenPoint(one.transform.position + Vector3.up * 1.5f), 0.5f)
-                                    );
-                                }).AddTo(gameObject);
-                            }
-                        }
-                    }
-                }
-            ).AddTo(this.gameObject);
-
-            if (TeamConfig.myTeam == RTFightManager.playerTeam)
+            inputsManager.CurrentFocus.Subscribe(x =>
             {
-                inputsManager.FocusUnit(ResolveDefaultFocus(), true);
+                // Both managers share the selection frame. Only the player
+                // manager may attach it to a portrait or change camera focus.
+                if (!IsPlayerTeam) return;
+                UpdateSelectedFrame(x);
+                if (!IsGroupBattle)
+                {
+                    RTFightManager.Target.CameraAdjustment(Team.player1, TeamMode.MultiRaid,
+                        FightLoad.Fight.EventType, x != null ? x.geometryCenter : null);
+                    SetPlayerIndicators(x, false, false);
+                }
+                else
+                {
+                    SetPlayerIndicators(null, false, false);
+                }
+                StartStatusTracking();
+            }).AddTo(gameObject);
+
+            if (IsPlayerTeam)
+            {
+                if (!IsGroupBattle)
+                    inputsManager.FocusUnit(ResolveDefaultFocus(), true);
                 switchTeamAuto(currentAutoState());
             }
             SetLiveUnitCount();

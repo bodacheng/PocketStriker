@@ -27,7 +27,7 @@ public class QuestInfoPage : MSceneProcess
             BackGroundPS.target.ChangeBGByElement(unitConfig.element);
 
             FightLoad.Fight = stage;
-            _layer = FightLoad.Fight.EventType == FightEventType.Gangbang
+            _layer = FightLoad.Fight.IsGroupBattle
                 ? UILayerLoader.Load<FightPrepareLayer>(false, "FightPrepareLayer_gb")
                 : UILayerLoader.Load<FightPrepareLayer>();
 
@@ -49,6 +49,11 @@ public class QuestInfoPage : MSceneProcess
 
                     break;
                 case FightEventType.Quest:
+                    if (stage.IsGroupBattle)
+                    {
+                        ConfigureGroupPreparation((GangbangInfo)stage);
+                        break;
+                    }
                     _layer.SetLayerAnimatorTrigger(FightLoad.Fight.EvolutionMode ? "evolution" : "normal");
 
                     // Tutorial and evolution fights use one starter; mixed battles
@@ -93,36 +98,7 @@ public class QuestInfoPage : MSceneProcess
                     _layer.SetEventFeature(FightLoad.Fight.ID);
                     break;
                 case FightEventType.Gangbang:
-                    _layer.SetLayerAnimatorTrigger("normal");
-                    var controllingGangbangInfo = GangbangInfo.Copy((GangbangInfo)stage);
-                    _controllingGangbangInfo = controllingGangbangInfo;
-                    controllingGangbangInfo.FightMembers.HeroSets = TeamSet.GetTargetSet("gangbang").LoadTeamDic(); // 为了队员显示
-                    _layer.SetTeamEditFeature(
-                        () =>
-                        {
-                            PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "gangbang", true);
-                        }
-                    );
-
-                    _layer.SetGangbangFeature(
-                        controllingGangbangInfo,
-                        () => { PreScene.target.trySwitchToStep(MainSceneStep.GangBangFront, false); },
-                        FightLoad.Fight.ID,
-                        (x, y ,z, maxCount)=>
-                        {
-                            var whole = controllingGangbangInfo.SetTeamUnitCount(x, y, z, maxCount);
-                            if (x == 1) // 本地存储各个gangbang人数
-                            {
-                                PlayerPrefs.SetInt("gangbangPos"+ y, controllingGangbangInfo.GetTeamUnitCount(x,y));
-                                PlayerPrefs.Save();
-                            }
-
-                            var canFight = CanFightCheck(FightLoad.Fight, controllingGangbangInfo);
-                            //_layer.TeamEditIndicator.gameObject.SetActive(!canFight);
-                            _layer.SetFightBeginEnableRender(canFight);
-                            return whole;
-                        },
-                        (x,y)=> controllingGangbangInfo.GetTeamUnitCount(x,y,x == 1));
+                    ConfigureGroupPreparation((GangbangInfo)stage);
                     break;
             }
 
@@ -136,7 +112,7 @@ public class QuestInfoPage : MSceneProcess
             }
 
             if (!IsActiveEnter(version, token)) return;
-            if (FightLoad.Fight.EventType == FightEventType.Gangbang)
+            if (FightLoad.Fight.IsGroupBattle)
             {
                 _layer.SetFightMode(1);
                 _layer.SetFightBeginFeature(()=> GoToFight(_controllingGangbangInfo, _layer.SelectedMaxTeamCount));
@@ -169,6 +145,32 @@ public class QuestInfoPage : MSceneProcess
             SetLoaded(true);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+    }
+
+    void ConfigureGroupPreparation(GangbangInfo stage)
+    {
+        _layer.SetLayerAnimatorTrigger("normal");
+        var controlling = GangbangInfo.Copy(stage);
+        _controllingGangbangInfo = controlling;
+        FightLoad.Fight = controlling;
+        controlling.LoadMyTeam();
+        _layer.SetTeamEditFeature(() =>
+            PreScene.target.trySwitchToStep(MainSceneStep.TeamEditFront, "gangbang", true));
+        _layer.SetGangbangFeature(controlling,
+            () => PreScene.target.trySwitchToStep(controlling.EventType == FightEventType.Quest
+                ? MainSceneStep.ArcadeFront : MainSceneStep.GangBangFront, false), controlling.ID,
+            (team, id, count, maxCount) =>
+            {
+                var whole = controlling.SetTeamUnitCount(team, id, count, maxCount);
+                if (team == 1)
+                {
+                    PlayerPrefs.SetInt("gangbangPos" + id, controlling.GetTeamUnitCount(team, id));
+                    PlayerPrefs.Save();
+                }
+                _layer.SetFightBeginEnableRender(CanFightCheck(controlling, controlling));
+                return whole;
+            },
+            (team, id) => controlling.GetTeamUnitCount(team, id, team == 1));
     }
 
     void BeginEnter(FightInfo stage)
@@ -221,6 +223,12 @@ public class QuestInfoPage : MSceneProcess
 
     bool CanFightCheck(FightInfo fight, GangbangInfo refGangbangInfo = null)
     {
+        if (fight.IsGroupBattle)
+        {
+            var group = refGangbangInfo ?? fight as GangbangInfo;
+            return group != null && group.GetGroupWholeUnitCount(1) > 0 && group.GetGroupWholeUnitCount(2) > 0
+                && group.FightMembers.CheckStonesLegal(fight.EventType, group.GetNonZeroInstanceIds(1));
+        }
         switch (fight.EventType)
         {
             case FightEventType.Arena:
@@ -252,16 +260,6 @@ public class QuestInfoPage : MSceneProcess
                     }
                 }
                 break;
-            case FightEventType.Gangbang:
-                if (refGangbangInfo == null)
-                {
-                    return false;
-                }
-                var unitCountFit = refGangbangInfo.GetGroupWholeUnitCount(1) > 0
-                                   && refGangbangInfo.GetGroupWholeUnitCount(2) > 0;
-                if (!unitCountFit)
-                    return false;
-                break;
             default:
                 if (fight.FightMembers.HeroSets.GetValues().Count == 0)
                 {
@@ -270,27 +268,18 @@ public class QuestInfoPage : MSceneProcess
                 break;
         }
 
-        if (fight.EventType == FightEventType.Gangbang)
-        {
-            var instanceIds = refGangbangInfo.GetNonZeroInstanceIds(1);
-            if (!fight.FightMembers.CheckStonesLegal(fight.EventType, instanceIds))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if (!fight.FightMembers.CheckStonesLegal(fight.EventType))
-            {
-                return false;
-            }
-        }
+        if (!fight.FightMembers.CheckStonesLegal(fight.EventType)) return false;
 
         return true;
     }
 
     void GoToFight(FightInfo fightInfo, int maxTeamUnitCount = -1)
     {
+        if (fightInfo.IsGroupBattle)
+        {
+            GoToGroupFight((GangbangInfo)fightInfo, maxTeamUnitCount);
+            return;
+        }
         // if (!fightInfo.FightMembers.CheckStonesLegal(fightInfo.EventType))
         // {
         //     PopupLayer.ArrangeWarnWindow(Translate.Get("TeamUnitNotFull"));
@@ -317,39 +306,6 @@ public class QuestInfoPage : MSceneProcess
                         FightLoad.Go(fightInfo);
                     }
                 );
-                break;
-            case FightEventType.Gangbang:
-                if (fightInfo.FightMembers.HeroSets.GetValues().Count < 1 || fightInfo.FightMembers.EnemySets.GetValues().Count < 1)
-                {
-                    PopupLayer.ArrangeWarnWindow(Translate.Get("TeamNotFull"));
-                    return;
-                }
-
-                var bangBangInfo = ((GangbangInfo)fightInfo);
-                fightInfo.team1Mode = TeamMode.MultiRaid;
-                fightInfo.team2Mode = TeamMode.MultiRaid;
-                if (maxTeamUnitCount <= 0)
-                {
-                    maxTeamUnitCount = CommonSetting.GangbangModeMaxUnitPerTeam1;
-                }
-
-                void RealFight()
-                {
-                    bangBangInfo.ConvertTeamToGangbang();
-                    FightScene.FightScene.team1GroupSet = GangbangInfo.CopyGroupSets(bangBangInfo.Team1GroupSet);
-                    fightInfo.Team1ID = PlayerAccountInfo.Me.PlayFabId;
-                    FightLoad.Go(fightInfo);
-                }
-
-                if (bangBangInfo.GetGroupWholeUnitCount(1) < maxTeamUnitCount)
-                {
-                    PopupLayer.ArrangeConfirmWindow(
-                        RealFight,
-                        Translate.Get("HasExtraSeatForGangbangButFight"));
-                    return;
-                }
-
-                RealFight();
                 break;
             case FightEventType.Quest:
                 fightInfo.LoadMyTeam();
@@ -388,5 +344,30 @@ public class QuestInfoPage : MSceneProcess
                 FightLoad.Go(fightInfo);
                 break;
         }
+    }
+
+    void GoToGroupFight(GangbangInfo group, int maxTeamUnitCount)
+    {
+        if (!CanFightCheck(group, group))
+        {
+            PopupLayer.ArrangeWarnWindow(Translate.Get("TeamNotFull"));
+            return;
+        }
+        group.team1Mode = group.team2Mode = TeamMode.MultiRaid;
+        if (maxTeamUnitCount <= 0) maxTeamUnitCount = GangbangInfo.GetConfiguredTeamLimit();
+        void Begin()
+        {
+            group.RecordTeamLimit(maxTeamUnitCount);
+            group.ConvertTeamToGangbang();
+            FightScene.FightScene.team1GroupSet = GangbangInfo.CopyGroupSets(group.Team1GroupSet);
+            group.Team1ID = PlayerAccountInfo.Me.PlayFabId;
+            FightLoad.Go(group);
+        }
+        if (group.GetGroupWholeUnitCount(1) < maxTeamUnitCount)
+        {
+            PopupLayer.ArrangeConfirmWindow(Begin, Translate.Get("HasExtraSeatForGangbangButFight"));
+            return;
+        }
+        Begin();
     }
 }

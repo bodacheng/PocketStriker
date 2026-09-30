@@ -20,6 +20,7 @@ public class PreparingProcess : FSceneProcess
     {
         RTFightManager.Target.team1.Clear();
         RTFightManager.Target.team2.Clear();
+        BoundaryControlByGod.target.ConfigureBattleRadius(false);
         
         RTFightManager.Target._CameraManager.VisibilityControl.Clear();
         
@@ -147,7 +148,7 @@ public class PreparingProcess : FSceneProcess
                     FightLoad.Fight.team1HpRate, FightLoad.Fight.team1CGMode, 
                     FightLoad.Fight.team1AIMode, FightLoad.Fight.dumbAIDecisionDelay,
                     CreateRandomBoolFunc(
-                        FightLoad.Fight.EventType == FightEventType.Gangbang ? 100: FightGlobalSetting._player1DreamComboAIRateNumM)
+                        FightLoad.Fight.IsGroupBattle ? 100: FightGlobalSetting._player1DreamComboAIRateNumM)
                 );
                 break;
             case TeamMode.Rotation:
@@ -166,7 +167,7 @@ public class PreparingProcess : FSceneProcess
                     FightLoad.Fight.team2HpRate, FightLoad.Fight.team2CGMode, 
                     FightLoad.Fight.team2AIMode, FightLoad.Fight.dumbAIDecisionDelay,
                     CreateRandomBoolFunc(
-                        FightLoad.Fight.EventType == FightEventType.Gangbang ? 100 : 
+                        FightLoad.Fight.IsGroupBattle ? 100 :
                             (FightLoad.Fight.EventType == FightEventType.Arena ? 
                                 FightGlobalSetting.ArenaEnemyDreamComboAIRate: FightLoad.Fight.dreamComboAIRateNum))
                 );
@@ -210,6 +211,21 @@ public class PreparingProcess : FSceneProcess
         }
 
         RTFightManager.Target.FacePreparedTeamsTowardEachOther();
+        var formationBounds = new List<Bounds>();
+        if (FightLoad.Fight.IsGroupBattle)
+        {
+            void AddFormationBounds(UnitsManger team)
+            {
+                foreach (var unit in team.teamMembers.mDict.Values)
+                    if (unit != null && BattleCameraFraming.TryGetModelBounds(unit.WholeT, out var bounds))
+                        formationBounds.Add(bounds);
+            }
+            AddFormationBounds(RTFightManager.Target.team1);
+            AddFormationBounds(RTFightManager.Target.team2);
+        }
+        BoundaryControlByGod.target.ConfigureBattleRadius(FightLoad.Fight.IsGroupBattle,
+            BattleFormationPlacement.RequiredArenaRadius(formationBounds, 1f));
+        fightingStepLayer.SetSensor();
         
         RTFightManager.Target.team1.RMode_Unit.Subscribe(x =>
             {
@@ -228,6 +244,8 @@ public class PreparingProcess : FSceneProcess
     
     public override void ProcessEnter()
     {
+        // Also starts a fresh optional request for an in-scene retry/next battle.
+        FightScene.FightScene.target.PreloadAIStory();
         //HighLightLayer.DarkOff(Color.white, 0, true);
         // Background covers the notch/home-indicator area; UILayer keeps text safe.
         // Place it above battle UI, then EnterProcess puts the progress bar on top.

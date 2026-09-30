@@ -1,0 +1,28 @@
+Preparation button artwork provenance
+Imported 2026-09-30 from the existing local MComat asset collection.
+Source pack: Shift - Complete Sci-Fi UI / Textures / Border / Rounded.
+These resources replace the earlier clipped-corner/notched buttons with symmetrical rounded rectangles.
+The PNG files are byte-for-byte copies; MComat source files are unchanged.
+The existing PocketStriker target GUIDs are preserved so code and scene references stay valid.
+Unity imports: single Sprite, Full Rect, alpha transparency, no mipmaps, PPU 500, clamp, high quality compression.
+9-slice border is 63 pixels on all sides, leaving a 2-pixel vertical stretchable center.
+At Canvas referencePixelsPerUnit 100 and Image pixelsPerUnitMultiplier 1, corner radius is approximately 12.6 UI units and the 8-pixel outline is approximately 1.6 UI units.
+
+PreparationButtonFill.png
+  Source: /Users/daisei/MComat/Assets/D_Asset/Shift - Complete Sci-Fi UI/Textures/Border/Rounded/Rounded Filled (500ppu).png
+  SHA-256: 89eebb8e921fd2215aee121bc7deb6b3b63182b21022ca694a66bd731a8d9039
+  Target GUID: c541b21ee2004b9aacbd84ee924843af
+  Dimensions: 345 x 128; alpha range: 0..255; border L/B/R/T: 63/63/63/63.
+
+PreparationButtonOutline.png
+  Source: /Users/daisei/MComat/Assets/D_Asset/Shift - Complete Sci-Fi UI/Textures/Border/Rounded/Rounded Outline - Stroke 8px.png
+  SHA-256: fad2b19e9f328304e5b12a8183c7e6960755561d99885e6406dead989b4c4711
+  Target GUID: efb71ca1ee684dd8874d7c61ac1f97ca
+  Dimensions: 345 x 128; alpha range: 0..255; border L/B/R/T: 63/63/63/63.
+
+Resources paths:
+  UI/Preparation/PreparationButtonFill
+  UI/Preparation/PreparationButtonOutline
+
+Use Image.Type.Sliced for both layers with identical RectTransforms and pixelsPerUnitMultiplier 1.
+The matching fill and outline are the same size and require no layer inset.
