@@ -250,7 +250,7 @@ Shader "OmniShade/Standard URP" {
             #pragma fragment frag
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
-            #pragma multi_compile _ _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS _ADDITIONAL_LIGHTS_VERTEX
             #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED

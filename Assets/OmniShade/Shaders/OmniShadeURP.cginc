@@ -21,7 +21,12 @@ struct appdata_full {
 };
 
 // Function renames
-#define _LightColor0 (_MainLightColor * unity_ProbesOcclusion.r)
+// Realtime light color is independent of baked probe occlusion. In a player
+// without valid baked occlusion probes this vector can be zero,
+// which previously turned an otherwise lit character into a black silhouette.
+// URP's GetMainLight() likewise uses _MainLightColor.rgb directly; shadow
+// attenuation is applied separately by UnityLightAttenuation().
+#define _LightColor0 _MainLightColor
 #define _WorldSpaceLightPos0 _MainLightPosition
 #define UnityObjectToClipPos TransformObjectToHClip
 #define UnityObjectToWorldNormal TransformObjectToWorldNormal
@@ -134,7 +139,7 @@ float4 GetShadowPositionClip(float3 vertex, float3 normal) {
 #endif
 
 
-#if _ADDITIONAL_LIGHTS
+#if _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX
 half AdditionalLightsShadow(uint lightIndex, half3 pos_world, Light light) {
 	#if SHADOWS_ENABLED
 		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
@@ -157,7 +162,7 @@ half AdditionalLightsShadow(uint lightIndex, half3 pos_world, Light light) {
 
 half3 AdditionalLightsFrag(half3 pos_world, half3 nor_world, half4 pos_clip, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
 	half3 col_diffuse = 0;
-	#if _ADDITIONAL_LIGHTS
+	#if _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX
 		uint lightsCount = GetAdditionalLightsCount();
 		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
 			InputData inputData = (InputData)0;
@@ -191,7 +196,7 @@ half3 AdditionalLightsFrag(half3 pos_world, half3 nor_world, half4 pos_clip, hal
 
 half3 AdditionalLightsVert(half3 pos_world, half3 nor_world, half _DiffuseWrap, half _DiffuseBrightness, half _DiffuseContrast, uint meshRenderingLayers, half3 shadowColor) {
 	half3 col_diffuse = 0;
-	#if _ADDITIONAL_LIGHTS
+	#if _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX
 		uint lightsCount = GetAdditionalLightsCount();
 		#if (USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)
 			InputData inputData = (InputData)0;

@@ -213,7 +213,7 @@ CBUFFER_END
 				float fogCoord : TEXCOORD10;
 			#endif
 		#endif
-		#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)) && !FLAT && !(NORMAL_MAP || NORMAL_MAP2) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
+		#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)) && !FLAT && !(NORMAL_MAP || NORMAL_MAP2) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX || MIXED_LIGHTING)
 			half3 col_diffuse_add : TEXCOORD11;
 		#endif
 		#if CAMERA_FADE
@@ -597,7 +597,7 @@ v2f vert (appdata_full v) {
 		|| SPECULAR_HAIR
 			o.tan_world = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 	#endif
-	#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP))  && !_LIGHT_COOKIES && !FLAT && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
+	#if DIFFUSE && (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP))  && !_LIGHT_COOKIES && !FLAT && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP) && (!LIGHTMAP_ON || MIXED_LIGHTING) && (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX || MIXED_LIGHTING)
 		uint meshRenderingLayers = GetMeshRenderingLightLayerCustom();
 		o.col_diffuse_add = AdditionalLightsVert(o.pos_world, o.nor_world, _DiffuseWrap, _DiffuseBrightness, _DiffuseContrast, meshRenderingLayers, _ShadowColor.rgb);
 	#endif
@@ -1004,7 +1004,7 @@ half4 frag (v2f i) : COLOR {
 				#endif
 			}
 		#endif
-		#if (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || MIXED_LIGHTING)
+		#if (VERTEXLIGHT_ON || _ADDITIONAL_LIGHTS || _ADDITIONAL_LIGHTS_VERTEX || MIXED_LIGHTING)
 			#if (!DIFFUSE_PER_PIXEL && !(USE_FORWARD_PLUS || USE_CLUSTER_LIGHT_LOOP)) && !FLAT && !_LIGHT_COOKIES && !(NORMAL_MAP || NORMAL_MAP2 || NORMAL_MAP_TOP)
 				col_diffuse += i.col_diffuse_add;
 			#else

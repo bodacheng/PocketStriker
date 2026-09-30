@@ -9,7 +9,7 @@ public class DummyMesh : AbstractShaderMesh
     {
         foreach (var m in GetMaterials())
         {
-            m.SetFloat(kPropertyAlpha, alpha);
+            if (m != null && m.HasProperty(kPropertyAlpha)) m.SetFloat(kPropertyAlpha, alpha);
         }
     }
     

@@ -157,6 +157,7 @@ namespace Cocone.ProjectP3
                 throw new BuildFailedException("Select the dev or release Addressables profile before building assets.");
             }
             VersionSyncUtility.AssertVersionSettingsSynchronized();
+            PocketStrikerDownloadValidation.RequireSettings(settings);
             AddressableAssetSettings.CleanPlayerContent();
             BuildCache.PurgeCache(false);
             AddressableAssetSettings.BuildPlayerContent(out var result);

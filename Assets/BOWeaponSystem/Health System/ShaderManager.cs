@@ -49,7 +49,10 @@ public class ShaderManager : MonoBehaviour
                 shadowMaterials[i] = CommonSetting.ShadowMaterial;
             }
             shadowRenderer.sharedMaterials = shadowMaterials;
-            shadowRenderer.shadowCastingMode = ShadowCastingMode.On;
+            // The Default-layer copy exists so the ground camera can render its
+            // shadow while the unit camera draws the colored character. Drawing
+            // this copy's black forward pass would expose a second silhouette.
+            shadowRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             shadowRenderer.receiveShadows = false;
             shadowRenderer.lightProbeUsage = LightProbeUsage.Off;
             shadowRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;

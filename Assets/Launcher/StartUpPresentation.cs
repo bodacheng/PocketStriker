@@ -241,7 +241,7 @@ public class StartUpPresentation : MonoBehaviour
             startupStage = StartupStage.ResourceDownload;
             await AddressablesLogic.ResourcePrepareProcess(
                 null,
-                progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadedBytes / wholeBytes),
+                progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadProgress, false),
                 downLoadLabels
             );
             ProgressLayer.Close();

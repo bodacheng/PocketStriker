@@ -136,25 +136,26 @@ public static class AddressablesLogic
     
     static UniTask<bool> DownLoadMission(string label, Action<string> progressUIRefresh)
     {
-        return AddressablesDependencyDownloader.DownloadDependencies(
+        return PocketStrikerDependencyDownloader.DownloadDependencies(
             label,
             progressUIRefresh,
-            AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+            AppSetting.Value.Language);
     }
     
     public static UniTask<long> GetWholeDownLoadSize(Action<string> exception, List<string> downLoadLabel)
     {
-        return AddressablesDependencyDownloader.GetWholeDownloadSize(downLoadLabel, exception);
+        return PocketStrikerDependencyDownloader.GetWholeDownloadSize(downLoadLabel, exception);
     }
     
-    public static long DownloadedBytes => AddressablesDependencyDownloader.DownloadedBytes;
+    public static long DownloadedBytes => PocketStrikerDependencyDownloader.DownloadedBytes;
+    public static float DownloadProgress => PocketStrikerDependencyDownloader.Progress;
     
     public static async UniTask ResourcePrepareProcess(Action complete, Action<string> progressUIRefresh, List<string> downLoadLabel)
     {
-        var success = await AddressablesDependencyDownloader.DownloadRequiredDependencies(
+        var success = await PocketStrikerDependencyDownloader.DownloadRequiredDependencies(
             downLoadLabel,
             progressUIRefresh,
-            AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+            AppSetting.Value.Language);
 
         if (!success)
         {

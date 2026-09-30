@@ -53,6 +53,7 @@ Tools/validate_unity.sh build
 python3 Tools/Validation/validate_cloudscript_contracts.py
 python3 Tools/Validation/validate_dependency_upgrade.py
 python3 Tools/Validation/validate_runtime_loading.py
+python3 Tools/Validation/validate_downloads.py
 python3 Tools/Validation/validate_shop_loading.py
 python3 Tools/Validation/validate_upgrade_regressions.py
 python3 Tools/Validation/test_shared_sync.py
@@ -97,6 +98,15 @@ python3 Tools/Validation/validate_ios_pods.py
 [依赖升级记录](Tools/DependencyUpgrade.md#debug-console-migration-2026-09-30)。
 **PocketStriker → Validation → Debug Console** 检查超长堆栈的展开、复制和竖屏显示，
 `python3 Tools/Validation/validate_model_loading.py` 检查角色加载失败的具体诊断与取消行为。
+
+**Download Policy** 检查四个并发请求、30 秒无数据超时及自动重试；
+`python3 Tools/Validation/validate_downloads.py` 验证共享资源合并计数、失败后的缓存复用与进度回调。
+**Check Bundled UI Fonts** 检查包内字体、中文／日文备用字体、全部 Resources 界面的翻译字符
+和战斗准备标题；**Check Character Rendering** 用实际角色调色板和六个画质档位检查颜色、
+实时光照与阴影模型，报告与预览位于 `Logs/Fonts` 和 `Logs/Rendering`。
+iOS 默认画质显式设为支持阴影的 Ultra；Startup Smoke 还检查真实战斗的材质、光源和阴影，
+并保存 `Logs/Revival/startup-run-1.png`、`startup-run-2.png` 供视觉核对。
+这些修复需要重新构建客户端及同次 Addressables 资源；已发布版本按资源配对流程使用新版本发布。
 
 ## 独立 macOS 包辅助验证
 

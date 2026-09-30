@@ -28,6 +28,8 @@ public static class PocketStrikerValidation
     const string ReentryKey = SmokeKey + ".ReentryObserved";
     const string PoolCheckKey = SmokeKey + ".PoolChecked";
     const string DownloadCheckKey = SmokeKey + ".DownloadUiChecked";
+    const string ScreenshotKey = SmokeKey + ".ScreenshotCaptured";
+    const string RenderingCheckKey = SmokeKey + ".RenderingChecked";
     const string PlayModeBuilderKey = SmokeKey + ".PlayModeBuilder";
     const string ReportDirectory = "Logs/Revival";
 
@@ -71,6 +73,7 @@ public static class PocketStrikerValidation
         public bool reentryObserved;
         public bool poolLifecyclePassed;
         public bool downloadPresentationPassed;
+        public bool characterRenderingPassed;
     }
 
     static PocketStrikerValidation()
@@ -246,6 +249,8 @@ public static class PocketStrikerValidation
         SessionState.SetBool(ReentryKey, false);
         SessionState.SetBool(PoolCheckKey, false);
         SessionState.SetBool(DownloadCheckKey, false);
+        SessionState.SetBool(ScreenshotKey, false);
+        SessionState.SetBool(RenderingCheckKey, false);
         Application.logMessageReceived -= CaptureError;
         Application.logMessageReceived += CaptureError;
         EditorApplication.update -= PollSmoke;
@@ -376,6 +381,14 @@ public static class PocketStrikerValidation
                 var ready = SessionState.GetString(ReadyKey, "");
                 if (ready == "")
                 {
+                    var renderingErrors = new List<string>();
+                    PocketStrikerRenderingValidation.ValidateLoadedFight(renderingErrors);
+                    if (renderingErrors.Count > 0)
+                    {
+                        FinishSmoke(renderingErrors.ToArray());
+                        return;
+                    }
+                    SessionState.SetBool(RenderingCheckKey, true);
                     if (runs.items.Count == 1 && !SessionState.GetBool(ReentryKey, false))
                     {
                         FinishSmoke(new[] { "Fight reload did not leave the original battle/title process." });
@@ -417,6 +430,7 @@ public static class PocketStrikerValidation
                     else
                     {
                         SessionState.SetString(ReadyKey, "");
+                        SessionState.SetBool(ScreenshotKey, false);
                         Debug.Log("POCKETSTRIKER_SMOKE_REENTER requesting another screensaver battle.");
                         FightLoad.Go(FightLoad.Fight, inSceneLoad: true);
                         // Preparing can finish before the next editor update when assets are cached.
@@ -425,6 +439,14 @@ public static class PocketStrikerValidation
                         SessionState.SetBool(ReentryKey, leftBattle && (previousTitle == null || previousTitle.IsClosing));
                     }
                     return;
+                }
+                else if (!SessionState.GetBool(ScreenshotKey, false) &&
+                    (DateTime.UtcNow - DateTime.Parse(ready).ToUniversalTime()).TotalSeconds >= 5)
+                {
+                    Directory.CreateDirectory(ReportDirectory);
+                    ScreenCapture.CaptureScreenshot(Path.GetFullPath(
+                        $"{ReportDirectory}/startup-run-{runs.items.Count + 1}.png"));
+                    SessionState.SetBool(ScreenshotKey, true);
                 }
             }
             else SessionState.SetString(ReadyKey, "");
@@ -679,7 +701,8 @@ public static class PocketStrikerValidation
             fightRuns = check == "startup" ? ReadFightRuns().items.ToArray() : Array.Empty<FightRunReport>(),
             reentryObserved = check == "startup" && SessionState.GetBool(ReentryKey, false),
             poolLifecyclePassed = check == "startup" && SessionState.GetBool(PoolCheckKey, false),
-            downloadPresentationPassed = check == "startup" && SessionState.GetBool(DownloadCheckKey, false)
+            downloadPresentationPassed = check == "startup" && SessionState.GetBool(DownloadCheckKey, false),
+            characterRenderingPassed = check == "startup" && SessionState.GetBool(RenderingCheckKey, false)
         }, true);
         File.WriteAllText(Path.Combine(ReportDirectory, check + "-report.json"), json);
         File.WriteAllText(Path.Combine(ReportDirectory, check + "-" + EditorUserBuildSettings.activeBuildTarget + "-report.json"), json);
