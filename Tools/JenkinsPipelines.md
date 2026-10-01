@@ -55,6 +55,10 @@ bash Tools/validate_unity.sh compile ios
 
 Groovy 回归执行真实管线的受控 DSL，覆盖程序任务不构建／发布资源、独立 Dev／Release 发布、环境与版本路由、验证模式及 Bash 语法。初始化配置回归覆盖独立资源输出、错误配置和安全归档。Unity 的 `PocketStrikerVersionValidation.Validate` 检查版本与构建选项。
 
+2026-10-01 的程序任务 #28／#29 失败于下载 `player-bootstrap.zip`，S3 上缺少这个新产物，匿名请求返回 403。现有 `Release / 3.0.2 / iOS` 已从与线上 catalog 完全配套的成功构建 #25 补齐该文件，保留原有 96 个本地 bundle 和 linker。401 个远端文件均核对了大小与 ETag；未重新编译资源或替换已发布 catalog／bundle。后续新版本由独立资源任务自动生成这份产物。
+
+补齐后，Jenkins 程序任务 #30 以 `VALIDATE_ONLY=true` 成功通过 Unity 导出、CocoaPods 和 Xcode 无签名编译。导出的 96 个本地 bundle、catalog、settings 与 linker 均与配套历史产物逐字节一致，程序任务未调用资源编译。该验证跳过签名、IPA 导出与 App Store 上传。
+
 ## 既有签名配置与历史诊断
 
 iOS Release 使用 `PocketStriker App Store 2026-09-27` profile，Dev 使用 `PocketStriker Ad Hoc 2026-09-27`，两者均含 Sign In with Apple；到期日为 2027-03-13 UTC。已有 Release 正式归档和 IPA 导出验证通过，尚不代表本次机制已完成真机或 App Store 验证。
