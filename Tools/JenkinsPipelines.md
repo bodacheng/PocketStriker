@@ -1,94 +1,64 @@
-# PocketStriker Jenkins 管线维护记录
+# PocketStriker Jenkins 管线
 
-检查日期：2026-09-30。
+更新日期：2026-10-01。
 
-## 当前修复与版本入口
+## 程序与资源独立构建
 
-2026-09-30 已定位 #24 真机角色缺少 OutsideDataLink 的原因：#24 安装包 catalog hash 为 `9dc81134426c96d24388223dd0f7128f`，线上仍是资源任务 #12 的 `f9f6528ac83f3527c17fbd6dccc51bff`。新包内 tetsuya 引用 `CAB-5d02b076…` 中的脚本，旧线上 catalog 提供 `CAB-a46040fd…`；源 prefab 和最新 IL2CPP 均有 OutsideDataLink。这是两轮构建资源混用，不是源 prefab 丢组件。
+恢复为两个独立任务：
 
-项目只有一个版本入口：`MCombat/Version Sync` 的版本号（本轮准备为 3.0.2）。工具不再编辑 CI 构建号或独立资源版本；Jenkins 构建号由任务生成。Addressables 路径及 catalog 名称使用 `[UnityEditor.PlayerSettings.bundleVersion]`，Jenkins YAML 使用 `{version}` 模板，从同一 `ProjectSettings.bundleVersion` 解析，禁止另行填写资产版本。`app_version.json` 是由此版本生成的客户端升级信息。
+- `CustomIOSBuild_V`：检出程序、Unity 导出、CocoaPods、Xcode 编译、签名、IPA 导出和 App Store 上传。**不编译或发布 Addressables**，不使用 AWS，也不要求资源来自同一次程序构建。
+- `AssetDev_V`：独立构建并发布 Dev 或 Release 的资源。默认 `IOS=true`、`ANDROID=false`；Android 保留为可选平台。
 
-iOS Jenkins 仅以 `BUILD_KIND` 选择环境，旧 `AssetKind`、`buildAsset` 不再参与；Player 导出一次并同时构建 Addressables。导出后保存配对快照及 manifest；普通 Release 从该快照发布资源，校验线上 catalog 后才上传 App Store。两个验证模式都不发布。独立资源任务禁止完整重建并发布 Release。
+两者共用 `MCombat/Version Sync` 设置的项目版本。程序的 `BUILD_KIND` 决定使用 `dev` 或 `release` 地址；资源任务的 `AssetKind` 决定发布到哪一个环境。路径为：
 
-`Tools/publish_ios_addressables.py` 默认只生成只读计划，`--publish` 才写入 S3。它从安装包内配置推导目标地址，拒绝覆盖不同构建已占用的 Release 目录，先上传 bundle、最后上传 catalog hash，随后校验。重试只接受字节相同的已上传文件；S3 条件写入 manifest 先占用目标版本，防止两轮构建同时发布到空目录。已占用目录必须先增加项目版本，再重新构建整套资源和安装包。
+```text
+https://mcombat.s3.ap-northeast-1.amazonaws.com/{dev|release}/v/{项目版本}/{iOS|Android}/
+```
 
-这些管线源码位于 `/Users/daisei/MCombat_tool/pipeline_script/PocketStriker/`，Jenkins 仍从工具仓库 master 读取。未提交、推送到工具仓库的修改不会生效。本轮没有修改线上资源，也没有发布新安装包。
+程序构建明确使用 `DoNotBuildWithPlayer`，关闭 Unity 隐式资源构建。现有资源组的本地／远端标记保持原样：本地 bundle 随程序打包，远端 bundle 在运行时从对应地址下载。包内的 Resources 下载界面保留原有加载方式。
 
-验证：`python3 Tools/Validation/test_ios_addressables_publication.py` 检查配对、目标隔离、失败和重试；`python3 Tools/Validation/test_jenkins_pipelines.py --tool-repo /Users/daisei/MCombat_tool` 检查真实 Groovy 路由及 Bash 语法；`PocketStrikerVersionValidation.Validate` 检查 Unity 中的版本变量解析。
+## 新版本操作顺序
 
-## iOS 资源与安装包配对
+1. 在 `MCombat/Version Sync` 设置版本并保存项目。
+2. 运行 `AssetDev_V`，选择环境和平台，构建并上传资源。
+3. 运行 `CustomIOSBuild_V`，选择对应 `BUILD_KIND`，构建程序。
 
-手机上的 Jenkins iOS 包会在启动时检查远端 Addressables catalog。`CustomIOSBuild_V` 的 Unity Player 导出会构建 Addressables，因此**导出完成后的** `ServerData` 才与 IPA 内的 catalog 和本地 bundle 配套。单独运行 `AssetDev_V` 全量构建并上传到同一个 Release URL，会替换 catalog，也可能让包内本地 bundle 的 CRC 与新 catalog 不符。
+资源任务同时发布 `player-bootstrap.zip`，包含 Addressables 运行初始化配置、初始 catalog、**已编译的本地 bundle** 和 IL2CPP 类型保留文件。程序导出从所选资源地址读取这份现成产物，并把其中的本地 bundle 放进程序，因此新工作区或清空 `Library` 后也能构建；它不会运行资源编译器。地址、版本、平台不符或初始化配置缺失时，程序构建会明确失败，不会使用旧缓存。
 
-2026-09-28 核对：`CustomIOSBuild_V #17–#19` IPA 内的 catalog hash 为 `bab01537e03d30abf8047a41c068f9d8`；随后 `AssetDev_V #6` 上传的 `release/v/3.0.0/iOS` catalog hash 为 `95503727c36c16b946de7ffcc64ed39b`。两次构建使用同一 Git 提交，但 96 个同名本地 bundle 中有 52 个内容不同。旧版启动弹窗把所有异常都描述为网络错误，不能用它判断根因。
+资源上传顺序为远端 bundle、catalog、程序所需的资源产物、最后 catalog hash。重新发布不会删除旧远端 bundle。独立资源发布不再使用程序构建快照或版本目录占用 manifest。
 
-3.0.1 仍重现了这个发布风险：`CustomIOSBuild_V #20` IPA 内的 catalog hash 为 `265491fbe1eeec297ee64da83a7ed3cf`，随后 `AssetDev_V #7` 发布的线上 catalog hash 为 `36a1d5584927a58834b0f37046ac15a7`。正常联网且成功更新 catalog 时，#20 会使用 #7 catalog；线上 `config` 标签的 15 个 bundle 均与 #7 匹配。若远端 hash 请求失败而回退到 #20 包内 catalog，则旧 MonoScripts bundle 的 URL 已返回 HTTP 403，另有 3 个配置 bundle 被同名异字节内容覆盖；在手机缺少旧 bundle 缓存时，`DownLoadConfig()` 会失败。
+新机制第一次使用时，需先运行对应环境的资源任务生成远端资源和 `player-bootstrap.zip`。修改本地 bundle 后需要重新出程序；远端更新应保持与已安装程序的本地 bundle 和脚本类型兼容。旧安装包仍使用旧代码和包内资源，需重新构建、安装后才能验证新机制。
 
-已连接真机复现了 #20 的同一弹窗，实际堆栈是 `ImageBg.Setup()` 调用 `AdjustSize()` 时访问空的 `p1.sprite`。版本、配置和 130.3 MB 下载量检查均已通过；点击下载确认后，在下载开始前就抛空引用。`ImageBg.prefab` 的 `p1/p2` Sprite GUID 所对应图片在整理资源时被删除。该真机错误与上面的 catalog 回退风险是两个独立问题。
+## Jenkins 入口与验证模式
 
-PocketStriker 不使用这些人物贴图。最终修复删除下载流程中的 `ImageBg` 加载、注册、脚本和 prefab，改为直接打开包内 `ProgressLayer`，立即显示纯色背景、0% 进度及本地化下载文案。未恢复已删除的人物图片；下载界面不再读取它们的 Sprite 或尺寸。配置初始化、下载界面、资源下载、游戏初始化分别记录错误阶段，避免把空引用等程序错误误报成断网。此修复需要重新构建并安装 iOS 客户端，仅更新远端资源不会改变旧安装包的代码。
+管线源码位于 `/Users/daisei/MCombat_tool/pipeline_script/PocketStriker/`；两个任务从工具仓库 `master` 读取：
 
-回归入口为 `bash Tools/validate_unity.sh check ios`、`compile ios` 和 `startup ios`。启动 smoke 在 AssetDatabase 模式下运行，另行调用实际下载 UI 入口，检查纯色背景位于内容后方、全屏进度层从 0% 开始、重复打开时重置进度、关闭时移除遮挡。`startup-report.json` 的 `downloadPresentationPassed` 记录此结果；该检查不代表新 IPA 已在真机完成 CDN 下载。
+- [CustomIOSBuild_V](http://localhost:8080/job/CustomIOSBuild_V/)：`ios.groovy`。
+- [AssetDev_V](http://localhost:8080/job/AssetDev_V/)：`assets.groovy`。
 
-另对 #7 catalog 的 9 个启动下载标签（384 个唯一 bundle）逐项核对线上对象：全部 HTTP 200，长度及 MD5 与 #7 工作区文件相同。修复下载界面后，目前未发现该轮资源发布的缺包。
+项目代码与工具仓库的修改都需提交、推送后才会被 Jenkins 的检出使用。任务各使用自己的工作区并禁止同任务并发。Unity 固定为 `6000.5.1f1`，构建前检查编辑器版本、平台模块及 Metal 工具链。
 
-发布前用 `python3 Tools/Validation/verify_ios_addressables_pair.py --player-aa <Xcode导出目录>/Data/Raw/aa --server-dir <同一次Player构建的ServerData>/iOS --check-remote` 检查 IPA 对应 catalog 与线上 catalog；去掉 `--check-remote` 可先核对本地配对。Release 资源需要从与 IPA 同次构建的快照发布；对已安装客户端更新资源时使用 Addressables content update 流程。不要在已发布版本的 URL 上上传另一轮独立全量构建。
+- 程序 `VALIDATE_ONLY=true`：读取已有资源初始化配置、Unity 导出、CocoaPods 和未签名原生编译；跳过 IPA 导出与上传。
+- 程序 `SIGNING_VALIDATE_ONLY=true`：签名归档与 IPA 导出；跳过 App Store 验证和上传。
+- 资源 `VALIDATE_ONLY=true`：构建并检查资源及初始化配置；跳过 S3 上传。
 
-## 生效配置
+旧程序任务参数 `AssetKind` 与 `buildAsset` 不参与管线，程序环境统一由 `BUILD_KIND` 选择。资源任务继续使用 `AWS_PROFILE` 与可选 `AWS_CACHE`；catalog、hash 和初始化配置使用 `no-cache`。
 
-- [CustomIOSBuild_V](http://localhost:8080/job/CustomIOSBuild_V/)：`MCombat_tool` master 的 `pipeline_script/PocketStriker/ios.groovy`。
-- [AssetDev_V](http://localhost:8080/job/AssetDev_V/)：`MCombat_tool` master 的 `pipeline_script/PocketStriker/assets.groovy`。
-- 两个任务的 `UNITY_VERSION` 使用 Jenkins 原生单选参数，仅包含 `6000.5.1f1`（Unity 6.5）；启动时还会检查项目版本、编辑器和目标平台模块。
-- `AssetDev_V` 默认只构建 iOS 资源（`IOS=true`、`ANDROID=false`）；Android 保留为手动可选项，不再自动参与验证或构建。
-- 两个任务各用自己的默认工作目录，禁止同一任务并发运行。资源任务已移除会导致共用目录／额外 `@2` 分配的 `CUSTOM_WORKSPACE` 参数。
-- 原来其他项目使用的通用脚本保持不变。
+## 回归检查
 
-## 修复内容
+```bash
+python3 Tools/Validation/test_jenkins_pipelines.py --tool-repo /Users/daisei/MCombat_tool
+python3 Tools/Validation/test_addressables_bootstrap.py
+bash Tools/validate_unity.sh check ios
+bash Tools/validate_unity.sh compile ios
+```
 
-- 禁用工具仓库在 Unity 项目根目录的默认检出，直接检出所选项目分支，并保持递归子模块的固定版本。
-- 缓存清理明确只处理工作目录中的 `Library`；创建日志目录，检查必要配置和输出，保留失败日志。
-- Addressables 构建检查实际返回结果；缺失配置、无效 profile 或构建错误会使批处理失败。
-- 客户端正确解析带空格的命令行参数，明确接受 `-assetProfile`。管线同时传入机器名以选择相应 iOS 签名配置。
-- Xcode 配置使用实际的 `Debug`／`Release`；统一归档路径；IPA 导出不再把 workspace 当作 project；自动定位生成的 IPA。
-- 安装 Xcode 27 官方 Metal Toolchain 27A266a；管线增加 `xcrun metal --version` 启动检查。
-- CocoaPods 使用 UTF-8 环境。资源上传读取 `AWS_PROFILE`，验证 catalog/hash/bundle 完整性，并先上传 bundle、再上传 catalog。
-- macOS Bash 3.2 的可选缓存参数不再展开空数组，避免默认 `AWS_CACHE=false` 时失败。
+Groovy 回归执行真实管线的受控 DSL，覆盖程序任务不构建／发布资源、独立 Dev／Release 发布、环境与版本路由、验证模式及 Bash 语法。初始化配置回归覆盖独立资源输出、错误配置和安全归档。Unity 的 `PocketStrikerVersionValidation.Validate` 检查版本与构建选项。
 
-## 不发布的验证方式
+## 既有签名配置与历史诊断
 
-在 Build with Parameters 中勾选 `VALIDATE_ONLY`：
+iOS Release 使用 `PocketStriker App Store 2026-09-27` profile，Dev 使用 `PocketStriker Ad Hoc 2026-09-27`，两者均含 Sign In with Apple；到期日为 2027-03-13 UTC。已有 Release 正式归档和 IPA 导出验证通过，尚不代表本次机制已完成真机或 App Store 验证。
 
-- iOS：执行资源构建、Unity Xcode 导出、CocoaPods 和未签名原生编译，跳过钥匙串、IPA 导出和 App Store 上传。
-- 资源：执行所选 iOS／Android 资源构建并检查输出，跳过 S3 上传。
+2026-09-28 至 09-30 的旧管线曾混用不同构建的本地 bundle 与远端 catalog，并出现 OutsideDataLink 缺失等问题。此前加入的“程序构建同时生成并发布资源”机制现已撤除，改为复用独立资源任务生成的 catalog 和本地 bundle。
 
-`CustomIOSBuild_V` 还提供 `SIGNING_VALIDATE_ONLY`：保持 `VALIDATE_ONLY=false` 并勾选该项，将执行签名归档及 IPA 导出，但跳过 App Store 验证和上传。该参数默认为 false。
-
-该参数默认为 false，保留原有正常构建／上传行为。正常 Release iOS 构建仍会上传 App Store；正常资源构建仍会上传目标 S3 路径。
-
-## 验证结果
-
-- Unity 6000.5.1f1 iOS 编译通过：`Logs/Revival/compile-iOS-report.json`，`passed=true`，`errors=[]`。
-- Jenkins 实际安装版本的 Declarative Pipeline 校验通过；Groovy 2.4.21 编译、11 段 Bash 语法、输出检查／参数传递／缓存开关行为验证通过。
-- C# 构建入口的 17 项行为检查和 13 项版本回归检查通过。
-- AWS 只读检查通过：`mcombatDev` 身份有效，`mcombat` 桶可访问，Dev／Release 路径与项目配置一致。未写入对象，未验证 PutObject 权限。
-- [`CustomIOSBuild_V #14`](http://localhost:8080/job/CustomIOSBuild_V/14/) 验证构建成功：Unity iOS 资源、Xcode 工程导出、CocoaPods 和未签名原生编译均通过，未执行签名、IPA 导出或上传。
-- [`CustomIOSBuild_V #17`](http://localhost:8080/job/CustomIOSBuild_V/17/) 使用新 App Store profile 通过正式 Xcode 归档和 IPA 导出；归档 app 中嵌入的 profile 及实际代码签名均包含 `com.apple.developer.applesignin=[Default]`。构建结果为 `SUCCESS`，`SIGNING_VALIDATE_ONLY=true` 跳过了 App Store 上传。
-- [`AssetDev_V #4`](http://localhost:8080/job/AssetDev_V/4/) 的 iOS 资源阶段已通过；按项目不上线 Android 的要求，中止其正在进行的 Android 阶段。
-- [`AssetDev_V #5`](http://localhost:8080/job/AssetDev_V/5/) 以 `IOS=true`、`ANDROID=false`、`VALIDATE_ONLY=true` 完整通过，生成 399 个 iOS bundle 文件及 catalog/hash；Android 阶段和 S3 上传均跳过。
-
-## 正式签名的剩余前提
-
-`CustomIOSBuild_V #15` 和 `#16` 的正式归档在 Xcode 签名检查阶段失败：旧 `release_v` profile 不含 `com.apple.developer.applesignin`。按用户后续授权，已在 Apple Developer 为 `com.PocketStriker.BO` 启用 Sign In with Apple，并使用原有有效的 Apple Distribution 证书生成、下载和安装两份新 profile：
-
-| 用途 | profile 名称 | UUID | 到期日（UTC） |
-| --- | --- | --- | --- |
-| Dev / Ad Hoc | `PocketStriker Ad Hoc 2026-09-27` | `193b8c1b-510f-4d78-98c2-43484bb457b8` | 2027-03-13 |
-| Release / App Store | `PocketStriker App Store 2026-09-27` | `5140a08c-ea4b-4605-ab10-c124fd517267` | 2027-03-13 |
-
-两份 profile 均已验证 Bundle ID、团队、分发证书和 `com.apple.developer.applesignin=[Default]`；`ExportOptions_{Dev,Release}.plist` 分别使用唯一名称选中。旧 `release_v` 在 Apple Developer 中已变为 Invalid。Release 正式签名归档及 IPA 导出已通过；Dev profile 已完成静态校验，尚未执行 Dev 完整构建。App Store 上传未执行。
-
-## 回退与工作区
-
-原始 Jenkins 配置备份位于 `/Users/daisei/.jenkins/backups/pocketstriker-20260927/`；该目录权限为 0700。使用配置备份回退时需通过 Jenkins 正常配置接口重新加载对应任务。
-
-验证使用独立 Jenkins checkout 和独立的缓存副本。开发目录中原有材质和布局修改保持不变。
+原始 Jenkins 配置备份位于 `/Users/daisei/.jenkins/backups/pocketstriker-20260927/`。纯诊断工具 `Tools/Validation/verify_ios_addressables_pair.py` 保留用于核对已有产物，不作为程序构建或发布门槛。

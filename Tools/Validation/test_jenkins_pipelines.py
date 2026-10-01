@@ -31,8 +31,11 @@ class PipelineHarness {
         'Assets/App/Editor/Build/Configs/ReleaseBuildSettings.yaml': 'cfBundleName: controlled\n']
     Map stages = new LinkedHashMap()
     List shells = []
+    List archives = []
+    List environmentScopes = []
     boolean enabled = true
     def script
+    Closure postSteps
 
     PipelineHarness(File source) {
         def binding = new Binding([env: env, params: params, currentBuild: currentBuild])
@@ -41,7 +44,8 @@ class PipelineHarness {
         binding.setVariable('options', { Closure c -> })
         binding.setVariable('environment', { Closure c -> c.call() })
         binding.setVariable('stages', { Closure c -> c.call() })
-        binding.setVariable('post', { Closure c -> })
+        binding.setVariable('post', { Closure c -> postSteps = c })
+        binding.setVariable('always', { Closure c -> c.call() })
         binding.setVariable('stage', { String name, Closure c -> stages[name] = c })
         binding.setVariable('steps', { Closure c -> if (enabled) c.call() })
         binding.setVariable('script', { Closure c -> c.call() })
@@ -56,10 +60,13 @@ class PipelineHarness {
         binding.setVariable('dir', { String path, Closure c -> c.call() })
         binding.setVariable('deleteDir', { -> })
         binding.setVariable('checkout', { Map options -> })
-        binding.setVariable('archiveArtifacts', { Map options -> })
+        binding.setVariable('archiveArtifacts', { Map options -> archives.add(options) })
         binding.setVariable('withCredentials', { List options, Closure c -> c.call() })
         binding.setVariable('string', { Map options -> options })
-        binding.setVariable('withEnv', { List values, Closure c -> c.call() })
+        binding.setVariable('withEnv', { List values, Closure c ->
+            environmentScopes.add(values.collect { it.toString() })
+            c.call()
+        })
         binding.setVariable('sh', { command ->
             def value = command instanceof Map ? command.script : command
             shells.add(value.toString())
@@ -76,6 +83,10 @@ class PipelineHarness {
     void runStage(String name) {
         enabled = true
         stages[name].call()
+    }
+
+    void runPost() {
+        postSteps.call()
     }
 }
 
@@ -97,87 +108,107 @@ def assetsFile = new File(args[1])
 [iosFile, assetsFile].each { source ->
     def h = new PipelineHarness(source)
     check(h.script.projectVersion() == '3.0.2', source.name + ' reads project version')
-    def path = 'Assets/App/Editor/Build/Configs/AddressablesProfileSettings.yaml'
-    ['Dev', 'Release'].each { kind ->
-        def route = kind.toLowerCase()
-        check(h.script.versionedAssetPath(path, 'Build' + kind, '3.0.2', kind) == 'ServerData/' + route + '/v/3.0.2/', 'build route ' + kind)
-        check(h.script.versionedAssetPath(path, 'Upload' + kind, '3.0.2', kind) == 's3://mcombat/' + route + '/v/3.0.2', 'upload route ' + kind)
-    }
-    def valid = h.files[path]
-    h.files[path] = valid.replace('ServerData/dev/v/{version}/', 'ServerData/dev/v/3.0.1/')
-    rejects({ h.script.versionedAssetPath(path, 'BuildDev', '3.0.2', 'Dev') }, 'explicit versions')
-    h.files[path] = valid.replace('s3://mcombat/dev/v/{version}', 's3://mcombat/release/v/{version}')
-    rejects({ h.script.versionedAssetPath(path, 'UploadDev', '3.0.2', 'Dev') }, 'dev/v/{version}')
-    h.files[path] = valid.replace('ServerData/dev/v/{version}/', 'ServerData/dev/v/{version}/../')
-    rejects({ h.script.versionedAssetPath(path, 'BuildDev', '3.0.2', 'Dev') }, 'dev/v/{version}')
     h.files['ProjectSettings/ProjectSettings.asset'] = 'PlayerSettings:\n  bundleVersion: 3.0.2-beta\n'
     rejects({ h.script.projectVersion() }, 'numeric dotted version')
     h.files['ProjectSettings/ProjectSettings.asset'] = 'bundleVersion: 3.0.2\n  bundleVersion: 3.0.1\n'
     rejects({ h.script.projectVersion() }, 'exactly one bundleVersion')
 }
 
-def ios = new PipelineHarness(iosFile)
-ios.params.BUILD_KIND = 'Dev'
-ios.params.AssetKind = 'Release'
-ios.params.remove('AWS_PROFILE')
-ios.runStage('Checkout')
-ios.runStage('Preflight')
-check(ios.env.ASSET_KIND == 'Dev' && ios.env.ASSET_PROFILE == 'dev', 'iOS Dev ignores conflicting legacy AssetKind')
-check(ios.env.ASSET_BUILDPATH == 'ServerData/dev/v/3.0.2/', 'iOS Dev routes to current version')
-check(ios.env.AWS_PROFILE == 'mcombatDev', 'iOS AWS profile has compatible default')
-check(!ios.stages.containsKey('Addressables'), 'iOS has no independent pre-export asset build')
-ios.shells.clear()
-ios.runStage('Unity Export')
-check(ios.shells.size() == 1 && ios.shells[0].contains('Cocone.ProjectP3.Client.Build'), 'iOS exports once even with legacy buildAsset false')
-check(ios.shells[0].contains('-buildKind "$BUILD_KIND"') && ios.shells[0].contains('-assetProfile "$ASSET_PROFILE"'), 'Unity receives linked build and asset environment')
+def configPath = 'Assets/App/Editor/Build/Configs/AddressablesProfileSettings.yaml'
+def assets = new PipelineHarness(assetsFile)
+['Dev', 'Release'].each { kind ->
+    def route = kind.toLowerCase()
+    check(assets.script.versionedAssetPath(configPath, 'Build' + kind, '3.0.2', kind) == 'ServerData/' + route + '/v/3.0.2/', 'build route ' + kind)
+    check(assets.script.versionedAssetPath(configPath, 'Upload' + kind, '3.0.2', kind) == 's3://mcombat/' + route + '/v/3.0.2', 'upload route ' + kind)
+}
+def valid = assets.files[configPath]
+assets.files[configPath] = valid.replace('ServerData/dev/v/{version}/', 'ServerData/dev/v/3.0.1/')
+rejects({ assets.script.versionedAssetPath(configPath, 'BuildDev', '3.0.2', 'Dev') }, 'explicit versions')
+assets.files[configPath] = valid.replace('s3://mcombat/dev/v/{version}', 's3://mcombat/release/v/{version}')
+rejects({ assets.script.versionedAssetPath(configPath, 'UploadDev', '3.0.2', 'Dev') }, 'dev/v/{version}')
+assets.files[configPath] = valid.replace('ServerData/dev/v/{version}/', 'ServerData/dev/v/{version}/../')
+rejects({ assets.script.versionedAssetPath(configPath, 'BuildDev', '3.0.2', 'Dev') }, 'dev/v/{version}')
+
+def interpretedShells = []
+['Dev', 'Release'].each { kind ->
+    def ios = new PipelineHarness(iosFile)
+    ios.params.BUILD_KIND = kind
+    ios.params.AssetKind = kind == 'Dev' ? 'Release' : 'Dev'
+    ios.params.remove('AWS_PROFILE')
+    // Player exports need only a remote profile; local asset/S3 paths may be absent.
+    ios.files[configPath] = 'ProfileDev: dev\nProfileRelease: release\n'
+    ios.stages.keySet().each { ios.runStage(it) }
+    ios.runPost()
+    check(ios.env.ASSET_PROFILE == kind.toLowerCase(), 'iOS ' + kind + ' selects the matching remote profile despite legacy AssetKind')
+    ['ASSET_BUILDPATH', 'UPLOAD_S3_ADDRESS', 'AWS_PROFILE'].each { key ->
+        check(!ios.env.containsKey(key), 'iOS ' + kind + ' does not configure ' + key)
+    }
+    ['Addressables', 'Archive Matching Addressables', 'Publish Matching Addressables', 'Verify Published Addressables'].each { stage ->
+        check(!ios.stages.containsKey(stage), 'iOS has no asset stage: ' + stage)
+    }
+    def exports = ios.shells.findAll { it.contains('Cocone.ProjectP3.Client.Build') }
+    check(exports.size() == 1, 'iOS exports the program once even with legacy buildAsset false')
+    check(exports[0].contains('-buildKind "$BUILD_KIND"') && exports[0].contains('-assetProfile "$ASSET_PROFILE"'), 'Unity receives matching build and remote asset profile')
+    check(ios.shells.every { !(it =~ /BuildAddressableAssets|publish_ios_addressables|verify_ios_addressables_pair|\baws\b|AWS_|ServerData|addressables_/) }, 'iOS ' + kind + ' shells never build, publish, archive, or verify assets')
+    check(ios.archives.every { !(it.artifacts =~ /addressables|ServerData/) }, 'iOS ' + kind + ' archives program artifacts only')
+    interpretedShells.addAll(ios.shells)
+}
 
 def release = new PipelineHarness(iosFile)
-release.params.AssetKind = 'Dev'
-release.runStage('Preflight')
-check(release.env.ASSET_PROFILE == 'release' && release.env.ASSET_BUILDPATH == 'ServerData/release/v/3.0.2/', 'iOS Release ignores conflicting legacy AssetKind')
-def configPath = 'Assets/App/Editor/Build/Configs/AddressablesProfileSettings.yaml'
 release.files[configPath] = release.files[configPath].replace('ProfileRelease: release', 'ProfileRelease: dev')
 rejects({ release.runStage('Preflight') }, 'must match BUILD_KIND')
 
-['Publish Matching Addressables', 'Verify Published Addressables', 'Upload App Store'].each { stage ->
-    [[BUILD_KIND: 'Dev'], [VALIDATE_ONLY: true], [SIGNING_VALIDATE_ONLY: true]].each { overrides ->
-        def h = new PipelineHarness(iosFile)
-        h.params.putAll(overrides)
-        h.runStage(stage)
-        check(h.shells.isEmpty(), stage + ' skipped for ' + overrides)
-    }
+[[BUILD_KIND: 'Dev'], [VALIDATE_ONLY: true], [SIGNING_VALIDATE_ONLY: true]].each { overrides ->
+    def h = new PipelineHarness(iosFile)
+    h.params.putAll(overrides)
+    h.runStage('Upload App Store')
+    check(h.shells.isEmpty(), 'App Store upload skipped for ' + overrides)
 }
 def normal = new PipelineHarness(iosFile)
-normal.runStage('Publish Matching Addressables')
-check(normal.shells.size() == 1 && normal.shells[0].contains('Tools/publish_ios_addressables.py') && normal.shells[0].contains('--publish'), 'normal Release publishes matching export snapshot')
-normal.runStage('Verify Published Addressables')
-check(normal.shells.size() == 2 && normal.shells[1].contains('--check-remote'), 'normal Release verifies published catalog')
-def ordered = normal.stages.keySet().toList()
-check(ordered.indexOf('Unity Export') < ordered.indexOf('Archive Matching Addressables') && ordered.indexOf('Archive Matching Addressables') < ordered.indexOf('Publish Matching Addressables'), 'archive follows player export and precedes publish')
-check(ordered.indexOf('Publish Matching Addressables') < ordered.indexOf('Verify Published Addressables') && ordered.indexOf('Verify Published Addressables') < ordered.indexOf('Upload App Store'), 'remote pair verification gates App Store upload')
+normal.runStage('Upload App Store')
+check(normal.shells.size() == 1 && normal.shells[0].contains('altool --upload-app'), 'normal Release still uploads the app')
 
-def assets = new PipelineHarness(assetsFile)
-assets.params.AssetKind = 'Dev'
-assets.runStage('Checkout')
-assets.runStage('Preflight')
-check(assets.env.ASSET_PROFILE == 'dev' && assets.env.UPLOAD_S3_ADDRESS == 's3://mcombat/dev/v/3.0.2', 'independent Dev assets use current project version')
-assets.params.AssetKind = 'Release'
-rejects({ assets.runStage('Checkout') }, 'matching iOS player build')
-assets.params.VALIDATE_ONLY = true
-assets.runStage('Checkout')
-assets.runStage('Preflight')
-check(assets.env.ASSET_PROFILE == 'release', 'standalone Release asset validation stays available')
-assets.runStage('Upload iOS Assets')
-check(assets.shells.every { !it.contains('aws s3 cp') }, 'asset validation skips publication')
-println 'PASS: ' + checks + ' pipeline version/routing/publishing checks'
-def interpretedShells = []
-[iosFile, assetsFile].each { source ->
-    def h = new PipelineHarness(source)
-    h.params.AssetKind = 'Dev'
+['Dev', 'Release'].each { kind ->
+    def h = new PipelineHarness(assetsFile)
+    h.params.AssetKind = kind
     h.params.ANDROID = true
     h.stages.keySet().each { h.runStage(it) }
+    h.runPost()
+    check(h.env.ASSET_PROFILE == kind.toLowerCase(), 'independent ' + kind + ' assets select the matching profile')
+    check(h.env.ASSET_BUILDPATH == 'ServerData/' + kind.toLowerCase() + '/v/3.0.2/', 'independent ' + kind + ' assets build to the current version')
+    check(h.env.UPLOAD_S3_ADDRESS == 's3://mcombat/' + kind.toLowerCase() + '/v/3.0.2', 'independent ' + kind + ' assets upload to the current version')
+    check(h.shells.findAll { it.contains('BuildAddressableAssets.BatchBuild') }.size() == 2, kind + ' builds both selected platforms independently')
+    check(h.shells.findAll { it.contains('Tools/package_addressables_bootstrap.py') }.size() == 2, kind + ' packages a runtime bootstrap for each selected platform')
+    def uploads = h.shells.findAll { it.contains('aws s3 cp') }
+    check(uploads.size() == 2, kind + ' publishes both selected platforms independently')
+    uploads.each { upload ->
+        def bundle = upload.indexOf("--exclude 'catalog_*' --exclude 'player-bootstrap.zip'")
+        def catalog = upload.indexOf("--include 'catalog_*.bin' --include 'catalog_*.json'")
+        def bootstrap = upload.indexOf('"${ASSET_DIRECTORY}player-bootstrap.zip"')
+        def hash = upload.indexOf("--include 'catalog_*.hash'")
+        check([bundle, catalog, bootstrap, hash].every { it >= 0 }, kind + ' publishes bundles, catalogs, bootstrap, and hashes in distinct passes')
+        check(bundle < catalog && catalog < bootstrap && bootstrap < hash, kind + ' publishes bundles before catalogs and bootstrap, then advertises the hash last')
+        check(upload.substring(upload.lastIndexOf('aws s3 cp')).contains("--include 'catalog_*.hash'"), kind + ' has no S3 upload after the catalog hash')
+        check(upload.count("--cache-control 'no-cache'") == 3, kind + ' publishes mutable catalog, bootstrap, and hash without caching')
+        check(upload.contains('"${UPLOAD_S3_ADDRESS%/}/$ASSET_TARGET/"'), kind + ' uploads to the selected version and platform')
+    }
+    check(h.environmentScopes.count { it == ['ASSET_TARGET=iOS'] } == 2 && h.environmentScopes.count { it == ['ASSET_TARGET=Android'] } == 2, kind + ' builds and publishes each selected platform')
     interpretedShells.addAll(h.shells)
+
+    def validation = new PipelineHarness(assetsFile)
+    validation.params.AssetKind = kind
+    validation.params.ANDROID = true
+    validation.params.VALIDATE_ONLY = true
+    validation.params.remove('AWS_PROFILE')
+    validation.runStage('Checkout')
+    validation.runStage('Preflight')
+    validation.shells.clear()
+    ['Build iOS Assets', 'Upload iOS Assets', 'Build Android Assets', 'Upload Android Assets'].each { validation.runStage(it) }
+    check(validation.shells.findAll { it.contains('BuildAddressableAssets.BatchBuild') }.size() == 2, kind + ' validation still builds selected platforms')
+    check(validation.shells.every { !it.contains('aws s3 cp') }, kind + ' validation skips S3 publication without AWS credentials')
+    interpretedShells.addAll(validation.shells)
 }
+println 'PASS: ' + checks + ' pipeline version/routing/decoupling checks'
 println 'BASH_SCRIPTS:' + groovy.json.JsonOutput.toJson(interpretedShells)
 '''
 

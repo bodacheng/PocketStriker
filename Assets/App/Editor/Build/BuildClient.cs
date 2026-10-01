@@ -475,9 +475,10 @@ namespace Cocone.ProjectP3
 			BuildAddressableAssets.SetProfile(assetProfile);
 			VersionSyncUtility.AssertVersionSettingsSynchronized();
 			var addressableSettings = BuildAddressableAssets.GetSettings();
-			addressableSettings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
+			addressableSettings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
 			EditorUtility.SetDirty(addressableSettings);
 			AssetDatabase.SaveAssets();
+			AddressablesPlayerContent.Prepare(addressableSettings, config.buildTarget);
 
 			// Yamlの読み込みと設定
 			SetPlayerSettingsByBuildConfiguration(GetBuildKind(config.buildKind), config.buildTarget, config.TargetGroup);

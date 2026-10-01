@@ -144,4 +144,4 @@ Unity 版本及竖屏视口，旧版本编译的包不能替代当前版本的�
 
 ### 程序与资源版本
 
-在 `MCombat/Version Sync` 设置一个版本号。程序、资源 URL、catalog 名称共用此版本；Jenkins 构建号自动生成。iOS 只选择 Dev/Release 一次，随程序构建并发布同次资源。Release 目录禁止被另一轮完整构建覆盖，新完整发布需增加版本。详细流程和 Jenkins 工具仓库位置见 [Tools/JenkinsPipelines.md](Tools/JenkinsPipelines.md)。
+在 `MCombat/Version Sync` 设置一个版本号。程序、资源 URL、catalog 名称共用此版本；Jenkins 构建号自动生成。先由独立资源任务构建并发布 Dev/Release 资源，再运行对应环境的程序任务。程序构建复用已编译的本地 bundle 并随包携带，远端 bundle 在运行时从对应地址下载；程序任务不再编译或发布 asset。详细流程和 Jenkins 工具仓库位置见 [Tools/JenkinsPipelines.md](Tools/JenkinsPipelines.md)。

@@ -27,7 +27,7 @@ namespace Cocone.ProjectP3
         {
             EditorGUILayout.LabelField("当前版本", PlayerSettings.bundleVersion);
             versionText = EditorGUILayout.TextField("版本", versionText);
-            EditorGUILayout.HelpBox("程序、资源路径和 catalog 共用此版本。Jenkins 自动生成构建号，并随程序构建、发布配套资源。", MessageType.Info);
+            EditorGUILayout.HelpBox("程序、资源路径和 catalog 共用此版本。资源由独立 Jenkins 任务编译、发布；程序构建复用已发布的本地包和 catalog，运行时从对应地址下载远程资源。", MessageType.Info);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Patch +1") && VersionSyncUtility.IsValidVersion(versionText))
@@ -95,7 +95,7 @@ namespace Cocone.ProjectP3
             File.WriteAllText(ProfileYamlPath, yaml);
             foreach (var update in updates) settings.profileSettings.SetValue(update.profileId, update.variable, update.value);
             settings.OverridePlayerVersion = VersionToken;
-            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
+            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
             EditorUtility.SetDirty(settings);
             AssetDatabase.ImportAsset(AppVersionJsonPath);
             AssetDatabase.ImportAsset(ProfileYamlPath);
@@ -136,8 +136,8 @@ namespace Cocone.ProjectP3
             else
             {
                 if (settings.OverridePlayerVersion != VersionToken) errors.Add("Catalog version must derive from PlayerSettings.bundleVersion.");
-                if (settings.BuildAddressablesWithPlayerBuild != AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer)
-                    errors.Add("Addressables must be built with the player.");
+                if (settings.BuildAddressablesWithPlayerBuild != AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer)
+                    errors.Add("Addressables must be built independently from the player.");
                 foreach (var profile in Profiles)
                 {
                     var id = settings.profileSettings.GetProfileId(profile);
