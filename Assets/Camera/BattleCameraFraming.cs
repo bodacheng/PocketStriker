@@ -13,6 +13,41 @@ public static class BattleCameraFraming
         public Rect Viewport;
     }
 
+    /// <summary>A rotation-invariant horizontal silhouette with a finite vertical span.</summary>
+    public readonly struct BodyEnvelope
+    {
+        public readonly Vector3 Center;
+        public readonly float Radius;
+        public readonly float Height;
+
+        public BodyEnvelope(Vector3 center, float radius, float height)
+        {
+            Center = center;
+            Radius = Mathf.Max(0, radius);
+            Height = Mathf.Max(0, height);
+        }
+    }
+
+    readonly struct SupportPlane
+    {
+        readonly Vector3 _direction;
+        readonly float _horizontalSupport;
+        readonly float _verticalSupport;
+        readonly float _offset;
+
+        public SupportPlane(Vector3 direction, float offset = 0)
+        {
+            _direction = direction;
+            _horizontalSupport = Mathf.Sqrt(direction.x * direction.x + direction.z * direction.z);
+            _verticalSupport = Mathf.Abs(direction.y);
+            _offset = offset;
+        }
+
+        public float RequiredDistance(BodyEnvelope envelope, Vector3 center) => _offset
+            + Vector3.Dot(envelope.Center - center, _direction)
+            + envelope.Radius * _horizontalSupport + envelope.Height * 0.5f * _verticalSupport;
+    }
+
     public static Pose CalculatePose(IReadOnlyList<Bounds> bounds, float aspect, float fieldOfView,
         Rect usableViewport, float pitch, float yaw = 0, float minimumDistance = 6, float nearClip = 0.3f)
     {
@@ -28,7 +63,8 @@ public static class BattleCameraFraming
     }
 
     public static Pose CalculatePoseAtCenter(IReadOnlyList<Bounds> bounds, float aspect, float fieldOfView,
-        Rect usableViewport, Quaternion rotation, Vector3 center, float minimumDistance = 6, float nearClip = 0.3f)
+        Rect usableViewport, Quaternion rotation, Vector3 center, float minimumDistance = 6, float nearClip = 0.3f,
+        IReadOnlyList<BodyEnvelope> bodyEnvelopes = null)
     {
         var viewport = ClampViewport(usableViewport);
         float tanVertical = Mathf.Tan(Mathf.Clamp(fieldOfView, 10, 100) * 0.5f * Mathf.Deg2Rad);
@@ -59,6 +95,30 @@ public static class BattleCameraFraming
                     distance = Mathf.Max(distance, Mathf.Max(horizontal,
                         Mathf.Max(vertical, nearClip + 0.1f - depth)));
                 }
+            }
+        }
+        if (bodyEnvelopes != null && bodyEnvelopes.Count > 0)
+        {
+            // Each perspective edge is a linear half-space after accounting
+            // for the asymmetric viewport offset. Maximize that expression on
+            // the cylinder itself, avoiding the extra corners of an XZ square.
+            var horizontalPositive = new SupportPlane(right / (viewport.width * tanHorizontal)
+                - forward * (1 + offsetX / viewport.width));
+            var horizontalNegative = new SupportPlane(-right / (viewport.width * tanHorizontal)
+                - forward * (1 - offsetX / viewport.width));
+            var verticalPositive = new SupportPlane(up / (viewport.height * tanVertical)
+                - forward * (1 + offsetY / viewport.height));
+            var verticalNegative = new SupportPlane(-up / (viewport.height * tanVertical)
+                - forward * (1 - offsetY / viewport.height));
+            var nearPlane = new SupportPlane(-forward, nearClip + 0.1f);
+            for (var i = 0; i < bodyEnvelopes.Count; i++)
+            {
+                var body = bodyEnvelopes[i];
+                distance = Mathf.Max(distance, horizontalPositive.RequiredDistance(body, center));
+                distance = Mathf.Max(distance, horizontalNegative.RequiredDistance(body, center));
+                distance = Mathf.Max(distance, verticalPositive.RequiredDistance(body, center));
+                distance = Mathf.Max(distance, verticalNegative.RequiredDistance(body, center));
+                distance = Mathf.Max(distance, nearPlane.RequiredDistance(body, center));
             }
         }
         distance += 0.02f;

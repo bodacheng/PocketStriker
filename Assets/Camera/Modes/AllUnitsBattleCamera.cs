@@ -6,25 +6,32 @@ using UnityEngine;
 public class AllUnitsBattleCamera : CameraMode
 {
     readonly float _pitch;
-    readonly float _minimumDistance;
-    readonly float _centerSmoothTime;
-    readonly float _distanceSmoothTime;
+    readonly BattleCameraStabilizer _stabilizer;
     readonly List<Bounds> _bounds = new List<Bounds>(200);
-    readonly Dictionary<Data_Center, Renderer[]> _renderers = new Dictionary<Data_Center, Renderer[]>();
+    readonly List<BattleCameraFraming.BodyEnvelope> _bodyEnvelopes = new List<BattleCameraFraming.BodyEnvelope>(200);
+    readonly Dictionary<Data_Center, ModelFramingReference> _models = new Dictionary<Data_Center, ModelFramingReference>();
     readonly Vector3[] _corners = new Vector3[4];
     FightingStepLayer _hud;
-    Vector3 _center;
-    Vector3 _centerVelocity;
-    float _yaw;
-    float _distance;
-    bool _initialized;
+    Bounds _trackingBounds;
+    bool _hasTrackingBounds;
+    bool _autoOrbitEngaged;
+    bool _hasOrbitDirection;
+    Vector3 _orbitDirection;
+
+    sealed class ModelFramingReference
+    {
+        public Transform Root;
+        public Renderer[] Renderers;
+        public float CenterHeight;
+        public float HorizontalRadius;
+    }
 
     public float Pitch => _pitch;
-    public bool IsFramingInitialized => _initialized;
+    public bool IsFramingInitialized => _stabilizer.IsInitialized;
     public bool IsHoldingReplacementFraming { get; private set; }
     public int FramedUnitCount => _bounds.Count;
-    public BattleCameraFraming.Pose DesiredPose { get; private set; }
-    public BattleCameraFraming.Pose CurrentPose { get; private set; }
+    public BattleCameraFraming.Pose DesiredPose => _stabilizer.DesiredPose;
+    public BattleCameraFraming.Pose CurrentPose => _stabilizer.CurrentPose;
 
     public bool CanSetH { get; set; } = true;
     public bool AutoRotateCamera
@@ -34,37 +41,29 @@ public class AllUnitsBattleCamera : CameraMode
     }
 
     public AllUnitsBattleCamera(float pitch, float fov, float minimumDistance = 6,
-        float centerSmoothTime = 0.22f, float distanceSmoothTime = 2f)
-    {
-        _pitch = pitch;
-        fieldOfView = fov;
-        _minimumDistance = minimumDistance;
-        _centerSmoothTime = centerSmoothTime;
-        _distanceSmoothTime = distanceSmoothTime;
-    }
+        float centerSmoothTime = 0.32f, float distanceSmoothTime = 2f)
+        : this(new BattleCameraProfile(pitch, fov, minimumDistance, centerSmoothTime, distanceSmoothTime)) { }
 
     public AllUnitsBattleCamera(BattleCameraProfile profile)
-        : this(profile.Pitch, profile.FieldOfView, profile.MinimumDistance, profile.CenterSmoothTime, profile.DistanceSmoothTime) { }
+    {
+        _pitch = profile.Pitch;
+        fieldOfView = profile.FieldOfView;
+        _stabilizer = new BattleCameraStabilizer(profile);
+    }
 
     public override void Enter(Camera camera)
     {
         ApplyFieldOfView(camera, fieldOfView);
         CanSetH = true;
-        _initialized = false;
-        IsHoldingReplacementFraming = false;
-        _centerVelocity = Vector3.zero;
-        _renderers.Clear();
+        ResetFraming(camera);
         _hud = Object.FindFirstObjectByType<FightingStepLayer>(FindObjectsInactive.Include);
-        if (camera != null) _yaw = camera.transform.eulerAngles.y;
         UpdateCamera(camera, 0);
     }
 
     public override void Exit(Camera camera)
     {
-        _renderers.Clear();
+        ResetFraming(camera);
         _hud = null;
-        _initialized = false;
-        IsHoldingReplacementFraming = false;
     }
 
     public override void LocalUpdate(Camera camera) => UpdateCamera(camera, Time.deltaTime);
@@ -75,13 +74,13 @@ public class AllUnitsBattleCamera : CameraMode
         var manager = RTFightManager.Target;
         if (manager == null) return;
         _bounds.Clear();
+        _bodyEnvelopes.Clear();
+        _hasTrackingBounds = false;
         if (FSceneProcessesRunner.Main.currentProcess is PreparingProcess)
         {
             // HUD setup may select a camera while models are still in remote staging.
             // Initialize from the final fielded models on the first CountDown frame.
-            _initialized = false;
-            IsHoldingReplacementFraming = false;
-            _centerVelocity = Vector3.zero;
+            ResetFraming(camera);
             return;
         }
         AddTeam(manager.team1);
@@ -92,54 +91,71 @@ public class AllUnitsBattleCamera : CameraMode
         // that gap, panning/zooming onto the survivor creates an unnecessary
         // wide pullback when the replacement arrives. Keep the established
         // two-sided composition, while still expanding if the survivor moves.
-        IsHoldingReplacementFraming = _initialized && this is DuelBattleCamera
+        IsHoldingReplacementFraming = _stabilizer.IsInitialized && this is DuelBattleCamera
             && (AwaitingRotationReplacement(manager.team1) || AwaitingRotationReplacement(manager.team2));
 
         var usable = UsableViewport(camera);
         float horizontal = CanSetH ? UltimateJoystick.GetHorizontalAxis("RotateCamera") : 0;
         if (Mathf.Abs(horizontal) > 0.01f)
-            _yaw += horizontal * 75 * deltaTime;
-        else if (!IsHoldingReplacementFraming && manager.team1.TeamMode == TeamMode.Rotation && AutoRotateCamera)
         {
-            var first = manager.team1.GetRModeUnitT();
-            var second = manager.team2.GetRModeUnitT();
+            _autoOrbitEngaged = false;
+            _hasOrbitDirection = false;
+            _stabilizer.UpdateYaw(_stabilizer.Yaw + horizontal * 75 * Mathf.Clamp(deltaTime, 0, 0.05f),
+                deltaTime, true);
+        }
+        else if (!IsHoldingReplacementFraming && this is DuelBattleCamera && AutoRotateCamera)
+        {
+            bool rotating = false;
+            var first = manager.team1.RMode_Unit.Value?.WholeT;
+            var second = manager.team2.RMode_Unit.Value?.WholeT;
             if (first != null && second != null)
             {
-                var orbit = GetDesiredOrbitDirection(first.position, second.position,
-                    -(Quaternion.Euler(0, _yaw, 0) * Vector3.forward));
-                if ((first.position - second.position).sqrMagnitude > 6.25f)
+                var combatLine = second.position - first.position;
+                combatLine.y = 0;
+                // Separate engage/release distances prevent small contact and
+                // hit-reaction motion from repeatedly starting camera orbit.
+                float threshold = _autoOrbitEngaged ? 2.4f : 3.2f;
+                _autoOrbitEngaged = combatLine.sqrMagnitude > threshold * threshold;
+                if (_autoOrbitEngaged)
                 {
+                    var orbit = Quaternion.AngleAxis(90, Vector3.up) * combatLine.normalized;
+                    var reference = _hasOrbitDirection ? _orbitDirection
+                        : -(Quaternion.Euler(0, _stabilizer.Yaw, 0) * Vector3.forward);
+                    // Remember the desired side instead of selecting against
+                    // the lagging camera yaw, which can flip during an orbit.
+                    if (Vector3.Dot(orbit, reference) < 0) orbit = -orbit;
+                    _orbitDirection = orbit;
+                    _hasOrbitDirection = true;
                     float desiredYaw = Mathf.Atan2(-orbit.x, -orbit.z) * Mathf.Rad2Deg;
-                    _yaw = Mathf.MoveTowardsAngle(_yaw, desiredYaw, deltaTime * 25);
+                    _stabilizer.UpdateYaw(desiredYaw, deltaTime);
+                    rotating = true;
                 }
             }
+            else _autoOrbitEngaged = false;
+            if (!rotating) _stabilizer.UpdateYaw(_stabilizer.Yaw, deltaTime, true);
         }
-
-        var desired = BattleCameraFraming.CalculatePose(_bounds, camera.aspect, fieldOfView, usable,
-            _pitch, _yaw, _minimumDistance, camera.nearClipPlane);
-        DesiredPose = desired;
-        if (!_initialized)
+        else
         {
-            _center = desired.Center;
-            _distance = desired.Distance;
-            _initialized = true;
+            _autoOrbitEngaged = false;
+            _stabilizer.UpdateYaw(_stabilizer.Yaw, deltaTime, true);
         }
-        else if (IsHoldingReplacementFraming)
-            _centerVelocity = Vector3.zero;
-        else if (deltaTime > 0)
-            _center = Vector3.SmoothDamp(_center, desired.Center, ref _centerVelocity, _centerSmoothTime,
-                Mathf.Infinity, deltaTime);
 
-        // Solve again against the smoothed center: pan lag and camera rotation
-        // must never cut off a previously visible teammate.
-        var fitted = BattleCameraFraming.CalculatePoseAtCenter(_bounds, camera.aspect, fieldOfView, usable,
-            desired.Rotation, _center, _minimumDistance, camera.nearClipPlane);
-        _distance = IsHoldingReplacementFraming ? Mathf.Max(_distance, fitted.Distance)
-            : BattleCameraFraming.SmoothDistance(_distance, fitted.Distance, deltaTime, _distanceSmoothTime);
-        fitted = BattleCameraFraming.WithDistance(fitted, _distance, camera.aspect, fieldOfView);
-        CurrentPose = fitted;
+        var fitted = _stabilizer.Update(_bounds, _trackingBounds.center, camera.aspect, fieldOfView, usable,
+            camera.nearClipPlane, deltaTime, IsHoldingReplacementFraming, _bodyEnvelopes);
         camera.transform.SetPositionAndRotation(fitted.Position, fitted.Rotation);
-        camera.farClipPlane = Mathf.Max(camera.farClipPlane, _distance + 100);
+        camera.farClipPlane = Mathf.Max(camera.farClipPlane, fitted.Distance + 100);
+    }
+
+    void ResetFraming(Camera camera)
+    {
+        _stabilizer.Reset(camera != null ? camera.transform.eulerAngles.y : 0);
+        IsHoldingReplacementFraming = false;
+        _models.Clear();
+        _bounds.Clear();
+        _bodyEnvelopes.Clear();
+        _hasTrackingBounds = false;
+        _autoOrbitEngaged = false;
+        _hasOrbitDirection = false;
     }
 
     static bool AwaitingRotationReplacement(UnitsManger team)
@@ -162,17 +178,44 @@ public class AllUnitsBattleCamera : CameraMode
             if (!BattleCameraFraming.ShouldIncludeUnit(team.TeamMode,
                 unit.gameObject.activeInHierarchy && unit.WholeT.gameObject.activeInHierarchy,
                 unit.FightDataRef.IsDead.Value, team.RMode_Unit.Value == unit)) continue;
-            if (!_renderers.TryGetValue(unit, out var renderers))
+            bool newModel = !_models.TryGetValue(unit, out var model) || model.Root != unit.WholeT;
+            if (newModel)
             {
-                renderers = unit.WholeT.GetComponentsInChildren<Renderer>(true);
-                _renderers[unit] = renderers;
+                model = new ModelFramingReference { Root = unit.WholeT,
+                    Renderers = unit.WholeT.GetComponentsInChildren<Renderer>(true) };
+                _models[unit] = model;
             }
-            if (!BattleCameraFraming.TryGetModelBounds(renderers, out var box))
+            if (!BattleCameraFraming.TryGetModelBounds(model.Renderers, out var box))
             {
                 // A model not yet rendered still gets a scale-aware body envelope.
                 var size = Vector3.Scale(new Vector3(1, 2.8f, 1), Abs(unit.WholeT.lossyScale));
                 box = new Bounds(unit.WholeT.position + Vector3.up * size.y * 0.5f, size);
             }
+            float scaleY = Mathf.Abs(unit.WholeT.lossyScale.y);
+            float horizontalScale = Mathf.Max(Mathf.Abs(unit.WholeT.lossyScale.x), Mathf.Abs(unit.WholeT.lossyScale.z));
+            if (newModel)
+            {
+                model.CenterHeight = (box.center.y - unit.WholeT.position.y) / Mathf.Max(0.001f, scaleY);
+                var offset = box.center - unit.WholeT.position;
+                // Reserve the neutral silhouette in every horizontal direction.
+                // An upright cylinder anticipates turns without the excessive
+                // corner padding of a world-axis-aligned square footprint.
+                model.HorizontalRadius = (new Vector2(box.extents.x, box.extents.z).magnitude
+                    + new Vector2(offset.x, offset.z).magnitude) / Mathf.Max(0.001f, horizontalScale) + 0.15f;
+            }
+            // Animation changes the safety envelope, but does not move the
+            // composition target whenever a hand, sword or cape extends.
+            var anchor = unit.WholeT.position + Vector3.up * (model.CenterHeight * scaleY);
+            if (!_hasTrackingBounds)
+            {
+                _trackingBounds = new Bounds(anchor, Vector3.zero);
+                _hasTrackingBounds = true;
+            }
+            else _trackingBounds.Encapsulate(anchor);
+            float radius = model.HorizontalRadius * horizontalScale;
+            _bodyEnvelopes.Add(new BattleCameraFraming.BodyEnvelope(
+                new Vector3(unit.WholeT.position.x, box.center.y, unit.WholeT.position.z), radius, box.size.y + 0.5f));
+            // Exceptional attacks/jumps still include their actual full bounds.
             box.Expand(new Vector3(0.25f, 0.5f, 0.25f));
             _bounds.Add(box);
         }

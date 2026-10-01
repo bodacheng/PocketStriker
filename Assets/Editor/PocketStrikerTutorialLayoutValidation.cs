@@ -148,7 +148,7 @@ public static partial class PocketStrikerTutorialValidation
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             Require(source != null, "Missing battle UI prefab.");
             var map = new Dictionary<UnityEngine.Object, UnityEngine.Object>();
-            var root = CopyLayoutUI(source, canvas.transform, map);
+            var root = CopyLayoutUI(source, safe, map);
             root.anchorMin = Vector2.zero;
             root.anchorMax = Vector2.one;
             root.offsetMin = root.offsetMax = Vector2.zero;
@@ -158,6 +158,7 @@ public static partial class PocketStrikerTutorialValidation
             var layer = root.gameObject.AddComponent<PocketStrikerTutorialValidationLayer>();
             foreach (var name in new[] { "pauseButton", "inputsManager", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask", "top", "middle", "bottom" })
                 SetField(layer, name, map[(UnityEngine.Object)FindField(sourceLayer, name).GetValue(sourceLayer)]);
+            CopyBackdrops(sourceLayer, layer, map);
             Invoke(layer, "ResetOverlayStates");
             Invoke(layer, "KeepTopButtonsClickable");
             var tutorial = Field<ClickNextTutorial>(layer, "clickNextTutorial");

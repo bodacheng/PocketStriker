@@ -194,6 +194,7 @@ public static partial class PocketStrikerTutorialValidation
             var layer = root.gameObject.AddComponent<PocketStrikerTutorialValidationLayer>();
             foreach (var name in new[] { "pauseButton", "inputsManager", "team1UI", "team2UI", "clickNextTutorial", "clickTriggerDreamCombo", "forceClickAutoBtnBlackMask", "top", "middle", "bottom" })
                 SetField(layer, name, map[(UnityEngine.Object)FindField(sourceLayer, name).GetValue(sourceLayer)]);
+            CopyBackdrops(sourceLayer, layer, map);
             Invoke(layer, "ResetOverlayStates");
             Invoke(layer, "KeepTopButtonsClickable");
             layer.Team1UI.TeamMode = layer.Team2UI.TeamMode = TeamMode.Rotation;

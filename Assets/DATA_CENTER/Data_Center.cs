@@ -261,6 +261,7 @@ public partial class Data_Center : MonoBehaviour
         _MyBehaviorRunner.SetAt(unitInfo.level);
         var hp = SkillSet.INI_Hp(unitInfo.set.SkillIDList(), unitInfo.level) * teamHpRate;
         _hpSubscription?.Dispose();
+        FightDataRef.MaxHp = hp;
         FightDataRef.CurrentHp.Value = hp;
         _hpSubscription = FightDataRef.CurrentHp.Subscribe(x =>
         {

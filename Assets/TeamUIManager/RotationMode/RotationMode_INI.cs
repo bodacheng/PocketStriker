@@ -31,10 +31,9 @@ namespace FightScene
                     UnitIconDic[center].Icon.CooldownCurtainUpdate(x/10);
                 }).AddTo(RTFightManager.Target.Disposables);
                 
-                var maxHp = center.FightDataRef.CurrentHp.Value;
                 center.FightDataRef.CurrentHp.Subscribe(x =>
                 {
-                    RefreshHPBar(center, x, maxHp);
+                    RefreshHPBar(center, x, center.FightDataRef.MaxHp);
                 }).AddTo(RTFightManager.Target.Disposables);
                 
                 center.FightDataRef.CriticalGauge.Subscribe(x =>

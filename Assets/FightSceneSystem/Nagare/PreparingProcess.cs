@@ -244,6 +244,10 @@ public class PreparingProcess : FSceneProcess
     
     public override void ProcessEnter()
     {
+        // Result-screen retries enter Preparing directly and retain the previous
+        // battle's AUTO state. Restore tutorial controls before each attempt.
+        if (FightLoad.Fight != null && (FightLoad.Fight.RunTutorial || FightLoad.Fight.ShouldRunFirstQuestTutorial))
+            FightLoad.ConfigureBattleControl(FightLoad.Fight);
         // Also starts a fresh optional request for an in-scene retry/next battle.
         FightScene.FightScene.target.PreloadAIStory();
         //HighLightLayer.DarkOff(Color.white, 0, true);

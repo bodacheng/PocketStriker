@@ -20,7 +20,8 @@ using UnityEngine.SceneManagement;
 public static class PocketStrikerCombatFlowSmoke
 {
     const string Key = "PocketStriker.CombatFlowSmoke";
-    static string Output => SessionState.GetBool(Key + ".StoryFailures", false) ? "Logs/AIStory/Playmode" : "Logs/CombatFlow/Playmode";
+    static string Output => SessionState.GetBool(Key + ".EvolutionHeal", false) ? "Logs/Evolution/Playmode"
+        : SessionState.GetBool(Key + ".StoryFailures", false) ? "Logs/AIStory/Playmode" : "Logs/CombatFlow/Playmode";
     const string Account = "local-combat-flow-smoke";
     static readonly BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
     static bool finishing;
@@ -43,6 +44,12 @@ public static class PocketStrikerCombatFlowSmoke
         public bool ownerRebindFiltersDeath;
         public bool nullOwnerLaterResolves;
         public int optionalStoryRequestCases;
+        public int evolutionDefeatHeals;
+        public int evolutionSkillRecalculations;
+        public int evolutionHealthBarChecks;
+        public bool evolutionFinalDefeatHeal;
+        public bool normalRotationHealthUnchanged;
+        public bool deadPlayerNotRevived;
         public List<Case> cases = new List<Case>();
         public List<string> errors = new List<string>();
     }
@@ -82,6 +89,7 @@ public static class PocketStrikerCombatFlowSmoke
     [MenuItem("PocketStriker/Validation/Combat Flow Playmode Smoke")]
     public static void StartBatch()
     {
+        SessionState.SetBool(Key + ".EvolutionHeal", false);
         SessionState.SetBool(Key + ".StoryFailures", false);
         Begin();
     }
@@ -89,7 +97,16 @@ public static class PocketStrikerCombatFlowSmoke
     [MenuItem("PocketStriker/Validation/AI Story Failure Playmode Smoke")]
     public static void StartStoryFailureBatch()
     {
+        SessionState.SetBool(Key + ".EvolutionHeal", false);
         SessionState.SetBool(Key + ".StoryFailures", true);
+        Begin();
+    }
+
+    [MenuItem("PocketStriker/Validation/Evolution Heal Playmode Smoke")]
+    public static void StartEvolutionHealBatch()
+    {
+        SessionState.SetBool(Key + ".EvolutionHeal", true);
+        SessionState.SetBool(Key + ".StoryFailures", false);
         Begin();
     }
 
@@ -180,13 +197,21 @@ public static class PocketStrikerCombatFlowSmoke
             // Validation must not rewrite the user's persistent skill-analysis data.
             FightGlobalSetting.HitBoxLogger = false;
             Directory.CreateDirectory(Output);
-            ValidateSaturatedQuery();
+            if (!SessionState.GetBool(Key + ".EvolutionHeal", false)) ValidateSaturatedQuery();
             var manager = new ArcadeModeManager();
             await manager.Initialize().Timeout(TimeSpan.FromSeconds(30));
             var authored = await manager.LoadStage(4).Timeout(TimeSpan.FromSeconds(30));
             Require(authored is GangbangInfo && authored.UnitsData.Count > 0, "Registered Group stage 4 did not load.");
             var leader = authored.UnitsData[0].DeepCopy();
             UnityEngine.Object.Destroy(authored);
+            if (SessionState.GetBool(Key + ".EvolutionHeal", false))
+            {
+                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three real skill-choice UI callbacks/stat recalculations and live HP sliders. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
+                report.limitation = "Local Self battles isolate account/reward services. Invulnerability prevents incidental AI damage; fixture HP reductions and death notifications make boundary conditions deterministic. This checks production defeat handling and evolution transitions, not natural damage or device performance.";
+                await ValidateEvolutionHeal(leader);
+                report.passed = true;
+                return;
+            }
             if (SessionState.GetBool(Key + ".StoryFailures", false))
             {
                 report.scope = "Native Quest Group battles with real AI/damage/elimination, FightResultAnim and ArenaFightOver. Injected optional story exceptions, never-ending requests and malformed responses; results must complete without awaiting story generation. Also checks success, empty, exception, real-time timeout and cancellation through the production request wrapper.";
@@ -508,6 +533,119 @@ public static class PocketStrikerCombatFlowSmoke
             }
         }
     }
+
+    static async UniTask ValidateEvolutionHeal(UnitInfo leader)
+    {
+        FightInfo CreateFixture(string id, bool evolution, int enemies)
+        {
+            var fight = ScriptableObject.CreateInstance<FightInfo>();
+            fight.ID = id;
+            fight.EventType = FightEventType.Self;
+            fight.FightMode = evolution ? FightMode.Evolve : FightMode.Rotate;
+            fight.Team1ID = Account; fight.Team2ID = Account + "-enemy";
+            fight.battleGroundID = 0;
+            fight.team1HpRate = 1.7f;
+            fight.FightMembers = new FightMembers();
+            var hero = leader.DeepCopy(); hero.id = "0";
+            fight.FightMembers.HeroSets.Set(0, 0, hero);
+            for (int i = 0; i < enemies; i++)
+            {
+                var enemy = leader.DeepCopy(); enemy.id = i.ToString();
+                fight.FightMembers.EnemySets.Set(0, i, enemy);
+            }
+            return fight;
+        }
+
+        async UniTask<Data_Center> StartFixture(FightInfo fight, bool reuse)
+        {
+            FightLoad.Go(fight, reuse);
+            await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == "FightScene"
+                && FightLoad.Fight?.ID == fight.ID && FSceneProcessesRunner.Main.currentProcess is FightingProcess
+                && UnityEngine.Object.FindFirstObjectByType<FightingStepLayer>()?.Initialized == true)
+                .Timeout(TimeSpan.FromSeconds(180));
+            var manager = RTFightManager.Target;
+            manager.team1.TurnAllUnitsInvincible(true); manager.team2.TurnAllUnitsInvincible(true);
+            manager.team1.Auto = false; manager.team2.Auto = false;
+            var hero = manager.team1.RMode_Unit.Value;
+            float expected = SkillSet.INI_Hp(hero.UnitInfo.set.SkillIDList(), hero.UnitInfo.level) * FightLoad.Fight.team1HpRate;
+            Require(expected > 0 && Mathf.Approximately(hero.FightDataRef.MaxHp, expected)
+                && Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, expected), "Initial MaxHp lost the configured team HP multiplier.");
+            return hero;
+        }
+
+        async UniTask CheckHealthBar(Data_Center hero, float fraction)
+        {
+            hero.FightDataRef.CurrentHp.Value = hero.FightDataRef.MaxHp * fraction;
+            await UniTask.Delay(300);
+            var layer = UnityEngine.Object.FindFirstObjectByType<FightingStepLayer>();
+            var slider = layer.Team1UI.UnitIconDic[hero].HealthBarRect.GetComponent<UnityEngine.UI.Slider>();
+            Require(Mathf.Abs(slider.value - fraction) < 0.001f, "Live HP bar did not use the evolved maximum HP.");
+            report.evolutionHealthBarChecks++;
+        }
+
+        var evolutionFight = CreateFixture("evolution-heal", true, 4);
+        var hero = await StartFixture(evolutionFight, false);
+        for (int index = 0; index < 4; index++)
+        {
+            var enemy = RTFightManager.Target.team2.RMode_Unit.Value;
+            Require(enemy != null && !enemy.FightDataRef.IsDead.Value, "Evolution did not present a living next opponent.");
+            await CheckHealthBar(hero, 0.35f);
+            enemy.FightDataRef.IsDead.Value = true;
+            Require(Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, hero.FightDataRef.MaxHp),
+                "Opponent defeat did not immediately restore full HP before the skill choice: " + index);
+            report.evolutionDefeatHeals++;
+            if (index == 3)
+            {
+                Require(FightLogger.value.GameOver.Value && FightLogger.value.GetWinnerTeam() == Team.player1
+                    && ActiveEvolutionLayer() == null, "Final defeat did not skip evolution and complete the battle.");
+                report.evolutionFinalDefeatHeal = true;
+                break;
+            }
+
+            var evolution = ActiveEvolutionLayer();
+            Require(evolution != null, "Opponent defeat omitted the real evolution layer.");
+            await UniTask.WaitUntil(() => ((UnityEngine.UI.Text)typeof(InBattleEvolution)
+                .GetField("upperText", PrivateInstance).GetValue(evolution)).text == Translate.Get("ChooseYourEvolution"))
+                .Timeout(TimeSpan.FromSeconds(20));
+            var options = (EvolutionSkill[])typeof(InBattleEvolution).GetField("skillOptions", PrivateInstance).GetValue(evolution);
+            options[0].Btn.onClick.Invoke();
+            await UniTask.WaitUntil(() => ActiveEvolutionLayer() == null
+                && RTFightManager.Target.team2.RMode_Unit.Value != enemy)
+                .Timeout(TimeSpan.FromSeconds(30));
+            float expected = SkillSet.INI_Hp(hero.UnitInfo.set.SkillIDList(), hero.UnitInfo.level) * FightLoad.Fight.team1HpRate;
+            Require(Mathf.Approximately(hero.FightDataRef.MaxHp, expected)
+                && Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, expected), "Skill choice did not refresh maximum/full HP.");
+            report.evolutionSkillRecalculations++;
+        }
+        await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess)
+            .Timeout(TimeSpan.FromSeconds(15));
+
+        var rotationFight = CreateFixture("rotation-no-heal", false, 1);
+        hero = await StartFixture(rotationFight, true);
+        float damagedHp = hero.FightDataRef.MaxHp * 0.35f;
+        hero.FightDataRef.CurrentHp.Value = damagedHp;
+        RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef.IsDead.Value = true;
+        Require(Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, damagedHp), "Normal rotation unexpectedly healed on an enemy defeat.");
+        report.normalRotationHealthUnchanged = true;
+        await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess)
+            .Timeout(TimeSpan.FromSeconds(15));
+
+        var simultaneousFight = CreateFixture("evolution-dead-player", true, 1);
+        hero = await StartFixture(simultaneousFight, true);
+        hero.FightDataRef.CurrentHp.Value = 0;
+        hero.FightDataRef.IsDead.Value = true;
+        RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef.IsDead.Value = true;
+        Require(hero.FightDataRef.CurrentHp.Value == 0 && hero.FightDataRef.IsDead.Value, "A defeated player was revived by the opponent's death.");
+        report.deadPlayerNotRevived = true;
+        Require(report.evolutionDefeatHeals == 4 && report.evolutionSkillRecalculations == 3
+            && report.evolutionHealthBarChecks == 4 && report.evolutionFinalDefeatHeal
+            && report.normalRotationHealthUnchanged && report.deadPlayerNotRevived, "Evolution heal checks were incomplete.");
+        UnityEngine.Object.Destroy(evolutionFight); UnityEngine.Object.Destroy(rotationFight); UnityEngine.Object.Destroy(simultaneousFight);
+    }
+
+    static InBattleEvolution ActiveEvolutionLayer() => UnityEngine.Object
+        .FindObjectsByType<InBattleEvolution>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+        .FirstOrDefault(layer => !layer.IsClosing && layer.gameObject.activeInHierarchy);
 
     static int ReadHitCount(SensorUnity sensor) => (int)typeof(SensorUnity).GetField("_hitCount", PrivateInstance).GetValue(sensor);
     static int ReadCapacity(SensorUnity sensor) => ((Collider[])typeof(SensorUnity).GetField("_hits", PrivateInstance).GetValue(sensor))?.Length ?? 0;

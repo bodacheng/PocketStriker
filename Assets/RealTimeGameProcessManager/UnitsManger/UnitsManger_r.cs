@@ -107,6 +107,15 @@ namespace FightScene
                     {
                         Sensor.AddOrRemoveSharedDeadUnitInfo(center, teamConfig.myTeam, true);
                         Sensor.AddOrRemoveSharedUnitInfo(center, teamConfig.myTeam, false);
+                        if (teamConfig.myTeam == Team.player2 && FightLoad.Fight.EvolutionMode)
+                        {
+                            // Heal as soon as an opponent is defeated, including the final
+                            // opponent whose death skips the next evolution choice.
+                            var hero = RTFightManager.Target.team1.RMode_Unit.Value;
+                            if (hero != null && !hero.FightDataRef.IsDead.Value
+                                             && hero.FightDataRef.CurrentHp.Value > 0)
+                                hero.FightDataRef.CurrentHp.Value = hero.FightDataRef.MaxHp;
+                        }
                         if (FightLogger.value.GetWinnerTeam() == Team.none)
                         {
                             if (teamConfig.myTeam == Team.player2 && FightLoad.Fight.EvolutionMode)

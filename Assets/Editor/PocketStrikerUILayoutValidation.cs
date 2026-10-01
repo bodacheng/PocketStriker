@@ -101,6 +101,7 @@ public static class PocketStrikerUILayoutValidation
         public float settingsContentCenterOffset;
         public int clippedContentChecks;
         public int intentionalFullscreenControls;
+        public int fullScreenBackdropsChecked;
         public int comboTranslationsChecked;
         public string[] omittedBehaviours;
         public List<RegionResult> regions = new List<RegionResult>();
@@ -304,6 +305,50 @@ public static class PocketStrikerUILayoutValidation
         }
     }
 
+    [MenuItem("PocketStriker/Validation/Full Screen Backdrops")]
+    public static void ValidateBackdrops()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            throw new InvalidOperationException("Stop Play mode before checking backdrops.");
+        var oldCanvas = PosCal.Canvas;
+        var oldSafe = PosCal.SafeAreaRect;
+        var report = new Report { unityVersion = Application.unityVersion, utcTime = DateTime.UtcNow.ToString("O") };
+        try
+        {
+            var loader = typeof(UILayer).Assembly.GetType("DummyLayerSystem.UILayerLoader");
+            var paths = (IDictionary<string, string>)loader.GetField("Paths", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+            foreach (var path in paths.Values.Distinct())
+            {
+                var source = Resources.Load<GameObject>(path);
+                var layer = source.GetComponent<UILayer>();
+                if (layer.FullScreenBackdrops.Count == 0) continue;
+                report.registeredLayers++;
+                foreach (var device in new[] {
+                    new Device("Phone 540x960", 540, 960),
+                    new Device("Notched phone 390x844", 390, 844, 34, 47),
+                    new Device("Screenshot phone 1206x2622", 1206, 2622, 102, 186),
+                    new Device("iPad 768x1024", 768, 1024)
+                })
+                {
+                    var result = new CaseResult { layer = source.name, prefab = path, device = device.name,
+                        parenting = "safe-area child (backdrop regression)", state = "authored", screenPixels = device.size,
+                        safeAreaPixels = device.safe };
+                    CheckCase(source, device, result, false);
+                    report.cases.Add(result);
+                }
+            }
+            report.errors = report.failures.Count + report.cases.Sum(item => item.findings.Count(finding => finding.severity == "error"));
+            report.warnings = report.cases.Sum(item => item.findings.Count(finding => finding.severity == "warning"));
+            report.casesChecked = report.expectedCases = report.cases.Count;
+            report.passed = report.registeredLayers > 0 && report.errors == 0 && report.warnings == 0;
+            Directory.CreateDirectory("Logs/UILayout");
+            File.WriteAllText("Logs/UILayout/backdrops-report.json", JsonUtility.ToJson(report, true));
+            if (!report.passed) throw new InvalidOperationException($"Backdrop validation failed: {report.errors} errors, {report.warnings} warnings.");
+            Debug.Log($"[Backdrops] PASS: {report.registeredLayers} layers, {report.casesChecked} device cases, {report.cases.Sum(item => item.fullScreenBackdropsChecked)} full-canvas rectangles.");
+        }
+        finally { PosCal.Canvas = oldCanvas; PosCal.SafeAreaRect = oldSafe; }
+    }
+
     static void CheckSafeAreaInitialization(Report report, bool canvasAsFallback)
     {
         var scene = EditorSceneManager.NewPreviewScene();
@@ -411,6 +456,10 @@ public static class PocketStrikerUILayoutValidation
                 targetFields.FindProperty(field).objectReferenceValue = sourceArea != null && copies.TryGetValue(sourceArea, out var copiedArea)
                     ? copiedArea : null;
             }
+            var backdrops = targetFields.FindProperty("fullScreenBackdrops");
+            backdrops.arraySize = sourceLayer.FullScreenBackdrops.Count;
+            for (int index = 0; index < backdrops.arraySize; index++)
+                backdrops.GetArrayElementAtIndex(index).objectReferenceValue = copies[sourceLayer.FullScreenBackdrops[index]];
             targetFields.ApplyModifiedPropertiesWithoutUndo();
             foreach (var helper in source.GetComponentsInChildren<MidAreaSizeHelper>(true))
             {
@@ -427,6 +476,15 @@ public static class PocketStrikerUILayoutValidation
             Rebuild(root);
             layer.ResizeAreas();
             Rebuild(root);
+            var fullBounds = Bounds(canvasRect, root);
+            foreach (var backdrop in layer.FullScreenBackdrops)
+            {
+                var bounds = Bounds(backdrop, root);
+                result.fullScreenBackdropsChecked++;
+                if (!Contains(bounds, fullBounds) || !Contains(fullBounds, bounds))
+                    Add(result, "error", "backdrop-not-fullscreen", PathOf(backdrop, root), "overlay", bounds, fullBounds,
+                        "Backdrop must cover the entire canvas including the unsafe edges.");
+            }
             if (sourceLayer is SettingLayer && result.state != "authored")
             {
                 PlaceSettingSelectionFrame(sourceLayer, copies, result.state);

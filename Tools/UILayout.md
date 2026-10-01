@@ -1,5 +1,20 @@
 # UI layout coverage
 
+## Full-screen backdrops
+
+`UILayer.fullScreenBackdrops` explicitly marks background graphics and modal click
+catchers that cover the entire root canvas, including the notch and home-indicator
+insets. Their original parents still control visibility, fades and sorting;
+text and controls retain safe-area layout. Four tutorial dimmers and the tutorial
+click catcher are included, along with loading and modal screens. Startup uses a
+separate full-canvas black background and empty safe-area hanger.
+
+Run `PocketStrikerUILayoutValidation.ValidateBackdrops` to check 20 registered
+rectangles across 14 screens on four phone/tablet shapes, including 1206×2622.
+The report is `Logs/UILayout/backdrops-report.json`. Tutorial validation also
+raycasts the top and bottom unsafe edges on all six pages; Tutorial Layout uses
+the actual safe-area parent to verify the explanations and controls remain inset.
+
 ## Battle HUD proportions
 
 `BattleHUDPresentation` lays out the live `FightingStepLayer` within its safe
@@ -43,9 +58,28 @@ Independent profiles use a 32° pitch for duels, 33° for normal multiplayer and
 46° for Group battles. Either team's MultiRaid mode selects the multiplayer
 profile. Preparing never fits remote loading positions; the first CountDown
 frame immediately fits the final models, with no inherited staging distance.
-Expansion is immediate to keep separated/airborne models visible. Duels use a
-0.10-second center follow and 0.45-second inward exponential time constant;
-MultiRaid/Group retain the 0.22-second center follow and two-second inward constant.
+Composition follows fielded root positions with cached body heights, so changing
+limb and weapon bounds do not move the entire scene. `BattleCameraStabilizer`
+uses a 2% view-relative pan dead zone, 0.26-second Duel and 0.32-second crowd
+horizontal follow, and slower vertical follow to absorb contact and hit reactions.
+Large deliberate movement accelerates horizontal follow toward 0.12 seconds once
+lag exceeds four pan windows (at least 0.8 world units), reducing unnecessary
+safety zoom caused by the center falling behind.
+A cached neutral silhouette reserves a circular horizontal footprint for each
+model, so turning a body or long weapon does not abruptly change portrait zoom.
+The solver fits this upright cylinder directly instead of adding the excessive
+corners of a square footprint; actual live model bounds still set the safety floor.
+A 12% framing reserve, peak hold and 6% zoom hysteresis suppress repeated outward
+and inward adjustments. Normal expansion eases over 0.24 seconds; a full-model
+safety floor expands immediately for sudden separation, airborne models or a
+viewport change, including while paused. Duels retain a 0.45-second inward
+exponential time constant and 0.35-second peak hold; MultiRaid/Group retain a
+two-second inward constant and 0.65-second peak hold.
+Automatic orbit applies only to Duels, with an 8-degree angular dead zone,
+smoothed rotation and remembered orbit direction. Separation must exceed 3.2
+units to start orbiting and fall below 2.4 to stop. Crowd views retain their
+heading; manual orbit remains available. Large frame delays cannot advance
+the tracking/orbit filters by more than 50 milliseconds at once.
 When a rotation fighter is dead, inactive or temporarily absent while a living
 replacement remains, the duel camera holds its established center, yaw and inward
 distance instead of moving onto the survivor. It may still expand to keep the
@@ -60,6 +94,16 @@ it does not validate battle outcomes.
 Its local account fixture excludes shop/login services; reports and screenshots
 are saved under `Logs/CameraFraming/Playmode`.
 
+`PocketStrikerBattleCameraStabilityValidation.ValidateBatch` compares all three
+production profiles against the previous camera at 30/60/120 fps. Synthetic
+animated bounds and root punches isolate unwanted motion; fixed world markers
+measure screen travel and camera velocity variation. It also checks narrow-model
+quarter/half turns and continuous rotation, deliberate movement/orbit, sudden
+separation/height changes, pause-time safety fitting,
+replacement holds and fresh-battle resets. The report is under
+`Logs/CameraFraming/Stability`; complete live model framing is checked separately
+by the Play-mode smoke. These comparisons are not device performance measurements.
+
 For transition regression, run `PocketStrikerBattleCameraSmoke.StartBatch` without
 `-quit` and set `POCKETSTRIKER_CAMERA_REVIEW` to a new report label. Add
 `POCKETSTRIKER_CAMERA_SIZE=390x844` for the narrow portrait case. Reports, per-frame
@@ -72,6 +116,8 @@ replacement zoom swings and projected model clipping. This is a local Self battl
 fixture, not an authenticated match or a validation of jump/knockback mechanics;
 retry resets dead fighters, but there is no separate in-match resurrection flow
 covered by this fixture.
+Use `Tools/Validation/camera_telemetry.py <new report.json> --baseline <old report.json>`
+to compare settled transition motion and check that no model corners are clipped.
 
 Models initialize at separate temporary positions while their animation setup
 requires them to remain active. Normal starting placement then synchronizes root

@@ -21,6 +21,7 @@ public static class PocketStrikerTutorialPlaymodeSmoke
 {
     const string Key = "PocketStriker.TutorialPlaymodeSmoke";
     const string Output = "Logs/Tutorial/Playmode";
+    const string HeroId = "local-tutorial-smoke-hero";
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
     static bool finishing;
     static Report report;
@@ -28,14 +29,17 @@ public static class PocketStrikerTutorialPlaymodeSmoke
     [Serializable] public sealed class Report
     {
         public bool passed;
-        public string scope = "Actual published first quest, FightLoad.Go, Preparing/CountDown/Fighting, production OpenTutorial, live animated HUD and models. Six native tutorial pages, first-page click lock while paused, later pages with active animations, real raycasts, callout targets, force-auto callback and Dream Combo overlay.";
-        public string limitation = "Local fixture account and Addressables Fast Mode; shop services removed before Start. Both teams become invulnerable after battle starts to isolate tutorial UI. Battle victory/rewards are covered by the separate combat-flow smoke. Editor Play mode, not a device test.";
+        public string scope = "Actual published first quest, FightLoad.Go, Preparing/CountDown/Fighting, production OpenTutorial, live animated HUD and models. Six native tutorial pages, first-page click lock while paused, later pages with active animations, real raycasts, callout targets, force-auto callback and Dream Combo overlay. Production Death, defeat result and retry callback reopen page one with both teams manual and stationary while simulation runs.";
+        public string limitation = "Local fixture account, hero inventory and Addressables Fast Mode; shop services removed before Start. Both teams become invulnerable after battle starts to isolate tutorial UI. The retry fixture explicitly enters the player's native Death state to reach a local defeat without remote rewards; natural battle damage is covered by the separate combat-flow smoke. Editor Play mode, not a device test.";
         public int pages;
         public int pointerChecks;
         public int raycastChecks;
         public bool forceAuto;
         public bool skillInputRestored;
         public bool dreamOverlay;
+        public bool defeatRetry;
+        public int retryIdleFrames;
+        public float retryMaxMovement;
         public List<string> screenshots = new List<string>();
         public List<string> errors = new List<string>();
     }
@@ -112,6 +116,9 @@ public static class PocketStrikerTutorialPlaymodeSmoke
         var oldAccount = PlayerAccountInfo.Me;
         var oldLanguage = AppSetting.Value.Language;
         var oldLogging = FightGlobalSetting.HitBoxLogger;
+        var oldTeam = dataAccess.TeamSet.Default;
+        dataAccess.Units.Dic.TryGetValue(HeroId, out var oldHero);
+        var fixtureStones = new List<string>();
         try
         {
             FightGlobalSetting.HitBoxLogger = false;
@@ -129,7 +136,8 @@ public static class PocketStrikerTutorialPlaymodeSmoke
             quest.EventType = FightEventType.Quest;
             quest.Team1ID = "local-tutorial-smoke"; quest.Team2ID = "local-tutorial-smoke-enemy";
             quest.FightMembers = new FightMembers();
-            var hero = leaderSource.UnitsData[0].DeepCopy(); hero.id = "0";
+            var hero = leaderSource.UnitsData[0].DeepCopy(); hero.id = HeroId;
+            PrepareRetryInventory(hero, fixtureStones);
             quest.FightMembers.HeroSets.Set(0, 0, hero);
             for (int i = 0; i < quest.UnitsData.Count; i++)
             { var enemy = quest.UnitsData[i].DeepCopy(); enemy.id = i.ToString(); quest.FightMembers.EnemySets.Set(0, i, enemy); }
@@ -206,6 +214,7 @@ public static class PocketStrikerTutorialPlaymodeSmoke
             layer.TutorialModeForceOnClickDreamCombo();
             Require(!dreamOverlay.activeSelf, "Dream Combo tutorial did not close through its production action.");
             report.dreamOverlay = true;
+            await CheckDefeatRetry();
             Require(report.pages == 6 && report.forceAuto && report.pointerChecks > 0, "Tutorial flow checks were incomplete.");
             report.passed = true;
         }
@@ -214,9 +223,82 @@ public static class PocketStrikerTutorialPlaymodeSmoke
         {
             Time.timeScale = 1; PlayerAccountInfo.Me = oldAccount;
             AppSetting.Value.Language = oldLanguage; FightGlobalSetting.HitBoxLogger = oldLogging;
+            dataAccess.TeamSet.Default = oldTeam;
+            if (oldHero == null) dataAccess.Units.Dic.Remove(HeroId);
+            else dataAccess.Units.Dic[HeroId] = oldHero;
+            foreach (var id in fixtureStones) await dataAccess.Stones.RemoveStoneLocal(id);
             Finish(null);
         }
     }
+
+    static void PrepareRetryInventory(UnitInfo hero, List<string> fixtureStones)
+    {
+        Require(!dataAccess.Units.Dic.ContainsKey(HeroId), "Tutorial fixture hero ID is already in use.");
+        dataAccess.Units.Dic.Add(HeroId, hero.DeepCopy());
+        var skills = new[] { hero.set.a1, hero.set.a2, hero.set.a3, hero.set.b1, hero.set.b2,
+            hero.set.b3, hero.set.c1, hero.set.c2, hero.set.c3 };
+        for (var i = 0; i < skills.Length; i++)
+        {
+            var id = HeroId + "-stone-" + i;
+            Require(dataAccess.Stones.Get(id) == null, "Tutorial fixture stone ID is already in use.");
+            fixtureStones.Add(id);
+            dataAccess.Stones.Add(new dataAccess.StoneOfPlayerInfo { InstanceId = id, SkillId = skills[i],
+                unitInstanceId = HeroId, slot = (i + 1).ToString(), Level = Mathf.RoundToInt(hero.level), Born = "false" });
+        }
+        dataAccess.TeamSet.Default = new PosKeySet();
+        dataAccess.TeamSet.Default.SetPosMemInfoByInstanceID(0, HeroId);
+        Require(UnitInfo.GetUnitInfo(dataAccess.Units.Get(HeroId)).set.CheckEdit() == SkillSet.SkillEditError.Perfect,
+            "Retry fixture hero inventory has an invalid skill set.");
+    }
+
+    static async UniTask CheckDefeatRetry()
+    {
+        var manager = RTFightManager.Target;
+        Require(manager.team1.Auto && FightLoad.Fight.Team1Auto && PlayerPrefs.GetInt("auto", 0) == 1,
+            "Tutorial completion did not produce the saved AUTO state required by the retry regression.");
+        manager.team1.RMode_Unit.Value._MyBehaviorRunner.ChangeState("Death");
+        await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess
+            && LiveLayer<ArenaFightOver>()?.AgainBtn.gameObject.activeInHierarchy == true)
+            .Timeout(TimeSpan.FromSeconds(20));
+        Require(FightLogger.value.GetWinnerTeam() == Team.player2 && PlayerAccountInfo.Me.tutorialProgress == "Started",
+            "Tutorial fixture did not reach a local defeat with unfinished onboarding.");
+        var retry = Field<BOButton>(LiveLayer<ArenaFightOver>().AgainBtn, "againBtn");
+        retry.onClick.Invoke();
+        Require(FSceneProcessesRunner.Main.currentProcess is PreparingProcess,
+            "Production result retry action did not enter Preparing.");
+        await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightingProcess
+            && LiveLayer<FightingStepLayer>()?.Initialized == true).Timeout(TimeSpan.FromSeconds(90));
+        var layer = LiveLayer<FightingStepLayer>();
+        var tutorial = Field<ClickNextTutorial>(layer, "clickNextTutorial");
+        Require(RTFightManager.Target == manager && FightLoad.Fight.RunTutorial && tutorial.gameObject.activeInHierarchy
+            && Field<int>(tutorial, "pageIndex") == 0, "Defeat retry did not reopen the first tutorial page in the same scene.");
+        Require(!FightLoad.Fight.Team1Auto && !FightLoad.Fight.Team2Auto && !manager.team1.Auto && !manager.team2.Auto,
+            "Defeat retry inherited AUTO from the previous tutorial attempt.");
+        Require(Time.timeScale == 1, "Retry stationary check requires active simulation.");
+        var fighters = new[] { manager.team1.RMode_Unit.Value, manager.team2.RMode_Unit.Value };
+        var positions = fighters.Select(unit => unit.WholeT.position).ToArray();
+        var start = Time.realtimeSinceStartup;
+        while (Time.realtimeSinceStartup - start < 2f)
+        {
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            for (var i = 0; i < fighters.Length; i++)
+            {
+                Require(!fighters[i]._MyBehaviorRunner.AI && !fighters[i].FightDataRef.IsDead.Value,
+                    "A fighter resumed AI or died before the restarted tutorial was advanced.");
+                var delta = fighters[i].WholeT.position - positions[i];
+                var movement = new Vector2(delta.x, delta.z).magnitude;
+                report.retryMaxMovement = Mathf.Max(report.retryMaxMovement, movement);
+                Require(movement < .05f, "A fighter moved during the restarted tutorial: " + movement);
+            }
+            report.retryIdleFrames++;
+        }
+        await Screenshot("defeat-retry-page-1");
+        Require(report.retryIdleFrames > 1, "Retry idle state was not sampled across live frames.");
+        report.defeatRetry = true;
+    }
+
+    static T LiveLayer<T>() where T : UILayer => UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.None)
+        .FirstOrDefault(layer => !layer.IsClosing);
 
     static void CheckCallouts(FightingStepLayer layer, BattleTutorialLayout layout)
     {

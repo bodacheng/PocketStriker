@@ -7,10 +7,12 @@ public class UILayer : MonoBehaviour
     [SerializeField] private RectTransform top;
     [SerializeField] private RectTransform middle;
     [SerializeField] private RectTransform bottom;
+    [SerializeField] private RectTransform[] fullScreenBackdrops = new RectTransform[0];
 
     public RectTransform TopArea => top;
     public RectTransform MiddleArea => middle;
     public RectTransform BottomArea => bottom;
+    public System.Collections.Generic.IReadOnlyList<RectTransform> FullScreenBackdrops => fullScreenBackdrops;
     bool _resizingAreas;
     bool _areasInitialized;
     bool _middleLayoutCaptured;
@@ -24,8 +26,7 @@ public class UILayer : MonoBehaviour
     
     public void ResizeAreas()
     {
-        if (_resizingAreas || top == null || middle == null || bottom == null ||
-            !(transform is RectTransform root))
+        if (_resizingAreas || !(transform is RectTransform root))
         {
             return;
         }
@@ -33,6 +34,11 @@ public class UILayer : MonoBehaviour
         _resizingAreas = true;
         try
         {
+            if (top == null || middle == null || bottom == null)
+            {
+                ResizeBackdrops();
+                return;
+            }
             float height = root.rect.height;
             if (height <= 0) return;
             if (!_middleLayoutCaptured)
@@ -71,11 +77,34 @@ public class UILayer : MonoBehaviour
             SetVerticalEdges(bottom, lower, middleBottom, height);
             _areasInitialized = true;
             OnAreasResized();
+            ResizeBackdrops();
         }
         finally { _resizingAreas = false; }
     }
 
     protected virtual void OnAreasResized() { }
+
+    void ResizeBackdrops()
+    {
+        if (fullScreenBackdrops == null || fullScreenBackdrops.Length == 0) return;
+        var canvas = GetComponentInParent<Canvas>(true)?.rootCanvas;
+        if (canvas == null || !(canvas.transform is RectTransform canvasRect)) return;
+        var corners = new Vector3[4];
+        canvasRect.GetWorldCorners(corners);
+        foreach (var backdrop in fullScreenBackdrops)
+        {
+            if (backdrop == null || backdrop == transform || !(backdrop.parent is RectTransform parent)) continue;
+            // Keep the graphic in its original hierarchy so visibility, fading,
+            // sorting and tutorial click callbacks still belong to its screen.
+            // Only its rectangle extends past the safe-area content parent.
+            var lower = (Vector2)parent.InverseTransformPoint(corners[0]);
+            var upper = (Vector2)parent.InverseTransformPoint(corners[2]);
+            backdrop.anchorMin = Vector2.zero;
+            backdrop.anchorMax = Vector2.one;
+            backdrop.offsetMin = lower - parent.rect.min;
+            backdrop.offsetMax = upper - parent.rect.max;
+        }
+    }
 
     static void SetVerticalEdges(RectTransform rect, float lower, float upper, float parentHeight)
     {

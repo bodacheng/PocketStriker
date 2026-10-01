@@ -99,7 +99,13 @@ public static partial class PocketStrikerTutorialValidation
             var canvasRect = (RectTransform)canvas.transform;
             canvasRect.sizeDelta = new Vector2(1080, 1920);
             PosCal.Canvas = canvas;
-            PosCal.SafeAreaRect = canvasRect;
+            var safe = new GameObject("Safe Area", typeof(RectTransform)).GetComponent<RectTransform>();
+            safe.SetParent(canvasRect, false);
+            safe.anchorMin = Vector2.zero;
+            safe.anchorMax = Vector2.one;
+            safe.offsetMin = new Vector2(0, 80);
+            safe.offsetMax = new Vector2(0, -140);
+            PosCal.SafeAreaRect = safe;
             dragCanvasField.SetValue(null, canvas);
             var eventObject = new GameObject("EventSystem", typeof(EventSystem));
             eventObject.transform.SetParent(rig.transform, false);
@@ -108,7 +114,7 @@ public static partial class PocketStrikerTutorialValidation
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             Require(source != null, "FightingStepLayer prefab is missing.");
             var map = new Dictionary<UnityEngine.Object, UnityEngine.Object>();
-            var root = HUDCopyUI(source, canvas.transform, map);
+            var root = HUDCopyUI(source, safe, map);
             root.anchorMin = Vector2.zero;
             root.anchorMax = Vector2.one;
             root.offsetMin = root.offsetMax = Vector2.zero;
@@ -136,6 +142,7 @@ public static partial class PocketStrikerTutorialValidation
                 var field = typeof(UILayer).GetField(name, Private);
                 field.SetValue(layer, map[(UnityEngine.Object)field.GetValue(sourceLayer)]);
             }
+            CopyBackdrops(sourceLayer, layer, map);
             var tutorial = Field<ClickNextTutorial>(layer, "clickNextTutorial");
             var pages = Field<GameObject[]>(tutorial, "TutorialLayers");
             Require(pages.Length == 6, "Expected the six authored tutorial pages.");
@@ -193,7 +200,9 @@ public static partial class PocketStrikerTutorialValidation
                 Require(Field<int>(tutorial, "pageIndex") == page, "Incorrect current tutorial page.");
                 Require(pages.Count(item => item.activeSelf) == 1 && pages[page].activeSelf, "Exactly the expected page must be active.");
                 Rebuild(root, camera, texture);
-                foreach (var point in new[] { blank, skillPoint, autoPoint })
+                foreach (var point in new[] { blank, skillPoint, autoPoint,
+                    (Vector2)camera.WorldToScreenPoint(canvasRect.TransformPoint(new Vector3(0, canvasRect.rect.yMin + 12, 0))),
+                    (Vector2)camera.WorldToScreenPoint(canvasRect.TransformPoint(new Vector3(0, canvasRect.rect.yMax - 12, 0))) })
                     CheckTarget(eventSystem, point, tutorial.Button.gameObject, "Page " + (page + 1), report);
                 Require(!automatic, "Force-auto action ran on page entry instead of on the next click.");
                 var pointToClick = new[] { blank, skillPoint, autoPoint }[page % 3];
@@ -427,6 +436,8 @@ public static partial class PocketStrikerTutorialValidation
         throw new MissingFieldException(target.GetType().Name, name);
     }
     static T Field<T>(object target, string name) => (T)FindField(target, name).GetValue(target);
+    static void CopyBackdrops(UILayer source, UILayer target, Dictionary<UnityEngine.Object, UnityEngine.Object> map) =>
+        SetField(target, "fullScreenBackdrops", source.FullScreenBackdrops.Select(rect => (RectTransform)map[rect]).ToArray());
     static void SetField(object target, string name, object value) => FindField(target, name).SetValue(target, value);
     static object Invoke(object target, string name) =>
         (target.GetType().GetMethod(name, Private) ?? target.GetType().BaseType.GetMethod(name, Private)).Invoke(target, null);
