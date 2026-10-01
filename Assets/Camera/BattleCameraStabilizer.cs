@@ -49,7 +49,7 @@ public sealed class BattleCameraStabilizer
 
     public BattleCameraFraming.Pose Update(IReadOnlyList<Bounds> rawBounds, Vector3 trackingCenter,
         float aspect, float fieldOfView, Rect usable, float nearClip, float deltaTime, bool holdFraming = false,
-        IReadOnlyList<BattleCameraFraming.BodyEnvelope> bodyEnvelopes = null)
+        IReadOnlyList<BattleCameraFraming.BodyEnvelope> bodyEnvelopes = null, bool targetHandoff = false)
     {
         float step = Mathf.Clamp(deltaTime, 0, 0.05f);
         var rotation = Quaternion.Euler(_profile.Pitch, Yaw, 0);
@@ -82,12 +82,15 @@ public sealed class BattleCameraStabilizer
             // Contact punches remain below this screen-relative threshold.
             float catchUpThreshold = Mathf.Max(0.8f, horizontalZone * 4);
             float catchUp = Mathf.InverseLerp(catchUpThreshold, catchUpThreshold * 2, horizontal.magnitude);
-            float horizontalSmoothTime = Mathf.Lerp(_profile.CenterSmoothTime, 0.12f, catchUp);
+            // A replacement's different body origin is not a running fighter.
+            // Do not invoke the fast knockback catch-up during its short handoff.
+            float horizontalSmoothTime = targetHandoff ? Mathf.Max(.45f, _profile.CenterSmoothTime)
+                : Mathf.Lerp(_profile.CenterSmoothTime, 0.12f, catchUp);
             float y = Mathf.SmoothDamp(_center.y,
                 _center.y + Mathf.Sign(delta.y) * Mathf.Max(0, Mathf.Abs(delta.y) - verticalZone),
                 ref _heightVelocity, Mathf.Max(0.45f, _profile.CenterSmoothTime), Mathf.Infinity, step);
             _center = Vector3.SmoothDamp(_center, target, ref _centerVelocity,
-                horizontalSmoothTime, Mathf.Infinity, step);
+                horizontalSmoothTime, targetHandoff ? 6f : Mathf.Infinity, step);
             _center.y = y;
             _centerVelocity.y = 0;
         }

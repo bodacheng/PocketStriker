@@ -22,7 +22,10 @@ public static partial class PocketStrikerBattleCameraSmoke
     {
         public int frame;
         public float elapsed, distance, required, centerLag, pitch, fieldOfView;
-        public Vector3 cameraPosition, center;
+        public Vector3 cameraPosition, center, projectedCenter;
+        public float yaw, yawSpeed;
+        public string process;
+        public Rect usable;
         public int fielded, clippedCorners;
         public bool holdingReplacement;
         public List<FighterFrame> fighters = new List<FighterFrame>();
@@ -209,6 +212,15 @@ public static partial class PocketStrikerBattleCameraSmoke
                 pitch = camera.transform.eulerAngles.x, fieldOfView = camera.fieldOfView, fielded = mode.FramedUnitCount,
                 holdingReplacement = mode.IsHoldingReplacementFraming };
             var usable = mode.GetUsableViewport(camera);
+            frame.usable = usable;
+            frame.projectedCenter = camera.WorldToViewportPoint(mode.CurrentPose.Center);
+            frame.yaw = camera.transform.eulerAngles.y;
+            frame.process = FSceneProcessesRunner.Main.currentProcess?.GetType().Name;
+            if (item.frames.Count > 0)
+            {
+                var last = item.frames[item.frames.Count - 1];
+                frame.yawSpeed = Mathf.Abs(Mathf.DeltaAngle(last.yaw, frame.yaw)) / Mathf.Max(.001f, frame.elapsed-last.elapsed);
+            }
             foreach (var team in new[] { manager.team1, manager.team2 })
             foreach (var unit in team.teamMembers.mDict.Values)
             {

@@ -22,7 +22,7 @@ using UnityEngine.UI;
 /// handlers. Does not replace the logged-in account with a local fixture.
 /// </summary>
 [InitializeOnLoad]
-public static class PocketStrikerUILiveReview
+public static partial class PocketStrikerUILiveReview
 {
     const string Key = "PocketStriker.UILiveReview";
     const string Startup = "Assets/Scene/ABLoadScene/Scene1.unity";
@@ -61,6 +61,8 @@ public static class PocketStrikerUILiveReview
         public int loadedModelPreviews;
         public int portraitCount;
         public int loadedPortraits;
+        public float simulatedBannerPixels;
+        public Rect contentPixels;
     }
     [Serializable] public sealed class Report
     {
@@ -208,6 +210,16 @@ public static class PocketStrikerUILiveReview
             await DismissStartupModals();
             Require(PlayerAccountInfo.Me.tutorialProgress == "Finished", "The actual account has unfinished onboarding; menu review is blocked rather than substituting a fixture account.");
             await Check("home", async () => { await Home(); RequirePreview(Layer<FrontLayer>()); await Screenshot("home"); });
+            if (BannerSimulation)
+            {
+                await BannerNavigationReview();
+                if (Environment.GetEnvironmentVariable("POCKETSTRIKER_BANNER_ONLY") == "1")
+                {
+                    foreach (var entry in report.cases.Where(x => x.status == "unreached"))
+                    { entry.status = "unavailable"; entry.note = "Not run in the focused banner review."; }
+                    return;
+                }
+            }
             await Adventure();
             await Arena();
             await Check("random-boss", async () =>
@@ -216,6 +228,7 @@ public static class PocketStrikerUILiveReview
                 await Page<EventBattleTop>(MainSceneStep.RandomBoss, 40); await Screenshot("random-boss"); await Back(MainSceneStep.FrontPage);
             });
             await Collection();
+            if (Environment.GetEnvironmentVariable("POCKETSTRIKER_ASYNC_ICON_LIVE") == "1") await AsyncIconNavigation();
             await Check("stones", async () =>
             {
                 await Home(); await Click(Tab("stoneTab")); await Page<StoneListLayer>(MainSceneStep.SkillStoneList, 35);
@@ -688,6 +701,21 @@ public static class PocketStrikerUILiveReview
     static async UniTask Screenshot(string name)
     {
         if (finishing) return;
+        if (BannerSimulation)
+        {
+            DrawSimulatedBanner(); await UniTask.DelayFrame(3);
+            if (BannerAds.OccupiedHeightPixels > 0)
+            {
+                var safe = bannerSafeOverride ?? Screen.safeArea;
+                Require(Mathf.Abs(PixelRect(PosCal.SafeAreaRect).yMax - (safe.yMax - BannerAds.OccupiedHeightPixels)) < 1,
+                    "This page did not reserve the simulated native banner.");
+                var topBar = Layer<UpperInfoBar>();
+                if (topBar != null)
+                    foreach (var control in topBar.GetComponentsInChildren<Button>().Where(x => x.IsInteractable()))
+                        Require(PixelRect((RectTransform)control.transform).yMax <= safe.yMax - BannerAds.OccupiedHeightPixels + 1,
+                            "Upper bar control enters the simulated ad: " + control.name);
+            }
+        }
         await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate, cancellation?.Token ?? default);
         var portraits = UnityEngine.Object.FindObjectsByType<HeroIcon>(FindObjectsInactive.Exclude)
             .Where(icon => icon.unitConfig != null && !string.IsNullOrEmpty(icon.unitConfig.RECORD_ID)).ToArray();
@@ -730,6 +758,8 @@ public static class PocketStrikerUILiveReview
             var cameras = UnityEngine.Object.FindObjectsByType<DedicatedCameraConnector>(FindObjectsInactive.Exclude);
             current.captures.Add(new CaptureState { path = path, scene = SceneManager.GetActiveScene().name,
                 process = ProcessesRunner.Main.currentProcess?.GetType().Name, width = width, height = height,
+                simulatedBannerPixels = BannerSimulation ? BannerAds.OccupiedHeightPixels : 0,
+                contentPixels = PosCal.SafeAreaRect != null ? PixelRect(PosCal.SafeAreaRect) : default,
                 activeModelPreviews = cameras.Length, loadedModelPreviews = cameras.Count(camera => camera.FocusingC != null),
                 portraitCount = portraits.Length, loadedPortraits = portraits.Count(icon => icon != null && Field<Image>(icon, "icon").sprite != null) });
             if (current.observedScene == null) current.observedScene = SceneManager.GetActiveScene().name;

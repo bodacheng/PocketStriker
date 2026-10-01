@@ -17,6 +17,10 @@ public class AllUnitsBattleCamera : CameraMode
     bool _autoOrbitEngaged;
     bool _hasOrbitDirection;
     Vector3 _orbitDirection;
+    Data_Center _lastFirst, _lastSecond;
+    float _handoffRemaining;
+    Rect _lastUsableViewport;
+    bool _hasUsableViewport;
 
     sealed class ModelFramingReference
     {
@@ -29,6 +33,7 @@ public class AllUnitsBattleCamera : CameraMode
     public float Pitch => _pitch;
     public bool IsFramingInitialized => _stabilizer.IsInitialized;
     public bool IsHoldingReplacementFraming { get; private set; }
+    public bool IsSettlingReplacementFraming => _handoffRemaining > 0;
     public int FramedUnitCount => _bounds.Count;
     public BattleCameraFraming.Pose DesiredPose => _stabilizer.DesiredPose;
     public BattleCameraFraming.Pose CurrentPose => _stabilizer.CurrentPose;
@@ -83,16 +88,26 @@ public class AllUnitsBattleCamera : CameraMode
             ResetFraming(camera);
             return;
         }
+        bool wasHolding = IsHoldingReplacementFraming;
+        var firstUnit = manager.team1?.RMode_Unit.Value;
+        var secondUnit = manager.team2?.RMode_Unit.Value;
+        // Preserve both sides until an actual replacement is active. The final
+        // knockout uses the same hold until the result process owns the camera;
+        // the existence of a reserve must not decide whether a body is abandoned.
+        IsHoldingReplacementFraming = _stabilizer.IsInitialized && this is DuelBattleCamera
+            && (!HasLiveRotationFighter(manager.team1) || !HasLiveRotationFighter(manager.team2));
+        if (this is DuelBattleCamera && !IsHoldingReplacementFraming && _stabilizer.IsInitialized
+            && (wasHolding || firstUnit != _lastFirst || secondUnit != _lastSecond))
+            _handoffRemaining = .7f;
+        else _handoffRemaining = Mathf.Max(0, _handoffRemaining - Mathf.Clamp(deltaTime, 0, .05f));
+        if (!IsHoldingReplacementFraming)
+        {
+            _lastFirst = firstUnit;
+            _lastSecond = secondUnit;
+        }
         AddTeam(manager.team1);
         AddTeam(manager.team2);
         if (_bounds.Count == 0) return;
-
-        // A defeated rotation fighter is replaced after a short delay. During
-        // that gap, panning/zooming onto the survivor creates an unnecessary
-        // wide pullback when the replacement arrives. Keep the established
-        // two-sided composition, while still expanding if the survivor moves.
-        IsHoldingReplacementFraming = _stabilizer.IsInitialized && this is DuelBattleCamera
-            && (AwaitingRotationReplacement(manager.team1) || AwaitingRotationReplacement(manager.team2));
 
         var usable = UsableViewport(camera);
         float horizontal = CanSetH ? UltimateJoystick.GetHorizontalAxis("RotateCamera") : 0;
@@ -103,7 +118,7 @@ public class AllUnitsBattleCamera : CameraMode
             _stabilizer.UpdateYaw(_stabilizer.Yaw + horizontal * 75 * Mathf.Clamp(deltaTime, 0, 0.05f),
                 deltaTime, true);
         }
-        else if (!IsHoldingReplacementFraming && this is DuelBattleCamera && AutoRotateCamera)
+        else if (!IsHoldingReplacementFraming && !IsSettlingReplacementFraming && this is DuelBattleCamera && AutoRotateCamera)
         {
             bool rotating = false;
             var first = manager.team1.RMode_Unit.Value?.WholeT;
@@ -141,7 +156,7 @@ public class AllUnitsBattleCamera : CameraMode
         }
 
         var fitted = _stabilizer.Update(_bounds, _trackingBounds.center, camera.aspect, fieldOfView, usable,
-            camera.nearClipPlane, deltaTime, IsHoldingReplacementFraming, _bodyEnvelopes);
+            camera.nearClipPlane, deltaTime, IsHoldingReplacementFraming, _bodyEnvelopes, IsSettlingReplacementFraming);
         camera.transform.SetPositionAndRotation(fitted.Position, fitted.Rotation);
         camera.farClipPlane = Mathf.Max(camera.farClipPlane, fitted.Distance + 100);
     }
@@ -156,17 +171,16 @@ public class AllUnitsBattleCamera : CameraMode
         _hasTrackingBounds = false;
         _autoOrbitEngaged = false;
         _hasOrbitDirection = false;
+        _lastFirst = _lastSecond = null;
+        _handoffRemaining = 0;
+        _hasUsableViewport = false;
     }
 
-    static bool AwaitingRotationReplacement(UnitsManger team)
+    static bool HasLiveRotationFighter(UnitsManger team)
     {
-        if (team?.teamMembers?.mDict == null || team.TeamMode != TeamMode.Rotation) return false;
-        var current = team.RMode_Unit.Value;
-        if (current != null && current.WholeT != null && current.gameObject.activeInHierarchy
-            && current.WholeT.gameObject.activeInHierarchy && !current.FightDataRef.IsDead.Value) return false;
-        foreach (var unit in team.teamMembers.mDict.Values)
-            if (unit != null && unit.WholeT != null && !unit.FightDataRef.IsDead.Value) return true;
-        return false;
+        var unit = team?.RMode_Unit.Value;
+        return unit != null && unit.WholeT != null && unit.gameObject.activeInHierarchy
+            && unit.WholeT.gameObject.activeInHierarchy && !unit.FightDataRef.IsDead.Value;
     }
 
     void AddTeam(UnitsManger team)
@@ -228,6 +242,10 @@ public class AllUnitsBattleCamera : CameraMode
         var rail = new Rect();
         bool excludeRail = false;
         if (_hud == null) _hud = Object.FindFirstObjectByType<FightingStepLayer>(FindObjectsInactive.Include);
+        // Evolution and result flows temporarily hide/remove the HUD. Its
+        // disappearance is not a request to move or zoom the battle camera.
+        if ((_hud == null || !_hud.gameObject.activeInHierarchy) && _hasUsableViewport)
+            return _lastUsableViewport;
         if (_hud != null)
         {
             if (_hud.MiddleArea != null) middle = UIViewport(_hud.MiddleArea, camera);
@@ -236,7 +254,11 @@ public class AllUnitsBattleCamera : CameraMode
                 && portraits != null && portraits.gameObject.activeInHierarchy;
             if (excludeRail) rail = UIViewport(portraits, camera);
         }
-        return BattleCameraFraming.CalculateUsableViewport(safe, middle, rail, excludeRail);
+        _lastUsableViewport = this is DuelBattleCamera
+            ? BattleCameraFraming.CalculateDuelViewport(safe, middle, rail, excludeRail)
+            : BattleCameraFraming.CalculateUsableViewport(safe, middle, rail, excludeRail);
+        _hasUsableViewport = true;
+        return _lastUsableViewport;
     }
 
     public Rect GetUsableViewport(Camera camera) => UsableViewport(camera);

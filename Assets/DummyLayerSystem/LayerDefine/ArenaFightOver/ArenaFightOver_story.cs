@@ -73,6 +73,7 @@ public partial class ArenaFightOver : UILayer
             return false;
         }
 
+        PrepareAIStoryPresentation();
         activeAIStory = story;
         aiStoryPlaying = true;
         aiStorySceneIndex = firstSceneIndex;
@@ -163,6 +164,7 @@ public partial class ArenaFightOver : UILayer
     {
         aiStoryPlaying = false;
         activeAIStory = null;
+        if (aiStoryPresentation != null) aiStoryPresentation.SetActive(false);
         storyBgImage.gameObject.SetActive(false);
         shortStory.gameObject.SetActive(false);
         FightScene.FightScene.target?.AIServiceManager?.MarkAIStoryAsShown();

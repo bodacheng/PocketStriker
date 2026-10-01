@@ -301,6 +301,20 @@ public static class PocketStrikerBattleCameraStabilityValidation
         Require(Vector3.Distance(retried.Center, new Vector3(200, 1.1f, -170)) < .0001f,
             name + " reset retained previous battle pan lag.");
         Configure(camera, retried, profile); CheckCorners(camera, bounds, name + "/reset/" + fps, report);
+        // A replacement can have a different authored body origin. Even a
+        // deliberately large offset must not trigger the fast running catch-up.
+        current.Reset(); FillBounds(bounds, 2, 0, Vector3.zero, false);
+        current.Update(bounds, Vector3.up * 1.1f, Aspect, profile.FieldOfView, Usable, .3f, dt);
+        var handoffCenter = new Vector3(8, 1.1f, 0);
+        FillBounds(bounds, 2, 0, Vector3.right * 8, false);
+        for (int frame = 0; frame < fps * .7f; frame++)
+        {
+            var prior = current.CurrentPose.Center;
+            var handed = current.Update(bounds, handoffCenter, Aspect, profile.FieldOfView, Usable, .3f, dt, false, null, true);
+            Require(Vector3.Distance(handed.Center, prior) <= 6 * dt + .001f,
+                name + " handoff invokes fast pan catch-up.");
+            Configure(camera, handed, profile); CheckCorners(camera, bounds, name + "/handoff/" + fps, report);
+        }
         report.lifecycleCases++;
     }
 

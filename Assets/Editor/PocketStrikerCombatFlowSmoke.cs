@@ -44,6 +44,8 @@ public static class PocketStrikerCombatFlowSmoke
         public bool ownerRebindFiltersDeath;
         public bool nullOwnerLaterResolves;
         public int optionalStoryRequestCases;
+        public List<string> evolutionCameraChecks = new List<string>();
+        public List<string> evolutionScreenshots = new List<string>();
         public int evolutionDefeatHeals;
         public int evolutionSkillRecalculations;
         public int evolutionHealthBarChecks;
@@ -590,6 +592,10 @@ public static class PocketStrikerCombatFlowSmoke
             var enemy = RTFightManager.Target.team2.RMode_Unit.Value;
             Require(enemy != null && !enemy.FightDataRef.IsDead.Value, "Evolution did not present a living next opponent.");
             await CheckHealthBar(hero, 0.35f);
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            var cameraMode = RTFightManager.Target._CameraManager.CurrentBattleCamera;
+            var cameraCenter = cameraMode.CurrentPose.Center;
+            var cameraViewport = cameraMode.GetUsableViewport(CameraManager._camera);
             enemy.FightDataRef.IsDead.Value = true;
             Require(Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, hero.FightDataRef.MaxHp),
                 "Opponent defeat did not immediately restore full HP before the skill choice: " + index);
@@ -607,6 +613,16 @@ public static class PocketStrikerCombatFlowSmoke
             await UniTask.WaitUntil(() => ((UnityEngine.UI.Text)typeof(InBattleEvolution)
                 .GetField("upperText", PrivateInstance).GetValue(evolution)).text == Translate.Get("ChooseYourEvolution"))
                 .Timeout(TimeSpan.FromSeconds(20));
+            await UniTask.Delay(200, DelayType.Realtime);
+            Require(cameraMode.IsHoldingReplacementFraming
+                && Vector3.Distance(cameraMode.CurrentPose.Center, cameraCenter) < .01f
+                && cameraMode.GetUsableViewport(CameraManager._camera) == cameraViewport,
+                "Evolution choice changed the established battle composition while its HUD was hidden.");
+            report.evolutionCameraChecks.Add("choice-"+index+": hidden HUD preserves viewport and two-sided center");
+            string imagePath = Path.GetFullPath(Path.Combine(Output,"evolution-choice-"+index+".png"));
+            ScreenCapture.CaptureScreenshot(imagePath); await UniTask.Delay(100, DelayType.Realtime);
+            Require(File.Exists(imagePath), "Evolution screenshot did not save.");
+            report.evolutionScreenshots.Add(imagePath);
             var options = (EvolutionSkill[])typeof(InBattleEvolution).GetField("skillOptions", PrivateInstance).GetValue(evolution);
             options[0].Btn.onClick.Invoke();
             await UniTask.WaitUntil(() => ActiveEvolutionLayer() == null
@@ -615,6 +631,10 @@ public static class PocketStrikerCombatFlowSmoke
             float expected = SkillSet.INI_Hp(hero.UnitInfo.set.SkillIDList(), hero.UnitInfo.level) * FightLoad.Fight.team1HpRate;
             Require(Mathf.Approximately(hero.FightDataRef.MaxHp, expected)
                 && Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, expected), "Skill choice did not refresh maximum/full HP.");
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            Require(cameraMode.GetUsableViewport(CameraManager._camera) == cameraViewport,
+                "Returning from evolution changed the battle viewport.");
+            report.evolutionCameraChecks.Add("return-"+index+": restored HUD retains viewport");
             report.evolutionSkillRecalculations++;
         }
         await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess)

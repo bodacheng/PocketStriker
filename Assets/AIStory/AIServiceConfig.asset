@@ -15,14 +15,17 @@ MonoBehaviour:
   currentModel: 0
   geminiConfig: {fileID: 11400000, guid: f6225f17a842246d3900a7d25ea21407, type: 2}
   openAIConfig: {fileID: 0}
-  storyThemes: []
-  pageCount: 3
-  storyStyle: 2
+  storyThemes:
+  - A young magic-stone fighter learns to combine elemental stones through a friendly arena duel
+  - Rival adventurers cooperate to protect a village using nine-slot magic-stone combinations
+  - An underdog fighter discovers that patience, timing and teamwork beat brute force
+  pageCount: 1
+  storyStyle: 1
   customStoryStylePrompt: 
-  additionalStoryRequirements: PocketStriker match aftermath, concise scene beats, no long exposition
+  additionalStoryRequirements: PocketStriker magic-stone fighting adventure; a short complete aftermath with 2-3 concise lines, hopeful tone, no football or modern sports, no long exposition
   imageStyle: 5
   customImageStylePrompt: 
-  additionalImageRequirements: full-body action composition, vivid colors, soccer-striker energy
+  additionalImageRequirements: colorful stylized low-poly fantasy fighters, elemental magic stones, readable full-body action composition, warm adventurous cartoon tone, no football, no science-fiction HUD, no text or logos
   imageAspectRatio: 16:9
   fallbackTone: 0
   fairyTaleFallbackConfigAddress: 

@@ -1,16 +1,39 @@
 using UnityEngine;
 using GoogleMobileAds.Api;
+using GoogleMobileAds.Common;
 using System;
 
 public class BannerAds : MonoBehaviour
 {
     public static BannerAds target;
     private string _adUnitId;
+    float _occupiedHeightPixels;
+    bool _hasLoaded;
+    Vector2Int _requestedScreen;
+    Rect _requestedSafeArea;
+    public static float OccupiedHeightPixels => target != null && target.isActiveAndEnabled
+        ? target._occupiedHeightPixels : 0;
+    public static event Action OccupiedAreaChanged;
+
+    void SetOccupiedHeight(float pixels)
+    {
+        pixels = float.IsNaN(pixels) || float.IsInfinity(pixels) ? 0 : Mathf.Max(0, pixels);
+        if (Mathf.Approximately(_occupiedHeightPixels, pixels)) return;
+        _occupiedHeightPixels = pixels;
+        OccupiedAreaChanged?.Invoke();
+    }
+
+    void RefreshOccupiedArea()
+    {
+        SetOccupiedHeight(_hasLoaded && _bannerView != null ? _bannerView.GetHeightInPixels() : 0);
+    }
+
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetState()
     {
         target = null;
+        OccupiedAreaChanged = null;
     }
 
     void Awake()
@@ -80,6 +103,8 @@ public class BannerAds : MonoBehaviour
 
         var adSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(200);
         // Debug.Log(adSize.Width + ":"+ adSize.Height);
+        _requestedScreen = new Vector2Int(Screen.width, Screen.height);
+        _requestedSafeArea = Screen.safeArea;
         _bannerView = new BannerView(_adUnitId, adSize, AdPosition.TopLeft);
         ListenToAdEvents();
     }
@@ -114,6 +139,14 @@ public class BannerAds : MonoBehaviour
         // A no-ads purchase can complete while this screen is still open.
         if (_bannerView != null && PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState)
             DestroyBannerView();
+        else if (_bannerView != null && (_requestedScreen.x != Screen.width || _requestedScreen.y != Screen.height
+            || _requestedSafeArea != Screen.safeArea))
+        {
+            // Adaptive height is orientation-dependent. A replacement request
+            // owns its own occupancy; callbacks from the old view are ignored.
+            DestroyBannerView();
+            LoadAd();
+        }
     }
 
     /// <summary>
@@ -123,19 +156,22 @@ public class BannerAds : MonoBehaviour
     {
         var bannerView = _bannerView;
         // Raised when an ad is loaded into the banner view.
-        bannerView.OnBannerAdLoaded += () =>
+        bannerView.OnBannerAdLoaded += () => MobileAdsEventExecutor.ExecuteInUpdate(() =>
         {
-            if (_bannerView != bannerView)
-                return;
-            Debug.Log("Banner view loaded an ad with response : "
-                      + bannerView.GetResponseInfo());
-        };
+            if (this == null || !isActiveAndEnabled || _bannerView != bannerView) return;
+            _hasLoaded = true;
+            RefreshOccupiedArea();
+            Debug.Log("Banner view loaded.");
+        });
         // Raised when an ad fails to load into the banner view.
-        bannerView.OnBannerAdLoadFailed += (LoadAdError error) =>
+        bannerView.OnBannerAdLoadFailed += (LoadAdError error) => MobileAdsEventExecutor.ExecuteInUpdate(() =>
         {
-            Debug.LogError("Banner view failed to load an ad with error : "
-                           + error);
-        };
+            if (this == null || !isActiveAndEnabled || _bannerView != bannerView) return;
+            // A failed refresh can leave the previous ad visible. Keep its
+            // space, while an initial failure never reserves an empty row.
+            RefreshOccupiedArea();
+            Debug.LogWarning("Banner view failed to load an ad with error : " + error);
+        });
         // Raised when the ad is estimated to have earned money.
         bannerView.OnAdPaid += (AdValue adValue) =>
         {
@@ -170,6 +206,8 @@ public class BannerAds : MonoBehaviour
     /// </summary>
     public void DestroyBannerView()
     {
+        _hasLoaded = false;
+        SetOccupiedHeight(0);
         if (_bannerView != null)
         {
             Debug.Log("Destroying banner view.");

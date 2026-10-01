@@ -49,7 +49,7 @@ internal static class BattleModeTests
                 continue;
             }
             Check(stage >= 1 && stage <= 130 && !stages.ContainsKey(stage), "stage IDs are unique and within 1–130");
-            Check(mode >= 1 && mode <= 3, "stage has a fixed supported mode");
+            Check(mode >= AdventureModeRules.MultiMode && mode <= AdventureModeRules.GroupMode, "stage has a fixed supported mode");
             stages.Add(stage, mode);
             modes.Add(AdventureModeRules.ResolveMode(stage.ToString(), mode));
         }
@@ -57,16 +57,16 @@ internal static class BattleModeTests
         for (int stage = 1; stage <= 130; stage++)
             Check(stages.ContainsKey(stage), "no missing adventure stage: " + stage);
         Check(stages[1] == 2 && stages[2] == 2, "tutorial table rows are rotation battles");
-        Check(modes.SetEquals(new[] { 1, 2, 3 }), "adventure contains team, rotation and evolution battles");
+        Check(modes.SetEquals(new[] { 1, 2, 3, 4 }), "adventure contains team, rotation, evolution and Group battles");
         foreach (string tutorial in new[] { "1", "2" })
         {
             foreach (int configured in new[] { -1, 0, 1, 2, 3, 4 })
                 Check(AdventureModeRules.ResolveMode(tutorial, configured) == 2,
                     "tutorial remains rotation despite stale mode configuration");
         }
-        foreach (int mode in new[] { 1, 2, 3 })
+        foreach (int mode in new[] { 1, 2, 3, 4 })
             Check(AdventureModeRules.ResolveMode("3", mode) == mode, "normal stages use their configured mode");
-        foreach (int invalid in new[] { -1, 0, 4, int.MaxValue })
+        foreach (int invalid in new[] { -1, 0, 5, int.MaxValue })
             Check(AdventureModeRules.ResolveMode("130", invalid) == 2, "invalid mode falls back to rotation");
     }
 

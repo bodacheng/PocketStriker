@@ -249,7 +249,7 @@ public class PreparingProcess : FSceneProcess
         if (FightLoad.Fight != null && (FightLoad.Fight.RunTutorial || FightLoad.Fight.ShouldRunFirstQuestTutorial))
             FightLoad.ConfigureBattleControl(FightLoad.Fight);
         // Also starts a fresh optional request for an in-scene retry/next battle.
-        FightScene.FightScene.target.PreloadAIStory();
+        FightScene.FightScene.target.PreloadAIStory(newBattleAttempt: true);
         //HighLightLayer.DarkOff(Color.white, 0, true);
         // Background covers the notch/home-indicator area; UILayer keeps text safe.
         // Place it above battle UI, then EnterProcess puts the progress bar on top.

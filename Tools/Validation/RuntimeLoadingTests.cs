@@ -42,6 +42,12 @@ internal static class RuntimeLoadingTests
         AddressablesLogic.Complete("battleGround/0", first);
         await firstLoad;
         Check(first.BattleGround.SetCalls == 1, "valid battlefield applies placement");
+        controller.ConfigureBattleRadius(true, 40);
+        Check(first.transform.localScale.x == 2 && first.transform.localScale.y == 1 && first.transform.localScale.z == 2,
+            "Group radius scales the loaded ground horizontally, preserving authored height");
+        controller.ConfigureBattleRadius(false);
+        Check(first.transform.localScale.x == 1 && first.transform.localScale.y == 1 && first.transform.localScale.z == 1,
+            "Returning to ordinary combat restores the authored ground scale");
         await controller.ChangeBackGround(0);
         Check(AddressablesLogic.Calls("battleGround/0") == 1, "same battlefield is reused");
 
@@ -451,7 +457,23 @@ namespace UnityEngine
 {
     public sealed class SerializeField : Attribute { }
     public class MonoBehaviour : Object { }
-    public class ParticleSystem : Object { public GameObject gameObject = new GameObject("particle"); }
+    public enum ParticleSystemScalingMode { Hierarchy, Local, Shape }
+    public enum ParticleSystemStopBehavior { StopEmittingAndClear }
+    public class ParticleSystem : Object
+    {
+        public GameObject gameObject = new GameObject("particle");
+        public Transform transform => gameObject.transform;
+        public sealed class MainModule
+        {
+            public ParticleSystemScalingMode scalingMode;
+            public float startSizeXMultiplier = 1, startSizeYMultiplier = 1, startSizeZMultiplier = 1;
+            public bool startSize3D;
+        }
+        public MainModule main = new MainModule();
+        public T[] GetComponentsInChildren<T>(bool includeInactive) where T : class => new[] { this as T };
+        public void Stop(bool withChildren, ParticleSystemStopBehavior behavior) { }
+        public void Play(bool withChildren) { }
+    }
     public static class Random { public static int Range(int min, int max) => min; }
     public class Object
     {
@@ -479,19 +501,33 @@ namespace UnityEngine
         public GameObject gameObject = new GameObject("animator");
         public RuntimeAnimatorController runtimeAnimatorController;
     }
-    public static class Mathf { public static float Lerp(float a, float b, float t) => a + (b - a) * t; }
+    public static class Mathf
+    {
+        public static float Lerp(float a, float b, float t) => a + (b - a) * t;
+        public static float Max(float a, float b) => Math.Max(a, b);
+        public static int Max(int a, int b) => Math.Max(a, b);
+        public static bool Approximately(float a, float b) => Math.Abs(a - b) <= .00001f * Math.Max(1, Math.Max(Math.Abs(a), Math.Abs(b)));
+    }
     public class AudioClip { }
     public class GameObject : Object
     {
         public Decomposition Decomposition = new Decomposition();
         public UniTaskCompletionSource<bool> PreloadGate;
         public BattleGround BattleGround;
+        public Transform transform = new Transform();
+        public bool activeInHierarchy = true;
         public GameObject(string name) { this.name = name; }
-        public void SetActive(bool active) { }
+        public void SetActive(bool active) { activeInHierarchy = active; }
         public T GetComponent<T>() where T : class => BattleGround as T ?? Decomposition as T;
     }
-    public class Transform { public Vector3 position; public Quaternion rotation; }
-    public struct Vector3 { public static Vector3 zero => default; }
+    public class Transform { public Vector3 position; public Quaternion rotation; public Vector3 localScale = new Vector3(1, 1, 1); }
+    public struct Vector3
+    {
+        public float x, y, z;
+        public Vector3(float x, float y, float z) { this.x = x; this.y = y; this.z = z; }
+        public static Vector3 zero => default;
+        public static Vector3 operator *(Vector3 value, float scale) => new Vector3(value.x * scale, value.y * scale, value.z * scale);
+    }
     public struct Quaternion { }
     public static class Debug { public static void Log(object value) { } public static void LogWarning(object value) { } }
 }
@@ -548,4 +584,4 @@ public class TestFightInfo
     public TestMembers FightMembers = new TestMembers();
 }
 public class TestMembers { public TestSets HeroSets = new TestSets(), EnemySets = new TestSets(); }
-public class TestSets { public List<object> GetValues() => new List<object>(); }
+public class TestSets { readonly List<object> values = new List<object>(); public int Count => values.Count; public List<object> GetValues() => values; }

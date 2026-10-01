@@ -164,6 +164,30 @@ public static class BattleCameraFraming
         return ClampViewport(Rect.MinMaxRect(left + padding, bottom + padding, right - padding, top - padding));
     }
 
+    /// <summary>Center a duel under the corner portraits instead of pushing it toward the enemy.</summary>
+    public static Rect CalculateDuelViewport(Rect safe, Rect middle, Rect rail, bool hasPortraits)
+    {
+        var usable = CalculateUsableViewport(safe, middle, rail, false);
+        if (!hasPortraits || !usable.Overlaps(rail)) return usable;
+        float belowPortraits = rail.yMin - .02f;
+        if (belowPortraits - usable.yMin >= .35f)
+        {
+            // Portrait phones have ample height below the short corner rail.
+            // Retain the full width for the two fighters and their separation.
+            usable.yMax = Mathf.Min(usable.yMax, belowPortraits);
+        }
+        else
+        {
+            // A short landscape/safe-area viewport cannot use the lower band.
+            // Reserve equal side margins so the remaining duel is still centered.
+            float inset = Mathf.Max(0, rail.xMax + .02f - usable.xMin);
+            inset = Mathf.Min(inset, Mathf.Max(0, (usable.width - .2f) * .5f));
+            usable.xMin += inset;
+            usable.xMax -= inset;
+        }
+        return usable;
+    }
+
     public static bool TryGetModelBounds(Transform root, out Bounds bounds)
     {
         return TryGetModelBounds(root != null ? root.GetComponentsInChildren<Renderer>(true) : null, out bounds);

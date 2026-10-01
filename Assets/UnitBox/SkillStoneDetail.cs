@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using dataAccess;
@@ -9,6 +10,18 @@ namespace mainMenu
 {
     public class SkillStoneDetail : MonoBehaviour
     {
+#if UNITY_EDITOR
+        // Per-view fault injection for Editor regression; omitted from player builds.
+        System.Func<string, Cysharp.Threading.Tasks.UniTask<SKStoneItem>> iconLoaderForValidation;
+#endif
+        Cysharp.Threading.Tasks.UniTask<SKStoneItem> LoadIcon(string id)
+        {
+#if UNITY_EDITOR
+            if (iconLoaderForValidation != null) return iconLoaderForValidation(id);
+#endif
+            return Stones.GenerateStoneModel(id, false);
+        }
+
         [Header("图标")]
         [SerializeField] RectTransform iconShowT;
 
@@ -46,30 +59,72 @@ namespace mainMenu
 
         public Text SkillIntro => skillIntro;
 
-        // 额外生成一个技能石图像
-        public async void IconForShow(string skillID, float size)
+        int iconRequestVersion;
+        SKStoneItem renderedIcon;
+
+        // An old selection must never replace the text's current skill icon.
+        public void IconForShow(string skillID, float size)
         {
-            var item = await Stones.GenerateStoneModel(skillID, false);
+            int version = ++iconRequestVersion;
+            ClearIcon();
+            RenderIcon(skillID, size, version).Forget();
+        }
+
+        async UniTask RenderIcon(string skillID, float size, int version)
+        {
+            var item = await LoadIcon(skillID);
+            if (item == null) return;
+            if (this == null || version != iconRequestVersion)
+            {
+                DiscardIcon(item);
+                return;
+            }
+            var target = iconShowT != null ? iconShowT : tempT;
+            if (target == null)
+            {
+                DiscardIcon(item);
+                return;
+            }
+            renderedIcon = item;
+            item.transform.SetParent(target, false);
             if (iconShowT != null)
             {
-                foreach (Transform child in iconShowT)
-                {
-                    Destroy(child.gameObject);
-                }
-                item.transform.SetParent(iconShowT);
                 item.gameObject.SetActive(true);
                 item.transform.localPosition = Vector3.zero;
                 item.transform.localScale = Vector3.one;
-                item.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(size, size);
+                item.GetComponent<RectTransform>().sizeDelta = new Vector2(size, size);
             }
-            else
+        }
+
+        void ClearIcon()
+        {
+            DiscardIcon(renderedIcon);
+            renderedIcon = null;
+            if (iconShowT == null) return;
+            foreach (Transform child in iconShowT)
             {
-                item.transform.SetParent(tempT);
+                child.gameObject.SetActive(false);
+                Destroy(child.gameObject);
             }
+        }
+
+        static void DiscardIcon(SKStoneItem item)
+        {
+            if (item == null) return;
+            item.gameObject.SetActive(false);
+            Destroy(item.gameObject);
+        }
+
+        void OnDestroy()
+        {
+            iconRequestVersion++;
+            DiscardIcon(renderedIcon);
         }
 
         public void Clear()
         {
+            iconRequestVersion++;
+            ClearIcon();
             keyName.text = string.Empty;
             showName.text = string.Empty;
             skillIntro.text = string.Empty;
@@ -85,13 +140,6 @@ namespace mainMenu
             ShowSKillRanges(close, near, far, -10, -10); //即清空
             atIcon.SetActive(false);
             defenceIcon.SetActive(false);
-            if (iconShowT != null)
-            {
-                foreach (Transform child in iconShowT)
-                {
-                    Destroy(child.gameObject);
-                }
-            }
         }
 
         public void RefreshInfo(string instanceID)

@@ -157,12 +157,22 @@ namespace FightScene
             PreloadAIStory();
         }
 
-        public void PreloadAIStory()
+        public void PreloadAIStory(bool newBattleAttempt = false)
         {
-            if (ShouldLoadAIStory())
+            if (!ShouldLoadAIStory()) return;
+
+            // A result-screen retry can keep the same FightInfo. A completed
+            // empty response must not permanently disable stories for that fight.
+            // Reset only at a new attempt; ordinary reads never reissue network
+            // calls, and pending/ready stories remain shared.
+            if (newBattleAttempt && ReferenceEquals(aiStoryFight, FightLoad.Fight)
+                && aiStoryInfo == null && aiStoryLoadSource != null
+                && aiStoryLoadSource.Task.Status == UniTaskStatus.Succeeded)
             {
-                EnsureAIStory().Forget();
+                CancelAIStory();
+                aiStoryLoadSource = null;
             }
+            EnsureAIStory().Forget();
         }
 
         private bool ShouldLoadAIStory()
@@ -210,7 +220,9 @@ namespace FightScene
                 EnsureAIServiceManager();
                 aiStoryLoadSource = new UniTaskCompletionSource<StoryInfo>();
                 aiStoryCancellation = new CancellationTokenSource();
-                LoadAIStory(aiStoryLoadSource, aiStoryFight, aiStoryCancellation.Token).Forget();
+                var loadSource = aiStoryLoadSource;
+                LoadAIStory(loadSource, aiStoryFight, aiStoryCancellation.Token).Forget();
+                return loadSource.Task;
             }
 
             return aiStoryLoadSource.Task;

@@ -345,6 +345,21 @@ public static class PocketStrikerBattleCameraValidation
                     "Hidden or vertically separate portraits still shrink the battle view.");
             report.viewportCases++;
         }
+        foreach (var input in inputs)
+        foreach (bool portraits in new[] { false, true })
+        {
+            var full = BattleCameraFraming.CalculateUsableViewport(input[0], input[1], input[2], false);
+            var duel = BattleCameraFraming.CalculateDuelViewport(input[0], input[1], input[2], portraits);
+            Require(Mathf.Abs(duel.center.x - full.center.x) < .0001f, "Corner portraits bias the duel toward one team.");
+            Require(Contains(full, duel) && duel.width >= .2f && duel.height >= .1f, "Duel viewport escapes its safe gameplay area.");
+            Require(!portraits || !duel.Overlaps(input[2]), "Centered duel remains under the corner portraits.");
+            report.viewportCases++;
+        }
+        var tallDuel = BattleCameraFraming.CalculateDuelViewport(new Rect(0, 0, 1, 1),
+            new Rect(0, .18f, 1, .76f), new Rect(.02f, .74f, .12f, .16f), true);
+        Require(tallDuel.width > .95f && tallDuel.yMax <= .7201f,
+            "Portrait duel wastes horizontal space beside its short portrait rail.");
+        report.viewportCases++;
         foreach (var bounds in new[] { new List<Bounds>(), null })
         {
             var empty = BattleCameraFraming.CalculatePose(bounds, 9f / 16, 45, new Rect(0, 0, 1, 1), 45);

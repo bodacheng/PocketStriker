@@ -94,6 +94,9 @@ public static partial class PocketStrikerBattleCameraSmoke
         SessionState.SetInt(Key + ".Builder", settings.ActivePlayModeDataBuilderIndex);
         SessionState.SetBool(Key + ".HadAuto", PlayerPrefs.HasKey("auto"));
         SessionState.SetInt(Key + ".Auto", PlayerPrefs.GetInt("auto", 0));
+        SessionState.SetBool(Key + ".HadOrbit", PlayerPrefs.HasKey("AutoRotateCamera"));
+        SessionState.SetInt(Key + ".Orbit", PlayerPrefs.GetInt("AutoRotateCamera", 1));
+        PlayerPrefs.SetInt("AutoRotateCamera", 1);
         SessionState.SetString(Key + ".Start", DateTime.UtcNow.ToString("O"));
         SessionState.SetString(Key + ".Errors", "");
         SessionState.SetInt(Key + ".IAPObjects", 0);
@@ -169,7 +172,9 @@ public static partial class PocketStrikerBattleCameraSmoke
             var leader = authored.UnitsData[0].DeepCopy();
             UnityEngine.Object.Destroy(authored);
 
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
+            if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
+                await ReviewHandoffs(leader);
+            else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
                 await ReviewTransitions(leader);
             else
             {
@@ -562,6 +567,8 @@ public static partial class PocketStrikerBattleCameraSmoke
         if (settings != null) settings.ActivePlayModeDataBuilderIndex = SessionState.GetInt(Key + ".Builder", 0);
         if (SessionState.GetBool(Key + ".HadAuto", false)) PlayerPrefs.SetInt("auto", SessionState.GetInt(Key + ".Auto", 0));
         else PlayerPrefs.DeleteKey("auto");
+        if (SessionState.GetBool(Key + ".HadOrbit", false)) PlayerPrefs.SetInt("AutoRotateCamera", SessionState.GetInt(Key + ".Orbit", 1));
+        else PlayerPrefs.DeleteKey("AutoRotateCamera");
         Debug.Log("[CameraSmoke] " + (report.passed ? "PASS" : "FAIL") + ": " + Path.GetFullPath(Path.Combine(Output, "report.json")));
         if (!report.passed) Debug.LogError(string.Join("\n", report.errors));
         if (Application.isBatchMode) EditorApplication.Exit(report.passed ? 0 : 1);

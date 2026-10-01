@@ -114,6 +114,7 @@ public class ProgressLayer : UILayer
     #region 黑幕
     void DarkOff(float darkness, float duration)
     {
+        bigCurtain.DOKill();
         bigCurtain.raycastTarget = true;
         bigCurtain.DOColor(new Color(0,0,0, darkness), duration).SetLink(gameObject);
     }
@@ -125,9 +126,10 @@ public class ProgressLayer : UILayer
         {
             var layer = popupLayer;
             var curtain = popupLayer.bigCurtain;
+            curtain.DOKill();
             curtain.DOColor(new Color(0,0,0, 0), duration).SetLink(layer.gameObject).OnComplete(() =>
             {
-                if (layer == null || curtain == null)
+                if (layer == null || curtain == null || layer.IsClosing || UILayerLoader.Get<ProgressLayer>() != layer)
                 {
                     return;
                 }
@@ -204,6 +206,8 @@ public class ProgressLayer : UILayer
     {
         currentTween?.Kill();
         currentTween = null;
+        var layer = UILayerLoader.Get<ProgressLayer>();
+        if (layer != null && layer.bigCurtain != null) layer.bigCurtain.DOKill();
         UILayerLoader.Remove<ProgressLayer>();
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class HighLightLayer : UILayer
 {
     [SerializeField] Image bigCurtain;
+    int requestVersion;
     
     // canvasSortOrder = 100，这个数字无非是想让黑幕变成最上层，
     // 黑幕是靠缕空来实现空区域可点击。
@@ -32,9 +33,11 @@ public class HighLightLayer : UILayer
     
     async void _HighLightRect(RectTransform r, Options options = null)
     {
+        var version = ++requestVersion;
+        bigCurtain.DOKill();
         bigCurtain.raycastTarget = true; // 防止下面那点间隔里有点击画面的空间
         await Observable.TimerFrame(2); // 没有这个间隔ShowForUI的计算可能出错
-        if (this == null || bigCurtain == null)
+        if (this == null || bigCurtain == null || IsClosing || version != requestVersion)
         {
             return;
         }
@@ -66,6 +69,9 @@ public class HighLightLayer : UILayer
             return;
         }
 
+        ++highLightLayer.requestVersion;
+        highLightLayer.bigCurtain.DOKill();
+        HighlightUI.Dismiss(false);
         highLightLayer.bigCurtain.raycastTarget = true;
         highLightLayer.bigCurtain.DOColor(color, duration).SetLink(highLightLayer.gameObject);
     }
@@ -77,9 +83,12 @@ public class HighLightLayer : UILayer
         {
             var layer = highLightLayer;
             var curtain = highLightLayer.bigCurtain;
+            var version = ++layer.requestVersion;
+            curtain.DOKill();
             curtain.DOColor(new Color(0,0,0, 0), duration).SetLink(layer.gameObject).OnComplete(() =>
             {
-                if (layer == null || curtain == null)
+                if (layer == null || curtain == null || layer.IsClosing || version != layer.requestVersion
+                    || UILayerLoader.Get<HighLightLayer>() != layer)
                 {
                     return;
                 }
@@ -94,6 +103,12 @@ public class HighLightLayer : UILayer
     
     public static void Close()
     {
+        var layer = UILayerLoader.Get<HighLightLayer>();
+        if (layer != null)
+        {
+            ++layer.requestVersion;
+            if (layer.bigCurtain != null) layer.bigCurtain.DOKill();
+        }
         HighlightUI.Dismiss();
         UILayerLoader.Remove<HighLightLayer>();
     }
