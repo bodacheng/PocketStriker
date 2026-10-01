@@ -15,10 +15,12 @@ using UnityEngine.SceneManagement;
 
 /// <summary>Local Play-mode smoke using the production fight scene, loaders, HUD and camera.</summary>
 [InitializeOnLoad]
-public static class PocketStrikerBattleCameraSmoke
+public static partial class PocketStrikerBattleCameraSmoke
 {
     const string Key = "PocketStriker.CameraSmoke";
-    const string Output = "Logs/CameraFraming/Playmode";
+    static string Output => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW"))
+        ? "Logs/CameraFraming/Playmode"
+        : "Logs/CameraFraming/Transitions/" + Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW");
     static bool finishing;
     static Report report;
 
@@ -28,12 +30,13 @@ public static class PocketStrikerBattleCameraSmoke
         public bool passed;
         public string unityVersion;
         public string utcTime;
-        public string scope = "Play mode in the actual FightScene through Addressables Fast Mode and FightLoad.Go. Production Preparing/CountDown/Fighting, RTFightManager, live animated models, FightingStepLayer and CameraManager. Duel 1v1, Rotation 3v3 (only current fighters), MultiRaid 3v3, Group 100v100 and production in-scene Group retry. Each first CountDown view must immediately fit the final fielded models at its independent Duel25/Multi33/Group46 pitch, without inherited staging distance. Fixture then moves active models around the arena and changes ordinary focus; each sampled frame projects complete visible renderer bounds through the actual camera.";
+        public string scope = "Play mode in the actual FightScene through Addressables Fast Mode and FightLoad.Go. Production Preparing/CountDown/Fighting, RTFightManager, live animated models, FightingStepLayer and CameraManager. Duel 1v1, Rotation 3v3 (only current fighters), MultiRaid 3v3, Group 100v100 and production in-scene Group retry. Each first CountDown view must immediately fit the final fielded models at its independent Duel32/Multi33/Group46 pitch, without inherited staging distance. Fixture then moves active models around the arena and changes ordinary focus; each sampled frame projects complete visible renderer bounds through the actual camera.";
         public string limitation = "Local Self event bypasses login, rewards, advertising and AI story requests. A fixture sceneLoaded hook disables and destroys shop IAP startup objects before Start in every scene, cancelling their login subscriptions; production IAP code remains unchanged. Group mechanics still use GangbangInfo/IsGroupBattle. This is editor Play mode, not a physical-device performance test.";
         public int isolatedIAPObjects;
         public List<string> weaponLifecycleChecks = new List<string>();
         public List<StartCase> starts = new List<StartCase>();
         public List<Case> cases = new List<Case>();
+        public List<TransitionCase> transitions = new List<TransitionCase>();
         public List<string> errors = new List<string>();
     }
 
@@ -166,36 +169,41 @@ public static class PocketStrikerBattleCameraSmoke
             var leader = authored.UnitsData[0].DeepCopy();
             UnityEngine.Object.Destroy(authored);
 
-            var duel = CreateOrdinary(leader, TeamMode.Rotation, 1);
-            FightLoad.Go(duel);
-            await WaitReady(1, 1, false, "duel");
-            ValidateWeaponLifecycles();
-            await Observe("duel", false, 1, 1);
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
+                await ReviewTransitions(leader);
+            else
+            {
+                var duel = CreateOrdinary(leader, TeamMode.Rotation, 1);
+                FightLoad.Go(duel);
+                await WaitReady(1, 1, false, "duel");
+                ValidateWeaponLifecycles();
+                await Observe("duel", false, 1, 1);
 
-            var rotation = CreateOrdinary(leader, TeamMode.Rotation);
-            FightLoad.Go(rotation);
-            await WaitReady(3, 3, false, "rotation");
-            await Observe("rotation", false, 3, 3);
+                var rotation = CreateOrdinary(leader, TeamMode.Rotation);
+                FightLoad.Go(rotation);
+                await WaitReady(3, 3, false, "rotation");
+                await Observe("rotation", false, 3, 3);
 
-            var multi = CreateOrdinary(leader, TeamMode.MultiRaid);
-            FightLoad.Go(multi);
-            await WaitReady(3, 3, false, "multiraid");
-            await Observe("multiraid", false, 3, 3);
+                var multi = CreateOrdinary(leader, TeamMode.MultiRaid);
+                FightLoad.Go(multi);
+                await WaitReady(3, 3, false, "multiraid");
+                await Observe("multiraid", false, 3, 3);
 
-            var group = CreateGroup(leader);
-            FightLoad.Go(group);
-            await WaitReady(100, 100, true, "group-200");
-            await Observe("group-200", true, 100, 100);
+                var group = CreateGroup(leader);
+                FightLoad.Go(group);
+                await WaitReady(100, 100, true, "group-200");
+                await Observe("group-200", true, 100, 100);
 
-            var before = RTFightManager.Target;
-            FightLoad.Go(FightLoad.Fight, true);
-            await UniTask.NextFrame();
-            await WaitReady(100, 100, true, "group-200-retry");
-            Require(RTFightManager.Target == before, "Production in-scene retry unexpectedly replaced the fight scene manager.");
-            await Observe("group-200-retry", true, 100, 100);
-            Require(report.cases.Count == 5 && report.starts.Count == 5
-                && report.cases.All(item => item.frames >= 10 && item.projectedCorners > 0),
-                "Play-mode camera checks did not exercise all five starts and live cases.");
+                var before = RTFightManager.Target;
+                FightLoad.Go(FightLoad.Fight, true);
+                await UniTask.NextFrame();
+                await WaitReady(100, 100, true, "group-200-retry");
+                Require(RTFightManager.Target == before, "Production in-scene retry unexpectedly replaced the fight scene manager.");
+                await Observe("group-200-retry", true, 100, 100);
+                Require(report.cases.Count == 5 && report.starts.Count == 5
+                    && report.cases.All(item => item.frames >= 10 && item.projectedCorners > 0),
+                    "Play-mode camera checks did not exercise all five starts and live cases.");
+            }
             report.passed = true;
         }
         catch (Exception exception) { report.errors.Add(exception.ToString()); }
@@ -560,13 +568,19 @@ public static class PocketStrikerBattleCameraSmoke
         else EditorApplication.isPlaying = false;
     }
 
+    static Vector2 ReviewResolution()
+    {
+        return Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_SIZE") == "390x844"
+            ? new Vector2(390, 844) : new Vector2(540, 960);
+    }
+
     static void ConfigurePortraitGameView()
     {
         var gameViewType = typeof(Editor).Assembly.GetType("UnityEditor.GameView", true);
         var method = gameViewType.GetMethod("SetCustomResolution", BindingFlags.Instance | BindingFlags.NonPublic);
         Require(method != null, "Cannot configure a portrait Game view in this editor.");
         var view = EditorWindow.GetWindow(gameViewType);
-        method.Invoke(view, new object[] { new Vector2(540, 960), "PocketStriker Camera Smoke" });
+        method.Invoke(view, new object[] { ReviewResolution(), "PocketStriker Camera Smoke" });
         view.Repaint();
     }
 

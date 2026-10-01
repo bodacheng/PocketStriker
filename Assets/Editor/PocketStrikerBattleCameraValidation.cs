@@ -25,7 +25,7 @@ public static class PocketStrikerBattleCameraValidation
         public int modelBoundsCases;
         public int centerLagCases;
         public int profileCases;
-        public string scope = "Production BattleCameraFraming with perspective Camera.WorldToViewportPoint: complete AABB corners, portrait phone/tablet aspect ratios, safe-area/HUD usable rectangles, 25/45/60 degree field of view, production Duel25/Multi33/Group46 and 30/45/65/90 degree pitch, 0.5/1/2 fighter scale, narrow/split/tall/airborne/200-fighter layouts. Checks independent profiles and mixed-team routing, emergency expansion, gradual shrink, center lag, production target selection, safe-area/HUD exclusion and local model renderer bounds.";
+        public string scope = "Production BattleCameraFraming with perspective Camera.WorldToViewportPoint: complete AABB corners, portrait phone/tablet aspect ratios, safe-area/HUD usable rectangles, 25/45/60 degree field of view, production Duel32/Multi33/Group46 and 30/45/65/90 degree pitch, 0.5/1/2 fighter scale, narrow/split/tall/airborne/200-fighter layouts. Checks independent profiles and mixed-team routing, emergency expansion, gradual shrink, center lag, production target selection, safe-area/HUD exclusion and local model renderer bounds.";
         public string limitation = "Offline geometric validation. No account, prefab gameplay, Addressables, render pipeline or battle simulation is initialized. Device safe-area rectangles are explicit fixture inputs. Runtime manager integration and moving animation bounds require Play-mode smoke.";
         public List<string> errors = new List<string>();
         public List<string> observations = new List<string>();
@@ -110,7 +110,7 @@ public static class PocketStrikerBattleCameraValidation
         finally
         {
             UnityEngine.Object.DestroyImmediate(rig); EditorSceneManager.ClosePreviewScene(scene);
-            report.passed = report.errors.Count == 0 && report.framingCases == 1890 && report.profileCases >= 21 && report.transitionCases >= 3
+            report.passed = report.errors.Count == 0 && report.framingCases == 1890 && report.profileCases >= 21 && report.transitionCases >= 6
                 && report.selectionCases >= 24 && report.viewportCases >= 5 && report.modelBoundsCases >= 6 && report.centerLagCases >= 6;
             File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         }
@@ -128,8 +128,8 @@ public static class PocketStrikerBattleCameraValidation
                 "Independent battle camera class does not apply its profile.");
             report.profileCases++;
         }
-        Require(Mathf.Abs(BattleCameraProfiles.Duel.Pitch - Mathf.Atan2(8 - 1.5f, 14) * Mathf.Rad2Deg) < .2f,
-            "Duel pitch no longer matches the previous midpoint camera elevation.");
+        Require(BattleCameraProfiles.Duel.Pitch >= 30 && BattleCameraProfiles.Duel.Pitch <= 35,
+            "Duel camera must look over the fighters without becoming an overhead crowd view.");
         Require(Mathf.Abs(BattleCameraProfiles.MultiRaid.Pitch - Mathf.Atan2(15 - 2, 20) * Mathf.Rad2Deg) < .2f,
             "MultiRaid pitch no longer matches the previous camera elevation.");
         Require(BattleCameraProfiles.Group.Pitch > BattleCameraProfiles.MultiRaid.Pitch
@@ -144,7 +144,7 @@ public static class PocketStrikerBattleCameraValidation
                 "Battle camera routing ignores the opponent's fielded mode.");
             report.profileCases++;
         }
-        report.observations.Add("Duel25 and Multi33 restore the previous elevation while Group46 retains a moderate overhead view. A rotation player against multiple fielded enemies uses MultiRaid framing.");
+        report.observations.Add("Duel32 raises the view over the fighters; Multi33 and Group46 retain their independent elevations. A rotation player against multiple fielded enemies uses MultiRaid framing.");
     }
 
     static IEnumerable<KeyValuePair<string, List<Bounds>>> Formations(float scale)
@@ -253,6 +253,26 @@ public static class PocketStrikerBattleCameraValidation
         Require(prior - compact.Distance <= initialDelta * .008f + .0001f,
             "Camera does not follow the gradual two-second shrink after distant fighters leave.");
         report.transitionCases++;
+        // The close pair must become readable promptly, at several frame rates,
+        // without losing emergency expansion or changing crowd-camera behavior.
+        foreach (int fps in new[] { 30, 60, 120 })
+        {
+            float duel = expanded.Distance;
+            float crowd = expanded.Distance;
+            for (int frame = 0; frame < fps * 2; frame++)
+            {
+                duel = BattleCameraFraming.SmoothDistance(duel, compact.Distance, 1f / fps, BattleCameraProfiles.Duel.DistanceSmoothTime);
+                crowd = BattleCameraFraming.SmoothDistance(crowd, compact.Distance, 1f / fps, BattleCameraProfiles.MultiRaid.DistanceSmoothTime);
+                Require(duel >= compact.Distance && crowd >= compact.Distance, "Camera shrink cropped the near pair.");
+            }
+            Require(duel - compact.Distance < (expanded.Distance - compact.Distance) * .02f,
+                "Duel retains a wide shot after two seconds of close combat.");
+            Require(crowd - compact.Distance > (expanded.Distance - compact.Distance) * .3f,
+                "Duel tuning unexpectedly changes the slower crowd framing.");
+            Require(BattleCameraFraming.SmoothDistance(duel, expanded.Distance, 1f / fps,
+                BattleCameraProfiles.Duel.DistanceSmoothTime) >= expanded.Distance, "Fast duel return lost immediate separation safety.");
+            report.transitionCases++;
+        }
     }
 
     static BattleCameraFraming.Pose PoseAtDistance(BattleCameraFraming.Pose target, float distance)

@@ -39,11 +39,17 @@ Battle cameras frame the complete model bounds of every living, fielded unit;
 rotation reserves are excluded. `AllUnitsBattleCamera` fits perspective against
 portrait aspect ratio, safe area and the space between the HUD header and controls,
 excluding the player portrait rail. Focus does not narrow the target collection.
-Independent profiles use a 25° pitch for duels, 33° for normal multiplayer and
+Independent profiles use a 32° pitch for duels, 33° for normal multiplayer and
 46° for Group battles. Either team's MultiRaid mode selects the multiplayer
 profile. Preparing never fits remote loading positions; the first CountDown
 frame immediately fits the final models, with no inherited staging distance.
-Expansion is immediate, while inward motion eases over two seconds. Camera
+Expansion is immediate to keep separated/airborne models visible. Duels use a
+0.10-second center follow and 0.45-second inward exponential time constant;
+MultiRaid/Group retain the 0.22-second center follow and two-second inward constant.
+When a rotation fighter is dead, inactive or temporarily absent while a living
+replacement remains, the duel camera holds its established center, yaw and inward
+distance instead of moving onto the survivor. It may still expand to keep the
+survivor visible; normal tracking resumes when the replacement is fielded. Camera
 updates run after animated models and HUD layout. `PocketStrikerBattleCameraValidation`
 projects full bounds through the production pose, including 200-unit formations.
 `PocketStrikerBattleCameraSmoke.StartBatch` runs the actual fight scene in local
@@ -53,6 +59,19 @@ after live camera updates. Its invulnerable fighters isolate camera behavior;
 it does not validate battle outcomes.
 Its local account fixture excludes shop/login services; reports and screenshots
 are saved under `Logs/CameraFraming/Playmode`.
+
+For transition regression, run `PocketStrikerBattleCameraSmoke.StartBatch` without
+`-quit` and set `POCKETSTRIKER_CAMERA_REVIEW` to a new report label. Add
+`POCKETSTRIKER_CAMERA_SIZE=390x844` for the narrow portrait case. Reports, per-frame
+camera/model telemetry and timed PNGs are saved in
+`Logs/CameraFraming/Transitions/<label>`. Sixteen scenarios cover real portrait
+pointer switching, enemy switching, death replacement, temporary target loss,
+in-scene retry, scene reload, mixed-model switching and controlled
+near/separated/airborne envelopes. Assertions catch delayed inward convergence,
+replacement zoom swings and projected model clipping. This is a local Self battle
+fixture, not an authenticated match or a validation of jump/knockback mechanics;
+retry resets dead fighters, but there is no separate in-match resurrection flow
+covered by this fixture.
 
 Models initialize at separate temporary positions while their animation setup
 requires them to remain active. Normal starting placement then synchronizes root

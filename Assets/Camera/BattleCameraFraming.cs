@@ -78,11 +78,11 @@ public static class BattleCameraFraming
         return pose;
     }
 
-    /// <summary>Separation is visible immediately; deaths ease the camera inward.</summary>
-    public static float SmoothDistance(float current, float required, float deltaTime)
+    /// <summary>Separation is visible immediately; each profile controls its inward settling time.</summary>
+    public static float SmoothDistance(float current, float required, float deltaTime, float smoothTime = 2f)
     {
         return required >= current ? required
-            : Mathf.Lerp(current, required, 1 - Mathf.Exp(-Mathf.Max(0, deltaTime) / 2f));
+            : Mathf.Lerp(current, required, 1 - Mathf.Exp(-Mathf.Max(0, deltaTime) / Mathf.Max(0.01f, smoothTime)));
     }
 
     public static bool ShouldIncludeUnit(TeamMode mode, bool active, bool dead, bool isRotationFighter)

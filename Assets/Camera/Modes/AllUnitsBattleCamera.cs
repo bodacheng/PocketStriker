@@ -7,6 +7,8 @@ public class AllUnitsBattleCamera : CameraMode
 {
     readonly float _pitch;
     readonly float _minimumDistance;
+    readonly float _centerSmoothTime;
+    readonly float _distanceSmoothTime;
     readonly List<Bounds> _bounds = new List<Bounds>(200);
     readonly Dictionary<Data_Center, Renderer[]> _renderers = new Dictionary<Data_Center, Renderer[]>();
     readonly Vector3[] _corners = new Vector3[4];
@@ -19,6 +21,7 @@ public class AllUnitsBattleCamera : CameraMode
 
     public float Pitch => _pitch;
     public bool IsFramingInitialized => _initialized;
+    public bool IsHoldingReplacementFraming { get; private set; }
     public int FramedUnitCount => _bounds.Count;
     public BattleCameraFraming.Pose DesiredPose { get; private set; }
     public BattleCameraFraming.Pose CurrentPose { get; private set; }
@@ -30,21 +33,25 @@ public class AllUnitsBattleCamera : CameraMode
         set { PlayerPrefs.SetInt("AutoRotateCamera", value ? 1 : 0); PlayerPrefs.Save(); }
     }
 
-    public AllUnitsBattleCamera(float pitch, float fov, float minimumDistance = 6)
+    public AllUnitsBattleCamera(float pitch, float fov, float minimumDistance = 6,
+        float centerSmoothTime = 0.22f, float distanceSmoothTime = 2f)
     {
         _pitch = pitch;
         fieldOfView = fov;
         _minimumDistance = minimumDistance;
+        _centerSmoothTime = centerSmoothTime;
+        _distanceSmoothTime = distanceSmoothTime;
     }
 
     public AllUnitsBattleCamera(BattleCameraProfile profile)
-        : this(profile.Pitch, profile.FieldOfView, profile.MinimumDistance) { }
+        : this(profile.Pitch, profile.FieldOfView, profile.MinimumDistance, profile.CenterSmoothTime, profile.DistanceSmoothTime) { }
 
     public override void Enter(Camera camera)
     {
         ApplyFieldOfView(camera, fieldOfView);
         CanSetH = true;
         _initialized = false;
+        IsHoldingReplacementFraming = false;
         _centerVelocity = Vector3.zero;
         _renderers.Clear();
         _hud = Object.FindFirstObjectByType<FightingStepLayer>(FindObjectsInactive.Include);
@@ -57,6 +64,7 @@ public class AllUnitsBattleCamera : CameraMode
         _renderers.Clear();
         _hud = null;
         _initialized = false;
+        IsHoldingReplacementFraming = false;
     }
 
     public override void LocalUpdate(Camera camera) => UpdateCamera(camera, Time.deltaTime);
@@ -72,6 +80,7 @@ public class AllUnitsBattleCamera : CameraMode
             // HUD setup may select a camera while models are still in remote staging.
             // Initialize from the final fielded models on the first CountDown frame.
             _initialized = false;
+            IsHoldingReplacementFraming = false;
             _centerVelocity = Vector3.zero;
             return;
         }
@@ -79,11 +88,18 @@ public class AllUnitsBattleCamera : CameraMode
         AddTeam(manager.team2);
         if (_bounds.Count == 0) return;
 
+        // A defeated rotation fighter is replaced after a short delay. During
+        // that gap, panning/zooming onto the survivor creates an unnecessary
+        // wide pullback when the replacement arrives. Keep the established
+        // two-sided composition, while still expanding if the survivor moves.
+        IsHoldingReplacementFraming = _initialized && this is DuelBattleCamera
+            && (AwaitingRotationReplacement(manager.team1) || AwaitingRotationReplacement(manager.team2));
+
         var usable = UsableViewport(camera);
         float horizontal = CanSetH ? UltimateJoystick.GetHorizontalAxis("RotateCamera") : 0;
         if (Mathf.Abs(horizontal) > 0.01f)
             _yaw += horizontal * 75 * deltaTime;
-        else if (manager.team1.TeamMode == TeamMode.Rotation && AutoRotateCamera)
+        else if (!IsHoldingReplacementFraming && manager.team1.TeamMode == TeamMode.Rotation && AutoRotateCamera)
         {
             var first = manager.team1.GetRModeUnitT();
             var second = manager.team2.GetRModeUnitT();
@@ -108,19 +124,33 @@ public class AllUnitsBattleCamera : CameraMode
             _distance = desired.Distance;
             _initialized = true;
         }
+        else if (IsHoldingReplacementFraming)
+            _centerVelocity = Vector3.zero;
         else if (deltaTime > 0)
-            _center = Vector3.SmoothDamp(_center, desired.Center, ref _centerVelocity, 0.22f,
+            _center = Vector3.SmoothDamp(_center, desired.Center, ref _centerVelocity, _centerSmoothTime,
                 Mathf.Infinity, deltaTime);
 
         // Solve again against the smoothed center: pan lag and camera rotation
         // must never cut off a previously visible teammate.
         var fitted = BattleCameraFraming.CalculatePoseAtCenter(_bounds, camera.aspect, fieldOfView, usable,
             desired.Rotation, _center, _minimumDistance, camera.nearClipPlane);
-        _distance = BattleCameraFraming.SmoothDistance(_distance, fitted.Distance, deltaTime);
+        _distance = IsHoldingReplacementFraming ? Mathf.Max(_distance, fitted.Distance)
+            : BattleCameraFraming.SmoothDistance(_distance, fitted.Distance, deltaTime, _distanceSmoothTime);
         fitted = BattleCameraFraming.WithDistance(fitted, _distance, camera.aspect, fieldOfView);
         CurrentPose = fitted;
         camera.transform.SetPositionAndRotation(fitted.Position, fitted.Rotation);
         camera.farClipPlane = Mathf.Max(camera.farClipPlane, _distance + 100);
+    }
+
+    static bool AwaitingRotationReplacement(UnitsManger team)
+    {
+        if (team?.teamMembers?.mDict == null || team.TeamMode != TeamMode.Rotation) return false;
+        var current = team.RMode_Unit.Value;
+        if (current != null && current.WholeT != null && current.gameObject.activeInHierarchy
+            && current.WholeT.gameObject.activeInHierarchy && !current.FightDataRef.IsDead.Value) return false;
+        foreach (var unit in team.teamMembers.mDict.Values)
+            if (unit != null && unit.WholeT != null && !unit.FightDataRef.IsDead.Value) return true;
+        return false;
     }
 
     void AddTeam(UnitsManger team)
