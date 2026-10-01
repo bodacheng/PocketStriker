@@ -79,7 +79,7 @@ public class TeamSingleSelectLayer : UILayer
     private void SetConfirmBtnActive()
     {
         bool legal = _teamLegal(_currentTeamMode);
-        skillEditBtnColorSwapper.ChangeColor(legal ? Color.green : new Color(1,1,1,0.5f));
+        skillEditBtnColorSwapper.ChangeColor(legal ? new Color(0.96f, 0.78f, 0.43f) : new Color(1,1,1,0.5f));
         saveBtn.interactable = legal;
     }
 }

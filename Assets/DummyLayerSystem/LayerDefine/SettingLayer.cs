@@ -1,4 +1,6 @@
-﻿using DummyLayerSystem;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using DummyLayerSystem;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -70,6 +72,22 @@ public class SettingLayer : UILayer
     [SerializeField] Text nickName;
     [SerializeField] BOButton resetNickNameBtn;
     #endregion
+
+    bool _initialized;
+    bool _languageChanging;
+    bool _nicknameDialogOpen;
+    int _nicknameDialogVersion;
+
+    // Instance-scoped service seams keep the real click flow independently testable.
+    Func<UniTask> _reloadSkillNames = SkillNameTable.LoadSkillNamesFromConfig;
+    Action _refreshSkillConfig = SkillConfigTable.RefreshSkillConfigDicForReference;
+    Action _changeLanguagePresentation = LanguageConverterManger.ChangeLanguage;
+    Action<Action<string>, Action> _openNickname = (success, cancel) => SettingPage.SetNickName(success, true, cancel);
+    Action _nicknameSaved = () => PopupLayer.ArrangeWarnWindow(Translate.Get("NicknameSet"));
+#if UNITY_EDITOR
+    Action _confirmEmailForValidation;
+    Action _sendPasswordResetForValidation;
+#endif
 
     bool _contentCenteringPending;
     Rect _lastAvailableRect;
@@ -205,18 +223,8 @@ public class SettingLayer : UILayer
         EmailConfirmBtn.gameObject.SetActive(true);
         SendPwResetBtn.gameObject.SetActive(false);
         
-        EmailConfirmBtn.onClick.RemoveAllListeners();
-        EmailConfirmBtn.onClick.AddListener(() =>
-        {
-            if (PlayerAccountInfo.Me.PlayFabUserName == null)
-            {
-                PlayFabReadClient.AddUserNameAndEmail(
-                    PlayerAccountInfo.Me.PlayFabId, 
-                    EmailInput.text.Trim(),
-                    AccountPhase_EmailSet
-                ); // 这个方法没有server版，只能客户端主动执行
-            }
-        });
+        EmailConfirmBtn.onClick.RemoveListener(ConfirmEmail);
+        EmailConfirmBtn.onClick.AddListener(ConfirmEmail);
         RefreshContentCentering();
     }
     
@@ -233,25 +241,138 @@ public class SettingLayer : UILayer
         EmailConfirmBtn.gameObject.SetActive(false);
         SendPwResetBtn.gameObject.SetActive(true);
         
-        SendPwResetBtn.onClick.AddListener(
-        () =>
-            {
-                PlayFabReadClient.SendPwResetEmail(
-                    PlayerAccountInfo.Me.Email,
-                    () =>
-                    {
-                        PopupLayer.ArrangeWarnWindow(" Email Sent ");
-                    }
-                );
-            }
-        );
+        SendPwResetBtn.onClick.RemoveListener(SendPasswordReset);
+        SendPwResetBtn.onClick.AddListener(SendPasswordReset);
         RefreshContentCentering();
+    }
+
+    void ConfirmEmail()
+    {
+#if UNITY_EDITOR
+        if (_confirmEmailForValidation != null) { _confirmEmailForValidation(); return; }
+#endif
+        if (PlayerAccountInfo.Me.PlayFabUserName == null)
+            PlayFabReadClient.AddUserNameAndEmail(PlayerAccountInfo.Me.PlayFabId,
+                EmailInput.text.Trim(), AccountPhase_EmailSet);
+    }
+
+    void SendPasswordReset()
+    {
+#if UNITY_EDITOR
+        if (_sendPasswordResetForValidation != null) { _sendPasswordResetForValidation(); return; }
+#endif
+        PlayFabReadClient.SendPwResetEmail(PlayerAccountInfo.Me.Email,
+            () => PopupLayer.ArrangeWarnWindow(" Email Sent "));
+    }
+
+    void LanguageIndicator()
+    {
+        Transform target = null;
+        switch (AppSetting.Value.Language)
+        {
+            case SystemLanguage.English: target = enBtn.transform; break;
+            case SystemLanguage.Japanese: target = jpBtn.transform; break;
+            case SystemLanguage.Chinese:
+            case SystemLanguage.ChineseSimplified:
+            case SystemLanguage.ChineseTraditional: target = chBtn.transform; break;
+        }
+        if (target != null) selectedIndicator.transform.SetParent(target, false);
+        selectedIndicator.transform.localPosition = Vector3.zero;
+    }
+
+    async UniTask ChangeLanguage(SystemLanguage code)
+    {
+        // A click dispatched again in the same frame must not start a second load.
+        if (_languageChanging || AppSetting.Value.Language == code) return;
+        _languageChanging = true;
+        var previousLanguage = AppSetting.Value.Language;
+        bool enWasEnabled = enBtn.interactable, jpWasEnabled = jpBtn.interactable, chWasEnabled = chBtn.interactable;
+        enBtn.interactable = jpBtn.interactable = chBtn.interactable = false;
+        try
+        {
+            AppSetting.Value.Language = code;
+            _changeLanguagePresentation();
+            RefreshPrivacyOptionsButton();
+            RefreshContentCentering();
+            LanguageIndicator();
+            await _reloadSkillNames();
+            _refreshSkillConfig();
+        }
+        catch
+        {
+            // A failed resource load must not leave the selected language
+            // pointing at a catalogue that never finished loading.
+            AppSetting.Value.Language = previousLanguage;
+            _changeLanguagePresentation();
+            RefreshPrivacyOptionsButton();
+            RefreshContentCentering();
+            LanguageIndicator();
+            throw;
+        }
+        finally
+        {
+            _languageChanging = false;
+            if (this != null)
+            {
+                enBtn.interactable = enWasEnabled;
+                jpBtn.interactable = jpWasEnabled;
+                chBtn.interactable = chWasEnabled;
+                LanguageIndicator();
+                RefreshContentCentering();
+            }
+        }
+    }
+
+    void OpenNicknameDialog()
+    {
+        if (_nicknameDialogOpen) return;
+        _nicknameDialogOpen = true;
+        int version = ++_nicknameDialogVersion;
+        gameObject.SetActive(false);
+        void Resume() => ResumeNicknameDialog(version);
+        try
+        {
+            _openNickname(value =>
+            {
+                if (!_nicknameDialogOpen || version != _nicknameDialogVersion) return;
+                Resume();
+                if (this == null || IsClosing) return;
+                nickName.text = value;
+                _nicknameSaved();
+                RefreshContentCentering();
+            }, Resume);
+        }
+        catch
+        {
+            Resume();
+            throw;
+        }
+    }
+
+    void ResumeNicknameDialog(int version)
+    {
+        if (version != _nicknameDialogVersion || !_nicknameDialogOpen) return;
+        _nicknameDialogOpen = false;
+        if (this != null && !IsClosing) gameObject.SetActive(true);
     }
 
     void SetSelectedFrame(RectTransform target)
     {
         selectedFrame.position = target.position;
+        selectedFrame.sizeDelta = target.rect.size;
+        selectedFrame.SetAsLastSibling();
         selectedFrame.gameObject.SetActive(true);
+        // Keep the current section readable above opaque tab backgrounds.
+        foreach (var button in new[] { accountBtn, volumeBtn, deviceBtn, supportBtn, languageBtn, nickNameBtn })
+        {
+            bool selected = button.transform == target;
+            if (button.targetGraphic != null)
+                button.targetGraphic.color = selected
+                    ? new Color(0.27f, 0.32f, 0.30f) : new Color(0.14f, 0.24f, 0.29f);
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null) label.color = selected
+                ? new Color(0.96f, 0.78f, 0.43f) : new Color(0.95f, 0.94f, 0.86f);
+        }
         RefreshContentCentering();
     }
     
@@ -259,7 +380,13 @@ public class SettingLayer : UILayer
     {
         nickName.text = PlayerAccountInfo.Me.TitleDisplayName;
         CurrentEmail.text = PlayerAccountInfo.Me.PlayFabUserName;
-        
+        ResetSliders();
+        LanguageIndicator();
+        RefreshPrivacyOptionsButton();
+        RefreshContentCentering();
+        if (_initialized) return;
+        _initialized = true;
+
         void CloseAllPanels()
         {
             volumePanel.gameObject.SetActive(false);
@@ -299,44 +426,16 @@ public class SettingLayer : UILayer
             SetSelectedFrame(supportBtn.GetComponent<RectTransform>());
         });
 
-        void LanguageIndicator()
-        {
-            switch (AppSetting.Value.Language)
-            {
-                case SystemLanguage.English:
-                    selectedIndicator.transform.SetParent(enBtn.transform);
-                    break;
-                case SystemLanguage.Japanese:
-                    selectedIndicator.transform.SetParent(jpBtn.transform);
-                    break;
-                case SystemLanguage.Chinese:
-                case SystemLanguage.ChineseSimplified:
-                case SystemLanguage.ChineseTraditional:
-                    selectedIndicator.transform.SetParent(chBtn.transform);
-                    break;
-            }
-            selectedIndicator.transform.localPosition= Vector3.zero;
-        }
+        enBtn.onClick.AddListener(() => ChangeLanguage(SystemLanguage.English).Forget());
+        jpBtn.onClick.AddListener(() => ChangeLanguage(SystemLanguage.Japanese).Forget());
+        chBtn.onClick.AddListener(() => ChangeLanguage(SystemLanguage.Chinese).Forget());
+        resetNickNameBtn.onClick.AddListener(OpenNicknameDialog);
 
-        async void SetLanguage(SystemLanguage code)
-        {
-            AppSetting.Value.Language = code;
-            LanguageConverterManger.ChangeLanguage();
-            RefreshPrivacyOptionsButton();
-            RefreshContentCentering();
-            await SkillNameTable.LoadSkillNamesFromConfig();
-            SkillConfigTable.RefreshSkillConfigDicForReference();
-            LanguageIndicator();
-        }
-        
         languageBtn.onClick.AddListener(
             () =>
             {
                 CloseAllPanels();
                 languagePanel.gameObject.SetActive(true);
-                enBtn.onClick.AddListener(() => { SetLanguage(SystemLanguage.English); });
-                jpBtn.onClick.AddListener(() => { SetLanguage(SystemLanguage.Japanese); });
-                chBtn.onClick.AddListener(() => { SetLanguage(SystemLanguage.Chinese); });
                 SetSelectedFrame(languageBtn.GetComponent<RectTransform>());
             }
         );
@@ -349,27 +448,9 @@ public class SettingLayer : UILayer
                 CloseAllPanels();
                 nickNamePanel.gameObject.SetActive(true);
                 SetSelectedFrame(nickNameBtn.GetComponent<RectTransform>());
-                resetNickNameBtn.onClick.AddListener(
-                    () =>
-                    {
-                        this.gameObject.SetActive(false);
-                        SettingPage.SetNickName((x) =>
-                        {
-                            PopupLayer.ArrangeWarnWindow(Translate.Get("NicknameSet"));
-                            nickName.text = x;
-                            this.gameObject.SetActive(true);
-                        }, 
-                        true, () =>
-                        {
-                            this.gameObject.SetActive(true);
-                        });
-                    }
-                );
             }
         );
-        
-        ResetSliders();
-        
+
         linkDeviceBtn.onClick.AddListener(() =>
             {
                 PlayFabReadClient.LinkAccountPopup(RefreshLinkDeviceBtn);
@@ -396,7 +477,7 @@ public class SettingLayer : UILayer
             Application.OpenURL("https://personal-site.hotaru-studio.workers.dev/#contact");
         });
         
-        deleteAccountBtn.SetListener(() =>
+        deleteAccountBtn.onClick.AddListener(() =>
         {
             PlayFabReadClient.DeleteAccountPopup(() =>
             {

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace mainMenu
 {
@@ -18,7 +18,7 @@ namespace mainMenu
         
         public void ValidationWarn(SkillSet.SkillEditError skillEditError)
         {
-            confirmBtnColorSwapper.ChangeColor(skillEditError == SkillSet.SkillEditError.Perfect ? Color.green : Color.white);
+            confirmBtnColorSwapper.ChangeColor(skillEditError == SkillSet.SkillEditError.Perfect ? new Color(0.96f, 0.78f, 0.43f) : Color.white);
             validationWarn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");
             normalSkillIndicator.gameObject.SetActive(false);
             overHeatIndicator.gameObject.SetActive(skillEditError == SkillSet.SkillEditError.UnBalanced);

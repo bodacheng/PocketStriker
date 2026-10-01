@@ -24,6 +24,11 @@ public class DropTableInfoLayer : UILayer
             Destroy(row.gameObject);
         }
         rows.Clear();
+        resultT.childControlWidth = true;
+        resultT.childForceExpandWidth = true;
+        resultT.childControlHeight = false;
+        resultT.childForceExpandHeight = false;
+        resultT.spacing = 10;
 
         var nodes = tableInfo?.Nodes?.Where(node => node != null && node.Weight >= 0 && !string.IsNullOrEmpty(node.ResultItem))
             .OrderBy(node => node.Weight)

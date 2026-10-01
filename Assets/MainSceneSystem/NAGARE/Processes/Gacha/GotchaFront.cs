@@ -5,6 +5,7 @@ using DummyLayerSystem;
 using mainMenu;
 using PlayFab.ClientModels;
 using PlayFab;
+using UnityEngine;
 
 public class GotchaFront : MSceneProcess
 {
@@ -92,6 +93,7 @@ public class GotchaFront : MSceneProcess
     
     public override void ProcessEnd()
     {
+        _purchaseControls.Restore();
         UILayerLoader.Remove<GotchaLayer>();
         StarsFall.target.Turn(false);
     }
@@ -102,6 +104,23 @@ public class GotchaFront : MSceneProcess
     }
 
     private bool _processingGotcha = false;
+    // Instance-scoped request seam lets offline validation use the real UI and
+    // failure callback without contacting PlayFab or spending any currency.
+    private Action<PurchaseItemRequest, Action<PurchaseItemResult>, Action<PlayFabError>> _purchaseItem = RequestPurchase;
+    private readonly GachaPurchaseControls _purchaseControls = new GachaPurchaseControls();
+
+    private static void RequestPurchase(PurchaseItemRequest request, Action<PurchaseItemResult> success, Action<PlayFabError> failure)
+    {
+        PlayFabClientAPI.PurchaseItem(request, success, failure);
+    }
+
+    private void PurchaseFailed(string message)
+    {
+        _purchaseControls.Restore();
+        _processingGotcha = false;
+        PopupLayer.ArrangeWarnWindow(message);
+    }
+
     void NineTimes(string itemId, string currencyCode, int currencyCount)
     {
         if (_processingGotcha)
@@ -128,58 +147,95 @@ public class GotchaFront : MSceneProcess
                 }
                 break;
         }
-        var returnLayer = UILayerLoader.Load<ReturnLayer>();
-        if (returnLayer != null)
+        // Keep the selected page, balances and return control visible while the
+        // request is pending. A failed request must not strand the player.
+        _purchaseControls.Pause(_layer);
+        _purchaseControls.Pause(UILayerLoader.Get<UpperInfoBar>());
+        _purchaseControls.Pause(UILayerLoader.Get<ReturnLayer>());
+        try
         {
-            returnLayer.gameObject.SetActive(false);
-        }
-        UILayerLoader.Remove<UpperInfoBar>();
-        UILayerLoader.Remove<GotchaLayer>();// 点击按钮瞬间关闭layer。
-        PlayFabClientAPI.PurchaseItem(
-            new PurchaseItemRequest
-            {
-                CatalogVersion = "stone",
-                StoreId = "StoneGotcha",
-                ItemId = itemId,
-                VirtualCurrency = currencyCode,
-                Price = currencyCount
-            },
-            (x) =>
-            {
-                var gotStones = new List<StoneOfPlayerInfo>();
-                if (x.Items.Count > 0)
+            _purchaseItem(
+                new PurchaseItemRequest
                 {
-                    foreach (var skillId in x.Items[0].BundleContents)
+                    CatalogVersion = "stone",
+                    StoreId = "StoneGotcha",
+                    ItemId = itemId,
+                    VirtualCurrency = currencyCode,
+                    Price = currencyCount
+                },
+                (x) =>
+                {
+                    _purchaseControls.Restore();
+                    var returnLayer = UILayerLoader.Get<ReturnLayer>();
+                    if (returnLayer != null) returnLayer.gameObject.SetActive(false);
+                    UILayerLoader.Remove<UpperInfoBar>();
+                    UILayerLoader.Remove<GotchaLayer>();
+                    var gotStones = new List<StoneOfPlayerInfo>();
+                    if (x.Items.Count > 0)
                     {
-                        var stoneOfPlayerInfo = new StoneOfPlayerInfo
+                        foreach (var skillId in x.Items[0].BundleContents)
                         {
-                            SkillId = skillId
-                        };
-                        gotStones.Add(stoneOfPlayerInfo);
+                            var stoneOfPlayerInfo = new StoneOfPlayerInfo
+                            {
+                                SkillId = skillId
+                            };
+                            gotStones.Add(stoneOfPlayerInfo);
+                        }
                     }
-                }
 
-                void Next()
-                {
-                    PlayFabReadClient.LoadItems(null);
-                    GotchaResult.Result = gotStones;
-                    PreScene.target.trySwitchToStep(MainSceneStep.GotchaResult, itemId, true);
-                    _processingGotcha = false;
-                }
+                    void Next()
+                    {
+                        PlayFabReadClient.LoadItems(null);
+                        GotchaResult.Result = gotStones;
+                        PreScene.target.trySwitchToStep(MainSceneStep.GotchaResult, itemId, true);
+                        _processingGotcha = false;
+                    }
 
-                if (_extraSuccessAction != null)
+                    if (_extraSuccessAction != null)
+                    {
+                        _extraSuccessAction.Invoke(Next);
+                    }
+                    else
+                    {
+                        Next();
+                    }
+                },
+                (x) =>
                 {
-                    _extraSuccessAction.Invoke(Next);
-                }
-                else
-                {
-                    Next();
-                }
-            },
-            (x) =>
-            {
-                PopupLayer.ArrangeWarnWindow(x.ErrorMessage);
-                _processingGotcha = false;
-            });
+                    PurchaseFailed(x.ErrorMessage);
+                });
+        }
+        catch (Exception exception)
+        {
+            PurchaseFailed(exception.Message);
+        }
+    }
+}
+
+// A request pauses existing controls rather than destroying the player's page.
+// Restoring the captured state preserves controls that were already unavailable.
+internal sealed class GachaPurchaseControls
+{
+    private sealed class ControlState
+    {
+        public CanvasGroup group;
+        public bool interactable;
+    }
+    private readonly List<ControlState> states = new List<ControlState>();
+
+    public void Pause(UILayer layer)
+    {
+        if (layer == null) return;
+        var group = layer.GetComponent<CanvasGroup>();
+        if (group == null) group = layer.gameObject.AddComponent<CanvasGroup>();
+        states.Add(new ControlState { group = group, interactable = group.interactable });
+        group.interactable = false;
+    }
+
+    public void Restore()
+    {
+        foreach (var state in states)
+            if (state.group != null) state.group.interactable = state.interactable;
+        states.Clear();
     }
 }

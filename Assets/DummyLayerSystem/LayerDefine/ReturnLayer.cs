@@ -30,17 +30,25 @@ public class ReturnLayer : UILayer
         returnLayer.Setup();
     }
     
+    static bool _returning;
+
     public static void POP()
     {
-        if (ReturnMissionList.Count == 0)
+        if (_returning || ReturnMissionList.Count == 0)
             return;
 
         var targetMission = ReturnMissionList[^1];
-        ReturnMissionList.RemoveAt(ReturnMissionList.Count - 1);
-        var success = targetMission.returnAction.Invoke();
-        
-        if (success)
+        _returning = true;
+        try
         {
+            // Loading pages can refuse the transition. Keep their destination
+            // until the callback succeeds, including when it throws.
+            if (!targetMission.returnAction.Invoke())
+                return;
+
+            // A successful transition may clear/rebuild history or append an
+            // action. Consume only this completed mission, never the new top.
+            ReturnMissionList.Remove(targetMission);
             if (ReturnMissionList.Count == 0)
             {
                 UILayerLoader.Remove<ReturnLayer>();
@@ -51,6 +59,7 @@ public class ReturnLayer : UILayer
                 returnLayer.Setup();
             }
         }
+        finally { _returning = false; }
     }
     
     public static void PUSH(ReturnAction returnAction)

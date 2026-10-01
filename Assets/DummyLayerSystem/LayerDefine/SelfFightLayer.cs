@@ -52,6 +52,15 @@ namespace mainMenu
             
             _fightModeSwitch.Setup(0,PlayerPrefs.GetInt("preferAdventureMode",  PlayerPrefs.GetInt("preferAdventureMode", 2)));
             fightStartBtn.SetAction(FightStart);
+            // Reuse the adventure controls' visual language in practice setup.
+            _fightModeSwitch.ApplyPreparationSkin();
+            fightStartBtn.ApplyPreparationSkin();
+            var modeRect = (RectTransform)_fightModeSwitch.transform;
+            modeRect.sizeDelta = new Vector2(164, 96);
+            modeRect.anchoredPosition = new Vector2(-96, modeRect.anchoredPosition.y);
+            var startRect = (RectTransform)fightStartBtn.transform;
+            startRect.sizeDelta = new Vector2(196, 96);
+            startRect.anchoredPosition = new Vector2(108, startRect.anchoredPosition.y);
             
             void SkillEdit()
             {
@@ -63,10 +72,13 @@ namespace mainMenu
             }
             skillEditButton.SetListener(SkillEdit);
             await battleGroundSwitch.INI();
+            CheckFightLegal();
         }
         
         void FightStart()
         {
+            ArrangeStageInfo();
+            if (!_stage.FightMembers.CheckStonesLegal(FightEventType.Self)) return;
             _stage.battleGroundID = battleGroundSwitch.BattleFieldIndex;
             _stage.team1Mode = _fightModeSwitch.TeamMode;
             _stage.team2Mode = _fightModeSwitch.TeamMode;
@@ -82,6 +94,7 @@ namespace mainMenu
             
             _team1PosKeySetR = new PosKeySet();
             _team2PosKeySetR = new PosKeySet();
+            CheckFightLegal();
         }
         
         void CancelSelect()

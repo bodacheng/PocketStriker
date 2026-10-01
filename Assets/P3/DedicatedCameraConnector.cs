@@ -133,6 +133,7 @@ namespace ModelView
 
         private void OnDestroy()
         {
+            resetModelPosTween?.Kill();
             _rotateTo?.Kill();
             ReleaseUIPresentationTexture();
             ReleaseUIPresentationSlot(false);

@@ -191,7 +191,9 @@ namespace ModelView
                 {
                     _focusingC.AnimationManger.AnimationTrigger(string.Empty, 0.25f);
                     IfShowingSkill = false;
-                    resetModelPosTween = _focusingC.WholeT.transform.DOMove(modelPos, 1);
+                    resetModelPosTween?.Kill();
+                    resetModelPosTween = _focusingC.WholeT.transform.DOMove(modelPos, 1)
+                        .SetLink(_focusingC.WholeT.gameObject);
                 }
             }
         }
