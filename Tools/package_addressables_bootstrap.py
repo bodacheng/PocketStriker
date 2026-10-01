@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Package runtime data from an independent Addressables build for player CI.
+"""Package Addressables runtime data for inspecting historical player artifacts.
 
-The asset job uploads player-bootstrap.zip alongside its catalog and bundles.
-The player job downloads this archive instead of building Addressables itself.
+The current player builds its own runtime data; neither Jenkins job uses this
+archive. It remains available for comparing builds from the former bootstrap flow.
 This command uses local files only; it never uploads or reserves a release.
 """
 

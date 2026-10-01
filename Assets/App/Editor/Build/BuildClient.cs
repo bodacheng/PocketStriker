@@ -475,10 +475,12 @@ namespace Cocone.ProjectP3
 			BuildAddressableAssets.SetProfile(assetProfile);
 			VersionSyncUtility.AssertVersionSettingsSynchronized();
 			var addressableSettings = BuildAddressableAssets.GetSettings();
-			addressableSettings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
+			// Generate this player's catalog, local bundles and linker from its own
+			// checkout, as in MCombat. Asset publication remains a separate job;
+			// exporting the app must not download or wait for published resources.
+			addressableSettings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
 			EditorUtility.SetDirty(addressableSettings);
 			AssetDatabase.SaveAssets();
-			AddressablesPlayerContent.Prepare(addressableSettings, config.buildTarget);
 
 			// Yamlの読み込みと設定
 			SetPlayerSettingsByBuildConfiguration(GetBuildKind(config.buildKind), config.buildTarget, config.TargetGroup);

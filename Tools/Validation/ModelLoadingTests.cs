@@ -264,6 +264,6 @@ namespace UnityEngine
         public void SetActive(bool active) { if (active) Activations++; }
     }
     public sealed class Transform { public Transform Parent; public void SetParent(Transform parent) { Parent = parent; } }
-    public struct Vector3 { }
+    public struct Vector3 { public static Vector3 zero => default; }
     public static class Mathf { public static float Lerp(float a, float b, float t) => a + (b - a) * t; }
 }

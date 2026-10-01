@@ -3,7 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Build;
 using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine;
 
@@ -27,7 +29,7 @@ namespace Cocone.ProjectP3
         {
             EditorGUILayout.LabelField("当前版本", PlayerSettings.bundleVersion);
             versionText = EditorGUILayout.TextField("版本", versionText);
-            EditorGUILayout.HelpBox("程序、资源路径和 catalog 共用此版本。资源由独立 Jenkins 任务编译、发布；程序构建复用已发布的本地包和 catalog，运行时从对应地址下载远程资源。", MessageType.Info);
+            EditorGUILayout.HelpBox("程序、资源路径和 catalog 共用此版本。程序构建自行生成 catalog 和包内资源；资源任务独立发布到对应地址，两者无需按固定顺序编译。", MessageType.Info);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Patch +1") && VersionSyncUtility.IsValidVersion(versionText))
@@ -95,7 +97,8 @@ namespace Cocone.ProjectP3
             File.WriteAllText(ProfileYamlPath, yaml);
             foreach (var update in updates) settings.profileSettings.SetValue(update.profileId, update.variable, update.value);
             settings.OverridePlayerVersion = VersionToken;
-            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
+            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
+            settings.MonoScriptBundleNaming = MonoScriptBundleNaming.DefaultGroupGuid;
             EditorUtility.SetDirty(settings);
             AssetDatabase.ImportAsset(AppVersionJsonPath);
             AssetDatabase.ImportAsset(ProfileYamlPath);
@@ -136,8 +139,26 @@ namespace Cocone.ProjectP3
             else
             {
                 if (settings.OverridePlayerVersion != VersionToken) errors.Add("Catalog version must derive from PlayerSettings.bundleVersion.");
-                if (settings.BuildAddressablesWithPlayerBuild != AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer)
-                    errors.Add("Addressables must be built independently from the player.");
+                if (settings.BuildAddressablesWithPlayerBuild != AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer)
+                    errors.Add("Player builds must generate their own Addressables catalog, local bundles and linker without requiring published assets.");
+                if (!settings.BuildRemoteCatalog || settings.DisableCatalogUpdateOnStartup)
+                    errors.Add("Addressables must build a remote catalog and check it at startup.");
+                var units = settings.FindGroup("Units")?.GetSchema<BundledAssetGroupSchema>();
+                if (units == null)
+                    errors.Add("The Units Addressables group must have a bundled asset schema.");
+                else
+                {
+                    if (units.BuildPath.GetName(settings) != "Remote.BuildPath" || units.LoadPath.GetName(settings) != "Remote.LoadPath")
+                        errors.Add("Units models must use Remote.BuildPath and Remote.LoadPath so asset updates contain model bundles.");
+                    if (units.BundleNaming != BundledAssetGroupSchema.BundleNamingStyle.AppendHash)
+                        errors.Add("Units model bundle names must append their content hash.");
+                }
+                // ProjectName is the checkout directory name, which differs between
+                // the independent Jenkins asset jobs and changes MonoScript file IDs.
+                if (settings.MonoScriptBundleNaming != MonoScriptBundleNaming.DefaultGroupGuid)
+                    errors.Add("MonoScript bundle naming must use DefaultGroupGuid so independent asset jobs share stable script references.");
+                if (settings.DefaultGroup == null || string.IsNullOrEmpty(settings.DefaultGroup.Guid))
+                    errors.Add("A default Addressables group GUID is required for stable MonoScript bundle naming.");
                 foreach (var profile in Profiles)
                 {
                     var id = settings.profileSettings.GetProfileId(profile);

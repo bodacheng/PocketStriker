@@ -135,7 +135,8 @@ def interpretedShells = []
     ios.params.BUILD_KIND = kind
     ios.params.AssetKind = kind == 'Dev' ? 'Release' : 'Dev'
     ios.params.remove('AWS_PROFILE')
-    // Player exports need only a remote profile; local asset/S3 paths may be absent.
+    // The pipeline selects a profile; Unity generates the player's content locally.
+    // Pipeline-only upload paths and credentials are unnecessary for player exports.
     ios.files[configPath] = 'ProfileDev: dev\nProfileRelease: release\n'
     ios.stages.keySet().each { ios.runStage(it) }
     ios.runPost()
@@ -149,7 +150,7 @@ def interpretedShells = []
     def exports = ios.shells.findAll { it.contains('Cocone.ProjectP3.Client.Build') }
     check(exports.size() == 1, 'iOS exports the program once even with legacy buildAsset false')
     check(exports[0].contains('-buildKind "$BUILD_KIND"') && exports[0].contains('-assetProfile "$ASSET_PROFILE"'), 'Unity receives matching build and remote asset profile')
-    check(ios.shells.every { !(it =~ /BuildAddressableAssets|publish_ios_addressables|verify_ios_addressables_pair|\baws\b|AWS_|ServerData|addressables_/) }, 'iOS ' + kind + ' shells never build, publish, archive, or verify assets')
+    check(ios.shells.every { !(it =~ /BuildAddressableAssets|publish_ios_addressables|verify_ios_addressables_pair|\baws\b|AWS_|ServerData|addressables_/) }, 'iOS ' + kind + ' has no standalone resource build or resource publication commands')
     check(ios.archives.every { !(it.artifacts =~ /addressables|ServerData/) }, 'iOS ' + kind + ' archives program artifacts only')
     interpretedShells.addAll(ios.shells)
 }
@@ -178,18 +179,17 @@ check(normal.shells.size() == 1 && normal.shells[0].contains('altool --upload-ap
     check(h.env.ASSET_BUILDPATH == 'ServerData/' + kind.toLowerCase() + '/v/3.0.2/', 'independent ' + kind + ' assets build to the current version')
     check(h.env.UPLOAD_S3_ADDRESS == 's3://mcombat/' + kind.toLowerCase() + '/v/3.0.2', 'independent ' + kind + ' assets upload to the current version')
     check(h.shells.findAll { it.contains('BuildAddressableAssets.BatchBuild') }.size() == 2, kind + ' builds both selected platforms independently')
-    check(h.shells.findAll { it.contains('Tools/package_addressables_bootstrap.py') }.size() == 2, kind + ' packages a runtime bootstrap for each selected platform')
+    check(h.shells.every { !it.contains('package_addressables_bootstrap') && !it.contains('player-bootstrap.zip') }, kind + ' publishes assets without preparing a player bootstrap artifact')
     def uploads = h.shells.findAll { it.contains('aws s3 cp') }
     check(uploads.size() == 2, kind + ' publishes both selected platforms independently')
     uploads.each { upload ->
-        def bundle = upload.indexOf("--exclude 'catalog_*' --exclude 'player-bootstrap.zip'")
+        def bundle = upload.indexOf("--exclude 'catalog_*'")
         def catalog = upload.indexOf("--include 'catalog_*.bin' --include 'catalog_*.json'")
-        def bootstrap = upload.indexOf('"${ASSET_DIRECTORY}player-bootstrap.zip"')
         def hash = upload.indexOf("--include 'catalog_*.hash'")
-        check([bundle, catalog, bootstrap, hash].every { it >= 0 }, kind + ' publishes bundles, catalogs, bootstrap, and hashes in distinct passes')
-        check(bundle < catalog && catalog < bootstrap && bootstrap < hash, kind + ' publishes bundles before catalogs and bootstrap, then advertises the hash last')
+        check([bundle, catalog, hash].every { it >= 0 }, kind + ' publishes bundles, catalogs, and hashes in distinct passes')
+        check(bundle < catalog && catalog < hash, kind + ' publishes bundles before catalogs, then advertises the hash last')
         check(upload.substring(upload.lastIndexOf('aws s3 cp')).contains("--include 'catalog_*.hash'"), kind + ' has no S3 upload after the catalog hash')
-        check(upload.count("--cache-control 'no-cache'") == 3, kind + ' publishes mutable catalog, bootstrap, and hash without caching')
+        check(upload.count("--cache-control 'no-cache'") == 2, kind + ' publishes mutable catalog and hash without caching')
         check(upload.contains('"${UPLOAD_S3_ADDRESS%/}/$ASSET_TARGET/"'), kind + ' uploads to the selected version and platform')
     }
     check(h.environmentScopes.count { it == ['ASSET_TARGET=iOS'] } == 2 && h.environmentScopes.count { it == ['ASSET_TARGET=Android'] } == 2, kind + ' builds and publishes each selected platform')
