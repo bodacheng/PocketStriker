@@ -70,6 +70,11 @@ namespace mainMenu
             _focusingEffectsGroup.RefreshBoxEffects(sp_level, pos);
         }
 
+        public void RefreshTagEffect(RectTransform button, Camera camera, int spLevel)
+        {
+            _focusingEffectsGroup.RefreshBoxEffects(spLevel, button, camera);
+        }
+
         public void RefreshSlotEffect(int slotNum ,Vector3 pos, int sp_level)//按钮切换也可以在这里做文章
         {
             _focusingEffectsGroup.RefreshSlotEffects(slotNum, sp_level, pos, transform);

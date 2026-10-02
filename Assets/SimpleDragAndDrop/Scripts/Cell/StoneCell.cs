@@ -50,8 +50,16 @@ public partial class StoneCell : MonoBehaviour, IDropHandler
         }
         item.transform.SetParent(transform, false);
         item.transform.SetAsLastSibling();
-        item.transform.localScale = Vector3.one * 1.2f;
-        item.transform.localPosition = Vector3.zero;
+        // Full-bleed EX3 sprites must fit the cell even when the inventory grid is small.
+        // Stretch anchors also follow nine-slot and inventory layout changes after placement.
+        var iconRect = (RectTransform)item.transform;
+        iconRect.localScale = Vector3.one;
+        iconRect.anchorMin = Vector2.one * 0.07f;
+        iconRect.anchorMax = Vector2.one * 0.93f;
+        iconRect.pivot = Vector2.one * 0.5f;
+        iconRect.offsetMin = iconRect.offsetMax = Vector2.zero;
+        iconRect.localPosition = new Vector3(iconRect.localPosition.x, iconRect.localPosition.y, 0f);
+        item.image.preserveAspect = true;
         item.MakeRaycast(true);
     }
 

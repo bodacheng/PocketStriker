@@ -35,6 +35,20 @@ bottom control area rises from 344 to 392 units; the battle camera's middle
 area starts above it. Control sizes and transparent effect-only touch targets
 stay the same.
 
+Manual camera orbit now accepts drags throughout the background of the battle
+canvas. The transparent camera touch target sits behind the existing movement
+pad, portraits, action controls, pause/AUTO buttons and tutorial overlays;
+those controls retain their touch areas and pointer ownership. A second finger
+cannot move or release the first finger's camera gesture. The Battle HUD fixture
+checks expanded blank-space coverage, control edges and simultaneous pointers.
+
+The pause menu uses the existing Shift rounded fill/outline sprites and circular
+thumb for a cyan/charcoal camera switch. Its native Toggle still owns input;
+visuals follow silent preference restores as well as click changes. The entire
+label row is clickable. `PocketStrikerBattlePauseValidation.ValidateBatch` checks
+real prefab toggle callbacks, disabled input, multilingual layout and state
+previews under `Logs/UILayout/BattlePause`.
+
 World status uses compact 94-unit bars with warm enemy and green player
 colors; Group battles use 60-unit bars and omit the floating EX chips. World
 widgets follow the current camera directly, hide outside its viewport, and
@@ -132,6 +146,21 @@ formations, model footprints, arena capacity and restoration.
 Shape/Local ring particles also scale their original size multipliers and restart
 on radius changes; changing only the parent transform leaves World-space glow
 particles at the old radius. The validator samples actual emitted particle sizes.
+
+## Skill category tabs and stone icons
+
+Category gems follow their actual tab rectangles through `SkillStoneTabEffectLayout`
+instead of using a one-time world position. Rotating mesh bounds fit inside 90%
+of each button; particle-only icons include emission volume and child scaling.
+EX3 inventory and equipped icons now use stretch anchors with a 7% inset on each
+side, so their size follows the cell without spilling into adjacent rows.
+The single-type dropdown and old opaque normal-tab background are hidden.
+Tab bindings are initialized once; filtering and click feedback use current geometry.
+
+`PocketStrikerSkillUIValidation.ValidateBatch()` checks the actual two page layouts, six
+element categories, visual-center raycasts, production filtering callbacks,
+EX3 inventory/equipped insets and resizing. Its offline report is saved to
+`Logs/UILayout/SkillUI/report.json`.
 
 ## Battle tutorial callouts
 

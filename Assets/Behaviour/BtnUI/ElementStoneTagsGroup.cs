@@ -19,8 +19,18 @@ public class ElementStoneTagsGroup
         {
             return;
         }
-        _selectedTab.transform.SetParent(tab.transform);
-        _selectedTab.transform.localPosition = Vector3.zero;
+        var layout = tab.GetComponent<SkillStoneTabEffectLayout>();
+        if (layout != null)
+        {
+            var selectedLayout = _selectedTab.GetComponent<SkillStoneTabEffectLayout>()
+                ?? _selectedTab.gameObject.AddComponent<SkillStoneTabEffectLayout>();
+            selectedLayout.Initialize(layout.Target, layout.EffectCamera, 1f);
+        }
+        else
+        {
+            _selectedTab.transform.SetParent(tab.transform, false);
+            _selectedTab.transform.localPosition = Vector3.zero;
+        }
         _selectedTab.Play();
     }
 
@@ -160,6 +170,18 @@ public class ElementStoneTagsGroup
         p.gameObject.transform.position = pos;
         p.gameObject.SetActive(true);
         p.Play(true);
+    }
+
+    public void RefreshBoxEffects(int ex, RectTransform button, Camera camera)
+    {
+        if (!_btnEffectsSetsForStoneBox.TryGetValue(ex, out var effect) || effect == null) return;
+        _exTagEffects[ex] = effect;
+        effect.gameObject.name = "UIExTag" + ex;
+        var layout = effect.GetComponent<SkillStoneTabEffectLayout>()
+            ?? effect.gameObject.AddComponent<SkillStoneTabEffectLayout>();
+        layout.Initialize(button, camera);
+        effect.gameObject.SetActive(true);
+        effect.Play(true);
     }
 
     public async void RefreshSlotEffects(int slotNum, int eX, Vector3 pos, Transform releaseTarget)

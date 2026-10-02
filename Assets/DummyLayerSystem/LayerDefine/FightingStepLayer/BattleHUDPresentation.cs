@@ -290,6 +290,14 @@ public sealed class BattleHUDPresentation : MonoBehaviour
     {
         foreach (var joystick in _layer.GetComponentsInChildren<UltimateJoystick>(true))
         {
+            if (joystick.joystickName == "RotateCamera")
+            {
+                // Its full-screen activation rectangle uses the current canvas
+                // size, just like the movement pad below. Refresh it when the
+                // HUD is resized rather than waiting for the deferred canvas updater.
+                joystick.UpdatePositioning();
+                continue;
+            }
             if (joystick.joystickName != "joystick") continue;
             joystick.UpdateParentCanvas();
             var canvas = joystick.GetComponentInParent<Canvas>()?.rootCanvas;

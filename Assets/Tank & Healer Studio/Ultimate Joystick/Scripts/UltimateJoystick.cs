@@ -67,6 +67,7 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 	public bool dynamicPositioning = false;
 	public float gravity = 60.0f;
 	bool gravityActive = false;
+	int activePointerId = int.MinValue;
 	public bool extendRadius = false;
 	public enum Axis
 	{
@@ -206,6 +207,7 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 
 		// Set the joystick state since the joystick is being interacted with.
 		joystickState = true;
+		activePointerId = touchInfo.pointerId;
 
 		// If the user has gravity set and it's active then stop the current movement.
 		if( gravity > 0 && gravityActive )
@@ -281,8 +283,9 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 
 	public void OnDrag ( PointerEventData touchInfo )
 	{
-		// If the joystick has not been initialized properly, then return.
-		if( !joystickState )
+		// The full-screen camera pad belongs to the finger that started it.
+		// Another finger on empty space must not take over that orbit.
+		if( !joystickState || ( joystickName == "RotateCamera" && activePointerId != touchInfo.pointerId ) )
 			return;
 
 		// Then call ProcessInput with the info with the current input information.
@@ -295,12 +298,13 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 
 	public void OnPointerUp ( PointerEventData touchInfo )
 	{
-		// If the joystick has not been initialized properly, then return.
-		if( !joystickState )
+		// Releasing a different finger must not end the active camera gesture.
+		if( !joystickState || ( joystickName == "RotateCamera" && activePointerId != touchInfo.pointerId ) )
 			return;
 
 		// Since the touch has lifted, set the state to false and reset the local pointerId.
 		joystickState = false;
+		activePointerId = int.MinValue;
 
 		// If dynamicPositioning, disableVisuals, or extendRadius are enabled...
 		if( dynamicPositioning || disableVisuals || extendRadius )
@@ -898,6 +902,7 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 		// Reset all of the controller variables.
 		gravityActive = false;
 		joystickState = false;
+		activePointerId = int.MinValue;
 
 		// Stop the gravity coroutine.
 		StopCoroutine( "GravityHandler" );
@@ -1082,6 +1087,7 @@ public class UltimateJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
 	{
 		// Set the states to false.
 		joystickState = false;
+		activePointerId = int.MinValue;
 		
 		// If the joystick center has been changed, then reset it.
 		if( dynamicPositioning || disableVisuals || extendRadius )

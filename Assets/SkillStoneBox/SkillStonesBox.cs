@@ -74,23 +74,25 @@ namespace mainMenu
                 types.ClearOptions();
                 foreach (var s in Units.GetTypeList())
                 {
+                    // Legacy unit types with no configured skills are not selectable categories.
+                    if (SkillConfigTable.GetSkillConfigsOfType(s).Count == 0) continue;
                     var m_NewData = new Dropdown.OptionData
                     {
                         text = s
                     };
                     types.options.Add(m_NewData);
                 }
-                if (types.options.Count > 1)
-                {
-                    types.gameObject.SetActive(false);
-                }else{
-                    types.gameObject.SetActive(true);
-                }
+                var selectedType = types.options.FindIndex(option => option.text == FocusingType);
+                types.SetValueWithoutNotify(Mathf.Max(0, selectedType));
+                types.RefreshShownValue();
+                types.gameObject.SetActive(types.options.Count > 1);
             }
             else
             {
                 types.gameObject.SetActive(false);
             }
+            types.onValueChanged.RemoveListener(OnTypeSelected);
+            types.onValueChanged.AddListener(OnTypeSelected);
             closeCheckBox.onValueChanged.RemoveAllListeners();
             closeCheckBox.onValueChanged.AddListener(delegate { RestFilter(); });
             nearCheckBox.onValueChanged.RemoveAllListeners();
@@ -102,9 +104,11 @@ namespace mainMenu
         // 直接放在type下拉按钮上的功能
         public void TypeDropDownBehaviour()
         {
-            string targetType = types.options[types.value].text.Clone() as string;
-            FilterFeatureRefresh(true);
+            if (types.options.Count == 0) return;
+            FocusingType = types.options[types.value].text;
             RestFilter();
         }
+
+        void OnTypeSelected(int value) => TypeDropDownBehaviour();
     }
 }

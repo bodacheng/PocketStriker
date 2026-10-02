@@ -13,8 +13,8 @@ public class FightingStepLayer : UILayer
     const int TutorialSortingOrder = TopButtonSortingOrder + 2;
     const float TeamMoveJoystickTouchWidth = 40f;
     const float TeamMoveJoystickTouchHeight = 35f;
-    const float RotateCameraJoystickTouchWidth = 45f;
-    const float RotateCameraJoystickTouchHeight = 35f;
+    const float RotateCameraJoystickTouchWidth = 100f;
+    const float RotateCameraJoystickTouchHeight = 100f;
 
     [Header("Pause Button")]
     [SerializeField] BOButton pauseButton;
@@ -274,7 +274,22 @@ public class FightingStepLayer : UILayer
                     UpdateJoystickTouchArea(joystick, TeamMoveJoystickTouchWidth, TeamMoveJoystickTouchHeight, 0f, 0f);
                     break;
                 case "RotateCamera":
-                    UpdateJoystickTouchArea(joystick, RotateCameraJoystickTouchWidth, RotateCameraJoystickTouchHeight, 0f, 100f);
+                    UpdateJoystickTouchArea(joystick, RotateCameraJoystickTouchWidth, RotateCameraJoystickTouchHeight, 0f, 0f);
+                    // Empty battlefield space accepts camera input. Keep this
+                    // background target behind the movement pad, portraits,
+                    // action buttons and tutorial/modal UI so they retain the
+                    // pointer from the beginning of every gesture.
+                    joystick.transform.SetAsFirstSibling();
+                    foreach (var graphic in joystick.GetComponentsInChildren<Graphic>(true))
+                        graphic.raycastTarget = graphic.transform == joystick.transform;
+                    var touchSurface = joystick.GetComponent<Graphic>();
+                    if (touchSurface != null)
+                    {
+                        touchSurface.enabled = true;
+                        touchSurface.color = Color.clear;
+                        touchSurface.canvasRenderer.cullTransparentMesh = false;
+                        touchSurface.raycastTarget = true;
+                    }
                     break;
             }
         }

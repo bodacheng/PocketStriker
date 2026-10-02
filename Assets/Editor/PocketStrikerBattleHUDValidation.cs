@@ -23,7 +23,8 @@ public static class PocketStrikerBattleHUDValidation
         var report = PocketStrikerTutorialValidation.RunBattleHUDFixture();
         if (!report.passed) throw new InvalidOperationException(string.Join("\n", report.errors));
         Debug.Log("POCKETSTRIKER_BATTLE_HUD_PASSED: " + report.viewportsChecked + " viewports, "
-            + report.raycastsChecked + " raycasts, " + report.inputStatesChecked + " input states.");
+            + report.raycastsChecked + " raycasts, " + report.inputStatesChecked + " input states, "
+            + report.cameraTouchPointsChecked + " camera touch points.");
     }
 
     public static void ValidateBatch()
@@ -91,11 +92,13 @@ public static partial class PocketStrikerTutorialValidation
         public int geometryChecks;
         public int raycastsChecked;
         public int inputStatesChecked;
+        public int cameraTouchPointsChecked;
+        public int cameraPointerOwnershipChecks;
         public int stableLayoutsChecked;
         public int labelsChecked;
         public int localizedLabelCases;
         public bool sourcePrefabsUnchanged;
-        public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls, expanded action edges and both joystick touch areas. Authored action down/up callbacks verify countdown locking and recovery. This static fixture has no bound fighter focus and explicitly restores its manually displayed controls after verifying production no-focus hiding; live focus/energy behavior is covered separately. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
+        public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls, expanded action edges, player portraits, movement pad and full-screen camera touch points. Camera input checks cover a rejected second finger, simultaneous movement and action input, and captured gestures crossing controls. Authored action down/up callbacks verify countdown locking and recovery. This static fixture has no bound fighter focus and explicitly restores its manually displayed controls after verifying production no-focus hiding; live focus/energy behavior is covered separately. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
         public string limitation = "Stopped-editor fixture: battle simulation, accounts, Addressables downloads, pause scene navigation and live camera-follow bars are omitted. The pause's native Button press is observed with a local callback. Skill EventTriggers are reconstructed from their authored persistent method names because RuntimeOnly persistent callbacks do not run in Edit mode. Joystick pointer state is tested with transitions/gravity disabled; axis magnitude assumes a screen-space canvas and is left to Play-mode smoke. Static ground and boundary are fixture context, not a simulation of the runtime arena.";
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
@@ -321,7 +324,8 @@ public static partial class PocketStrikerTutorialValidation
             Application.logMessageReceived -= CaptureError;
             report.sourcePrefabsUnchanged = sources.All(pair => File.ReadAllText(pair.Key) == pair.Value);
             report.passed = report.errors.Count == 0 && report.sourcePrefabsUnchanged && report.viewportsChecked == 5
-                && report.stableLayoutsChecked == 5 && report.screenshots.Count == 5 && report.localizedLabelCases == 15;
+                && report.stableLayoutsChecked == 5 && report.screenshots.Count == 5 && report.localizedLabelCases == 15
+                && report.cameraTouchPointsChecked == 45 && report.cameraPointerOwnershipChecks == 180;
             File.WriteAllText(Path.Combine(HUDOutput, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
@@ -540,8 +544,15 @@ public static partial class PocketStrikerTutorialValidation
             Require(LayoutContains(LayoutBounds(root, (RectTransform)gem.parent), LayoutBounds(root, gem), 1), "Skill art escapes its button.");
         var joysticks = root.GetComponentsInChildren<UltimateJoystick>().ToArray();
         Require(joysticks.Length == 2, "Expected movement and camera joysticks.");
-        Require(joysticks.All(joystick => joystick.customActivationRange && joystick.activationHeight <= 35.1f), "Joystick activation region covers too much of the screen.");
-        Require(joysticks.Sum(joystick => joystick.activationWidth) <= 90.1f, "Joystick activation regions overlap horizontally.");
+        Require(movement.customActivationRange && movement.activationWidth <= 40.1f && movement.activationHeight <= 35.1f,
+            "Movement joystick lost its reserved activation region.");
+        var cameraPad = joysticks.Single(joystick => joystick.joystickName == "RotateCamera");
+        Require(cameraPad.customActivationRange && cameraPad.activationWidth == 100 && cameraPad.activationHeight == 100,
+            "Camera input does not cover the full battlefield.");
+        Require(LayoutContains(LayoutBounds(root, (RectTransform)cameraPad.transform), item.safeBounds, 1),
+            "Camera input leaves part of the visible safe area unreachable.");
+        Require(cameraPad.GetComponent<Graphic>().raycastTarget && !cameraPad.GetComponent<Graphic>().canvasRenderer.cullTransparentMesh,
+            "Transparent camera input can be removed by rendering.");
     }
 
     static void HUDCheckLabels(RectTransform root, FightingStepLayer layer, Rect safeBounds, HUDReport report)
@@ -584,6 +595,8 @@ public static partial class PocketStrikerTutorialValidation
             report.raycastsChecked++;
         }
         Target(layer.PauseButton.transform, "Pause"); Target(layer.Team1UI.AutoSwitch.transform, "AUTO");
+        foreach (var portrait in layer.Team1UI.SideIconsContainer.GetComponentsInChildren<SideUnitIcon>())
+            Target(portrait.transform, "Player portrait");
         foreach (var button in new[] { layer.PauseButton, Field<BOButton>(layer.Team1UI.AutoSwitch, "btn"),
             layer.InputsManager.DashButton, layer.InputsManager.DefendButton, layer.InputsManager.DreamComboBtn })
         {
@@ -629,6 +642,7 @@ public static partial class PocketStrikerTutorialValidation
             ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerUpHandler);
             Require(!joystick.GetJoystickState(), "Joystick pointer up did not release."); report.inputStatesChecked += 2;
         }
+        HUDCheckCameraTouch(layer, events, camera, report);
         input.PreparingMode(true);
         Require(new[] { input.AttackButton, input.Fire1Button, input.Fire2Button, input.DashButton, input.DreamComboBtn }.All(button => !button.interactable)
             && !input.MovementJoystick.enabled, "Preparing mode did not lock the attack controls and movement.");
@@ -652,6 +666,85 @@ public static partial class PocketStrikerTutorialValidation
         for (int index = 0; index < buttons.Length; index++)
             ActionPointer(index, buttons[index].gameObject, Center(buttons[index].transform, camera), true, "Recovered battle action");
         report.inputStatesChecked += 2;
+    }
+
+    static void HUDCheckCameraTouch(FightingStepLayer layer, EventSystem events, Camera camera, HUDReport report)
+    {
+        var root = (RectTransform)layer.transform;
+        var safe = LayoutBounds(root, PosCal.SafeAreaRect);
+        var input = layer.InputsManager;
+        var cameraPad = layer.GetComponentsInChildren<UltimateJoystick>().Single(joystick => joystick.joystickName == "RotateCamera");
+        var movement = input.MovementJoystick;
+        var state = new Func<bool>[] { () => input.attack, () => input.fire1, () => input.fire2, () => input.defendButtonHover, () => input.acc, () => input.dreamCombo };
+        PointerEventData Pointer(int id, Vector2 point) => new PointerEventData(events)
+            { pointerId = id, position = point, button = PointerEventData.InputButton.Left };
+        Vector2 Point(float x, float y) => camera.WorldToScreenPoint(root.TransformPoint(
+            new Vector2(Mathf.Lerp(safe.xMin, safe.xMax, x), Mathf.Lerp(safe.yMin, safe.yMax, y))));
+        foreach (float x in new[] { .2f, .5f, .82f })
+        foreach (float y in new[] { .47f, .65f, .82f })
+        {
+            var point = Point(x, y);
+            var hit = Hit(events, point);
+            Require(hit == cameraPad.gameObject, "Empty battlefield touch is blocked by " + hit.name + " at " + point);
+            report.raycastsChecked++;
+            var owner = Pointer(71, point);
+            ExecuteEvents.ExecuteHierarchy(hit, owner, ExecuteEvents.pointerDownHandler);
+            Require(cameraPad.GetJoystickState() && !movement.GetJoystickState() && state.All(value => !value()),
+                "Camera touch leaked into a movement/action control.");
+            var other = Pointer(72, point + new Vector2(96, 32));
+            var knobBefore = cameraPad.joystick.localPosition;
+            var axisBefore = new Vector2(cameraPad.HorizontalAxis, cameraPad.VerticalAxis);
+            ExecuteEvents.ExecuteHierarchy(hit, other, ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.ExecuteHierarchy(hit, other, ExecuteEvents.dragHandler);
+            Require(cameraPad.joystick.localPosition == knobBefore
+                && new Vector2(cameraPad.HorizontalAxis, cameraPad.VerticalAxis) == axisBefore,
+                "A second finger took over the active camera gesture.");
+            ExecuteEvents.ExecuteHierarchy(hit, other, ExecuteEvents.pointerUpHandler);
+            Require(cameraPad.GetJoystickState(), "A rejected second finger ended the camera gesture.");
+            // Input remains captured by its initial hit even when the owner
+            // crosses a button; no pointer-down is dispatched to that button.
+            owner.position = Center(input.AttackButton.transform, camera);
+            ExecuteEvents.ExecuteHierarchy(hit, owner, ExecuteEvents.dragHandler);
+            Require(cameraPad.GetJoystickState() && state.All(value => !value()), "A camera drag pressed an action button.");
+            ExecuteEvents.ExecuteHierarchy(hit, owner, ExecuteEvents.pointerUpHandler);
+            Require(!cameraPad.GetJoystickState() && cameraPad.HorizontalAxis == 0 && cameraPad.VerticalAxis == 0,
+                "The owning camera pointer did not release/reset its input.");
+            report.cameraTouchPointsChecked++;
+            report.cameraPointerOwnershipChecks += 4;
+            report.inputStatesChecked += 5;
+        }
+
+        var cameraPointer = Pointer(81, Point(.82f, .65f));
+        var movementPointer = Pointer(82, Center(movement.joystickBase, camera));
+        ExecuteEvents.ExecuteHierarchy(cameraPad.gameObject, cameraPointer, ExecuteEvents.pointerDownHandler);
+        var movementHit = Hit(events, movementPointer.position);
+        Require(movementHit == movement.gameObject || movementHit.transform.IsChildOf(movement.transform),
+            "Camera pad swallowed the movement activation area.");
+        ExecuteEvents.ExecuteHierarchy(movementHit, movementPointer, ExecuteEvents.pointerDownHandler);
+        Require(cameraPad.GetJoystickState() && movement.GetJoystickState(), "Movement and camera cannot be used together.");
+        ExecuteEvents.ExecuteHierarchy(movementHit, movementPointer, ExecuteEvents.pointerUpHandler);
+        Require(cameraPad.GetJoystickState() && !movement.GetJoystickState(), "Releasing movement ended the camera gesture.");
+
+        var buttons = new[] { input.AttackButton, input.Fire1Button, input.Fire2Button, input.DefendButton, input.DashButton, input.DreamComboBtn };
+        for (int index = 0; index < buttons.Length; index++)
+        {
+            var point = Center(buttons[index].transform, camera);
+            var hit = Hit(events, point);
+            var pointer = Pointer(90 + index, point);
+            Require(hit == buttons[index].gameObject || hit.transform.IsChildOf(buttons[index].transform),
+                "Active camera input occluded an action button: " + buttons[index].name);
+            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerDownHandler);
+            Require(state[index]() && state.Where((_, other) => other != index).All(value => !value()) && cameraPad.GetJoystickState(),
+                "Simultaneous camera/action pointer changed the wrong input.");
+            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerUpHandler);
+            Require(state.All(value => !value()) && cameraPad.GetJoystickState(), "Releasing an action ended camera input.");
+            report.raycastsChecked++;
+            report.inputStatesChecked += 2;
+        }
+        ExecuteEvents.ExecuteHierarchy(cameraPad.gameObject, cameraPointer, ExecuteEvents.pointerUpHandler);
+        Require(!cameraPad.GetJoystickState(), "Simultaneous input left camera active.");
+        report.raycastsChecked++;
+        report.inputStatesChecked += 5;
     }
 
     static Camera HUDCreateWorld(Transform parent, Scene scene, out Material contextMaterial)

@@ -27,6 +27,7 @@ public class FightScenePauseSupport : UILayer
         
         autoRoateCamera.gameObject.SetActive(FightLoad.Fight.team1Mode == TeamMode.Rotation);
         autoRoateCamera.SetIsOnWithoutNotify(PlayerPrefs.GetInt("AutoRotateCamera", 1) == 1);
+        autoRoateCamera.GetComponent<BattleCameraTogglePresentation>()?.RefreshVisuals();
     }
 
     void OnAutoRotateCameraChanged(bool enabled)

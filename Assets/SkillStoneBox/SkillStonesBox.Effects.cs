@@ -9,6 +9,8 @@ namespace mainMenu
     public partial class SkillStonesBox : MonoBehaviour
     {
         private int focusingExType;
+        bool exTabsInitialized;
+        Camera tabEffectCamera;
         int FocusingExType
         {
             get => focusingExType;
@@ -21,6 +23,8 @@ namespace mainMenu
 
         public void IniExTabs()
         {
+            if (exTabsInitialized) return;
+            exTabsInitialized = true;
             void Temp(Button btn, int exLevel)
             {
                 btn.onClick.AddListener(() =>
@@ -28,6 +32,9 @@ namespace mainMenu
                     ExTabPressed?.Invoke();
                     FocusingExType = exLevel;
                     RestFilter();
+                    if (tabEffectCamera != null)
+                        _tabEffects.SkillButtonExplosion(exLevel,
+                            PosCal.GetWorldPos(tabEffectCamera, btn.GetComponent<RectTransform>(), 5f), _tabEffects.transform);
                 });
             }
             Temp(NormalTab,0);
@@ -45,13 +52,7 @@ namespace mainMenu
 
             void IniExTab(Button btn, int exLevel)
             {
-                var worldPos = PosCal.GetWorldPos(fxCamera, btn.GetComponent<RectTransform>(), 5f);
-                _tabEffects.RefreshTagEffect(worldPos, exLevel);
-                btn.onClick.AddListener(() =>
-                {
-                    //NormalTabFeature(PosCal.GetWorldPos(fxCamera, btn.GetComponent<RectTransform>(), 3));
-                    _tabEffects.SkillButtonExplosion(exLevel, worldPos, _tabEffects.transform);
-                });
+                _tabEffects.RefreshTagEffect(btn.GetComponent<RectTransform>(), fxCamera, exLevel);
             }
 
             await Observable.TimerFrame(5);
@@ -60,6 +61,7 @@ namespace mainMenu
                 return;
             }
 
+            tabEffectCamera = fxCamera;
             IniExTab(NormalTab,0);
             IniExTab(EX1Tab,1);
             IniExTab(EX2Tab,2);
