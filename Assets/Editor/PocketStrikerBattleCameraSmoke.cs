@@ -78,7 +78,12 @@ public static partial class PocketStrikerBattleCameraSmoke
     }
 
     [MenuItem("PocketStriker/Validation/Battle Camera Playmode Smoke")]
-    public static void StartBatch()
+    public static void StartBatch() => Start(false);
+
+    [MenuItem("PocketStriker/Validation/Battle Camera Handoff and Defeat Smoke")]
+    public static void StartHandoffs() => Start(true);
+
+    static void Start(bool reviewHandoffs)
     {
         finishing = false;
         report = null;
@@ -103,6 +108,7 @@ public static partial class PocketStrikerBattleCameraSmoke
         SessionState.SetString(Key + ".Errors", "");
         SessionState.SetInt(Key + ".IAPObjects", 0);
         SessionState.SetBool(Key + ".Running", false);
+        SessionState.SetBool(Key + ".Handoffs", reviewHandoffs);
         SessionState.SetBool(Key, true);
         settings.ActivePlayModeDataBuilderIndex = fast;
         ConfigurePortraitGameView();
@@ -178,7 +184,8 @@ public static partial class PocketStrikerBattleCameraSmoke
                 await ReviewImpact(leader);
             else if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_OPENING") == "1")
                 await ReviewOpening(leader);
-            else if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
+            else if (SessionState.GetBool(Key + ".Handoffs", false)
+                || Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
                 await ReviewHandoffs(leader);
             else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
                 await ReviewTransitions(leader);
@@ -361,9 +368,9 @@ public static partial class PocketStrikerBattleCameraSmoke
         return members;
     }
 
-    static bool IsLoaded(int team1, int team2, bool group)
+    static bool IsLoaded(int team1, int team2, bool group, FightEventType eventType = FightEventType.Self)
         => SceneManager.GetActiveScene().name == "FightScene"
-            && FightLoad.Fight != null && FightLoad.Fight.EventType == FightEventType.Self
+            && FightLoad.Fight != null && FightLoad.Fight.EventType == eventType
             && FightLoad.Fight.IsGroupBattle == group
             && RTFightManager.Target?.team1?.teamMembers?.mDict.Count == team1
             && RTFightManager.Target?.team2?.teamMembers?.mDict.Count == team2

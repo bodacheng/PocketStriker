@@ -142,6 +142,9 @@ public class MobileInputsManager : MonoBehaviour {
         else
         {
             focus.Value = null;
+            _inputting = false;
+            defendButtonHover = false;
+            StopPressing();
             RefreshDreamComboPresentation();
             TurnOffButtons();
         }
@@ -379,7 +382,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool attack;
     public void AttackDown()
     {
-        if (preparing || !a1Btn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !a1Btn.IsInteractable()) return;
         StartPressing(a1Btn);
         attack = true;
     }
@@ -392,7 +395,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool fire1;
     public void Fire1Down()
     {
-        if (preparing || !a2Btn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !a2Btn.IsInteractable()) return;
         fire1 = true;
         StartPressing(a2Btn);
     }
@@ -405,7 +408,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool fire2;
     public void Fire2Down()
     {
-        if (preparing || !a3Btn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !a3Btn.IsInteractable()) return;
         fire2 = true;
         StartPressing(a3Btn);
     }
@@ -417,7 +420,7 @@ public class MobileInputsManager : MonoBehaviour {
     
     public void DefendDown()
     {
-        if (preparing || !defendBtn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !defendBtn.IsInteractable()) return;
         defendButtonHover = true;
         StartPressing(defendBtn);
     }
@@ -430,7 +433,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool acc;
     public void RushDown()
     {
-        if (preparing || !dashBtn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !dashBtn.IsInteractable()) return;
         acc = true;
         StartPressing(dashBtn);
     }
@@ -443,7 +446,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool dreamCombo;
     public void DreamComboDown()
     {
-        if (preparing || !dreamComboBtn.IsInteractable()) return;
+        if (!isActiveAndEnabled || preparing || !dreamComboBtn.IsInteractable()) return;
         dreamCombo = true;
         StartPressing(dreamComboBtn);
     }

@@ -11,6 +11,8 @@ public class AllUnitsBattleCamera : CameraMode
     readonly List<Bounds> _bounds = new List<Bounds>(200);
     readonly List<BattleCameraFraming.BodyEnvelope> _bodyEnvelopes = new List<BattleCameraFraming.BodyEnvelope>(200);
     readonly Dictionary<Data_Center, ModelFramingReference> _models = new Dictionary<Data_Center, ModelFramingReference>();
+    readonly HashSet<ModelFramingReference> _framedModels = new HashSet<ModelFramingReference>();
+    readonly List<ModelFramingReference> _lastFieldedModels = new List<ModelFramingReference>();
     readonly Vector3[] _corners = new Vector3[4];
     FightingStepLayer _hud;
     Bounds _trackingBounds;
@@ -27,6 +29,10 @@ public class AllUnitsBattleCamera : CameraMode
         public Renderer[] Renderers;
         public float CenterHeight;
         public float HorizontalRadius;
+        public bool HasBounds;
+        public Bounds Bounds;
+        public Vector3 Anchor;
+        public BattleCameraFraming.BodyEnvelope BodyEnvelope;
     }
 
     public float Pitch => _pitch;
@@ -80,6 +86,7 @@ public class AllUnitsBattleCamera : CameraMode
         if (manager == null) return;
         _bounds.Clear();
         _bodyEnvelopes.Clear();
+        _framedModels.Clear();
         _hasTrackingBounds = false;
         if (FSceneProcessesRunner.Main.currentProcess is PreparingProcess)
         {
@@ -91,11 +98,12 @@ public class AllUnitsBattleCamera : CameraMode
         bool wasHolding = IsHoldingReplacementFraming;
         var firstUnit = manager.team1?.RMode_Unit.Value;
         var secondUnit = manager.team2?.RMode_Unit.Value;
-        // Preserve both sides until an actual replacement is active. The final
-        // knockout uses the same hold until the result process owns the camera;
-        // the existence of a reserve must not decide whether a body is abandoned.
-        IsHoldingReplacementFraming = _stabilizer.IsInitialized && this is DuelBattleCamera
-            && (!HasLiveRotationFighter(manager.team1) || !HasLiveRotationFighter(manager.team2));
+        // A fallen rotation fighter stays in the composition until replacement.
+        // On the final knockout every profile keeps the established battlefield
+        // until the result process explicitly takes camera ownership.
+        IsHoldingReplacementFraming = _stabilizer.IsInitialized && (FightLogger.value.GameOver.Value
+            || (manager.team1?.TeamMode == TeamMode.Rotation && !HasLiveRotationFighter(manager.team1))
+            || (manager.team2?.TeamMode == TeamMode.Rotation && !HasLiveRotationFighter(manager.team2)));
         if (this is DuelBattleCamera && !IsHoldingReplacementFraming && _stabilizer.IsInitialized
             && (wasHolding || firstUnit != _lastFirst || secondUnit != _lastSecond))
             _handoffRemaining = .7f;
@@ -107,6 +115,18 @@ public class AllUnitsBattleCamera : CameraMode
         }
         AddTeam(manager.team1);
         AddTeam(manager.team2);
+        if (IsHoldingReplacementFraming)
+        {
+            // Keep following the death animation while it is visible, then its
+            // last bounds after removal. A death flag must not leave only the
+            // surviving enemy in the camera's safety and target set.
+            foreach (var model in _lastFieldedModels) AddModel(model, true);
+        }
+        else
+        {
+            _lastFieldedModels.Clear();
+            _lastFieldedModels.AddRange(_framedModels);
+        }
         if (_bounds.Count == 0) return;
 
         var usable = UsableViewport(camera);
@@ -181,6 +201,8 @@ public class AllUnitsBattleCamera : CameraMode
         _stabilizer.Reset(camera != null ? camera.transform.eulerAngles.y : 0);
         IsHoldingReplacementFraming = false;
         _models.Clear();
+        _framedModels.Clear();
+        _lastFieldedModels.Clear();
         _bounds.Clear();
         _bodyEnvelopes.Clear();
         _hasTrackingBounds = false;
@@ -236,18 +258,28 @@ public class AllUnitsBattleCamera : CameraMode
                     Renderers = unit.WholeT.GetComponentsInChildren<Renderer>(true) };
                 _models[unit] = model;
             }
+            AddModel(model);
+        }
+    }
+
+    void AddModel(ModelFramingReference model, bool retain = false)
+    {
+        if (!_framedModels.Add(model)) return;
+        if (model.Root != null && model.Root.gameObject.activeInHierarchy)
+        {
+            bool newModel = !model.HasBounds;
             if (!BattleCameraFraming.TryGetModelBounds(model.Renderers, out var box))
             {
                 // A model not yet rendered still gets a scale-aware body envelope.
-                var size = Vector3.Scale(new Vector3(1, 2.8f, 1), Abs(unit.WholeT.lossyScale));
-                box = new Bounds(unit.WholeT.position + Vector3.up * size.y * 0.5f, size);
+                var size = Vector3.Scale(new Vector3(1, 2.8f, 1), Abs(model.Root.lossyScale));
+                box = new Bounds(model.Root.position + Vector3.up * size.y * 0.5f, size);
             }
-            float scaleY = Mathf.Abs(unit.WholeT.lossyScale.y);
-            float horizontalScale = Mathf.Max(Mathf.Abs(unit.WholeT.lossyScale.x), Mathf.Abs(unit.WholeT.lossyScale.z));
+            float scaleY = Mathf.Abs(model.Root.lossyScale.y);
+            float horizontalScale = Mathf.Max(Mathf.Abs(model.Root.lossyScale.x), Mathf.Abs(model.Root.lossyScale.z));
             if (newModel)
             {
-                model.CenterHeight = (box.center.y - unit.WholeT.position.y) / Mathf.Max(0.001f, scaleY);
-                var offset = box.center - unit.WholeT.position;
+                model.CenterHeight = (box.center.y - model.Root.position.y) / Mathf.Max(0.001f, scaleY);
+                var offset = box.center - model.Root.position;
                 // Reserve the neutral silhouette in every horizontal direction.
                 // An upright cylinder anticipates turns without the excessive
                 // corner padding of a world-axis-aligned square footprint.
@@ -256,20 +288,24 @@ public class AllUnitsBattleCamera : CameraMode
             }
             // Animation changes the safety envelope, but does not move the
             // composition target whenever a hand, sword or cape extends.
-            var anchor = unit.WholeT.position + Vector3.up * (model.CenterHeight * scaleY);
-            if (!_hasTrackingBounds)
-            {
-                _trackingBounds = new Bounds(anchor, Vector3.zero);
-                _hasTrackingBounds = true;
-            }
-            else _trackingBounds.Encapsulate(anchor);
+            model.Anchor = model.Root.position + Vector3.up * (model.CenterHeight * scaleY);
             float radius = model.HorizontalRadius * horizontalScale;
-            _bodyEnvelopes.Add(new BattleCameraFraming.BodyEnvelope(
-                new Vector3(unit.WholeT.position.x, box.center.y, unit.WholeT.position.z), radius, box.size.y + 0.5f));
+            model.BodyEnvelope = new BattleCameraFraming.BodyEnvelope(
+                new Vector3(model.Root.position.x, box.center.y, model.Root.position.z), radius, box.size.y + 0.5f);
             // Exceptional attacks/jumps still include their actual full bounds.
             box.Expand(new Vector3(0.25f, 0.5f, 0.25f));
-            _bounds.Add(box);
+            model.Bounds = box;
+            model.HasBounds = true;
         }
+        else if (!retain || !model.HasBounds) return;
+        if (!_hasTrackingBounds)
+        {
+            _trackingBounds = new Bounds(model.Anchor, Vector3.zero);
+            _hasTrackingBounds = true;
+        }
+        else _trackingBounds.Encapsulate(model.Anchor);
+        _bodyEnvelopes.Add(model.BodyEnvelope);
+        _bounds.Add(model.Bounds);
     }
 
     Rect UsableViewport(Camera camera)

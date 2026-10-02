@@ -23,7 +23,7 @@ public static class PocketStrikerLoginArtSmoke
     const string Key = "PocketStriker.LoginArtSmoke";
     const string Startup = "Assets/Scene/ABLoadScene/Scene1.unity";
     const string PreviousArtwork = "Assets/AIStory/Art/PocketStrikerLogin.png";
-    const string CurrentArtwork = "Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png";
+    const string CurrentArtwork = "Assets/AIStory/Art/PocketStrikerLoginMultiverse-v3-abstract.png";
     const double MaximumSeconds = 360;
     const BindingFlags Fields = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
     static readonly Type Loader = typeof(UILayer).Assembly.GetType("DummyLayerSystem.UILayerLoader", true);
@@ -64,7 +64,8 @@ public static class PocketStrikerLoginArtSmoke
     public static void StartBaselineBatch() => Begin("baseline", true);
     public static void StartAfterBatch() => Begin("after", false);
     public static void StartOfflineBaselineBatch() => Begin("Multiverse20261002/baseline", true, true);
-    public static void StartOfflineAfterBatch() => Begin("Multiverse20261002/after", false, true);
+    [MenuItem("PocketStriker/Validation/Login Artwork Offline Smoke")]
+    public static void StartOfflineAfterBatch() => Begin("AbstractCharacters20261002/after", false, true);
 
     static void Begin(string label, bool baseline, bool titleOnly = false)
     {

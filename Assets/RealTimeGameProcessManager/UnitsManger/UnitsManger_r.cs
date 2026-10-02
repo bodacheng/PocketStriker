@@ -120,53 +120,7 @@ namespace FightScene
                         {
                             if (teamConfig.myTeam == Team.player2 && FightLoad.Fight.EvolutionMode)
                             {
-                                HitBoxesProcesser.Instance.AllProcessingFade();
-                                RTFightManager.Target.team1.RMode_Unit.Value._MyBehaviorRunner.ChangeToWaitingState();
-                                var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
-                                var fightingLayer = FightingStepLayer.Open();
-                                fightingLayer.gameObject.SetActive(false);
-                                RTFightManager.Target.team1.InputsManager.FocusUnit(null);
-                                RTFightManager.Target.EvolutionManager.EvolutionCount++;
-                                string bottomText = "";
-                                switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
-                                {
-                                    case 1:
-                                        bottomText = Translate.Get("InBattleEvolutionInfo1");
-                                        break;
-                                    case 2:
-                                        bottomText = Translate.Get("InBattleEvolutionInfo2");
-                                        break;
-                                    case 3:
-                                        bottomText = Translate.Get("InBattleEvolutionInfo3");
-                                        break;
-                                }
-
-                                inBattleEvolution.Setup(RTFightManager.Target.team1.RMode_Unit.Value, () =>
-                                    {
-                                        HitBoxesProcesser.Instance.AllProcessingFade();
-                                        UILayerLoader.Remove<InBattleEvolution>();
-                                        ToNewUnit(0);
-                                        switch (RTFightManager.Target.EvolutionManager.EvolutionCount)
-                                        {
-                                            case 1:
-                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                    .CriticalGaugeMode = CriticalGaugeMode.Normal;
-                                                break;
-                                            case 2:
-                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                    .CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
-                                                break;
-                                            case 3:
-                                                RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef
-                                                    .CriticalGaugeMode = CriticalGaugeMode.Unlimited;
-                                                break;
-                                        }
-
-                                        fightingLayer.gameObject.SetActive(true);
-                                        RTFightManager.Target.team1.InputsManager.FocusUnit(RTFightManager.Target.team1
-                                            .RMode_Unit.Value);
-                                    },
-                                    Translate.Get("ChooseYourEvolution"), bottomText);
+                                BeginEvolutionChoice();
                             }
                             else
                             {
@@ -202,6 +156,71 @@ namespace FightScene
                     }
                 }).AddTo(gameObject);
             }
+        }
+
+        void BeginEvolutionChoice()
+        {
+            var manager = RTFightManager.Target;
+            var hero = manager.team1.RMode_Unit.Value;
+            var fightingLayer = FightingStepLayer.Open();
+            HitBoxesProcesser.Instance.AllProcessingFade();
+            hero._MyBehaviorRunner.ChangeToWaitingState();
+            foreach (var stick in fightingLayer.GetComponentsInChildren<UltimateJoystick>(true))
+                stick.UpdatePositioning();
+            manager.team1.InputsManager.FocusUnit(null);
+            fightingLayer.gameObject.SetActive(false);
+
+            // Lock controls immediately, leaving a real-time beat for the defeat
+            // before the skill choices appear. Fight exit disposes this timer.
+            Observable.Timer(TimeSpan.FromSeconds(1), Scheduler.MainThreadIgnoreTimeScale)
+                .Subscribe(_ =>
+                {
+                    if (manager == null || manager != RTFightManager.Target || hero == null
+                        || fightingLayer == null || hero.FightDataRef.IsDead.Value
+                        || FightLogger.value.GameOver.Value
+                        || FSceneProcessesRunner.Main.currentProcess is not FightingProcess)
+                        return;
+
+                    manager.EvolutionManager.EvolutionCount++;
+                    string bottomText = "";
+                    switch (manager.EvolutionManager.EvolutionCount)
+                    {
+                        case 1:
+                            bottomText = Translate.Get("InBattleEvolutionInfo1");
+                            break;
+                        case 2:
+                            bottomText = Translate.Get("InBattleEvolutionInfo2");
+                            break;
+                        case 3:
+                            bottomText = Translate.Get("InBattleEvolutionInfo3");
+                            break;
+                    }
+
+                    var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
+                    inBattleEvolution.Setup(hero, () =>
+                        {
+                            HitBoxesProcesser.Instance.AllProcessingFade();
+                            UILayerLoader.Remove<InBattleEvolution>();
+                            ToNewUnit(0);
+                            switch (manager.EvolutionManager.EvolutionCount)
+                            {
+                                case 1:
+                                    manager.team2.RMode_Unit.Value.FightDataRef.CriticalGaugeMode = CriticalGaugeMode.Normal;
+                                    break;
+                                case 2:
+                                    manager.team2.RMode_Unit.Value.FightDataRef.CriticalGaugeMode = CriticalGaugeMode.DoubleGain;
+                                    break;
+                                case 3:
+                                    manager.team2.RMode_Unit.Value.FightDataRef.CriticalGaugeMode = CriticalGaugeMode.Unlimited;
+                                    break;
+                            }
+
+                            fightingLayer.gameObject.SetActive(true);
+                            manager.team1.InputsManager.FocusUnit(hero);
+                            var battleCamera = manager._CameraManager.CurrentBattleCamera;
+                            if (battleCamera != null) battleCamera.CanSetH = true;
+                        }, Translate.Get("ChooseYourEvolution"), bottomText);
+                }).AddTo(manager.Disposables);
         }
 
         public void TutorialSpecial()

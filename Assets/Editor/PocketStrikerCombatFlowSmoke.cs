@@ -47,6 +47,9 @@ public static class PocketStrikerCombatFlowSmoke
         public List<string> evolutionCameraChecks = new List<string>();
         public List<string> evolutionScreenshots = new List<string>();
         public int evolutionDefeatHeals;
+        public List<float> evolutionChoiceDelaySeconds = new List<float>();
+        public int evolutionInputLockChecks;
+        public bool cancelledEvolutionChoice;
         public int evolutionSkillRecalculations;
         public int evolutionHealthBarChecks;
         public bool evolutionFinalDefeatHeal;
@@ -208,7 +211,7 @@ public static class PocketStrikerCombatFlowSmoke
             UnityEngine.Object.Destroy(authored);
             if (SessionState.GetBool(Key + ".EvolutionHeal", false))
             {
-                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three real skill-choice UI callbacks/stat recalculations and live HP sliders. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
+                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three one-second real-time skill-choice delays with locked input, real UI callbacks/stat recalculations and live HP sliders. Fight exit cancels a pending choice. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
                 report.limitation = "Local Self battles isolate account/reward services. Invulnerability prevents incidental AI damage; fixture HP reductions and death notifications make boundary conditions deterministic. This checks production defeat handling and evolution transitions, not natural damage or device performance.";
                 await ValidateEvolutionHeal(leader);
                 report.passed = true;
@@ -590,12 +593,23 @@ public static class PocketStrikerCombatFlowSmoke
         for (int index = 0; index < 4; index++)
         {
             var enemy = RTFightManager.Target.team2.RMode_Unit.Value;
+            var hud = UnityEngine.Object.FindFirstObjectByType<FightingStepLayer>();
+            var inputs = hud.InputsManager;
             Require(enemy != null && !enemy.FightDataRef.IsDead.Value, "Evolution did not present a living next opponent.");
             await CheckHealthBar(hero, 0.35f);
             await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
             var cameraMode = RTFightManager.Target._CameraManager.CurrentBattleCamera;
             var cameraCenter = cameraMode.CurrentPose.Center;
             var cameraViewport = cameraMode.GetUsableViewport(CameraManager._camera);
+            inputs.attack = inputs.fire1 = inputs.fire2 = inputs.acc = inputs.dreamCombo = inputs.defendButtonHover = true;
+            var sticks = hud.GetComponentsInChildren<UltimateJoystick>(true);
+            foreach (var stick in sticks)
+            {
+                typeof(UltimateJoystick).GetProperty("HorizontalAxis").SetValue(stick, .7f);
+                typeof(UltimateJoystick).GetProperty("VerticalAxis").SetValue(stick, -.5f);
+            }
+            if (index == 0) Time.timeScale = .25f;
+            float defeatedAt = Time.realtimeSinceStartup;
             enemy.FightDataRef.IsDead.Value = true;
             Require(Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, hero.FightDataRef.MaxHp),
                 "Opponent defeat did not immediately restore full HP before the skill choice: " + index);
@@ -608,6 +622,33 @@ public static class PocketStrikerCombatFlowSmoke
                 break;
             }
 
+            void RequireLockedInput()
+            {
+                Require(ActiveEvolutionLayer() == null && !hud.gameObject.activeInHierarchy
+                    && inputs.CurrentFocus.Value == null && !hero._MyBehaviorRunner.HasInputFocus()
+                    && !inputs.Inputting && !cameraMode.CanSetH
+                    && !hud.PauseButton.gameObject.activeInHierarchy
+                    && !hud.Team1UI.AutoSwitch.gameObject.activeInHierarchy
+                    && !hud.Team2UI.AutoSwitch.gameObject.activeInHierarchy
+                    && sticks.All(stick => Mathf.Approximately(stick.GetHorizontalAxis(), 0)
+                        && Mathf.Approximately(stick.GetVerticalAxis(), 0)),
+                    "The defeat delay allowed battle, camera or HUD interaction.");
+                // Stale callbacks from a held pointer must not relatch input.
+                inputs.AttackDown(); inputs.Fire1Down(); inputs.Fire2Down();
+                inputs.RushDown(); inputs.DefendDown(); inputs.DreamComboDown();
+                Require(!inputs.attack && !inputs.fire1 && !inputs.fire2 && !inputs.acc
+                    && !inputs.dreamCombo && !inputs.defendButtonHover,
+                    "The defeat delay preserved or accepted a held action.");
+            }
+            RequireLockedInput();
+            await UniTask.Delay(600, DelayType.Realtime);
+            RequireLockedInput();
+            report.evolutionInputLockChecks++;
+            await UniTask.WaitUntil(() => ActiveEvolutionLayer() != null).Timeout(TimeSpan.FromSeconds(10));
+            float choiceDelay = Time.realtimeSinceStartup - defeatedAt;
+            Require(choiceDelay >= .98f, "The evolution choice appeared before the one-second delay.");
+            report.evolutionChoiceDelaySeconds.Add(choiceDelay);
+            Time.timeScale = 1f;
             var evolution = ActiveEvolutionLayer();
             Require(evolution != null, "Opponent defeat omitted the real evolution layer.");
             await UniTask.WaitUntil(() => ((UnityEngine.UI.Text)typeof(InBattleEvolution)
@@ -635,6 +676,9 @@ public static class PocketStrikerCombatFlowSmoke
             Require(cameraMode.GetUsableViewport(CameraManager._camera) == cameraViewport,
                 "Returning from evolution changed the battle viewport.");
             report.evolutionCameraChecks.Add("return-"+index+": restored HUD retains viewport");
+            Require(hud.gameObject.activeInHierarchy && inputs.CurrentFocus.Value == hero
+                && hero._MyBehaviorRunner.HasInputFocus() && cameraMode.CanSetH,
+                "Choosing an evolution did not restore player and camera controls.");
             report.evolutionSkillRecalculations++;
         }
         await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess)
@@ -650,6 +694,17 @@ public static class PocketStrikerCombatFlowSmoke
         await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess)
             .Timeout(TimeSpan.FromSeconds(15));
 
+        var cancelledFight = CreateFixture("evolution-cancel-choice", true, 2);
+        hero = await StartFixture(cancelledFight, true);
+        RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef.IsDead.Value = true;
+        await UniTask.Delay(300, DelayType.Realtime);
+        Require(ActiveEvolutionLayer() == null, "Cancellation fixture opened its choice too early.");
+        FSceneProcessesRunner.Main.ChangeProcess(SceneStep.FightOver);
+        await UniTask.Delay(1200, DelayType.Realtime);
+        Require(ActiveEvolutionLayer() == null && RTFightManager.Target.EvolutionManager.EvolutionCount == 0,
+            "A choice from the ended battle appeared after its delay.");
+        report.cancelledEvolutionChoice = true;
+
         var simultaneousFight = CreateFixture("evolution-dead-player", true, 1);
         hero = await StartFixture(simultaneousFight, true);
         hero.FightDataRef.CurrentHp.Value = 0;
@@ -659,8 +714,11 @@ public static class PocketStrikerCombatFlowSmoke
         report.deadPlayerNotRevived = true;
         Require(report.evolutionDefeatHeals == 4 && report.evolutionSkillRecalculations == 3
             && report.evolutionHealthBarChecks == 4 && report.evolutionFinalDefeatHeal
-            && report.normalRotationHealthUnchanged && report.deadPlayerNotRevived, "Evolution heal checks were incomplete.");
-        UnityEngine.Object.Destroy(evolutionFight); UnityEngine.Object.Destroy(rotationFight); UnityEngine.Object.Destroy(simultaneousFight);
+            && report.normalRotationHealthUnchanged && report.deadPlayerNotRevived
+            && report.evolutionInputLockChecks == 3 && report.evolutionChoiceDelaySeconds.Count == 3
+            && report.cancelledEvolutionChoice, "Evolution transition checks were incomplete.");
+        UnityEngine.Object.Destroy(evolutionFight); UnityEngine.Object.Destroy(rotationFight);
+        UnityEngine.Object.Destroy(cancelledFight); UnityEngine.Object.Destroy(simultaneousFight);
     }
 
     static InBattleEvolution ActiveEvolutionLayer() => UnityEngine.Object

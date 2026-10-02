@@ -27,13 +27,14 @@ public static partial class PocketStrikerBattleCameraSmoke
         public string process;
         public Rect usable;
         public int fielded, clippedCorners;
-        public bool holdingReplacement;
+        public bool holdingReplacement, duelCamera;
         public List<FighterFrame> fighters = new List<FighterFrame>();
     }
 
     [Serializable] public sealed class FighterFrame
     {
         public string id;
+        public bool retainedDeath;
         public Vector3 root, geometry, boundsCenter, boundsSize;
         public Rect projected;
     }
@@ -141,9 +142,9 @@ public static partial class PocketStrikerBattleCameraSmoke
             "Duel remains unnecessarily distant two seconds after returning to melee.");
         var death = report.transitions.Single(item => item.name == "death-replacement");
         float initial = death.frames[0].distance;
-        Require(death.frames.Any(frame => frame.holdingReplacement && frame.fielded == 1)
+        Require(death.frames.Any(frame => frame.holdingReplacement && frame.fielded == 2)
             && death.frames.Any(frame => !frame.holdingReplacement && frame.fielded == 2),
-            "Death/replacement did not exercise the partial-roster hold and release.");
+            "Death/replacement did not retain both fighters and then release the hold.");
         Require(death.frames.Max(frame => frame.distance) < initial * 1.2f + .5f
             && death.frames.Min(frame => frame.distance) > initial * .85f,
             "Replacement gap still causes an inward/outward camera swing.");
@@ -210,7 +211,7 @@ public static partial class PocketStrikerBattleCameraSmoke
                 distance = mode.CurrentPose.Distance, required = mode.DesiredPose.Distance,
                 centerLag = Vector3.Distance(mode.CurrentPose.Center, mode.DesiredPose.Center),
                 pitch = camera.transform.eulerAngles.x, fieldOfView = camera.fieldOfView, fielded = mode.FramedUnitCount,
-                holdingReplacement = mode.IsHoldingReplacementFraming };
+                holdingReplacement = mode.IsHoldingReplacementFraming, duelCamera = mode is DuelBattleCamera };
             var usable = mode.GetUsableViewport(camera);
             frame.usable = usable;
             frame.projectedCenter = camera.WorldToViewportPoint(mode.CurrentPose.Center);
@@ -224,11 +225,17 @@ public static partial class PocketStrikerBattleCameraSmoke
             foreach (var team in new[] { manager.team1, manager.team2 })
             foreach (var unit in team.teamMembers.mDict.Values)
             {
-                if (!Fielded(team, unit)) continue;
+                // The normal live selector excludes Death immediately. During
+                // a framing hold the visible fallen fighter must still have
+                // every renderer corner checked against the camera viewport.
+                bool retainedDeath = frame.holdingReplacement && unit != null && unit.WholeT != null
+                    && unit.gameObject.activeInHierarchy && unit.WholeT.gameObject.activeInHierarchy
+                    && unit.FightDataRef.IsDead.Value;
+                if (!Fielded(team, unit) && !retainedDeath) continue;
                 if (!BattleCameraFraming.TryGetModelBounds(unit.WholeT, out var bounds)) continue;
                 var fighter = new FighterFrame { id = team.teamConfig.myTeam + "/" + unit.UnitInfo.id,
                     root = unit.WholeT.position, geometry = unit.geometryCenter.position,
-                    boundsCenter = bounds.center, boundsSize = bounds.size };
+                    boundsCenter = bounds.center, boundsSize = bounds.size, retainedDeath = retainedDeath };
                 var min = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
                 var max = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
                 for (int corner = 0; corner < 8; corner++)
