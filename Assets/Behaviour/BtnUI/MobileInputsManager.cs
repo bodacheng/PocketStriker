@@ -43,6 +43,7 @@ public class MobileInputsManager : MonoBehaviour {
         foreach (var effects in _elementEffects.Values) effects.ApplyHUDScale();
         if (focus.Value != null && FXCamera != null && _elementEffects.ContainsKey(focus.Value.element))
             SwitchElementEffects(focus.Value.element);
+        RefreshDreamComboPresentation();
     }
     
     //攻击键系成员
@@ -91,8 +92,18 @@ public class MobileInputsManager : MonoBehaviour {
         }
     }
 
+    bool preparing;
     public void PreparingMode(bool preparingMode)
     {
+        preparing = preparingMode;
+        if (preparing)
+        {
+            attack = fire1 = fire2 = acc = dreamCombo = defendButtonHover = false;
+            StopPressing();
+        }
+        dashBtn.gameObject.SetActive(preparing || focus.Value != null);
+        dreamComboBtn.gameObject.SetActive(preparing || focus.Value != null);
+        RefreshDreamComboPresentation();
         a1Btn.interactable = !preparingMode;
         a2Btn.interactable = !preparingMode;
         a3Btn.interactable = !preparingMode;
@@ -111,6 +122,8 @@ public class MobileInputsManager : MonoBehaviour {
     private IDisposable watchDreamComboGauge;
     public void FocusUnit(Data_Center center, bool force = false)
     {
+        watchDreamComboGauge?.Dispose();
+        watchDreamComboGauge = null;
         if (focus.Value != null)
         {
             focus.Value._MyBehaviorRunner.InputsManager = null;
@@ -121,32 +134,30 @@ public class MobileInputsManager : MonoBehaviour {
             focus.Value = center;
             SwitchElementEffects(center.element);
             SuddenRefreshButtons(focus.Value._MyBehaviorRunner, force);
-            watchDreamComboGauge?.Dispose();
-            watchDreamComboGauge = center.FightDataRef.DreamComboGauge.Subscribe(
-                (x) =>
-                {
-                    var percent = (float)x / FightGlobalSetting.DreamComboGaugeMax;
-                    if (percent == 1)
-                    {
-                        DreamComboEffectOn();
-                    }
-                    else
-                    {
-                        DreamComboEffectOff();
-                    }
-                    radialSegmentedHealthBar.SetPercent(percent);
-                }
-            ).AddTo(this.gameObject);
-            
+            watchDreamComboGauge = new CompositeDisposable(
+                center.FightDataRef.DreamComboGauge.Subscribe(_ => RefreshDreamComboPresentation()),
+                center.FightDataRef.IsDead.Subscribe(_ => RefreshDreamComboPresentation())).AddTo(this.gameObject);
             TurnOnButtons();
         }
         else
         {
             focus.Value = null;
+            RefreshDreamComboPresentation();
             TurnOffButtons();
         }
     }
     
+    void RefreshDreamComboPresentation()
+    {
+        float percent = focus.Value != null && !focus.Value.FightDataRef.IsDead.Value
+            ? Mathf.Clamp01((float)focus.Value.FightDataRef.DreamComboGauge.Value / Mathf.Max(1, FightGlobalSetting.DreamComboGaugeMax)) : 0;
+        if (percent >= 1) DreamComboEffectOn(); else DreamComboEffectOff();
+        radialSegmentedHealthBar.SetPercent(percent);
+        // The health-bar package batches shader writes on a low-frequency coroutine.
+        // Input focus/countdown changes must be visible immediately, not just correct in its stored value.
+        radialSegmentedHealthBar.RemoveSegments.ApplyToShader(false);
+    }
+
     public void Clear()
     {
         _elementEffects.Clear();
@@ -368,6 +379,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool attack;
     public void AttackDown()
     {
+        if (preparing || !a1Btn.IsInteractable()) return;
         StartPressing(a1Btn);
         attack = true;
     }
@@ -380,6 +392,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool fire1;
     public void Fire1Down()
     {
+        if (preparing || !a2Btn.IsInteractable()) return;
         fire1 = true;
         StartPressing(a2Btn);
     }
@@ -392,6 +405,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool fire2;
     public void Fire2Down()
     {
+        if (preparing || !a3Btn.IsInteractable()) return;
         fire2 = true;
         StartPressing(a3Btn);
     }
@@ -403,6 +417,7 @@ public class MobileInputsManager : MonoBehaviour {
     
     public void DefendDown()
     {
+        if (preparing || !defendBtn.IsInteractable()) return;
         defendButtonHover = true;
         StartPressing(defendBtn);
     }
@@ -415,6 +430,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool acc;
     public void RushDown()
     {
+        if (preparing || !dashBtn.IsInteractable()) return;
         acc = true;
         StartPressing(dashBtn);
     }
@@ -427,6 +443,7 @@ public class MobileInputsManager : MonoBehaviour {
     public bool dreamCombo;
     public void DreamComboDown()
     {
+        if (preparing || !dreamComboBtn.IsInteractable()) return;
         dreamCombo = true;
         StartPressing(dreamComboBtn);
     }
@@ -448,6 +465,7 @@ public class MobileInputsManager : MonoBehaviour {
         fire1 = false;
         fire2 = false;
         acc = false;
+        dreamCombo = false;
         joystick.gameObject.SetActive(true);
         if (FightGlobalSetting.HasDefend)
         {
@@ -461,14 +479,15 @@ public class MobileInputsManager : MonoBehaviour {
         a1Btn.gameObject.SetActive(false);
         a2Btn.gameObject.SetActive(false);
         a3Btn.gameObject.SetActive(false);
-        dashBtn.gameObject.SetActive(false);
+        dashBtn.gameObject.SetActive(preparing);
         defendBtn.gameObject.SetActive(false);
-        dreamComboBtn.gameObject.SetActive(false);
+        dreamComboBtn.gameObject.SetActive(preparing);
         
         attack = false;
         fire1 = false;
         fire2 = false;
         acc = false;
+        dreamCombo = false;
         joystick.gameObject.SetActive(false);
         if (FightGlobalSetting.HasDefend)
         {

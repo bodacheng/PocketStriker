@@ -18,7 +18,9 @@ using UnityEngine.SceneManagement;
 public static partial class PocketStrikerBattleCameraSmoke
 {
     const string Key = "PocketStriker.CameraSmoke";
-    static string Output => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW"))
+    static string Output => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_IMPACT_REVIEW"))
+        ? "Logs/CombatImpact/" + Environment.GetEnvironmentVariable("POCKETSTRIKER_IMPACT_REVIEW")
+        : string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW"))
         ? "Logs/CameraFraming/Playmode"
         : "Logs/CameraFraming/Transitions/" + Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW");
     static bool finishing;
@@ -172,7 +174,9 @@ public static partial class PocketStrikerBattleCameraSmoke
             var leader = authored.UnitsData[0].DeepCopy();
             UnityEngine.Object.Destroy(authored);
 
-            if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_IMPACT_REVIEW")))
+                await ReviewImpact(leader);
+            else if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
                 await ReviewHandoffs(leader);
             else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
                 await ReviewTransitions(leader);
@@ -577,8 +581,9 @@ public static partial class PocketStrikerBattleCameraSmoke
 
     static Vector2 ReviewResolution()
     {
-        return Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_SIZE") == "390x844"
-            ? new Vector2(390, 844) : new Vector2(540, 960);
+        var size = Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_SIZE");
+        if (size == "375x667") return new Vector2(375, 667);
+        return size == "390x844" ? new Vector2(390, 844) : new Vector2(540, 960);
     }
 
     static void ConfigurePortraitGameView()

@@ -64,8 +64,9 @@ public partial class FightParamsReference
         foreach (var limb in _myLimbs)
         {
             if (limb.myColliderMustEquip != null)
-                limb.myColliderMustEquip.isTrigger = !on;
+                limb.myColliderMustEquip.isTrigger = !on || Center._BasicPhysicSupport.GetComponent<CombatBodyProfile>() != null;
         }
+        Center._BasicPhysicSupport.GetComponent<CombatBodyProfile>()?.SetColliding(on);
     }
 
     public void ChangeLayerForLimbs(int layer)
@@ -76,6 +77,7 @@ public partial class FightParamsReference
             limb.gameObject.layer = layer;
         }
         Center.geometryCenter.gameObject.layer = layer;
+        Center._BasicPhysicSupport.GetComponent<CombatBodyProfile>()?.SetLayer(layer);
     }
 
     public bool IfMyBody(Collider collider) => _myColliders.Contains(collider);
@@ -95,6 +97,8 @@ public partial class FightParamsReference
                 }
             }
         }
+        var bodyProfile = Center._BasicPhysicSupport.GetComponent<CombatBodyProfile>();
+        if (bodyProfile?.Body != null) _myColliders.Add(bodyProfile.Body);
         if (_shield != null)
         {
             if (_shield._shieldCollider != null)
@@ -207,6 +211,9 @@ public partial class FightParamsReference
     float _d;
     public void ApplyDamage(V_Damage dmg)
 	{
+        // Continuous weapons can retain a hit from the preceding physics tick.
+        // A defeated target must not return to Hit or emit another damage event.
+        if (IsDead.Value) return;
         HitEffect(dmg);
         if (_getHitTriggerEvent.Count > 0)
         {

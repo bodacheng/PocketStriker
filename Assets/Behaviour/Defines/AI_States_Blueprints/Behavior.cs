@@ -566,7 +566,11 @@ namespace Soul
                 ? damage.DamageEffectPoint
                 : damage.impactComingPoint;
 
-            if (damage.from_weapon.ShouldPreferAttackerLinePush() && damage.attacker?.Center?.WholeT != null)
+            bool attachedDraw = damage.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon
+                && (damage.from_weapon.damage_type == DamageType.draw || damage.from_weapon.damage_type == DamageType.stable_draw);
+            // A rotating foot may cross the victim during a continuous impact.
+            // Launch away from the source body, never back toward an animated contact point.
+            if ((attachedDraw || damage.from_weapon.ShouldPreferAttackerLinePush()) && damage.attacker?.Center?.WholeT != null)
             {
                 pushOrigin = damage.attacker.Center.WholeT.position;
             }

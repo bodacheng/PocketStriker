@@ -235,17 +235,20 @@ namespace FightScene
 #if UNITY_EDITOR
                 if (StoryLoaderForValidation != null) return StoryLoaderForValidation();
 #endif
+                if (PocketStrikerQueuedStory.Enabled) return PocketStrikerQueuedStory.Load(cancellationToken);
                 return aiServiceManager != null ? aiServiceManager.LoadAIStory() : UniTask.FromResult<StoryInfo>(null);
             }
-            var story = await BattleStoryRequest.Load(Request, cancellationToken);
+            var story = await BattleStoryRequest.Load(Request, cancellationToken, PocketStrikerQueuedStory.Enabled ? 110 : 60);
             // A late reply from the previous battle cannot replace the current story.
             if (this != null && !cancellationToken.IsCancellationRequested && ReferenceEquals(fight, FightLoad.Fight)
                 && ReferenceEquals(loadSource, aiStoryLoadSource)) aiStoryInfo = story;
+            else PocketStrikerQueuedStory.Release(story);
             loadSource.TrySetResult(story);
         }
 
         void CancelAIStory()
         {
+            PocketStrikerQueuedStory.Release(aiStoryInfo);
             aiStoryLoadSource?.TrySetResult(null);
             if (aiStoryCancellation == null) return;
             aiStoryCancellation.Cancel();

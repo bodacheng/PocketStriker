@@ -16,11 +16,6 @@ namespace Soul
         readonly float hurtAnimDuration = 0.05f;
         Sequence mySequence;
         Tweener _fixedDisplacementTweener;
-        Tweener _shakeTweener;
-        readonly float duration = 0.3f;
-        readonly float magnitude = 0.6f;
-        readonly int vibrato = 80;
-        readonly float randomness = 20f;
 
         bool dropped;
         Vector3 _xz;
@@ -30,12 +25,6 @@ namespace Soul
         UnityEngine.Events.UnityAction pasuestart;
         UnityEngine.Events.UnityAction pasueend;
         CustomCoroutine pasueCoroutine;
-
-        void Shake()
-        {
-            _shakeTweener = _DATA_CENTER.WholeT.DOPunchPosition(-_DATA_CENTER.WholeT.forward * magnitude, duration,
-                vibrato, randomness).SetLink(_DATA_CENTER.WholeT.gameObject);
-        }
 
         void PlayHurtAnim(V_Damage newValue)
         {
@@ -64,9 +53,8 @@ namespace Soul
         public override void AI_State_exit()
         {
             base.AI_State_exit();
-            _shakeTweener?.Kill();
-            if (mySequence != null && mySequence.active && mySequence.IsPlaying())
-                mySequence.Kill();
+            _BasicPhysicSupport?.EndImpactFollow();
+            mySequence?.Kill();
             _fixedDisplacementTweener?.Kill();
             _physicMissionDisposable?.Dispose();
             HurtStateRuntimeUtility.ExitHurt(this, FightGlobalSetting.FighterRigidMass);
@@ -74,7 +62,7 @@ namespace Soul
 
         public override void AI_State_enter(V_Damage newValue)
         {
-            _shakeTweener?.Kill();
+            _BasicPhysicSupport?.EndImpactFollow();
 
             if (_DATA_CENTER.TryChangeToSub(StateKey, newValue))
             {
@@ -165,11 +153,8 @@ namespace Soul
                     return true;
             }
 
-            if (reaction.ShouldShake)
-            {
-                Shake();
-            }
-
+            // Hurt animation and hit effects supply recoil. Moving the physical root
+            // with DOPunchPosition fought the skill displacement and collision solver.
             if (reaction.ShouldGenerateElementShockEffect)
             {
                 EffectsManager.GenerateEffect("electric_s_e", FightGlobalSetting.EffectPathDefine(newValue.from_weapon.element),
@@ -267,6 +252,12 @@ namespace Soul
 
         void DrawDamageStart(V_Damage newValue)
         {
+            bool attachedImpact = newValue.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon;
+            if (attachedImpact && _BasicPhysicSupport != null)
+            {
+                _BasicPhysicSupport.BeginImpactFollow(newValue.attacker.Center);
+                return;
+            }
             HurtStateRuntimeUtility.StartDrawDamage(this, FightGlobalSetting.FighterRigidMass);
         }
 
@@ -274,6 +265,13 @@ namespace Soul
         {
             if (HurtStateRuntimeUtility.ShouldSkipDrawUpdate(newValue.from_weapon.weaponHP, newValue.from_weapon.CurrentHP))
                 return;
+            if (newValue.from_weapon._WeaponMode == WeaponMode.EnergyFromBodyWeapon && _BasicPhysicSupport != null)
+            {
+                // Once the source is gone, the reaction stays released. Do not
+                // fall back to following its animated foot/pooled marker next tick.
+                if (_BasicPhysicSupport.FollowingImpact) _BasicPhysicSupport.UpdateImpactFollow();
+                return;
+            }
             if (newValue.from_weapon_marker == null)
                 return;
 

@@ -1,86 +1,99 @@
 # PocketStriker AI stories
 
-The client uses the same PlayFab Title (`38054`) and registered Azure functions
-(`generateGeminiText`, `generateGeminiImages`) as the local MComat reference.
-`GeminiConfig.asset` selects `gemini-3.1-flash-image`; `AIServiceConfig.asset`
-requests one concise magic-stone adventure scene. The shared package is unchanged.
+PocketStriker uses the same PlayFab Title (`38054`) and registered Azure functions
+(`generateGeminiText`, `generateGeminiImages`) as the local MCombat reference.
+The shared package is unchanged. After the approved Azure deployment and real
+service acceptance on 2026-10-01, the iOS project defines
+`POCKETSTRIKER_QUEUED_STORIES` and uses its project-specific queue adapter.
+Other build targets retain their existing define sets.
 
-## Battle lifecycle
+## Fixed cause and behavior
 
-Story generation stays optional and runs in the background. Results use a story
-only when it is already ready; otherwise the authored story or ordinary result
-continues. The existing consumer has a 60-second realtime deadline and is cancelled
-when leaving its scene. Late responses cannot replace another fight's story.
+The former synchronous image call exceeded PlayFab's 10-second HTTP deadline.
+The new envelope starts an Azure queue job and returns quickly; status calls do
+not generate. Blob leases deduplicate concurrent work. A terminal failure can
+retry only on an explicit new attempt after cooldown, with at most three total
+generation attempts. Images are stored as Blob paths and signed URLs are freshly
+issued when needed. Old MCombat request shapes, caches and registrations remain.
+The old synchronous MCombat cold-image limit still applies to clients that have
+not adopted the new protocol. Provider response-body timeouts are also corrected.
 
-`PreparingProcess` marks an explicit new battle attempt. If a completed request
-returned no story, this attempt clears that empty request even when the result
-screen retains the same `FightInfo`. Ordinary reads and duplicate startup preloads
-reuse the existing request. A pending request or ready story also remains reused.
-There is no automatic resend loop: an Azure request can continue after PlayFab
-has timed out, and server in-flight deduplication has not been established.
+A follow-up real-account regression on 2026-10-02 reached the PlayFab SDK error
+callback on its first request, then succeeded on a same-key replay. Its original
+error code was not recorded, so the exact transient cause is not established.
+The client now recovers known temporary transport errors and Azure HTTP/cold-start
+timeouts with at most two resends across one job. Resends retain the identical
+start input or status ID, remain inside the existing deadline, respect Retry-After,
+and stop on cancellation. Permanent HTTP/auth errors and terminal worker failures
+are not recovered this way; explicit generation retry retains its existing rules.
+The live fixture now records safe status/timing/error categories without URLs.
 
-## Story presentation
+The client stops polling on cancellation, bounds its owned pipeline to 100 seconds
+and rejects stale results from another fight. The outer battle consumer is bounded
+to 110 seconds (60 for the legacy path). AI stories remain optional: results never
+wait for generation, and use an authored story or ordinary result if not ready.
+Late/abandoned owned sprites and textures are released. Existing same-attempt
+request reuse and explicit-next-attempt recovery are preserved.
 
-AI artwork uses an ordinary UI Image in its own opaque panel. The legacy authored
-background's sprite Animator previously replaced the generated illustration every
-frame. AI captions use a separate Text without the legacy per-letter reveal
-component, with wrapping, readable sizing, a localized heading and a full-panel
-continue button. Finishing hides the complete story panel before result animation.
-The authored fallback and result reward controls retain their existing paths.
+The focused single-page prompt uses recognizable fighters and magic stones, the
+current language, and a daily variation scoped by fight ID/event type/mode. A new
+date can generate new content; repeated requests within that scope share server
+jobs. Ordinary Gemini Markdown JSON fences are handled, malformed output falls
+back safely. Captions are capped at 200 characters; AI art is a static UI Image,
+isolated from the authored background animation and per-letter text component.
+
+## Evidence and limits
+
+Real development-account cold text and cold image tasks each generated once.
+Cold-image pipeline/download with text cached: 13.982 seconds; warm pipeline:
+1.433 seconds. Maximum observed HTTP callback across the first and replay runs:
+0.748 seconds. Identical concurrent starts, cancellation/recovery, warm reuse,
+actual 1376×768 download, invalid input and missing jobs passed. Legacy requests
+also returned a visual story. The first cold text response exposed fenced JSON;
+its paid result was reused after the parser fix. These are not Azure host
+cold-start measurements or one uninterrupted all-cold pipeline measurement.
+
+Two real-account natural battle fixtures passed image/caption/continue/result/home
+and repeated entry, with no runtime errors. They use a clone of completed Quest 4,
+22v1 and reduced enemy HP to shorten combat, and deliberately warm the story before
+combat. No account replacement, story/result injection or remote reward. Three
+separate isolated-account natural battles verify exception, permanent-wait and
+empty-story fallback without blocking results. Provider outages and worker-crash
+recovery use local fault fixtures; physical-device behavior and the separate full
+MCombat client are not certified. A story can still finish after a short battle.
+
+The full deployment/rollback/evidence details are in
+[AIStoryBackend/README.md](AIStoryBackend/README.md). Raw provider/editor logs may
+contain signed URLs: share sanitized reports and screenshots only.
 
 ## Validation
 
-Use Unity 6000.5.1f1. Do not open a second editor on this checkout. The playmode
-commands require rendering, so omit `-quit` and `-nographics`.
+Use Unity 6000.5.1f1. Do not open a second editor on this checkout. Rendered
+playmode checks require omitting `-quit` and `-nographics`.
 
 ```sh
-# Eight local request-lifecycle cases; no account/provider request.
+# 21 local protocol/parser/recovery cases; no account/provider request.
 Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
-  -executeMethod PocketStrikerAIStoryLifecycleValidation.ValidateBatch \
-  -logFile "$LOG_DIR/story-lifecycle.log"
-
-# Actual production device login, Azure generation, completed Quest 4 fixture,
-# natural battle, ready-cache reuse, real story clicks, result and home return.
+  -executeMethod PocketStrikerStoryJobValidation.ValidateBatch -logFile "$LOG_DIR/queued.log"
+# 8 local lifecycle cases.
 Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
-  -executeMethod PocketStrikerAIStoryLiveSmoke.StartAfterBatch \
-  -logFile "$LOG_DIR/story-live.log"
-
-# Existing isolated-account failure suite: exception, permanent wait and empty
-# story in three natural Quest battles; five request wrapper cases.
+  -executeMethod PocketStrikerAIStoryLifecycleValidation.ValidateBatch -logFile "$LOG_DIR/lifecycle.log"
+# Real account, queued warm story, natural battle and native UI navigation.
 Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
-  -executeMethod PocketStrikerCombatFlowSmoke.StartStoryFailureBatch \
-  -logFile "$LOG_DIR/story-failures.log"
-
+  -executeMethod PocketStrikerAIStoryLiveSmoke.StartQueuedBattleBatch -logFile "$LOG_DIR/live-private.log"
+# Three injected-fault natural battles and five optional-request wrapper cases.
+Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
+  -executeMethod PocketStrikerCombatFlowSmoke.StartStoryFailureBatch -logFile "$LOG_DIR/failures.log"
 Tools/validate_unity.sh compile ios
+Tools/validate_unity.sh check ios
 ```
 
-Reports: `Logs/AIStory/Lifecycle/report.json`, `Logs/AIStory/Live/after/report.json`,
-`Logs/AIStory/Playmode/report.json`, `Logs/Revival/compile-iOS-report.json`.
-Live screenshots are 540×960 actual Game view captures. The live suite waits for
-real generation in the test before launching a cloned, already-completed Quest 4
-Group battle (22v1, reduced enemy HP). It uses the actual logged-in account, natural
-combat and native EventSystem clicks; it neither injects a story/result nor awards
-remote rewards. This demonstrates warm-cache integration, not unmodified cold
-production timing or physical-device behavior. It counts provider responses without
-copying their URLs or tokens into the report; raw editor logs should remain private.
+Reports are under `Logs/AIStory/{Queued,Lifecycle,Playmode,Live}` and
+`Logs/Revival`. `StartQueuedServiceBatch` and `EnableClientBatch` are one-time,
+guarded acceptance helpers: service acceptance requires the client define absent
+and genuinely uncached input. Do not rerun it as a routine warm smoke or toggle a
+deployed feature merely to satisfy the cold assertion. Use the archived service
+report and preserved first-text evidence for this deployment.
 
-## Remaining server issue (2026-10-01)
-
-Both the old Imagen/three-page configuration and the updated single-page model
-hit PlayFab's 10-second HTTP function deadline on a real cold image request.
-The updated cold run returned no story after about 15.7 seconds. A later warm run
-completed in about 2.7 seconds and passed image stability, text visibility, natural
-battle, story completion and home return with nine pointer clicks and no errors.
-This proves the service can populate and serve its cache; it does not fix the
-first-request deadline.
-
-The service needs inspection before changing its request/caching protocol. A
-possible remedy is a bounded start/status job protocol with per-key in-flight
-protection, so each HTTP response stays within PlayFab's limit while image work
-continues independently. This has not been implemented or deployed. Automatic
-approval review refused source/test links because they may contain signed access
-credentials; explicit source-read authorization is pending. No Azure configuration,
-function deployment, Addressables publication or remote Git push was performed.
-
-Microsoft's documented HTTP limit:
-https://learn.microsoft.com/en-us/xbox/playfab/live-service-management/service-gateway/automation/cloudscript-af/quickstart#execution-limits
+Server tests: `cd Tools/AIStoryBackend && npm ci && npm test`. Optional Azurite
+integration uses local Blob/Queue services and fake Gemini, not live generation.

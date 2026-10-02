@@ -34,6 +34,10 @@ public static class PocketStrikerAIStoryLiveSmoke
         public bool passed;
         public bool complete;
         public bool baseline;
+        public bool queuedProtocol;
+        public bool serviceOnly;
+        public bool legacyCompatible;
+        public double legacySeconds;
         public bool realAccountLogin;
         public bool generated;
         public bool reusedReadyCache;
@@ -62,6 +66,7 @@ public static class PocketStrikerAIStoryLiveSmoke
         public List<string> imageDimensions = new List<string>();
         public List<string> screenshots = new List<string>();
         public List<string> failures = new List<string>();
+        public List<PocketStrikerQueuedLiveValidation.Call> storyCalls = new List<PocketStrikerQueuedLiveValidation.Call>();
     }
     [Serializable] sealed class SceneBackup { public List<SceneRecord> scenes = new List<SceneRecord>(); }
     [Serializable] sealed class SceneRecord { public string path; public bool loaded; public bool active; }
@@ -77,6 +82,10 @@ public static class PocketStrikerAIStoryLiveSmoke
 
     public static void StartBaselineBatch() => Begin("baseline", true);
     public static void StartAfterBatch() => Begin("after", false);
+
+    public static void StartQueuedServiceBatch() => Begin("queued-service", false);
+    public static void StartQueuedRepeatBatch() => Begin("queued-repeat", false);
+    public static void StartQueuedBattleBatch() => Begin("queued-battle", false);
 
     static void Begin(string label, bool baseline)
     {
@@ -96,6 +105,8 @@ public static class PocketStrikerAIStoryLiveSmoke
         SessionState.SetString(Key + ".Start", DateTime.UtcNow.ToString("O"));
         SessionState.SetString(Key + ".Output", "Logs/AIStory/Live/" + label);
         SessionState.SetBool(Key + ".Baseline", baseline);
+        SessionState.SetBool(Key + ".Queued", label.StartsWith("queued-"));
+        SessionState.SetBool(Key + ".ServiceOnly", label == "queued-service");
         SessionState.SetBool(Key + ".Running", false);
         SessionState.SetBool(Key, true);
         finishing = false;
@@ -146,12 +157,15 @@ public static class PocketStrikerAIStoryLiveSmoke
     {
         report = new Report { baseline = SessionState.GetBool(Key + ".Baseline", false),
             unityVersion = Application.unityVersion, utcTime = DateTime.UtcNow.ToString("O"), phase = "login" };
+        report.queuedProtocol = SessionState.GetBool(Key + ".Queued", false);
+        report.serviceOnly = SessionState.GetBool(Key + ".ServiceOnly", false);
         Directory.CreateDirectory(Output);
         cancellation = new CancellationTokenSource();
         FightInfo originalFight = FightLoad.Fight;
         bool originalLogging = FightGlobalSetting.HitBoxLogger;
         GameObject serviceHost = null;
         GangbangInfo fixture = null;
+        StoryInfo ownedPreview = null;
         try
         {
             await Stable();
@@ -180,11 +194,47 @@ public static class PocketStrikerAIStoryLiveSmoke
 
             report.phase = "real-generation";
             Save();
-            serviceHost = new GameObject("AIStoryLiveSmokeService");
-            var service = serviceHost.AddComponent<AIServiceManager>();
+            StoryInfo story;
             double generationStart = Time.realtimeSinceStartupAsDouble;
-            var story = await service.LoadAIStory().AttachExternalCancellation(cancellation.Token)
-                .Timeout(TimeSpan.FromSeconds(60), DelayType.Realtime);
+            if (report.queuedProtocol)
+            {
+                Require(report.serviceOnly || PocketStrikerQueuedStory.Enabled, "Queued battle requires accepted service and enabled client.");
+                if (report.serviceOnly)
+                {
+                    Require(!PocketStrikerQueuedStory.Enabled, "Service acceptance must precede client enablement.");
+                    serviceHost = new GameObject("AIStoryLegacyCompatibilityService");
+                    var legacy = await serviceHost.AddComponent<AIServiceManager>().LoadAIStory()
+                        .AttachExternalCancellation(cancellation.Token).Timeout(TimeSpan.FromSeconds(60), DelayType.Realtime);
+                    report.legacySeconds = Time.realtimeSinceStartupAsDouble - generationStart;
+                    report.legacyCompatible = legacy != null && legacy.HasVisualScene();
+                    Require(report.legacyCompatible, "The legacy request no longer returns a visual story.");
+                    generationStart = Time.realtimeSinceStartupAsDouble;
+                    story = await PocketStrikerQueuedLiveValidation.Validate(cancellation.Token, Output);
+                }
+                else
+                {
+                    PocketStrikerStoryJobClient.ValidationObserver = (request, reply, seconds, error) =>
+                    {
+                        report.storyCalls.Add(new PocketStrikerQueuedLiveValidation.Call
+                        {
+                            operation = request.operation, kind = request.kind, id = reply?.id,
+                            status = reply?.status, seconds = seconds, error = error ?? reply?.error,
+                            generationAttempts = reply?.generationAttempts ?? 0
+                        });
+                        if (!string.IsNullOrEmpty(reply?.result?.text))
+                            File.WriteAllText(Path.Combine(Output, "generated-text.txt"), reply.result.text);
+                        Save();
+                    };
+                    story = await PocketStrikerQueuedStory.Load(cancellation.Token);
+                }
+                ownedPreview = story;
+            }
+            else
+            {
+                serviceHost = new GameObject("AIStoryLiveSmokeService");
+                story = await serviceHost.AddComponent<AIServiceManager>().LoadAIStory().AttachExternalCancellation(cancellation.Token)
+                    .Timeout(TimeSpan.FromSeconds(60), DelayType.Realtime);
+            }
             report.generationSeconds = Time.realtimeSinceStartupAsDouble - generationStart;
             report.scenes = story?.StoryScenes?.Count ?? 0;
             report.visualScenes = story?.StoryScenes?.Count(scene => scene?.Pic != null) ?? 0;
@@ -200,6 +250,13 @@ public static class PocketStrikerAIStoryLiveSmoke
             Save();
             UnityEngine.Object.Destroy(serviceHost);
             serviceHost = null;
+            if (report.serviceOnly)
+            {
+                report.complete = true;
+                report.passed = report.generated && report.legacyCompatible && report.otherErrorLogs == 0;
+                report.outcome = "Real queued cold/warm/duplicate/cancel acceptance and legacy compatibility passed. No battle was run in service-only mode.";
+                return;
+            }
 
             report.phase = "natural-battle";
             FightLoad.Go(fixture);
@@ -207,7 +264,11 @@ public static class PocketStrikerAIStoryLiveSmoke
                 && global::FightScene.FightScene.target != null
                 && FSceneProcessesRunner.Main.currentProcess is FightingProcess, 90, "natural battle start");
             await Wait(() => global::FightScene.FightScene.target.AIStoryInfo != null, 15, "ready story cache reuse");
-            report.reusedReadyCache = ReferenceEquals(global::FightScene.FightScene.target.AIStoryInfo, story);
+            var battleStory = global::FightScene.FightScene.target.AIStoryInfo;
+            report.reusedReadyCache = report.queuedProtocol
+                ? PocketStrikerQueuedLiveValidation.ImageHash(battleStory) == PocketStrikerQueuedLiveValidation.ImageHash(story)
+                : ReferenceEquals(battleStory, story);
+            story = battleStory;
             Require(report.reusedReadyCache, "The battle did not consume the real generated story cache.");
             await Screenshot("battle");
             await Wait(() => Layer<ArenaFightOver>() != null && Field<bool>(Layer<ArenaFightOver>(), "aiStoryPlaying"),
@@ -242,6 +303,7 @@ public static class PocketStrikerAIStoryLiveSmoke
             report.storyFinished = !Field<bool>(result, "aiStoryPlaying");
             Require(report.storyFinished, "Story clicks did not finish all generated pages.");
             await Wait(() => FSceneProcessesRunner.Main.currentProcess is FightOverProcess, 15, "story-to-result transition");
+            await Wait(() => CanNativeClick(Field<Button>(result, "returnBtn")), 15, "result controls after victory animation");
             await Stable();
             await Screenshot("result");
             report.phase = "return-home";
@@ -261,13 +323,15 @@ public static class PocketStrikerAIStoryLiveSmoke
         {
             // Exception type and test phase are sufficient for a non-sensitive report.
             report.failures.Add(report.phase + ": " + exception.GetType().Name
-                + (exception.StackTrace != null && exception.StackTrace.Contains("PocketStrikerAIStoryLiveSmoke.Require")
+                + (exception.StackTrace != null && (exception.StackTrace.Contains("PocketStrikerAIStoryLiveSmoke.Require") || exception.StackTrace.Contains("PocketStrikerQueuedStory") || exception.StackTrace.Contains("PocketStrikerStoryJobClient"))
                     ? ": " + exception.Message : ""));
             report.outcome = "The live test did not complete its declared coverage.";
         }
         finally
         {
+            PocketStrikerStoryJobClient.ValidationObserver = null;
             if (serviceHost != null) UnityEngine.Object.Destroy(serviceHost);
+            PocketStrikerQueuedStory.Release(ownedPreview);
             if (fixture != null) UnityEngine.Object.Destroy(fixture);
             FightLoad.Fight = originalFight;
             FightGlobalSetting.HitBoxLogger = originalLogging;
@@ -311,6 +375,20 @@ public static class PocketStrikerAIStoryLiveSmoke
             var no = Field<Button>(popup, "NoButton");
             await NativeClick(no.gameObject.activeInHierarchy ? no : Field<Button>(popup, "YesButton"));
         }
+    }
+
+    static bool CanNativeClick(Button button)
+    {
+        if (button == null || !button.gameObject.activeInHierarchy || !button.IsInteractable()
+            || BOButton.AnyProcess || EventSystem.current == null) return false;
+        var rect = (RectTransform)button.transform;
+        var canvas = button.GetComponentInParent<Canvas>().rootCanvas;
+        var point = RectTransformUtility.WorldToScreenPoint(canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null
+            : canvas.worldCamera, rect.TransformPoint(rect.rect.center));
+        if (point.x < 0 || point.x > Screen.width || point.y < 0 || point.y > Screen.height) return false;
+        var hits = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = point }, hits);
+        return hits.Count > 0 && ExecuteEvents.GetEventHandler<IPointerClickHandler>(hits[0].gameObject) == button.gameObject;
     }
 
     static async UniTask NativeClick(Button button)

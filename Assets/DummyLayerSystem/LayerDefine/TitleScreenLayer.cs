@@ -32,7 +32,7 @@ public class TitleScreenLayer : UILayer
     private Tween titleTween;
     private Material titleMaterial;
     private bool eventsBound;
-    public void Initialise()
+    public void Initialise(bool illustrated = false)
     {
         version.text = Application.version;
         if (!eventsBound)
@@ -53,6 +53,7 @@ public class TitleScreenLayer : UILayer
             titleMaterial = new Material(title.material) { name = title.material.name + " (Runtime)", hideFlags = HideFlags.DontSave };
             title.material = titleMaterial;
         }
+        if (illustrated) ApplyIllustratedLayout();
         titleAnimFactor = 0;
         if (titleMaterial != null) titleMaterial.SetFloat("_Animation_Factor", titleAnimFactor);
         titleTween?.Kill();
@@ -69,8 +70,43 @@ public class TitleScreenLayer : UILayer
             });
     }
     
+    void ApplyIllustratedLayout()
+    {
+        // Keep existing title branding above the fighters and controls on quiet foreground.
+        var rect = title.rectTransform;
+        rect.anchorMin = new Vector2(.07f, 1);
+        rect.anchorMax = new Vector2(.93f, 1);
+        rect.anchoredPosition = new Vector2(0, 80);
+        rect.sizeDelta = new Vector2(0, 180);
+        title.preserveAspect = true;
+        title.GetComponent<SizeAdjustBySpriteSize>()?.AdjustSize();
+        if (titleMaterial != null)
+        {
+            titleMaterial.SetColor("_MainColor", new Color(.08f, .15f, .20f));
+            titleMaterial.SetColor("_OutlineColor", new Color(.13f, .19f, .23f));
+        }
+        version.fontSize = 34;
+        version.color = new Color(.08f, .15f, .20f);
+        var company = TopArea.Find("Company")?.GetComponent<Text>();
+        if (company != null) { company.fontSize = 34; company.color = version.color; }
+        var hint = mainTab.Find("touchScreenText") as RectTransform;
+        if (hint != null)
+        {
+            hint.anchorMin = hint.anchorMax = new Vector2(.5f, 0);
+            hint.anchoredPosition = new Vector2(0, -90);
+            var text = hint.GetComponent<Text>();
+            if (text != null) text.fontSize = 56;
+        }
+        var account = (RectTransform)accountLoginBtn.transform;
+        account.anchorMin = account.anchorMax = new Vector2(.5f, 0);
+        account.pivot = new Vector2(.5f, 0);
+        account.anchoredPosition = new Vector2(0, 100);
+        account.sizeDelta = new Vector2(480, 130);
+    }
+
     void SwitchTab(int step) // step 1:main ,step 2: login by pw
     {
+        accountLoginBtn.gameObject.SetActive(step == 1);
         if (step == 1)
         {
             mainTab.gameObject.SetActive(true);

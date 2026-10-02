@@ -9,7 +9,7 @@ public enum Weight
     heavy
 }
 
-public class BasicPhysicSupport : MonoBehaviour
+public partial class BasicPhysicSupport : MonoBehaviour
 {
     public Data_Center _DATA_CENTER;
     public Animator animator;
@@ -254,7 +254,7 @@ public class BasicPhysicSupport : MonoBehaviour
 
     void SetRootAndRigidbodyPosition(Vector3 targetPosition, bool resetVelocity, bool resetContactStabilizerState = true)
     {
-        targetPosition = ClampPositionToBattleRange(targetPosition);
+        targetPosition = ClampOwnedBodyMotion(ConstrainImpactSource(ClampPositionToBattleRange(targetPosition)));
 
         if (Rigidbody != null)
         {
@@ -280,6 +280,7 @@ public class BasicPhysicSupport : MonoBehaviour
         {
             ResetContactStabilizer();
         }
+        SynchronizeImpactFollowers();
     }
 
     void SetRigidbodyVelocity(Vector3 linearVelocity, Vector3 angularVelocity)
@@ -389,7 +390,10 @@ public class BasicPhysicSupport : MonoBehaviour
         public int OverrideOnEnemyDrag = -1;
         public bool HasSkillContactDragOverride => OverrideOnEnemyDrag >= 0;
 
-        public bool Grounded => _BasicPhysicSupport._DATA_CENTER.WholeT.position.y <= floorY;
+        // Root-motion recovery can leave a tiny positive float residual at the floor.
+        // Keep gravity and ground-only actions stable within one millimetre of contact.
+        const float GroundedTolerance = .001f;
+        public bool Grounded => _BasicPhysicSupport._DATA_CENTER.WholeT.position.y <= floorY + GroundedTolerance;
 
         readonly float floorY = 0f;
         public void AutoSwitchGravity()
@@ -471,26 +475,10 @@ public class BasicPhysicSupport : MonoBehaviour
             hiddenMethods.AutoSwitchGravity();
             AtRing = atRing;
 
-            float fps = 1.0f / Time.deltaTime;
-            if (fps < 45f && Rigidbody.collisionDetectionMode != CollisionDetectionMode.Discrete)
-            {
-                Rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            }
-            else if (fps > 55f && Rigidbody.collisionDetectionMode != CollisionDetectionMode.Continuous)
-            {
-                Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            }
-        }
-    }
+            // CombatBodyProfile configures a consistent collision mode. Frame-rate changes
+            // must not silently switch fast moving fighters to discrete collision detection.
 
-    void LateUpdate()
-    {
-        if (FightGlobalSetting.SceneStep != 1 || IsPreparingBattle)
-        {
-            ResetContactStabilizer();
-            return;
         }
-        ApplyContactStabilizer();
     }
 
     public float ToNearestEnemyXZ()
@@ -681,16 +669,8 @@ public class BasicPhysicSupport : MonoBehaviour
         }
     }
 
-    void OnCollisionStay(Collision collision)
-    {
-        if (_DATA_CENTER != null && _DATA_CENTER._MyBehaviorRunner.IfRunning())
-        {
-            if (ShouldSkipEnemyContactCorrection())
-                return;
-            ResolveContactPenetration(collision);
-        }
-    }
-
+    // The Rigidbody solver owns body separation. Do not add another penetration
+    // correction or rewind its result in LateUpdate; both produced contact oscillation.
     void OnCollisionExit(Collision collision)
     {
         if (!hiddenMethods.EnemyTouchingDrag) return;

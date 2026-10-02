@@ -96,20 +96,22 @@ public sealed class BattleHUDPresentation : MonoBehaviour
                 LayoutSkill(inputs.Fire1Button, new Vector2(safe.xMax - 274 * u, y), u);
                 LayoutSkill(inputs.Fire2Button, new Vector2(safe.xMax - 100 * u, y), u);
                 EffectOnly(inputs.DashButton);
+                ActionGlyph(inputs.DashButton, false);
                 Skin(inputs.DefendButton, Localize("GUARD", "ガード", "防御"), Cyan, ChineseLanguage ? 32 : 24);
                 Place(inputs.DashButton.transform, new Vector2(safe.xMax - 448 * u, safe.yMin + (274 + ControlsLift) * u), new Vector2(100, 100) * u);
                 Place(inputs.DefendButton.transform, new Vector2(safe.xMax - 274 * u, safe.yMin + (274 + ControlsLift) * u), new Vector2(100, 100) * u);
                 EffectOnly(inputs.DreamComboBtn, inputs.DreamComboGauge != null ? inputs.DreamComboGauge.transform : null);
+                ActionGlyph(inputs.DreamComboBtn, true);
                 Place(inputs.DreamComboBtn.transform, new Vector2(safe.xMax - 100 * u, safe.yMin + (282 + ControlsLift) * u), new Vector2(112, 112) * u);
                 var gauge = inputs.DreamComboGauge;
                 if (gauge != null)
                 {
                     PreparationButtonSkin.Fit((RectTransform)gauge.transform);
                     gauge.InnerColor.Value = new Color(0.86f, 0.74f, 0.43f);
-                    gauge.EmptyColor.Value = new Color(0.15f, 0.23f, 0.26f, 0.8f);
+                    gauge.EmptyColor.Value = new Color(0.27f, 0.31f, 0.32f, 0.92f);
                     gauge.BorderWidth.Value = 0;
                     gauge.Radius.Value = 0.43f;
-                    gauge.LineWidth.Value = 0.027f;
+                    gauge.LineWidth.Value = 0.045f;
                     gauge.InnerColor.ApplyToShader(false);
                     gauge.EmptyColor.ApplyToShader(false);
                     gauge.BorderWidth.ApplyToShader(false);
@@ -154,10 +156,34 @@ public sealed class BattleHUDPresentation : MonoBehaviour
         hit.enabled = true;
         hit.sprite = null;
         hit.color = Color.clear;
+        // This graphic intentionally has no visible pixels. Keep it in the canvas
+        // so later layout/render passes cannot remove its expanded pointer target.
+        hit.canvasRenderer.cullTransparentMesh = false;
         hit.raycastTarget = true;
         hit.raycastPadding = new Vector4(-20, -20, -20, -20);
         button.transition = Selectable.Transition.None;
         button.targetGraphic = hit;
+    }
+
+    static void ActionGlyph(BOButton button, bool dream)
+    {
+        if (button == null) return;
+        var child = button.transform.Find("ActionGlyph");
+        if (child == null)
+        {
+            var node = new GameObject("ActionGlyph", typeof(RectTransform), typeof(CanvasRenderer), typeof(BattleActionGlyph));
+            node.layer = button.gameObject.layer;
+            child = node.transform;
+            child.SetParent(button.transform, false);
+        }
+        PreparationButtonSkin.Fit((RectTransform)child);
+        var glyph = child.GetComponent<BattleActionGlyph>();
+        glyph.enabled = true;
+        glyph.DreamCombo = dream;
+        glyph.color = new Color(.87f, .76f, .43f, 1);
+        glyph.raycastTarget = false;
+        glyph.SetVerticesDirty();
+        child.SetAsLastSibling();
     }
 
     static void PauseGlyph(BOButton button)

@@ -95,7 +95,7 @@ public static partial class PocketStrikerTutorialValidation
         public int labelsChecked;
         public int localizedLabelCases;
         public bool sourcePrefabsUnchanged;
-        public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls and both joystick touch areas. Production MobileInputsManager down/up state and AutoSwitch toggle run locally. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
+        public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls, expanded action edges and both joystick touch areas. Authored action down/up callbacks verify countdown locking and recovery. This static fixture has no bound fighter focus and explicitly restores its manually displayed controls after verifying production no-focus hiding; live focus/energy behavior is covered separately. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
         public string limitation = "Stopped-editor fixture: battle simulation, accounts, Addressables downloads, pause scene navigation and live camera-follow bars are omitted. The pause's native Button press is observed with a local callback. Skill EventTriggers are reconstructed from their authored persistent method names because RuntimeOnly persistent callbacks do not run in Edit mode. Joystick pointer state is tested with transitions/gravity disabled; axis magnitude assumes a screen-space canvas and is left to Play-mode smoke. Static ground and boundary are fixture context, not a simulation of the runtime arena.";
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
@@ -562,6 +562,21 @@ public static partial class PocketStrikerTutorialValidation
     static void HUDCheckInputs(FightingStepLayer layer, EventSystem events, Camera camera, HUDReport report,
         Func<bool> automatic, Func<int> pauseCount)
     {
+        var input = layer.InputsManager;
+        var buttons = new[] { input.AttackButton, input.Fire1Button, input.Fire2Button, input.DefendButton, input.DashButton, input.DreamComboBtn };
+        var state = new Func<bool>[] { () => input.attack, () => input.fire1, () => input.fire2, () => input.defendButtonHover, () => input.acc, () => input.dreamCombo };
+        void ActionPointer(int index, GameObject hit, Vector2 point, bool enabled, string label)
+        {
+            var pointer = new PointerEventData(events) { position = point, button = PointerEventData.InputButton.Left };
+            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerDownHandler);
+            Require(state[index]() == enabled && state.Where((_, other) => other != index).All(value => !value()),
+                label + " down set the wrong input state: " + buttons[index].name);
+            Require(layer.GetComponentsInChildren<UltimateJoystick>().All(joystick => !joystick.GetJoystickState()),
+                label + " down leaked into a joystick: " + buttons[index].name);
+            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerUpHandler);
+            Require(state.All(value => !value()), label + " up did not clear input: " + buttons[index].name);
+            report.inputStatesChecked += 2;
+        }
         void Target(Transform control, string label)
         {
             var hit = Hit(events, Center(control, camera));
@@ -578,8 +593,13 @@ public static partial class PocketStrikerTutorialValidation
             var rect = graphic.rectTransform;
             var outside = camera.WorldToScreenPoint(rect.TransformPoint(new Vector3(rect.rect.xMin - 12, rect.rect.center.y)));
             var hit = Hit(events, outside);
-            Require(hit == button.gameObject || hit.transform.IsChildOf(button.transform), "Expanded touch target is occluded: " + button.name + " by " + hit.name);
+            Require(hit == button.gameObject || hit.transform.IsChildOf(button.transform), "Expanded touch target is occluded: " + button.name + " by " + hit.name
+                + " at " + outside + "; target depth=" + graphic.depth + ", culled=" + graphic.canvasRenderer.cull
+                + ", canvas=" + graphic.canvas?.name + ", sorting=" + graphic.canvas?.sortingOrder
+                + ", directRaycast=" + graphic.Raycast(outside, camera));
             report.raycastsChecked++;
+            int actionIndex = Array.IndexOf(buttons, button);
+            if (actionIndex >= 0) ActionPointer(actionIndex, hit, outside, true, "Expanded action target");
         }
         int paused = pauseCount();
         typeof(Button).GetMethod("Press", Private).Invoke(layer.PauseButton, null);
@@ -589,20 +609,12 @@ public static partial class PocketStrikerTutorialValidation
         Require(automatic() != before, "AUTO did not toggle on.");
         typeof(Button).GetMethod("Press", Private).Invoke(autoButton, null);
         Require(automatic() == before, "AUTO did not toggle off."); report.inputStatesChecked += 2;
-        var input = layer.InputsManager;
-        var buttons = new[] { input.AttackButton, input.Fire1Button, input.Fire2Button, input.DefendButton, input.DashButton, input.DreamComboBtn };
-        var state = new Func<bool>[] { () => input.attack, () => input.fire1, () => input.fire2, () => input.defendButtonHover, () => input.acc, () => input.dreamCombo };
         for (int index = 0; index < buttons.Length; index++)
         {
             Target(buttons[index].transform, buttons[index].name);
             var point = Center(buttons[index].transform, camera);
             var hit = Hit(events, point);
-            var pointer = new PointerEventData(events) { position = point, button = PointerEventData.InputButton.Left };
-            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerDownHandler);
-            Require(state[index](), "Skill down did not set state: " + buttons[index].name);
-            Require(!input.MovementJoystick.GetJoystickState(), "Skill down leaked into the movement joystick.");
-            ExecuteEvents.ExecuteHierarchy(hit, pointer, ExecuteEvents.pointerUpHandler);
-            Require(!state[index](), "Skill up did not clear state: " + buttons[index].name); report.inputStatesChecked += 2;
+            ActionPointer(index, hit, point, true, "Skill center");
         }
         foreach (var joystick in layer.GetComponentsInChildren<UltimateJoystick>())
         {
@@ -620,8 +632,25 @@ public static partial class PocketStrikerTutorialValidation
         input.PreparingMode(true);
         Require(new[] { input.AttackButton, input.Fire1Button, input.Fire2Button, input.DashButton, input.DreamComboBtn }.All(button => !button.interactable)
             && !input.MovementJoystick.enabled, "Preparing mode did not lock the attack controls and movement.");
+        for (int index = 0; index < buttons.Length; index++)
+        {
+            var point = Center(buttons[index].transform, camera);
+            var hit = Hit(events, point);
+            Require(hit == buttons[index].gameObject || hit.transform.IsChildOf(buttons[index].transform),
+                "Disabled countdown action is occluded: " + buttons[index].name + " by " + hit.name);
+            report.raycastsChecked++;
+            // EventTrigger receives down/up independently of Button.interactable.
+            ActionPointer(index, hit, point, false, "Disabled countdown action");
+        }
         input.PreparingMode(false);
         Require(buttons.All(button => button.interactable) && input.MovementJoystick.enabled, "Battle input did not recover after preparing mode.");
+        Require(!input.DashButton.gameObject.activeSelf && !input.DreamComboBtn.gameObject.activeSelf,
+            "No-focus battle input did not hide Dash and Dream Combo.");
+        // Local posed models have no production input focus. Restore the fixture's
+        // explicit display so the next viewport can test every action hit target.
+        foreach (var button in buttons) button.gameObject.SetActive(true);
+        for (int index = 0; index < buttons.Length; index++)
+            ActionPointer(index, buttons[index].gameObject, Center(buttons[index].transform, camera), true, "Recovered battle action");
         report.inputStatesChecked += 2;
     }
 

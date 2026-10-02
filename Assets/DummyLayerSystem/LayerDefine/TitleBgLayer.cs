@@ -21,7 +21,46 @@ public class TitleBgLayer : UILayer
     [SerializeField] float ScrollbarMaxValue = 1;
     float _milliSecondCounter = 0;
     IDisposable _disposable;
+    bool loginArtwork;
     
+    /// <summary>Static, aspect-preserving login art; the original scroll remains available for authored intros.</summary>
+    public async UniTask SetupLogin()
+    {
+        var sprite = await AddressablesLogic.LoadT<Sprite>("LoginArt", gameObject);
+        if (this == null) return;
+        if (sprite == null) throw new InvalidOperationException("Required login artwork is missing: LoginArt");
+        _disposable?.Dispose();
+        loginArtwork = true;
+        targetImage.sprite = sprite;
+        targetImage.color = Color.white;
+        targetImage.raycastTarget = false;
+        var scroll = content.GetComponentInParent<ScrollRect>();
+        if (scroll != null) scroll.enabled = false;
+        vScrollbar.gameObject.SetActive(false);
+        languageConverter.gameObject.SetActive(false);
+        skipBtn.gameObject.SetActive(false);
+        touchScreenBtn.gameObject.SetActive(false);
+        FitLoginArtwork();
+    }
+
+    protected override void OnRectTransformDimensionsChange()
+    {
+        base.OnRectTransformDimensionsChange();
+        FitLoginArtwork();
+    }
+
+    void FitLoginArtwork()
+    {
+        if (!loginArtwork || content == null || targetImage == null || targetImage.sprite == null) return;
+        var viewport = content.parent as RectTransform;
+        if (viewport == null || viewport.rect.width <= 0 || viewport.rect.height <= 0) return;
+        var size = targetImage.sprite.rect.size;
+        float scale = Mathf.Max(viewport.rect.width / size.x, viewport.rect.height / size.y);
+        content.anchorMin = content.anchorMax = content.pivot = new Vector2(.5f, .5f);
+        content.sizeDelta = size * scale;
+        content.anchoredPosition = Vector2.zero;
+    }
+
     public async UniTask Setup(float scrollValue) // false: titleMode
     {
         var targetSprite = await AddressablesLogic.LoadT<Sprite>("TitleBg", this.gameObject);
