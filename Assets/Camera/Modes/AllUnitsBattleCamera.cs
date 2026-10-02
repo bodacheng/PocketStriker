@@ -6,6 +6,7 @@ using UnityEngine;
 public class AllUnitsBattleCamera : CameraMode
 {
     readonly float _pitch;
+    readonly BattleCameraProfile _profile;
     readonly BattleCameraStabilizer _stabilizer;
     readonly List<Bounds> _bounds = new List<Bounds>(200);
     readonly List<BattleCameraFraming.BodyEnvelope> _bodyEnvelopes = new List<BattleCameraFraming.BodyEnvelope>(200);
@@ -15,8 +16,6 @@ public class AllUnitsBattleCamera : CameraMode
     Bounds _trackingBounds;
     bool _hasTrackingBounds;
     bool _autoOrbitEngaged;
-    bool _hasOrbitDirection;
-    Vector3 _orbitDirection;
     Data_Center _lastFirst, _lastSecond;
     float _handoffRemaining;
     Rect _lastUsableViewport;
@@ -51,6 +50,7 @@ public class AllUnitsBattleCamera : CameraMode
 
     public AllUnitsBattleCamera(BattleCameraProfile profile)
     {
+        _profile = profile;
         _pitch = profile.Pitch;
         fieldOfView = profile.FieldOfView;
         _stabilizer = new BattleCameraStabilizer(profile);
@@ -110,15 +110,27 @@ public class AllUnitsBattleCamera : CameraMode
         if (_bounds.Count == 0) return;
 
         var usable = UsableViewport(camera);
-        float horizontal = CanSetH ? UltimateJoystick.GetHorizontalAxis("RotateCamera") : 0;
+        bool countDown = FSceneProcessesRunner.Main.currentProcess is CountDownProcess;
+        bool hasFirstAnchor = TryGetTeamAnchor(manager.team1, out var firstAnchor);
+        bool hasSecondAnchor = TryGetTeamAnchor(manager.team2, out var secondAnchor);
+        bool hasTeamAxis = hasFirstAnchor && hasSecondAnchor;
+        if (hasTeamAxis && manager.team2.teamConfig.myTeam == RTFightManager.playerTeam)
+        {
+            var swap = firstAnchor; firstAnchor = secondAnchor; secondAnchor = swap;
+        }
+        if (!_stabilizer.IsInitialized && hasTeamAxis)
+            _stabilizer.Reset(DiagonalYaw(firstAnchor, secondAnchor, camera, usable));
+        // The countdown presents the final team arrangement. Do not inherit a
+        // menu/result heading or rotate that arrangement back into a side view.
+        float horizontal = CanSetH && !countDown ? UltimateJoystick.GetHorizontalAxis("RotateCamera") : 0;
         if (Mathf.Abs(horizontal) > 0.01f)
         {
             _autoOrbitEngaged = false;
-            _hasOrbitDirection = false;
             _stabilizer.UpdateYaw(_stabilizer.Yaw + horizontal * 75 * Mathf.Clamp(deltaTime, 0, 0.05f),
                 deltaTime, true);
         }
-        else if (!IsHoldingReplacementFraming && !IsSettlingReplacementFraming && this is DuelBattleCamera && AutoRotateCamera)
+        else if (!countDown && !IsHoldingReplacementFraming && !IsSettlingReplacementFraming
+            && this is DuelBattleCamera && AutoRotateCamera)
         {
             bool rotating = false;
             var first = manager.team1.RMode_Unit.Value?.WholeT;
@@ -133,16 +145,19 @@ public class AllUnitsBattleCamera : CameraMode
                 _autoOrbitEngaged = combatLine.sqrMagnitude > threshold * threshold;
                 if (_autoOrbitEngaged)
                 {
-                    var orbit = Quaternion.AngleAxis(90, Vector3.up) * combatLine.normalized;
-                    var reference = _hasOrbitDirection ? _orbitDirection
-                        : -(Quaternion.Euler(0, _stabilizer.Yaw, 0) * Vector3.forward);
-                    // Remember the desired side instead of selecting against
-                    // the lagging camera yaw, which can flip during an orbit.
-                    if (Vector3.Dot(orbit, reference) < 0) orbit = -orbit;
-                    _orbitDirection = orbit;
-                    _hasOrbitDirection = true;
-                    float desiredYaw = Mathf.Atan2(-orbit.x, -orbit.z) * Mathf.Rad2Deg;
-                    _stabilizer.UpdateYaw(desiredYaw, deltaTime);
+                    // Keep the same diagonal side after combat starts; the
+                    // existing slow orbit and engage/release window absorb
+                    // passing, impacts and brief changes of the combat axis.
+                    var player = first.position;
+                    var opponent = second.position;
+                    if (manager.team2.teamConfig.myTeam == RTFightManager.playerTeam)
+                    {
+                        var swap = player; player = opponent; opponent = swap;
+                    }
+                    // Orbit follows the ground axis, not animated body-center
+                    // height. A distant launch/landing must not rotate the arena.
+                    _stabilizer.UpdateYaw(BattleCameraOpening.CalculatePlanarYaw(player, opponent,
+                        _profile, camera.aspect, usable), deltaTime);
                     rotating = true;
                 }
             }
@@ -170,7 +185,6 @@ public class AllUnitsBattleCamera : CameraMode
         _bodyEnvelopes.Clear();
         _hasTrackingBounds = false;
         _autoOrbitEngaged = false;
-        _hasOrbitDirection = false;
         _lastFirst = _lastSecond = null;
         _handoffRemaining = 0;
         _hasUsableViewport = false;
@@ -181,6 +195,29 @@ public class AllUnitsBattleCamera : CameraMode
         var unit = team?.RMode_Unit.Value;
         return unit != null && unit.WholeT != null && unit.gameObject.activeInHierarchy
             && unit.WholeT.gameObject.activeInHierarchy && !unit.FightDataRef.IsDead.Value;
+    }
+
+    float DiagonalYaw(Vector3 player, Vector3 opponent, Camera camera, Rect usable)
+        => BattleCameraOpening.CalculateYaw(player, opponent, _profile, _bounds, _bodyEnvelopes,
+            _trackingBounds.center, camera.aspect, usable, camera.nearClipPlane);
+
+    static bool TryGetTeamAnchor(UnitsManger team, out Vector3 anchor)
+    {
+        anchor = Vector3.zero;
+        int count = 0;
+        if (team?.teamMembers?.mDict == null) return false;
+        foreach (var unit in team.teamMembers.mDict.Values)
+        {
+            if (unit == null || unit.WholeT == null
+                || !BattleCameraFraming.ShouldIncludeUnit(team.TeamMode,
+                    unit.gameObject.activeInHierarchy && unit.WholeT.gameObject.activeInHierarchy,
+                    unit.FightDataRef.IsDead.Value, team.RMode_Unit.Value == unit)) continue;
+            anchor += unit.geometryCenter != null ? unit.geometryCenter.position : unit.WholeT.position;
+            count++;
+        }
+        if (count == 0) return false;
+        anchor /= count;
+        return true;
     }
 
     void AddTeam(UnitsManger team)

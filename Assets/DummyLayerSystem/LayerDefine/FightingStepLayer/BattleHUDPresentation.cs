@@ -137,7 +137,7 @@ public sealed class BattleHUDPresentation : MonoBehaviour
         Place(button.transform, center, new Vector2(156, 156) * u);
     }
 
-    // These actions are represented by the existing elemental particle effects.
+    // Persistent action glyphs provide the cues; elemental effects add feedback.
     // The transparent graphic only preserves their pointer-down/up hit target.
     static void EffectOnly(BOButton button, Transform gauge = null)
     {
@@ -179,7 +179,7 @@ public sealed class BattleHUDPresentation : MonoBehaviour
         PreparationButtonSkin.Fit((RectTransform)child);
         var glyph = child.GetComponent<BattleActionGlyph>();
         glyph.enabled = true;
-        glyph.DreamCombo = dream;
+        glyph.Configure(dream);
         glyph.color = new Color(.87f, .76f, .43f, 1);
         glyph.raycastTarget = false;
         glyph.SetVerticesDirty();

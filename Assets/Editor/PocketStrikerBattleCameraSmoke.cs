@@ -176,6 +176,8 @@ public static partial class PocketStrikerBattleCameraSmoke
 
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_IMPACT_REVIEW")))
                 await ReviewImpact(leader);
+            else if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_OPENING") == "1")
+                await ReviewOpening(leader);
             else if (Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_HANDOFF") == "1")
                 await ReviewHandoffs(leader);
             else if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_REVIEW")))
@@ -582,8 +584,11 @@ public static partial class PocketStrikerBattleCameraSmoke
     static Vector2 ReviewResolution()
     {
         var size = Environment.GetEnvironmentVariable("POCKETSTRIKER_CAMERA_SIZE");
-        if (size == "375x667") return new Vector2(375, 667);
-        return size == "390x844" ? new Vector2(390, 844) : new Vector2(540, 960);
+        if (string.IsNullOrEmpty(size)) return new Vector2(540, 960);
+        var dimensions=size.ToLowerInvariant().Split('x');
+        if(dimensions.Length==2&&int.TryParse(dimensions[0],out int width)&&int.TryParse(dimensions[1],out int height)
+            &&width>=320&&height>=480) return new Vector2(width,height);
+        throw new ArgumentException("Invalid POCKETSTRIKER_CAMERA_SIZE: "+size);
     }
 
     static void ConfigurePortraitGameView()

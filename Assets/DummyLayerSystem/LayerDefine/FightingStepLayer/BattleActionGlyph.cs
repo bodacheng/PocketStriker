@@ -5,6 +5,33 @@ using UnityEngine.UI;
 public sealed class BattleActionGlyph : MaskableGraphic
 {
     public bool DreamCombo;
+    Texture _sprintTexture;
+    Material _sprintMaterial;
+    public bool ShowsSprintPerson => !DreamCombo && _sprintTexture != null && _sprintMaterial != null && isActiveAndEnabled;
+    public override Texture mainTexture => DreamCombo ? base.mainTexture : _sprintTexture;
+
+    public void Configure(bool dreamCombo)
+    {
+        DreamCombo=dreamCombo;
+        if (!dreamCombo)
+        {
+            // Reuse the exact authored rushing-person texture; its black JPEG
+            // background is removed in the UI shader, without altering the art.
+            if (_sprintTexture == null) _sprintTexture=Resources.Load<Texture2D>("BasicSprites/dash-rush");
+            if (_sprintMaterial == null) _sprintMaterial=new Material(Resources.Load<Shader>("BasicSprites/DashRush"));
+        }
+        material=dreamCombo?null:_sprintMaterial;
+        SetMaterialDirty();SetVerticesDirty();
+    }
+
+    protected override void OnDestroy()
+    {
+        if (_sprintMaterial != null)
+        {
+            if(Application.isPlaying) Destroy(_sprintMaterial); else DestroyImmediate(_sprintMaterial);
+        }
+        base.OnDestroy();
+    }
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();
@@ -24,10 +51,10 @@ public sealed class BattleActionGlyph : MaskableGraphic
         }
         else
         {
-            foreach (float x in new[]{-.16f,.08f})
-            {
-                Triangle(new Vector2(x-.1f,.19f),new Vector2(x+.1f,0),new Vector2(x-.1f,-.19f));
-            }
+            const float half=.34f;
+            foreach(var point in new[]{new Vector2(-half,-half),new Vector2(-half,half),new Vector2(half,half),new Vector2(half,-half)})
+                vh.AddVert((Vector3)(point*size+rect.center),color,new Vector2(point.x/half*.5f+.5f,point.y/half*.5f+.5f));
+            vh.AddTriangle(0,1,2);vh.AddTriangle(2,3,0);
         }
     }
 }

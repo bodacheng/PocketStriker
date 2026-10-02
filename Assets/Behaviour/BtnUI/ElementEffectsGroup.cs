@@ -215,6 +215,13 @@ public class ElementEffectsGroup
         var results2 = await UniTask.WhenAll(tasks2);
 
         _rushBtn = results2[0];
+        // The persistent UI draws the same rushing person once, including the
+        // no-focus Group countdown. Keep the ring/press effects, suppress only
+        // the pooled duplicate person renderer.
+        foreach(var renderer in _rushBtn.GetComponentsInChildren<ParticleSystemRenderer>(true))
+            foreach(var material in renderer.sharedMaterials)
+                if(material != null && material.mainTexture != null && material.mainTexture.name == "rush")
+                    renderer.enabled=false;
         var a1Refresh = results2[1];
         var a2Refresh = results2[2];
         var a3Refresh = results2[3];
