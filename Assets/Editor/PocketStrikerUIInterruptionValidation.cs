@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using ModelView;
 
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -22,13 +24,120 @@ public static class PocketStrikerUIInterruptionValidation
     {
         public bool passed;
         public string utcTime, unityVersion;
-        public string scope = "Actual Resources prefabs in isolated Editor Play mode; production ProgressLayer/HighLightLayer fades interrupted by newer requests, repeated title initialization and material lifecycle. No account, network, purchases or gameplay fixture.";
+        public string scope = "Actual Resources prefabs in isolated Editor Play mode; production ProgressLayer/HighLightLayer fades interrupted by newer requests, repeated title initialization and material lifecycle. Actual solo/group preparation prefabs and real haruka meshes also verify that production UILayerLoader.Remove synchronously hides every model and camera before a fixture-owned idle clip is released. Preparation/model behaviour scripts are disabled before activation. No account, network, scene load, purchases or gameplay initialization.";
         public List<string> checks = new List<string>();
         public List<string> errors = new List<string>();
     }
     static readonly Type Loader = typeof(UILayer).Assembly.GetType("DummyLayerSystem.UILayerLoader", true);
     static T Layer<T>() where T : UILayer => (T)Loader.GetMethod("Get").MakeGenericMethod(typeof(T)).Invoke(null, null);
     static Report report;
+
+    [Serializable] public sealed class PreparationCloseReport
+    {
+        public bool passed, previewsInactiveBeforeResourceRelease;
+        public int casesChecked, camerasChecked, modelsChecked;
+        public string utcTime, unityVersion;
+        public string scope = "Play mode only: actual solo/group preparation prefabs, their authored connector cameras, and copies of the real haruka model. Production UILayerLoader.Remove is called without a frame yield; roots, models and cameras must already be inactive before releasing the copied idle animation clip. The loader queue and hangers are restored synchronously before yielding for deferred destruction. All preparation/model behaviour scripts are disabled before activation. No account, Addressables, production resource release, scene load or network.";
+        public List<string> errors = new List<string>();
+    }
+
+    // Can also be run independently in an existing Play-mode validation session
+    // without starting a scene load or the rest of the batch suite.
+    public static async UniTask<PreparationCloseReport> ValidatePreparationCloseInPlayMode()
+    {
+        if (!Application.isPlaying) throw new InvalidOperationException("Preparation close lifecycle validation requires Play mode.");
+        var result = new PreparationCloseReport { utcTime = DateTime.UtcNow.ToString("O"), unityVersion = Application.unityVersion };
+        const BindingFlags StaticPrivate = BindingFlags.Static | BindingFlags.NonPublic;
+        var queues = (List<UILayer>)Loader.GetField("Queues", StaticPrivate).GetValue(null);
+        var hanger = Loader.GetField("_hanger", StaticPrivate);
+        var fullScreenHanger = Loader.GetField("_fullScreenHanger", StaticPrivate);
+        var remove = Loader.GetMethod("Remove", Type.EmptyTypes).MakeGenericMethod(typeof(FightPrepareLayer));
+        foreach (var group in new[] { false, true })
+        {
+            var oldQueues = queues.ToArray();
+            var oldHanger = hanger.GetValue(null);
+            var oldFullScreenHanger = fullScreenHanger.GetValue(null);
+            var stage = new GameObject("Preparation close fixture", typeof(RectTransform));
+            stage.SetActive(false);
+            GameObject instance = null;
+            AnimationClip ownedIdle = null;
+            try
+            {
+                var source = Resources.Load<GameObject>(group
+                    ? "DummyLayerSystem/FightPrepareLayer/FightPrepareLayer_gb"
+                    : "DummyLayerSystem/FightPrepareLayer");
+                Require(source != null, "Preparation prefab is unavailable.");
+                instance = UnityEngine.Object.Instantiate(source, stage.transform, false);
+                var layer = instance.GetComponent<FightPrepareLayer>();
+                layer.Index = nameof(FightPrepareLayer);
+                layer.IsClosing = false;
+                var connectors = instance.GetComponentsInChildren<DedicatedCameraConnector>(true);
+                Require(connectors.Length == (group ? 2 : 1), "Unexpected authored preparation connector count.");
+                var cameras = connectors.Select(connector => Get<Camera>(connector, "camera")).ToArray();
+                var modelSource = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ExternalAssets/Unit/human/haruka.prefab");
+                var idleSource = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/ExternalAssets/Animations/human/BasicPack/haruka/idle.anim");
+                Require(modelSource != null && idleSource != null, "Bundled real-model/idle fixtures are unavailable.");
+                ownedIdle = UnityEngine.Object.Instantiate(idleSource);
+                var models = connectors.Select(connector => UnityEngine.Object.Instantiate(modelSource, connector.transform, false)).ToArray();
+                // The inactive parent prevents OnEnable/Start while disabling
+                // model and UI logic; only the real hierarchy lifecycle is used.
+                foreach (var behaviour in instance.GetComponentsInChildren<MonoBehaviour>(true)) behaviour.enabled = false;
+                foreach (var animator in instance.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
+                foreach (var camera in cameras)
+                {
+                    Require(camera != null && camera.transform.IsChildOf(instance.transform), "An authored preview camera escapes the preparation hierarchy.");
+                    camera.enabled = false;
+                    for (var node = camera.transform; node != instance.transform; node = node.parent) node.gameObject.SetActive(true);
+                }
+                instance.SetActive(true);
+                stage.SetActive(true);
+                foreach (var model in models)
+                    foreach (var animator in model.GetComponentsInChildren<Animator>(true))
+                        if (animator.avatar != null && animator.avatar.isValid && animator.avatar.isHuman) ownedIdle.SampleAnimation(animator.gameObject, 0);
+                Require(instance.activeInHierarchy && models.All(model => model.activeInHierarchy)
+                    && cameras.All(camera => camera.gameObject.activeInHierarchy), "Preparation closure fixture did not begin with active preview hierarchies.");
+                queues.Clear();
+                queues.Add(layer);
+                hanger.SetValue(null, stage.transform);
+                fullScreenHanger.SetValue(null, stage.transform);
+                remove.Invoke(null, null);
+                // Destroy is deferred in Play mode, so inspect the actual
+                // objects synchronously before any clip is released or yielded.
+                Require(instance != null && layer != null && layer.IsClosing && !instance.activeSelf && !instance.activeInHierarchy,
+                    "Remove did not synchronously hide the preparation root before destruction.");
+                Require(models.All(model => model != null && !model.activeInHierarchy)
+                    && cameras.All(camera => camera != null && !camera.gameObject.activeInHierarchy),
+                    "Remove left a preview model or camera active before resource release.");
+                Require(ownedIdle != null && queues.Count == 0, "Fixture released animation early or Remove left its queue entry behind.");
+                result.previewsInactiveBeforeResourceRelease = true;
+                result.camerasChecked += cameras.Length;
+                result.modelsChecked += models.Length;
+                UnityEngine.Object.Destroy(ownedIdle);
+            }
+            catch (Exception exception) { result.errors.Add((group ? "group" : "solo") + ": " + exception.GetBaseException()); }
+            finally
+            {
+                // Restore the production loader before any await, preserving an
+                // existing live scene while its fixture is destroyed separately.
+                queues.Clear();
+                queues.AddRange(oldQueues.Where(layer => layer != null));
+                hanger.SetValue(null, oldHanger);
+                fullScreenHanger.SetValue(null, oldFullScreenHanger);
+                if (instance != null) UnityEngine.Object.Destroy(instance);
+                if (ownedIdle != null) UnityEngine.Object.Destroy(ownedIdle);
+                UnityEngine.Object.Destroy(stage);
+            }
+            await UniTask.DelayFrame(1);
+            if (instance != null || ownedIdle != null || stage != null)
+                result.errors.Add((group ? "group" : "solo") + ": deferred preparation/animation fixture destruction did not complete.");
+            else result.casesChecked++;
+        }
+        result.passed = result.errors.Count == 0 && result.casesChecked == 2 && result.camerasChecked == 3
+            && result.modelsChecked == 3 && result.previewsInactiveBeforeResourceRelease;
+        Directory.CreateDirectory(Output);
+        File.WriteAllText(Path.Combine(Output, "preparation-close-report.json"), JsonUtility.ToJson(result, true));
+        return result;
+    }
     static PocketStrikerUIInterruptionValidation()
     {
         if (SessionState.GetBool(Key, false)) EditorApplication.update += Poll;
@@ -137,6 +246,11 @@ public static class PocketStrikerUIInterruptionValidation
                 Require(isolated, "Title animation writes into the shared project material.");
                 Require(disposed, "The owned title material survived title destruction.");
             });
+            await Check("preparation-previews-hidden-before-resource-release", async () =>
+            {
+                var closed = await ValidatePreparationCloseInPlayMode();
+                Require(closed.passed, string.Join("\n", closed.errors));
+            });
         }
         catch (Exception exception) { report.errors.Add(exception.ToString()); }
         finally
@@ -165,11 +279,11 @@ public static class PocketStrikerUIInterruptionValidation
     static void Finish()
     {
         if (finishing) return; finishing = true;
-        report.passed = report.errors.Count == 0 && report.checks.Count == 5;
+        report.passed = report.errors.Count == 0 && report.checks.Count == 6;
         Directory.CreateDirectory(Output);
         File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         SessionState.SetBool(Key, false); EditorApplication.update -= Poll;
-        Debug.Log("[UIInterruption] " + (report.passed ? "PASS" : "FAIL") + ": " + report.checks.Count + "/5");
+        Debug.Log("[UIInterruption] " + (report.passed ? "PASS" : "FAIL") + ": " + report.checks.Count + "/6");
         EditorApplication.isPlaying = false;
         EditorApplication.Exit(report.passed ? 0 : 1);
     }

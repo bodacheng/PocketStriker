@@ -195,8 +195,10 @@ public partial class SkillEditLayer : UILayer
         stonesBox.FilterFeatureRefresh(true);
         skillStoneDetail.Clear();
         SkillEditButtonFeature(PreScene.target.Focusing);
-        toDo?.Invoke(this);
+        // Model callbacks run synchronously until their first await and require
+        // an active connector. All asynchronous UI preparation has finished.
         gameObject.SetActive(true);
+        toDo?.Invoke(this);
         
         //ResizeCameraConnectorRefLeft(camConnector.GetComponent<RectTransform>(), cameraConnectorRightSpace, cameraConnectorVerticalSpace);
         //ResizeCameraConnectorRefTopAndSideWidth(camConnector.GetComponent<RectTransform>(), PosCal.VTopSafeAreaHeight,1100);

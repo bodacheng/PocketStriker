@@ -28,6 +28,17 @@ public static class BattleCameraFraming
         }
     }
 
+    /// <summary>Shows the duel ground axis horizontally, with the player on the right.</summary>
+    public static float CalculateDuelYaw(Vector3 playerAnchor, Vector3 opponentAnchor, float fallbackYaw = 0)
+    {
+        var line = opponentAnchor - playerAnchor;
+        line.y = 0;
+        if (line.sqrMagnitude < .0001f) return fallbackYaw;
+        // Perpendicular ground-axis viewing gives both fighters the same depth
+        // and screen height regardless of pitch, aspect or the HUD offset.
+        return Mathf.Atan2(line.x, line.z) * Mathf.Rad2Deg + 90;
+    }
+
     readonly struct SupportPlane
     {
         readonly Vector3 _direction;

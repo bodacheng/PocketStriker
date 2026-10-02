@@ -14,7 +14,7 @@ public static partial class PocketStrikerBattleCameraSmoke
         public bool complete, passed;
         public int width, height, measuredFrames, fullModelCorners, clippedCorners;
         public string utcTime, unityVersion;
-        public string scope = "Actual FightScene, local Self account, authored haruka/baruk/earth-golem animated models, production countdown, native reserve pointer switch, enemy switch, death replacement and in-scene retry. Six-unit MultiRaid and 200-unit Group countdowns are included. Every recorded full-model corner and pixel-space team axis is checked. Explicit separated/airborne/landed placements isolate framing from combat.";
+        public string scope = "Actual FightScene, local Self account, authored haruka/baruk/earth-golem animated models, production countdown, native reserve pointer switch, enemy switch, death replacement and in-scene retry. Six-unit MultiRaid and 200-unit Group countdowns are included. Every recorded full-model corner and pixel-space team axis is checked. Explicit separated/airborne/landed placements isolate framing from combat. Countdown retains its diagonal; the separated fighting duel must settle to a horizontal ground axis while height-only launches/landings leave yaw stable.";
         public string limitation = "Editor Play mode with controlled placements and invulnerability. No device touch/performance certification; the airborne case checks camera framing, while actual skill145 impact/landing mechanics are validated separately.";
         public List<OpeningSample> samples = new List<OpeningSample>();
         public List<string> errors = new List<string>();
@@ -24,9 +24,11 @@ public static partial class PocketStrikerBattleCameraSmoke
     {
         public string name;
         public int frames, minimumFielded, clippedCorners;
-        public bool requiresDiagonal;
+        public bool requiresDiagonal, requiresHorizontal;
+        public int horizontalFrames;
+        public float maximumSettledAxisAngle;
         public float minimumAxisAngle = float.MaxValue, maximumAxisAngle = float.MinValue;
-        public float minimumDistance = float.MaxValue, maximumDistance, maximumYawSpeed;
+        public float minimumDistance = float.MaxValue, maximumDistance, maximumYawSpeed, maximumWallYawSpeed;
         public Vector3 firstPlayerViewport, firstOpponentViewport;
         public List<string> screenshots = new List<string>();
     }
@@ -46,10 +48,10 @@ public static partial class PocketStrikerBattleCameraSmoke
             await OpeningStart("mixed-rotation", 3, false);
             var manager = RTFightManager.Target;
             ClickPortrait(manager.team1.teamMembers.Get(0, 1));
-            await MeasureOpening("native-player-reserve", 2, true, 12);
+            await MeasureOpening("native-player-reserve", 2, false);
             HoldTeams();
             manager.team2.ReadyForNextMember(manager.team2.teamMembers.Get(0, 2));
-            await MeasureOpening("native-enemy-reserve", 2, true, 12);
+            await MeasureOpening("native-enemy-reserve", 2, false);
             HoldTeams();
             manager.team1.RMode_Unit.Value._MyBehaviorRunner.ChangeState("Death");
             await MeasureOpening("death-replacement", 5, false);
@@ -62,7 +64,7 @@ public static partial class PocketStrikerBattleCameraSmoke
             float yawOffset = BattleCameraOpening.CalculatePlanarYaw(Vector3.zero, Vector3.forward,
                 BattleCameraProfiles.Duel, CameraManager._camera.aspect, battleCamera.GetUsableViewport(CameraManager._camera));
             var axis = Quaternion.Euler(0, CameraManager._camera.transform.eulerAngles.y - yawOffset, 0) * Vector3.forward;
-            PlaceOpeningDuel(axis, 4, 0); await MeasureOpening("separated-ground", 3, false);
+            PlaceOpeningDuel(axis, 4, 0); await MeasureOpening("separated-ground", 7, false, horizontal: true);
             float separatedYaw = report.transitions.Last().frames.Last().yaw;
             await MeasureOpening("separated-airborne", 2, false, 5, () => PlaceOpeningDuel(axis, 4, 6));
             var air = report.transitions.Last();
@@ -132,15 +134,18 @@ public static partial class PocketStrikerBattleCameraSmoke
         RTFightManager.Target.team1.TurnAllUnitsInvincible(true);
         RTFightManager.Target.team2.TurnAllUnitsInvincible(true);
         HoldTeams();
-        await MeasureOpening(name + "-fight-start", .5f, true, 6);
+        await MeasureOpening(name + "-fight-start", .5f,
+            RTFightManager.Target._CameraManager.CurrentBattleCamera is not DuelBattleCamera, 6);
     }
 
-    static async UniTask MeasureOpening(string name, float seconds, bool diagonal, float angleTolerance = 5, Action placement = null)
+    static async UniTask MeasureOpening(string name, float seconds, bool diagonal, float angleTolerance = 5,
+        Action placement = null, bool horizontal = false)
     {
         await RecordTransition(name, seconds, placement);
         var transition = report.transitions.Last();
         var sample = new OpeningSample { name = name, frames = transition.frames.Count,
             minimumFielded = transition.frames.Min(f => f.fielded), requiresDiagonal = diagonal,
+            requiresHorizontal = horizontal,
             screenshots = transition.screenshots.ToList() };
         opening.samples.Add(sample);
         var playerPrefix = RTFightManager.playerTeam + "/";
@@ -153,6 +158,7 @@ public static partial class PocketStrikerBattleCameraSmoke
             sample.minimumDistance = Mathf.Min(sample.minimumDistance, frame.distance);
             sample.maximumDistance = Mathf.Max(sample.maximumDistance, frame.distance);
             sample.maximumYawSpeed = Mathf.Max(sample.maximumYawSpeed, frame.yawSpeed);
+            sample.maximumWallYawSpeed = Mathf.Max(sample.maximumWallYawSpeed, frame.yawWallSpeed);
             var players = frame.fighters.Where(f => f.id.StartsWith(playerPrefix)).ToArray();
             var enemies = frame.fighters.Where(f => !f.id.StartsWith(playerPrefix)).ToArray();
             if (players.Length == 0 || enemies.Length == 0) continue;
@@ -177,7 +183,25 @@ public static partial class PocketStrikerBattleCameraSmoke
                 opening.errors.Add(name + ": frame " + frame.frame + " player must be lower-right, enemy upper-left; pixel angle=" + angle);
                 break;
             }
+            if (horizontal && frame.elapsed >= 5)
+            {
+                // Different authored body heights need not share a geometry
+                // center. The automatic orbit aligns their ground positions.
+                var playerGround = players.Aggregate(Vector3.zero, (sum, f) => sum + f.root) / players.Length;
+                var enemyGround = enemies.Aggregate(Vector3.zero, (sum, f) => sum + f.root) / enemies.Length;
+                playerGround.y = enemyGround.y = 0;
+                var pg = Viewport(playerGround); var eg = Viewport(enemyGround);
+                float groundAngle = Mathf.Atan2(eg.y - pg.y, (pg.x - eg.x) * opening.width / opening.height) * Mathf.Rad2Deg;
+                sample.horizontalFrames++;
+                sample.maximumSettledAxisAngle = Mathf.Max(sample.maximumSettledAxisAngle, Mathf.Abs(groundAngle));
+                if (pg.x <= eg.x || Mathf.Abs(groundAngle) > angleTolerance)
+                {
+                    opening.errors.Add(name + ": settled automatic duel ground axis must be horizontal; pixel angle=" + groundAngle);
+                    break;
+                }
+            }
         }
+        if (horizontal && sample.horizontalFrames < 5) opening.errors.Add(name + ": no settled horizontal frames measured.");
         if (sample.clippedCorners > 0) opening.errors.Add(name + ": " + sample.clippedCorners + " full-model corners clipped.");
         if (sample.maximumYawSpeed > 21) opening.errors.Add(name + ": automatic camera exceeded stable orbit speed.");
         File.WriteAllText(Path.Combine(Output, "opening-report.json"), JsonUtility.ToJson(opening, true));

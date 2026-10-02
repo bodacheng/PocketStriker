@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Cysharp.Threading.Tasks;
 using Singleton;
 using UnityEngine;
@@ -155,9 +156,101 @@ internal static class ModelLoadingTests
             "valid battle unit preserves skill set, element, model type, and preload count");
         Check(progress[0] == 0f && progress[progress.Count - 1] == 1f && IsMonotonic(progress),
             "valid battle preparation keeps monotonic progress across both initialization phases");
+
+        await CheckClosedPreviewLoads();
     }
 
-    static GameObject Model() => new GameObject { Link = new OutsideDataLink { _C = new Data_Center() } };
+    static async UniTask CheckClosedPreviewLoads()
+    {
+        var preview = new ModelView.DedicatedCameraConnector();
+        var loading = preview.ShowModel("2");
+        var queued = preview.ShowModel("2");
+        Check(preview.TaskRunningCount == 2, "preview selection genuinely queues behind an in-flight model");
+        DisablePreview(preview);
+        ProgressLayer.Loading("battle loading");
+        var lateModel = Model();
+        AddressablesLogic.Complete(lateModel);
+        await loading;
+        await queued;
+        Check(lateModel == null && preview.FocusingC == null && preview.InitializeCalls == 0,
+            "closing preparation destroys late preview models before displaying or focusing them");
+        Check(ProgressLayer.Label == "battle loading" && ProgressLayer.CloseCalls == 0,
+            "late preview loads and queued selections preserve the new battle loading curtain");
+
+        preview = new ModelView.DedicatedCameraConnector();
+        loading = preview.ShowModel("2");
+        queued = preview.ShowModel("2");
+        DisablePreview(preview);
+        preview.enabled = true;
+        ProgressLayer.Loading("new page loading");
+        lateModel = Model();
+        var requestCount = AddressablesLogic.Requests;
+        AddressablesLogic.Complete(lateModel);
+        await loading;
+        await queued;
+        Check(lateModel == null && AddressablesLogic.Requests == requestCount && preview.FocusingC == null,
+            "reopening a connector does not revive selections queued by its previous page lifetime");
+        Check(ProgressLayer.Label == "new page loading" && ProgressLayer.CloseCalls == 0,
+            "an old page lifetime cannot close loading after the connector is reenabled");
+        await preview.ShowModel(null);
+        Check(preview.TaskRunningCount == 0, "reenabled connector accepts a new selection and drains its queue");
+
+        preview = new ModelView.DedicatedCameraConnector();
+        var warmup = preview.PrepareModel("2");
+        DisablePreview(preview);
+        lateModel = Model();
+        AddressablesLogic.Complete(lateModel);
+        await warmup;
+        Check(lateModel == null, "closing preparation releases models returned by an in-flight warmup");
+
+        preview = new ModelView.DedicatedCameraConnector();
+        warmup = preview.PrepareModel("2");
+        DisablePreview(preview);
+        preview.enabled = true;
+        lateModel = Model();
+        AddressablesLogic.Complete(lateModel);
+        await warmup;
+        Check(lateModel == null,
+            "reenabling a connector cannot cache an old page lifetime's in-flight warmup model");
+
+        DisablePreview(preview);
+
+        requestCount = AddressablesLogic.Requests;
+        await preview.ShowModel("2");
+        Check(AddressablesLogic.Requests == requestCount,
+            "an inactive preparation connector cannot start another model request");
+        ProgressLayer.Loading("2D lobby");
+        warmup = preview.PrepareModel("2");
+        Check(AddressablesLogic.Requests == requestCount + 1 && warmup.Status == UniTaskStatus.Pending,
+            "the 2D lobby can deliberately warm up its inactive 3D connector");
+        var preparedModel = Model();
+        AddressablesLogic.Complete(preparedModel);
+        await warmup;
+        Check(preparedModel != null && !preparedModel.activeSelf && ReferenceEquals(preparedModel.transform.Parent, preview.transform)
+            && preview.FocusingC == null && preview.InitializeCalls == 0 && ProgressLayer.Label == "2D lobby",
+            "inactive warmup caches a hidden model without changing the view or loading curtain");
+        await preview.PrepareModel("2");
+        Check(AddressablesLogic.Requests == requestCount + 1, "later warmup reuses the inactive connector's cached model");
+
+        UnityEngine.Object.Destroy(preview);
+        await preview.PrepareModel("2");
+        Check(AddressablesLogic.Requests == requestCount + 1, "destroyed connectors cannot start warmup requests");
+    }
+
+    static void DisablePreview(ModelView.DedicatedCameraConnector preview)
+    {
+        preview.enabled = false;
+        typeof(ModelView.DedicatedCameraConnector).GetMethod("OnDisable", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(preview, null);
+    }
+
+    static GameObject Model()
+    {
+        var model = new GameObject { Link = new OutsideDataLink { _C = new Data_Center() } };
+        model.transform.gameObject = model;
+        model.Link._C.WholeT = model.transform;
+        return model;
+    }
     static async UniTask<InvalidOperationException> Failure(UniTask<Data_Center> task)
     {
         try { await task; }
@@ -193,10 +286,14 @@ public static class Units
     public static readonly Dictionary<string, UnitConfig> Configs = new Dictionary<string, UnitConfig>();
     public static UnitConfig Find_RECORD_ID(string id) => Configs.TryGetValue(id, out var config) ? config : null;
     public static UnitConfig RowToUnitConfigInfo(UnitConfig config) => config;
+    public static UnitConfig GetUnitConfig(string id) => id == null ? null : Find_RECORD_ID(id);
 }
 public sealed class OutsideDataLink : UnityEngine.Object { public Data_Center _C; }
 public sealed class Data_Center : UnityEngine.Object
 {
+    public Transform WholeT;
+    public AnimationManger AnimationManger = new AnimationManger();
+    public ShaderManager _ShaderManager = new ShaderManager();
     public Element element, Step2Element;
     public string Step1Type, Step1Pack, Step2Type;
     public object Step2Set;
@@ -260,10 +357,91 @@ namespace UnityEngine
         public readonly Transform transform = new Transform();
         public OutsideDataLink Link;
         public int Activations;
+        public bool activeSelf = true;
         public T GetComponent<T>() where T : class => Link as T;
-        public void SetActive(bool active) { if (active) Activations++; }
+        public void SetActive(bool active) { activeSelf = active; if (active) Activations++; }
     }
-    public sealed class Transform { public Transform Parent; public void SetParent(Transform parent) { Parent = parent; } }
-    public struct Vector3 { public static Vector3 zero => default; }
+    public class MonoBehaviour : Object
+    {
+        public bool enabled = true;
+        public bool isActiveAndEnabled => enabled;
+        public readonly Transform transform = new Transform();
+    }
+    public sealed class SerializeField : Attribute { }
+    public sealed class Transform
+    {
+        public Transform Parent;
+        public Vector3 position;
+        public GameObject gameObject;
+        public Transform transform => this;
+        public void SetParent(Transform parent) { Parent = parent; }
+    }
+    public struct Vector3
+    {
+        public static Vector3 zero => default;
+        public Vector3(float x, float y, float z) { }
+        public static Vector3 operator -(Vector3 a, Vector3 b) => default;
+    }
+    public struct Color { public static Color black => default; }
+    public sealed class Animator { public bool applyRootMotion; }
+    public struct AnimatorStateInfo { public float normalizedTime; }
     public static class Mathf { public static float Lerp(float a, float b, float t) => a + (b - a) * t; }
+}
+
+public enum Facial { aggressive }
+public sealed class AnimationManger
+{
+    public Animator AnimatorRef = new Animator();
+    public void CasualFace() { }
+    public UniTask PreloadPersonalAnimResourceMode(string type, string skill, Element element, int count) => UniTask.CompletedTask;
+    public void AnimationTrigger(string skill, float duration) { }
+    public void TriggerExpression(Facial face) { }
+    public bool GetBool(string key) => false;
+    public AnimatorStateInfo GetCurrentAnimatorStateInfo(int layer) => default;
+}
+public sealed class ShaderManager { public void FlatColorForAShortTime(Color color, float from, float to) { } }
+public static class Translate { public static string Get(string key) => key; }
+public static class ProgressLayer
+{
+    public static string Label;
+    public static int CloseCalls;
+    public static void Loading(string label) { Label = label; }
+    public static void Close() { CloseCalls++; Label = null; }
+}
+public static class HurtObjectManager { public static UniTask ConstructDPool() => UniTask.CompletedTask; }
+public static class DicAdd<TKey, TValue>
+{
+    public static void Add(IDictionary<TKey, TValue> dictionary, TKey key, TValue value) { dictionary[key] = value; }
+}
+namespace dataAccess
+{
+    public static class Units { public static UnitInfo Get(string id) => null; }
+}
+namespace ModelView
+{
+    public partial class DedicatedCameraConnector : MonoBehaviour
+    {
+        public int InitializeCalls;
+        public DedicatedCameraConnector() { unitName = new UnityEngine.UI.Text(); }
+        void Initialize(bool fix, Transform focus, Transform holder) { InitializeCalls++; }
+        void ItemDetailStartDirection(float x, float y, float z) { }
+    }
+}
+namespace UnityEngine.UI { public sealed class Text { public string text; } }
+namespace UnityEngine.Events { public delegate void UnityAction(); }
+namespace DG.Tweening.Plugins.Options { public struct VectorOptions { } }
+namespace DG.Tweening.Core
+{
+    public sealed class TweenerCore<T1, T2, TOptions>
+    {
+        public void Kill() { }
+        public TweenerCore<T1, T2, TOptions> SetLink(GameObject target) => this;
+    }
+}
+namespace DG.Tweening
+{
+    public static class ModelTweenDouble
+    {
+        public static Core.TweenerCore<Vector3, Vector3, Plugins.Options.VectorOptions> DOMove(this Transform target, Vector3 position, float duration) => new Core.TweenerCore<Vector3, Vector3, Plugins.Options.VectorOptions>();
+    }
 }

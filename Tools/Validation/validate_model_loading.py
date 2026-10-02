@@ -6,12 +6,26 @@ an already imported checkout's UniTask.dll when validating a fresh worktree.
 """
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 
 
 def main():
     root = Path(__file__).resolve().parents[2]
+    fight_load = (root / "Assets/FightLoad/FightLoad.cs").read_text()
+    # The editor fixture checks Remove against the actual preparation prefabs.
+    # Keep the scene entrypoint's ordering tied to that checked operation without
+    # entering the scene loader or contacting account/network services here.
+    transition = re.search(r"if \(!inSceneLoad\)\s*\{(?P<body>.*?)\}\s*else", fight_load, re.S)
+    if transition is None:
+        raise SystemExit("Cannot locate external battle scene transition in FightLoad.Go.")
+    body = re.sub(r"//[^\n]*", "", transition.group("body"))
+    operations = ("UILayerLoader.Remove<FightPrepareLayer>();", "PreScene.CashClear();", "LoadFightSceneAsync().Forget();")
+    positions = [body.find(operation) for operation in operations]
+    if any(position < 0 for position in positions) or positions != sorted(positions):
+        raise SystemExit("Battle entry must synchronously remove preparation before releasing clips and starting scene loading.")
+    print("PASS: preparation closes before animation resource release and scene loading")
     version = next(line.split(":", 1)[1].strip()
                    for line in (root / "ProjectSettings/ProjectVersion.txt").read_text().splitlines()
                    if line.startswith("m_EditorVersion:"))
@@ -30,6 +44,8 @@ def main():
     sources = [
         "Assets/Singleton/GeneralModelPool.cs",
         "Assets/ResourceLoading/UnitCreator.cs",
+        "Assets/P3/DedicatedCameraConnector.ModelShow.cs",
+        "Assets/Structure/SingleThreadProcesser/SingleThreadProcessor.cs",
         "Tools/Validation/ModelLoadingTests.cs",
     ]
     with tempfile.TemporaryDirectory(prefix="pocketstriker-models-") as directory:

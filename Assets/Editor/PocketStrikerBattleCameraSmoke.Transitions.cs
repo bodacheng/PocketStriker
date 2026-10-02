@@ -23,7 +23,7 @@ public static partial class PocketStrikerBattleCameraSmoke
         public int frame;
         public float elapsed, distance, required, centerLag, pitch, fieldOfView;
         public Vector3 cameraPosition, center, projectedCenter;
-        public float yaw, yawSpeed;
+        public float yaw, yawSpeed, yawWallSpeed, cameraStep;
         public string process;
         public Rect usable;
         public int fielded, clippedCorners;
@@ -216,11 +216,17 @@ public static partial class PocketStrikerBattleCameraSmoke
             frame.usable = usable;
             frame.projectedCenter = camera.WorldToViewportPoint(mode.CurrentPose.Center);
             frame.yaw = camera.transform.eulerAngles.y;
+            frame.cameraStep = Mathf.Clamp(Time.deltaTime, 0, .05f);
             frame.process = FSceneProcessesRunner.Main.currentProcess?.GetType().Name;
             if (item.frames.Count > 0)
             {
                 var last = item.frames[item.frames.Count - 1];
-                frame.yawSpeed = Mathf.Abs(Mathf.DeltaAngle(last.yaw, frame.yaw)) / Mathf.Max(.001f, frame.elapsed-last.elapsed);
+                float yawDelta = Mathf.Abs(Mathf.DeltaAngle(last.yaw, frame.yaw));
+                // Orbit integrates Unity's frame step. Stopwatch sample spacing
+                // also includes variable editor rendering/capture work after
+                // LateUpdate, so keep it as a diagnostic, not its speed divisor.
+                frame.yawSpeed = yawDelta / Mathf.Max(.001f, frame.cameraStep);
+                frame.yawWallSpeed = yawDelta / Mathf.Max(.001f, frame.elapsed - last.elapsed);
             }
             foreach (var team in new[] { manager.team1, manager.team2 })
             foreach (var unit in team.teamMembers.mDict.Values)

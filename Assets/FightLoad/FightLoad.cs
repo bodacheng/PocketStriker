@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using mainMenu;
 using UnityEngine;
 using FightScene;
+using DummyLayerSystem;
 
 public static class FightLoad
 {
@@ -37,6 +38,10 @@ public static class FightLoad
 
         if (!inSceneLoad)
         {
+            // Releasing the lobby clips resets any still-visible preview to its
+            // bind pose. Hide the complete preparation hierarchy (including its
+            // model cameras) before clearing resources or fading in loading UI.
+            UILayerLoader.Remove<FightPrepareLayer>();
             PreScene.CashClear();
             LoadFightSceneAsync().Forget();
         }

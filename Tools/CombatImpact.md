@@ -77,9 +77,25 @@ Dash 使用原 `rush` 人物纹理的逐字节副本，由独立 UI glyph 显示
 相机额外入口：`PocketStrikerBattleCameraOpeningValidation.ValidateBatch`；实际场景用
 `POCKETSTRIKER_CAMERA_OPENING=1 POCKETSTRIKER_CAMERA_REVIEW=<新标签>` 调用现有
 `PocketStrikerBattleCameraSmoke.StartBatch`。尺寸可指定 `375x667`、`390x844`、
-`834x1194`。检验像素团队轴、玩家右下／敌人左上、完整模型角点、替补／死亡／重试、
+`834x1194`。倒计时检验玩家右下／敌人左上的像素团队轴；1v1 正式战斗的自动旋转
+改为将双方地面轴对齐屏幕水平线，继续保留原有震动过滤、慢速旋转和距离迟滞。
+另检验完整模型角点、替补／死亡／重试、
 高低模型、腾空／落地及 6 人／200 人阵容。约 45° 指屏幕斜线，安全拟合可能为极高
 模型扩大镜距；不承诺所有阵容都比横排更近。
+
+**PocketStriker → Validation → Combat Visuals**（批处理入口
+`PocketStrikerCombatVisualValidation.Validate`，带 `-quit`）统一检查完整模型构图、
+倒计时、水平自动旋转／震动稳定性、技能特效依赖和准备页相机／loading 排版。
+总报告位于 `Logs/CombatVisuals/report.json`，特效审计和渲染对照位于
+`Logs/EffectResources`。场景中的 UnitCamera 和展示用 DedicatedCameraConnector
+显式请求深度纹理，各档 URP Renderer 在不透明物体之后复制深度，供随后的透明特效使用。
+MCombat 的软粒子材质依赖这一纹理，资源文件齐全也可能因相机缺少深度、或生成过晚而
+隐藏光柱、光环。特效验证使用全部六档画质，以及世界和角色相机均关闭深度的负对照。
+
+准备页退出验证通过 `PocketStrikerUIInterruptionValidation.StartBatch` 运行
+（不带 `-quit`）；实际单人／团战准备页的角色及预览相机必须在释放动画资源前同步
+停用。`python3 Tools/Validation/validate_model_loading.py` 另检查延迟角色加载／
+预热回调不会复活关闭的界面或关闭后续战斗 loading。
 
 登录美术的原图、提示词、可恢复方式及离线真实标题层入口见
 `Tools/ArtSources/LoginBackground/README.md`。最终验收报告和源码一致性记录存于

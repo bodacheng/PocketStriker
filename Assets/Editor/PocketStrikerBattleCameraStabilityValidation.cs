@@ -17,13 +17,14 @@ public static class PocketStrikerBattleCameraStabilityValidation
     {
         public bool passed;
         public string unityVersion;
-        public string scope = "Production BattleCameraStabilizer, Duel/MultiRaid/Group profiles, 30/60/120 fps; oscillating animation bounds, high-frequency root punch, deliberate pan and orbit, abrupt separation/airborne bounds, pause, replacement hold and reset. Fixed-root slender bodies make repeated quarter/half and continuous turns at fixed camera yaw, using production neutral cylindrical envelopes; their startup distance is compared with the prior square envelope. A real large displacement must still expand immediately. Every raw body-bound corner projects through Unity Camera.WorldToViewportPoint on every moving frame. Fixed-world-marker screen travel is compared with the previous raw-AABB-center and asymmetric-distance camera.";
+        public string scope = "Production BattleCameraStabilizer, Duel/MultiRaid/Group profiles, 30/60/120 fps; oscillating animation bounds, high-frequency root punch, deliberate pan and orbit, abrupt separation/airborne bounds, pause, replacement hold and reset. Fixed-root slender bodies make repeated quarter/half and continuous turns at fixed camera yaw, using production neutral cylindrical envelopes; their startup distance is compared with the prior square envelope. A real large displacement must still expand immediately. Every raw body-bound corner projects through Unity Camera.WorldToViewportPoint on every moving frame. Fixed-world-marker screen travel is compared with the previous raw-AABB-center and asymmetric-distance camera. Automatic duel horizontal alignment covers five aspects, two HUD offsets, four ground headings, three gaps and unequal model heights; diagonal-to-horizontal settling preserves orbit speed and angular-twitch filtering.";
         public string limitation = "Deterministic editor geometry fixtures, including a 200-body Group layout. Synthetic animation envelopes and punch motion isolate camera response; actual animator, combat callbacks, scene loading and HUD integration are covered by BattleCameraSmoke separately. This is not a device performance benchmark.";
         public int projectedCorners;
         public int motionCases;
         public int yawCases;
         public int lifecycleCases;
         public int turningCases;
+        public int duelAlignmentCases, duelOrbitCases;
         public List<MotionCase> comparisons = new List<MotionCase>();
         public List<TurningCase> turns = new List<TurningCase>();
         public List<string> observations = new List<string>();
@@ -150,6 +151,7 @@ public static class PocketStrikerBattleCameraStabilityValidation
                 CheckLifecycle(camera, profiles[index], names[index], fps, report);
                 CheckTurning(camera, previous, profiles[index], names[index], fps, report);
             }
+            CheckDuelAlignment(camera, report);
         }
         catch (Exception exception) { report.errors.Add(exception.ToString()); }
         finally
@@ -157,7 +159,8 @@ public static class PocketStrikerBattleCameraStabilityValidation
             UnityEngine.Object.DestroyImmediate(rig); EditorSceneManager.ClosePreviewScene(scene);
             report.passed = report.errors.Count == 0 && report.comparisons.Count == 18
                 && report.motionCases == 9 && report.yawCases == 9 && report.lifecycleCases == 9
-                && report.turningCases == 9 && report.turns.Count == 27;
+                && report.turningCases == 9 && report.turns.Count == 27
+                && report.duelAlignmentCases == 240 && report.duelOrbitCases == 12;
             File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
@@ -257,6 +260,92 @@ public static class PocketStrikerBattleCameraStabilityValidation
         Require(Mathf.Abs(Mathf.DeltaAngle(paused, current.Yaw)) < .0001f,
             name + " automatic yaw moved during a paused frame.");
         report.yawCases++;
+    }
+
+    static void CheckDuelAlignment(Camera camera, Report report)
+    {
+        var profile = BattleCameraProfiles.Duel;
+        foreach (float aspect in new[] { 375f / 667, 390f / 844, 9f / 16, 834f / 1194, 3f / 4 })
+        foreach (var usable in new[] { new Rect(.02f, .22f, .96f, .5f), Usable })
+        foreach (float heading in new[] { 0f, 90f, 173f, 270f })
+        foreach (float gap in new[] { 2f, 8f, 20f })
+        foreach (float enemyHeight in new[] { 2.2f, 5.3f })
+        {
+            var axis = Quaternion.Euler(0, heading, 0) * Vector3.forward;
+            var player = new Vector3(8, 0, -7) - axis * gap;
+            var enemy = new Vector3(8, 0, -7) + axis * gap;
+            var bounds = new List<Bounds>
+            {
+                new Bounds(player + Vector3.up * 1.1f, new Vector3(1.2f, 2.2f, 1.2f)),
+                new Bounds(enemy + Vector3.up * enemyHeight * .5f, new Vector3(1.2f, enemyHeight, 1.2f))
+            };
+            var whole = bounds[0]; whole.Encapsulate(bounds[1]);
+            float yaw = BattleCameraFraming.CalculateDuelYaw(player, enemy);
+            var pose = BattleCameraFraming.CalculatePoseAtCenter(bounds, aspect, profile.FieldOfView, usable,
+                Quaternion.Euler(profile.Pitch, yaw, 0), whole.center, profile.MinimumDistance, .3f);
+            camera.aspect = aspect; camera.fieldOfView = profile.FieldOfView;
+            camera.transform.SetPositionAndRotation(pose.Position, pose.Rotation);
+            var pv = camera.WorldToViewportPoint(player); var ev = camera.WorldToViewportPoint(enemy);
+            Require(pv.x > ev.x && Mathf.Abs(pv.y - ev.y) < .0001f && Mathf.Abs(pv.z - ev.z) < .0001f,
+                "Automatic duel target does not align the ground axis horizontally: " + aspect + "/" + heading + "/" + gap);
+            Require(Mathf.Abs(Mathf.DeltaAngle(yaw, BattleCameraFraming.CalculateDuelYaw(player,
+                enemy + Vector3.up * 6, yaw))) < .0001f,
+                "A height-only launch changed the automatic duel target.");
+            foreach (var box in bounds)
+            for (int corner = 0; corner < 8; corner++)
+            {
+                var vp = camera.WorldToViewportPoint(box.center + Vector3.Scale(box.extents,
+                    new Vector3((corner & 1) == 0 ? -1 : 1, (corner & 2) == 0 ? -1 : 1, (corner & 4) == 0 ? -1 : 1)));
+                Require(vp.z > .3f && vp.x >= usable.xMin - .0002f && vp.x <= usable.xMax + .0002f
+                    && vp.y >= usable.yMin - .0002f && vp.y <= usable.yMax + .0002f,
+                    "Horizontal duel target cropped a full-model corner: " + vp);
+                report.projectedCorners++;
+            }
+            report.duelAlignmentCases++;
+        }
+        Require(BattleCameraFraming.CalculateDuelYaw(Vector3.zero, Vector3.up * 6, 173) == 173,
+            "Coincident ground positions lost the previous automatic heading.");
+
+        foreach (int fps in new[] { 30, 60, 120 })
+        foreach (float heading in new[] { 0f, 90f, 173f, 270f })
+        {
+            var axis = Quaternion.Euler(0, heading, 0) * Vector3.forward;
+            var player = -axis * 4; var enemy = axis * 4;
+            var bounds = new List<Bounds>
+            {
+                new Bounds(player + Vector3.up * 1.1f, new Vector3(1.2f, 2.2f, 1.2f)),
+                new Bounds(enemy + Vector3.up * 1.1f, new Vector3(1.2f, 2.2f, 1.2f))
+            };
+            var tracking = Vector3.up * 1.1f;
+            float opening = BattleCameraOpening.CalculateYaw(player, enemy, profile, bounds, null,
+                tracking, Aspect, Usable);
+            float target = BattleCameraFraming.CalculateDuelYaw(player, enemy);
+            var current = new BattleCameraStabilizer(profile); current.Reset(opening);
+            float dt = 1f / fps;
+            for (int frame = 0; frame < fps * 6; frame++)
+            {
+                float before = current.Yaw;
+                current.UpdateYaw(target, dt);
+                Require(Mathf.Abs(Mathf.DeltaAngle(before, current.Yaw)) / dt < 21,
+                    "Horizontal auto orbit exceeded the existing stable orbit speed.");
+                var pose = current.Update(bounds, tracking, Aspect, profile.FieldOfView, Usable, .3f, dt);
+                Configure(camera, pose, profile); CheckCorners(camera, bounds, "duel-horizontal-orbit/" + fps, report);
+            }
+            var pv = camera.WorldToViewportPoint(player); var ev = camera.WorldToViewportPoint(enemy);
+            float pixelAngle = Mathf.Atan2(ev.y - pv.y, (pv.x - ev.x) * Aspect) * Mathf.Rad2Deg;
+            Require(pv.x > ev.x && Mathf.Abs(pixelAngle) < 5,
+                "Automatic duel orbit did not settle near a horizontal axis: " + fps + "/" + heading + "/" + pixelAngle);
+            current.Reset(target);
+            for (int frame = 0; frame < fps * 3; frame++)
+            {
+                var twitch = Quaternion.Euler(0, Mathf.Sin(frame * dt * 2 * Mathf.PI * 7) * 6, 0) * axis * 4;
+                current.UpdateYaw(BattleCameraFraming.CalculateDuelYaw(-twitch, twitch + Vector3.up * 6), dt);
+            }
+            Require(Mathf.Abs(Mathf.DeltaAngle(target, current.Yaw)) < .0001f,
+                "Horizontal auto orbit followed small combat-axis twitch or height-only motion.");
+            report.duelOrbitCases++;
+        }
+        report.observations.Add("Duel auto orbit targets equal-depth ground positions at all tested aspect/HUD offsets and unequal model sizes. It leaves the countdown diagonal intact, settles within 5 pixel-axis degrees through the existing slow yaw filter, ignores height-only launches and angular twitch, and preserves complete model framing.");
     }
 
     static void CheckLifecycle(Camera camera, BattleCameraProfile profile, string name, int fps, Report report)

@@ -165,9 +165,9 @@ public class AllUnitsBattleCamera : CameraMode
                 _autoOrbitEngaged = combatLine.sqrMagnitude > threshold * threshold;
                 if (_autoOrbitEngaged)
                 {
-                    // Keep the same diagonal side after combat starts; the
-                    // existing slow orbit and engage/release window absorb
-                    // passing, impacts and brief changes of the combat axis.
+                    // After the diagonal countdown, aim for a horizontal duel
+                    // axis. The existing slow orbit and engage/release window
+                    // absorb passing, impacts and brief combat-axis changes.
                     var player = first.position;
                     var opponent = second.position;
                     if (manager.team2.teamConfig.myTeam == RTFightManager.playerTeam)
@@ -176,8 +176,8 @@ public class AllUnitsBattleCamera : CameraMode
                     }
                     // Orbit follows the ground axis, not animated body-center
                     // height. A distant launch/landing must not rotate the arena.
-                    _stabilizer.UpdateYaw(BattleCameraOpening.CalculatePlanarYaw(player, opponent,
-                        _profile, camera.aspect, usable), deltaTime);
+                    _stabilizer.UpdateYaw(BattleCameraFraming.CalculateDuelYaw(player, opponent,
+                        _stabilizer.Yaw), deltaTime);
                     rotating = true;
                 }
             }

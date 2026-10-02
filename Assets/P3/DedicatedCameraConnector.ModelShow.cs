@@ -40,14 +40,27 @@ namespace ModelView
         bool IfShowingSkill { get; set; } = false;
 
         private readonly SingleThreadProcessor _singleThreadProcessor = new SingleThreadProcessor();
+        int _modelDisplayVersion;
+
+        void OnDisable()
+        {
+            // A queued/in-flight selection must not resume after its UI closes,
+            // especially by closing the new battle-loading ProgressLayer.
+            _modelDisplayVersion++;
+        }
+
         public int TaskRunningCount => _singleThreadProcessor.TaskRunningCount;
         public async UniTask ShowModel(string recordID)
         {
-            await _singleThreadProcessor.RunAsQueued(() => _ShowModel(recordID));
+            var displayVersion = _modelDisplayVersion;
+            await _singleThreadProcessor.RunAsQueued(() => _ShowModel(recordID, displayVersion));
         }
         
-        async UniTask _ShowModel(string recordID)
+        async UniTask _ShowModel(string recordID, int displayVersion)
         {
+            bool IsCurrent() => this != null && isActiveAndEnabled && displayVersion == _modelDisplayVersion;
+            if (!IsCurrent()) return;
+
             foreach (var save in _saves)
             {
                 if (save.Value != null)
@@ -73,7 +86,14 @@ namespace ModelView
             else
             {
                 ProgressLayer.Loading(string.Empty);
-                _focusingC = await GeneralModelPool.GetModel(recordID, transform, modelPos- new Vector3(0,0, 200));
+                saveData = await GeneralModelPool.GetModel(recordID, transform, modelPos- new Vector3(0,0, 200));
+                if (!IsCurrent())
+                {
+                    if (saveData != null && saveData.WholeT != null)
+                        Destroy(saveData.WholeT.gameObject);
+                    return;
+                }
+                _focusingC = saveData;
                 if (_saves.TryGetValue(recordID, out var oldModel))
                 {
                     if (oldModel != null)
@@ -91,7 +111,7 @@ namespace ModelView
                 DicAdd<string, Data_Center>.Add(_saves, recordID, _focusingC);
             }
 
-            if (this == null)
+            if (!IsCurrent())
             {
                 return; // 上方的await后layer可能已经被销毁
             }
@@ -107,7 +127,7 @@ namespace ModelView
             _focusingC.WholeT.gameObject.SetActive(true);
             
             await UniTask.DelayFrame(5);// 否则Unity对mesh的尺寸计算有错误。算是Unity的bug
-            if (this == null)
+            if (!IsCurrent())
             {
                 return;
             }
@@ -126,6 +146,12 @@ namespace ModelView
         
         public async UniTask PrepareModel(string recordID)
         {
+            var displayVersion = _modelDisplayVersion;
+            // The 2D lobby intentionally warms up an inactive 3D connector.
+            // A later disable/close still invalidates an already-running warmup.
+            bool IsCurrent() => this != null && displayVersion == _modelDisplayVersion;
+            if (!IsCurrent()) return;
+
             Data_Center saveData = null;
             if (recordID != null)
                 _saves.TryGetValue(recordID, out saveData);
@@ -142,7 +168,7 @@ namespace ModelView
                 {
                     return;
                 }
-                if (this == null)
+                if (!IsCurrent())
                 {
                     if (saveData.WholeT != null)
                     {
