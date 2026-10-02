@@ -39,4 +39,11 @@ public static class AdventureModeRules
     {
         return count >= 1 && count <= GetHeroLimit(stageId, evolutionMode);
     }
+
+    public static float GetRotationMemberHpRate(float teamHpRate, bool evolutionMode, int memberIndex)
+    {
+        // Evolution reserves any boss HP bonus for the last opponent. Early
+        // rounds still honor authored reductions instead of silently using 1.
+        return evolutionMode && memberIndex < 3 ? System.Math.Min(1f, teamHpRate) : teamHpRate;
+    }
 }

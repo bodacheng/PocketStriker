@@ -14,34 +14,15 @@ namespace FightScene
             Step = SceneStep.FightOver;
         }
 
-        static void SaveTutorialProgressInBackground(string progress)
-        {
-            PlayerAccountInfo.Me.tutorialProgress = progress;
-            PlayFabReadClient.RememberPendingTutorialProgress(progress);
-            PlayFabReadClient.UpdateUserData(
-                new UpdateUserDataRequest()
-                {
-                    Data = new Dictionary<string, string>()
-                    {
-                        { "TutorialProgress", progress }
-                    }
-                },
-                () => PlayFabReadClient.ClearPendingTutorialProgress(progress),
-                () => Debug.LogWarning($"Failed to save tutorial progress '{progress}'. It will be retried later."),
-                false,
-                false
-            );
-        }
-
         static void TrySaveTutorialProgressAfterStage(string stageId)
         {
             switch (stageId)
             {
                 case "1":
-                    SaveTutorialProgressInBackground("StageOneFinished");
+                    PlayFabReadClient.SaveTutorialProgressInBackground("StageOneFinished");
                     break;
                 case "2":
-                    SaveTutorialProgressInBackground("Finished");
+                    PlayFabReadClient.SaveTutorialProgressInBackground("Finished");
                     break;
             }
         }

@@ -10,19 +10,9 @@ using UnityEngine.SceneManagement;
 public partial class PlayFabReadClient
 {
     const string PLAYFAB_CUSTOM_ID = "PLAYFAB_CUSTOM_ID";
-    const string PENDING_TUTORIAL_PROGRESS = "PENDING_TUTORIAL_PROGRESS";
     const int LoginRetryMaxAttempts = 4;
     const float LoginRetryBaseDelaySeconds = 1.5f;
     const float LoginRetryMaxDelaySeconds = 6f;
-    static readonly string[] TutorialProgressOrder =
-    {
-        "Started",
-        "SkillEditFinished",
-        "StageOneFinished",
-        "GotchaFinished",
-        "SkillEditFinished2",
-        "Finished"
-    };
     static readonly HashSet<PlayFabErrorCode> TransientLoginErrors = new HashSet<PlayFabErrorCode>
     {
         PlayFabErrorCode.Unknown,
@@ -148,6 +138,7 @@ public partial class PlayFabReadClient
         {
             PlayFabId = result.PlayFabId
         };
+        var loginAccount = PlayerAccountInfo.Me;
         
         _missionWatcher = new MissionWatcher(
             new List<string>
@@ -164,35 +155,16 @@ public partial class PlayFabReadClient
             }
         );
         // 尝试建立并获取玩家测试进度信息，因为延迟没有迅速获得的情况下会多次尝试
-        TryProcessWithLimitedTimes(()=> CheckTutorialProgressGot(loginType), ()=> _tutorialProgressGot, 0);
+        TryProcessWithLimitedTimes(
+            () => { if (ReferenceEquals(PlayerAccountInfo.Me, loginAccount)) CheckTutorialProgressGot(loginType); },
+            () => !ReferenceEquals(PlayerAccountInfo.Me, loginAccount) || _tutorialProgressGot,
+            0);
         GetAccountInfo(AccountInfoFinished);
     }
     
     static void AccountInfoFinished(bool value)
     {
         _missionWatcher.Finish("accountInfoFinished", value);
-    }
-
-    public static void RememberPendingTutorialProgress(string progress)
-    {
-        if (string.IsNullOrEmpty(progress))
-        {
-            return;
-        }
-
-        PlayerPrefs.SetString(PENDING_TUTORIAL_PROGRESS, progress);
-        PlayerPrefs.Save();
-    }
-
-    public static void ClearPendingTutorialProgress(string progress)
-    {
-        if (PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null) != progress)
-        {
-            return;
-        }
-
-        PlayerPrefs.DeleteKey(PENDING_TUTORIAL_PROGRESS);
-        PlayerPrefs.Save();
     }
 
     public static void ReconcileTutorialProgressAfterDataLoad()
@@ -203,7 +175,7 @@ public partial class PlayFabReadClient
         }
 
         var targetProgress = PlayerAccountInfo.Me.tutorialProgress;
-        var pendingProgress = PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null);
+        var pendingProgress = GetPendingTutorialProgress();
         if (IsTutorialProgressAhead(pendingProgress, targetProgress))
         {
             targetProgress = pendingProgress;
@@ -224,55 +196,7 @@ public partial class PlayFabReadClient
         }
 
         PlayerAccountInfo.Me.tutorialProgress = targetProgress;
-        RememberPendingTutorialProgress(targetProgress);
-        RetryPendingTutorialProgressSave();
-    }
-
-    static void RetryPendingTutorialProgressSave()
-    {
-        var pendingProgress = PlayerPrefs.GetString(PENDING_TUTORIAL_PROGRESS, null);
-        if (string.IsNullOrEmpty(pendingProgress))
-        {
-            return;
-        }
-
-        UpdateUserData(
-            new UpdateUserDataRequest()
-            {
-                Data = new Dictionary<string, string>()
-                {
-                    { "TutorialProgress", pendingProgress }
-                }
-            },
-            () => ClearPendingTutorialProgress(pendingProgress),
-            () => Debug.LogWarning($"Failed to retry tutorial progress '{pendingProgress}'. It will be retried later."),
-            false,
-            false
-        );
-    }
-
-    static bool IsTutorialProgressAhead(string candidate, string current)
-    {
-        var candidateIndex = TutorialProgressIndex(candidate);
-        return candidateIndex >= 0 && candidateIndex > TutorialProgressIndex(current);
-    }
-
-    static int TutorialProgressIndex(string progress)
-    {
-        if (string.IsNullOrEmpty(progress))
-        {
-            return -1;
-        }
-
-        for (var i = 0; i < TutorialProgressOrder.Length; i++)
-        {
-            if (TutorialProgressOrder[i] == progress)
-            {
-                return i;
-            }
-        }
-
-        return -1;
+        SaveTutorialProgressInBackground(targetProgress);
     }
 
     private static readonly int MAXTry = 5;
@@ -294,14 +218,19 @@ public partial class PlayFabReadClient
 
     static void CheckTutorialProgressGot(LoginType loginType)
     {
+        var account = PlayerAccountInfo.Me;
+        var context = new PlayFabAuthenticationContext();
+        context.CopyFrom(PlayFabSettings.staticPlayer);
         PlayFabClientAPI.GetUserData
         (
             new GetUserDataRequest
             {
-                PlayFabId = PlayerAccountInfo.Me.PlayFabId
+                PlayFabId = account.PlayFabId,
+                AuthenticationContext = context
             },
             (obj) =>
             {
+                if (!ReferenceEquals(PlayerAccountInfo.Me, account) || _tutorialProgressGot) return;
                 if (obj.Data.ContainsKey("TutorialProgress"))
                 {
                     PlayerAccountInfo.Me.tutorialProgress = obj.Data["TutorialProgress"].Value;
@@ -322,29 +251,14 @@ public partial class PlayFabReadClient
                         );
                     }
                     
-                    UpdateUserData(
-                        new UpdateUserDataRequest()
-                        {
-                            Data = new Dictionary<string, string>
-                            {
-                                { "TutorialProgress", loginType == LoginType.normal? "Started" : "Finished" }
-                            }
-                        },
-                        () =>
-                        {
-                            PlayerAccountInfo.Me.tutorialProgress = loginType == LoginType.normal ? "Started" : "Finished";
-                            _tutorialProgressGot = true;
-                            _missionWatcher.Finish("tutorialProgressGot", true);
-                        },
-                        () =>
-                        {
-                            _missionWatcher.Finish("tutorialProgressGot", false);
-                        }
-                    );
+                    SaveTutorialProgressInBackground(loginType == LoginType.normal ? "Started" : "Finished");
+                    _tutorialProgressGot = true;
+                    _missionWatcher.Finish("tutorialProgressGot", true);
                 }
             },
             errorCallback =>
             {
+                if (!ReferenceEquals(PlayerAccountInfo.Me, account) || _tutorialProgressGot) return;
                 PopupLayer.ArrangeWarnWindow(errorCallback.ErrorMessage);
             }
         );

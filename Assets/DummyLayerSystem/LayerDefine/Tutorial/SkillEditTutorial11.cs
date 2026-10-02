@@ -1,6 +1,4 @@
 using DG.Tweening;
-using DummyLayerSystem;
-using NoSuchStudio.Common;
 using UnityEngine;
 
 public class SkillEditTutorial11 : MonoBehaviour
@@ -11,28 +9,19 @@ public class SkillEditTutorial11 : MonoBehaviour
     [SerializeField] float moveDuration = 1f;
     
     private Tween moveTween;
+
+    public void SetTargets(RectTransform source, RectTransform destination)
+    {
+        if (startPoint == source && endPoint == destination && moveTween != null && moveTween.IsActive()) return;
+        moveTween?.Kill();
+        startPoint = source;
+        endPoint = destination;
+        if (targetUIElement != null) targetUIElement.gameObject.SetActive(source != null && destination != null);
+        if (isActiveAndEnabled) MoveElement();
+    }
     
     void OnEnable()
     {
-        var layer = UILayerLoader.Get<SkillEditLayer>();
-        if (layer == null || layer.nineSlot == null)
-        {
-            return;
-        }
-
-        var emptySlots = layer.nineSlot.GetEmptySlots();
-        if (emptySlots == null || emptySlots.Count == 0)
-        {
-            return;
-        }
-
-        var target = emptySlots.Random();
-        if (target == null || target._cell == null)
-        {
-            return;
-        }
-
-        endPoint = target._cell.GetComponent<RectTransform>();
         MoveElement();
     }
     
@@ -43,19 +32,15 @@ public class SkillEditTutorial11 : MonoBehaviour
             return;
         }
 
-        targetUIElement.position = startPoint.position;
         moveTween?.Kill();
-        moveTween = targetUIElement.DOMove(endPoint.position, moveDuration)
-            .SetLink(gameObject)
-            .OnComplete(() =>
+        float progress = 0;
+        moveTween = DOTween.To(() => progress, value =>
             {
-                if (targetUIElement == null || startPoint == null)
-                {
-                    return;
-                }
-
-                targetUIElement.position = startPoint.position;
-            })
+                progress = value;
+                if (targetUIElement != null && startPoint != null && endPoint != null)
+                    targetUIElement.position = Vector3.Lerp(startPoint.position, endPoint.position, progress);
+            }, 1, moveDuration)
+            .SetLink(gameObject)
             .SetEase(Ease.Linear)
             .SetLoops(-1);
     }
@@ -63,5 +48,11 @@ public class SkillEditTutorial11 : MonoBehaviour
     private void OnDestroy()
     {
         moveTween?.Kill();
+    }
+
+    private void OnDisable()
+    {
+        moveTween?.Kill();
+        moveTween = null;
     }
 }

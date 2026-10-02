@@ -40,6 +40,7 @@ public class AllUnitsBattleCamera : CameraMode
     public bool IsHoldingReplacementFraming { get; private set; }
     public bool IsSettlingReplacementFraming => _handoffRemaining > 0;
     public int FramedUnitCount => _bounds.Count;
+    public float ShadowReceiverDistance { get; private set; }
     public BattleCameraFraming.Pose DesiredPose => _stabilizer.DesiredPose;
     public BattleCameraFraming.Pose CurrentPose => _stabilizer.CurrentPose;
 
@@ -194,6 +195,7 @@ public class AllUnitsBattleCamera : CameraMode
             camera.nearClipPlane, deltaTime, IsHoldingReplacementFraming, _bodyEnvelopes, IsSettlingReplacementFraming);
         camera.transform.SetPositionAndRotation(fitted.Position, fitted.Rotation);
         camera.farClipPlane = Mathf.Max(camera.farClipPlane, fitted.Distance + 100);
+        ShadowReceiverDistance = BattleShadowCoverage.ReceiverDistance(fitted.Position, _bounds);
     }
 
     void ResetFraming(Camera camera)
@@ -210,6 +212,7 @@ public class AllUnitsBattleCamera : CameraMode
         _lastFirst = _lastSecond = null;
         _handoffRemaining = 0;
         _hasUsableViewport = false;
+        ShadowReceiverDistance = 0;
     }
 
     static bool HasLiveRotationFighter(UnitsManger team)

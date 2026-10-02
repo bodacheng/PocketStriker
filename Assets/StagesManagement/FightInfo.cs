@@ -439,6 +439,7 @@ public class FightInfo : ScriptableObject
         stage.RunTutorial = source.RunTutorial;
         stage.evolutionMode = source.evolutionMode;
         stage.EventType = source.EventType;
+        stage.dumbAIDecisionDelay = source.dumbAIDecisionDelay;
         stage.dreamComboAIRateNum = source.dreamComboAIRateNum;
         return stage;
     }

@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using DummyLayerSystem;
 using mainMenu;
-using PlayFab.ClientModels;
+using System;
 
 public class SkillEditTry : TutorialProcess
 {
@@ -11,6 +10,10 @@ public class SkillEditTry : TutorialProcess
     private UpperInfoBar _upperInfoBar;
     private bool _skillEditFinished = false;
     private readonly string _tutorialFlag;
+    private bool _active;
+    private bool _configured;
+    // Only the small progress marker is isolated for offline tutorial validation.
+    private Action<string> _saveProgress = SaveProgress;
 
     public SkillEditTry(string tutorialFlag)
     {
@@ -19,6 +22,7 @@ public class SkillEditTry : TutorialProcess
     
     public override void ProcessEnter()
     {
+        _active = true;
         if (_tutorialFlag == "openInstruction1")
         {
             string focusInstanceID = PreScene.target.GetFocusInstanceID();
@@ -59,11 +63,11 @@ public class SkillEditTry : TutorialProcess
             _upperInfoBar = UILayerLoader.Get<UpperInfoBar>();
             if (_upperInfoBar != null)
             {
-                _upperInfoBar.gameObject.SetActive(false);
+                _upperInfoBar.SetInteractive(false);
             }
         }
         
-        if (!_skillEditFinished)
+        if (!_skillEditFinished && _configured)
         {
             if (_skillEditLayer != null)
             {
@@ -78,7 +82,7 @@ public class SkillEditTry : TutorialProcess
         }
         else
         {
-            if (_skillEditLayer.Initialized)
+            if (_skillEditLayer.Initialized && !_configured)
             {
                 string nextTutorialProgress = null;
                 if (this._tutorialFlag == "openInstruction1")
@@ -96,30 +100,47 @@ public class SkillEditTry : TutorialProcess
                 _skillEditLayer.nineSlot.SetExtraSkillEditSuccess(
                     () =>
                     {
-                        PlayFabReadClient.UpdateUserData(
-                            new UpdateUserDataRequest()
-                            {
-                                Data = new Dictionary<string, string>()
-                                {
-                                    { "TutorialProgress", nextTutorialProgress }
-                                }
-                            },
-                            () =>
-                            {
-                                PlayerAccountInfo.Me.tutorialProgress = nextTutorialProgress;
-                                PlayFabReadClient.DontShowFrontFight = "True";
-                                _skillEditFinished = true;
-                                _skillEditLayer.nineSlot.confirmBtnIndicator.SetActive(false);
-                                _skillEditLayer.ExtraTipForSpStoneEquip();
-                            }
-                        );
+                        if (!_active || _skillEditFinished) return;
+                        // Equipment has already been saved by the production skill
+                        // update. A failed marker write must not strand that account.
+                        PlayFabReadClient.RememberPendingTutorialProgress(nextTutorialProgress);
+                        PlayerAccountInfo.Me.tutorialProgress = nextTutorialProgress;
+                        PlayFabReadClient.DontShowFrontFight = "True";
+                        _skillEditFinished = true;
+                        _skillEditLayer.nineSlot.confirmBtnIndicator.SetActive(false);
+                        _skillEditLayer.ClearTutorialGuidance();
+                        _saveProgress(nextTutorialProgress);
                     }
                 );
-                _skillEditLayer.stonesBox.ScrollRect.vertical = false;
                 _skillEditLayer.nineSlot.SetExtraOnNineSlotChanged(_skillEditLayer.ExtraTipForSpStoneEquip);
                 _skillEditLayer.ExtraTipForSpStoneEquip();
-                _skillEditLayer.Initialized = false;
+                _configured = true;
+                _skillEditLayer.stonesBox.ScrollRect.onValueChanged.AddListener(RefreshScrolledGuidance);
             }
         }
+    }
+
+    internal static void SaveProgress(string progress)
+    {
+        PlayFabReadClient.SaveTutorialProgressInBackground(progress);
+    }
+
+    void RefreshScrolledGuidance(UnityEngine.Vector2 position)
+    {
+        if (_active && _configured && !_skillEditFinished && _skillEditLayer != null)
+            _skillEditLayer.ExtraTipForSpStoneEquip();
+    }
+
+    public override void ProcessEnd()
+    {
+        _active = false;
+        if (_skillEditLayer != null)
+        {
+            _skillEditLayer.nineSlot.SetExtraSkillEditSuccess(null);
+            _skillEditLayer.nineSlot.SetExtraOnNineSlotChanged(null);
+            _skillEditLayer.stonesBox.ScrollRect.onValueChanged.RemoveListener(RefreshScrolledGuidance);
+            _skillEditLayer.ClearTutorialGuidance();
+        }
+        _lowerMainBar?.CloseIndicators();
     }
 }

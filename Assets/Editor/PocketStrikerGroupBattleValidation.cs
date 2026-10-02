@@ -29,7 +29,7 @@ public static class PocketStrikerGroupBattleValidation
         public int originalDataComparisons;
         public int[] teamLimits;
         public bool sourceAssetsUnchanged;
-        public string scope = "Nine actual main-adventure Group assets and their quest Addressables entries; production ArcadeModeManager.PrepareStage, GangbangInfo count selection/expansion/retry copy, and FightLoad.ConfigureBattleControl. All three authored 24/72/100 per-team options. Legacy 75 Gangbang assets, addresses, GUIDs, labels and bundled schema. Unit/skill references are checked against local master CSV registrations.";
+        public string scope = "Nine actual main-adventure Group assets and their quest Addressables entries; production ArcadeModeManager.PrepareStage, GangbangInfo count selection/expansion/retry copy, and FightLoad.ConfigureBattleControl. All three authored 12/24/48 per-team options. Legacy 75 Gangbang assets, addresses, GUIDs, labels and bundled schema. Unit/skill references are checked against local master CSV registrations.";
         public string limitation = "Pure stopped-editor data checks: no scene, account, download or combat simulation is started. Remote bundle availability is not checked. Original MComat payload comparison runs only when that local sibling checkout exists; curated stage identity/count/routing checks always run.";
         public List<string> errors = new List<string>();
         public List<string> observations = new List<string>();
@@ -69,7 +69,7 @@ public static class PocketStrikerGroupBattleValidation
             Require(common != null, "Common settings asset is missing.");
             var serialized = new SerializedObject(common);
             report.teamLimits = Enumerable.Range(1, 3).Select(option => serialized.FindProperty("gangbangModeMaxUnitPerTeam" + option).intValue).ToArray();
-            Require(report.teamLimits.SequenceEqual(new[] { 24, 72, 100 }), "Authored Group count options changed from 24/72/100.");
+            Require(report.teamLimits.SequenceEqual(new[] { 12, 24, 48 }), "Authored Group count options must be 12/24/48.");
             CommonSetting.GangbangModeMaxUnitPerTeam1 = report.teamLimits[0];
             CommonSetting.GangbangModeMaxUnitPerTeam2 = report.teamLimits[1];
             CommonSetting.GangbangModeMaxUnitPerTeam3 = report.teamLimits[2];
@@ -154,7 +154,7 @@ public static class PocketStrikerGroupBattleValidation
             foreach (int option in new[] { -1, 0, 4, 100 })
             {
                 PlayerPrefs.SetInt("gangbangCountOption", option);
-                Require(GangbangInfo.GetConfiguredTeamLimit() == 24, "Invalid saved count option did not fall back to 24.");
+                Require(GangbangInfo.GetConfiguredTeamLimit() == 12, "Invalid saved count option did not fall back to 12.");
             }
             CheckLegacyAssets(settings, entries, unitIds, skillIds, report, sourceSnapshots);
         }

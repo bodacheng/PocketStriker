@@ -29,6 +29,13 @@ Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes**
 **Tutorial Layout** 另检查教程全部说明页在四种竖屏尺寸和中／英／日文下的完整文字、
 安全区、箭头目标与重复排版；逐页预览和报告位于 `Logs/Tutorial/Layout`。
 
+**Pre-battle Tutorial** 检查首次技能编辑的普通／EX 拖拽目标、自动装备和确认指示、
+非法技能组的修复提示、加载顺序及按账号保存的待同步教程进度；报告位于
+`Logs/Tutorial/prebattle.json`。**Tutorial Difficulty Playmode Smoke** 使用两套合法等级 1
+技能组，对实际发布的前两关各运行三次自然战斗，报告位于 `Logs/Tutorial/Balance/report.json`。
+它使用本地测试角色和自动战斗，不代替服务器初始库存及真机操作验证。
+`python3 Tools/Validation/validate_combat_balance.py` 沿 Addressables GUID 检查实际关卡来源及数值。
+
 UI 修改后，在停止播放的编辑器中运行 **PocketStriker → Validation → UI Layout** 和
 **Check Stage Cards**：前者检查所有注册画面及常用导航组合在手机、刘海屏、iPad 下的区域边界，
 后者检查三种语言、锁定状态和四位关卡编号的卡片排版。报告和预览图位于 `Logs/UILayout`。
@@ -104,6 +111,8 @@ python3 Tools/Validation/validate_ios_pods.py
 **Check Bundled UI Fonts** 检查包内字体、中文／日文备用字体、全部 Resources 界面的翻译字符
 和战斗准备标题；**Check Character Rendering** 用实际角色调色板和六个画质档位检查颜色、
 实时光照与阴影模型，报告与预览位于 `Logs/Fonts` 和 `Logs/Rendering`。
+战斗相机按实际角色及地面范围调整 URP 阴影距离，保留各画质的图集预算；渲染检查另覆盖
+六档画质的每队 12／24／48 人与最远镜头，开关对比图位于 `Logs/Rendering/ShadowCoverage`。
 iOS 默认画质显式设为支持阴影的 Ultra；Startup Smoke 还检查真实战斗的材质、光源和阴影，
 并保存 `Logs/Revival/startup-run-1.png`、`startup-run-2.png` 供视觉核对。
 这些修复需要重新构建客户端及同次 Addressables 资源；已发布版本按资源配对流程使用新版本发布。

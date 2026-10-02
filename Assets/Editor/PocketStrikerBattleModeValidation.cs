@@ -47,9 +47,12 @@ public static class PocketStrikerBattleModeValidation
     public sealed class StageResult
     {
         public int stage;
+        public string sourceAssetPath;
         public string mode;
         public int enemyCount;
         public float level;
+        public float enemyHpRate;
+        public int enemyDreamRate;
         public bool sourceUnchanged;
     }
 
@@ -128,6 +131,9 @@ public static class PocketStrikerBattleModeValidation
             foreach (var entry in questEntries)
             {
                 Require(int.TryParse(entry.address, out var number) && number > 0, "Invalid quest address: " + entry.address);
+                if (AdventureModeRules.IsTutorialStage(entry.address))
+                    Require(entry.AssetPath == "Assets/ExternalAssets/Stage/" + number + ".asset",
+                        "Tutorial Addressable points to the wrong difficulty asset: " + entry.address + " -> " + entry.AssetPath);
                 var source = AssetDatabase.LoadAssetAtPath<FightInfo>(entry.AssetPath);
                 Require(source != null, "Missing quest asset: " + entry.AssetPath);
                 snapshots.Add(number, new SourceSnapshot
@@ -209,6 +215,33 @@ public static class PocketStrikerBattleModeValidation
                     }
                     else report.rotationStages++;
 
+                    if (number > 2 && (expectedFightMode == FightMode.Multi || expectedFightMode == FightMode.Rotate))
+                        Require(Mathf.Approximately(stage.team2HpRate, 1f) && stage.dreamComboAIRateNum <= 20,
+                            "Ordinary team/rotation battle inherited evolution Boss stats: " + number);
+
+                    var retry = FightInfo.Copy(stage);
+                    try
+                    {
+                        Require(retry.dumbAIDecisionDelay == stage.dumbAIDecisionDelay
+                            && retry.dreamComboAIRateNum == stage.dreamComboAIRateNum
+                            && Mathf.Approximately(retry.team1HpRate, stage.team1HpRate)
+                            && Mathf.Approximately(retry.team2HpRate, stage.team2HpRate),
+                            "Retry changes encounter difficulty at stage " + number);
+                    }
+                    finally { UnityEngine.Object.DestroyImmediate(retry); }
+
+                    if (AdventureModeRules.IsTutorialStage(stage.ID))
+                    {
+                        Require(stage.UnitsData.Count == number && stage.stageRefLevel == 1f
+                            && stage.team1HpRate > 1f && stage.team2HpRate < 0.6f
+                            && stage.team2AIMode == AIMode.Dumb && stage.dumbAIDecisionDelay >= 30
+                            && stage.dreamComboAIRateNum == 0,
+                            "Opening tutorial no longer has its beginner difficulty settings: " + number);
+                        Require(stage.UnitsData.SelectMany(unit => unit.set.SkillIDList())
+                            .All(id => SkillConfigTable.GetSkillConfigByRecordId(id)?.SP_LEVEL == 0),
+                            "Opening tutorial enemy includes an EX skill: " + number);
+                    }
+
                     // A runtime visit may change levels and skills. Such writes must not reach the authored asset.
                     var originalLevel = stage.UnitsData[0].level;
                     var originalFirstSkill = stage.UnitsData[0].set?.a1;
@@ -223,7 +256,8 @@ public static class PocketStrikerBattleModeValidation
                     Require(unchanged, "Runtime mutation changed the source of stage " + number);
                     report.stages.Add(new StageResult
                     {
-                        stage = number, mode = expectedFightMode.ToString(), enemyCount = stage.UnitsData.Count,
+                        stage = number, sourceAssetPath = source.path, mode = expectedFightMode.ToString(), enemyCount = stage.UnitsData.Count,
+                        enemyHpRate = stage.team2HpRate, enemyDreamRate = stage.dreamComboAIRateNum,
                         level = stage.stageRefLevel, sourceUnchanged = unchanged
                     });
                     report.stagesChecked++;

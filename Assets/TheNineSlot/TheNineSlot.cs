@@ -280,10 +280,24 @@ namespace mainMenu
             List<SkillStoneSlot> returnValue = new List<SkillStoneSlot>();
             foreach (var slot in AllSlot)
             {
+                slot._cell.UpdateMyItem();
                 if (slot._cell.GetItem() == null && slot._cell.gameObject.activeSelf)
                     returnValue.Add(slot);
             }
             return returnValue;
+        }
+
+        public SkillStoneSlot GetTutorialPlacementSlot(int spLevel)
+        {
+            var empty = GetEmptySlots();
+            // Start the normal skill in the first column. Prefer the combo
+            // columns for EX so the example retains a legal normal opener.
+            foreach (var slot in empty)
+                if ((slot.num - 1) % 3 == (spLevel == 0 ? 0 : 1)) return slot;
+            if (spLevel > 0)
+                foreach (var slot in empty)
+                    if ((slot.num - 1) % 3 != 0) return slot;
+            return empty.Count > 0 ? empty[0] : null;
         }
 
         private Action _extraOnNineSlotChanged;

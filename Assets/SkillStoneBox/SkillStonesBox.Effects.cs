@@ -9,6 +9,7 @@ namespace mainMenu
     public partial class SkillStonesBox : MonoBehaviour
     {
         private int focusingExType;
+        public int SelectedSpLevel => focusingExType;
         bool exTabsInitialized;
         Camera tabEffectCamera;
         int FocusingExType

@@ -32,7 +32,7 @@ public static class PocketStrikerGroupFormationValidation
         public List<string> emittedRingSizes = new List<string>();
         public List<string> observations = new List<string>();
         public List<string> errors = new List<string>();
-        public string scope = "Real FightScene's two 30-point formations through BattleFormationPlacement.Build: original 24/30 positions, 36/48/72/100 expanded teams, yaw/translation/scale, front edge, spacing, opposing teams, deterministic retry and unchanged source. Local human body spacing comes from native BO_Limb colliders; complete visible meshes including weapons/wings determine arena capacity. Actual BoundaryControlByGod adapts radius, sensor, ring and a local native battlefield prefab and restores ordinary size.";
+        public string scope = "Real FightScene's two 30-point formations through BattleFormationPlacement.Build: selectable 12/24/48 teams, original 30 positions and extra 36/72/100 stress counts; yaw/translation/scale, front edge, spacing, opposing teams, deterministic retry and unchanged source. Local human body spacing comes from native BO_Limb colliders; complete visible meshes including weapons/wings determine arena capacity. Actual BoundaryControlByGod adapts radius, sensor, ring and a local native battlefield prefab and restores ordinary size for all three count options.";
         public string limitation = "Stopped-editor geometry and capacity fixture. Does not initialize combat, account, Addressables or AI. Runtime start placement, live animations and 100v100 performance are covered by the separate production Play-mode smoke.";
     }
 
@@ -115,7 +115,7 @@ public static class PocketStrikerGroupFormationValidation
                     + ", front=" + z.Max() + ", back=" + z.Min() + ", minimum center spacing=" + MinimumSpacing(authored[team]) + ".");
             }
 
-            foreach (int count in new[] { 24, 30, 36, 48, 72, 100 })
+            foreach (int count in new[] { 12, 24, 30, 36, 48, 72, 100 })
             foreach (float spacing in new[] { 1f, 1.4f, 2f })
             {
                 var pair = new Pose[2][];
@@ -145,7 +145,7 @@ public static class PocketStrikerGroupFormationValidation
         {
             if (scene.IsValid()) EditorSceneManager.ClosePreviewScene(scene);
             BoundaryControlByGod.target = oldBoundary; BoundaryControlByGod._BattleRingRadius = oldRadius;
-            report.passed = report.errors.Count == 0 && report.formationCases == 40 && report.pairedCases == 18
+            report.passed = report.errors.Count == 0 && report.formationCases == 46 && report.pairedCases == 21
                 && report.localModels >= 3 && report.arenaCases >= 3 && report.ringParticleCases >= 8;
             File.WriteAllText(Output, JsonUtility.ToJson(report, true));
         }
@@ -302,7 +302,7 @@ public static class PocketStrikerGroupFormationValidation
         {
             float maxSpacing = report.footprints.Max(model => model.spacing);
             float maxPadding = report.footprints.Max(model => model.radialPadding);
-            foreach (int count in new[] { 24, 72, 100 })
+            foreach (int count in new[] { 12, 24, 48 })
             {
                 // Independent corner calculation validates the capacity overload,
                 // including mesh overhang, rather than comparing it to itself.

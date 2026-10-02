@@ -19,23 +19,23 @@ MonoBehaviour:
     r_id: 1
     level: 1
     set:
-      a1: 125
+      a1: 5
       a2: 27
-      a3: 159
+      a3: 10
       b1: 68
-      b2: 113
-      b3: 176
-      c1: 5
+      b2: 58
+      b3: 99
+      c1: 53
       c2: 95
-      c3: 58
-  team1HpRate: 1
-  team2HpRate: 1
+      c3: 80
+  team1HpRate: 1.5
+  team2HpRate: 0.55
   team1CGMode: 0
   team2CGMode: 0
   team1Mode: 2
   team2Mode: 2
   team1AIMode: 0
   team2AIMode: 1
-  dumbAIDecisionDelay: 20
+  dumbAIDecisionDelay: 45
   dreamComboAIRateNum: 0
   stageRefLevel: 1

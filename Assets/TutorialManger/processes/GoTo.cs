@@ -62,6 +62,6 @@ public class GoTo : TutorialProcess
         {
             return false;
         }
-        return ProcessesRunner.Main.currentProcess.Step == _goto;
+        return ProcessesRunner.Main.currentProcess.Step == _goto && ProcessesRunner.Main.currentProcess.GetLoaded();
     }
 }

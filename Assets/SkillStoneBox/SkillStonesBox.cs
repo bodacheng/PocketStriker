@@ -35,10 +35,25 @@ namespace mainMenu
 
         public void TutorialSimpleMode()
         {
-            closeCheckBox.gameObject.SetActive(false);
-            nearCheckBox.gameObject.SetActive(false);
-            farCheckBox.gameObject.SetActive(false);
-            showAllMyStoneLevel.gameObject.SetActive(false);
+            SetTutorialSimpleMode(true);
+        }
+
+        public void SetTutorialSimpleMode(bool on)
+        {
+            if (on)
+            {
+                // A hidden remembered range filter must not hide the stones that
+                // the tutorial asks a returning/new account to equip.
+                var filtered = closeCheckBox.isOn || nearCheckBox.isOn || farCheckBox.isOn;
+                closeCheckBox.SetIsOnWithoutNotify(false);
+                nearCheckBox.SetIsOnWithoutNotify(false);
+                farCheckBox.SetIsOnWithoutNotify(false);
+                if (filtered) RestFilter();
+            }
+            closeCheckBox.gameObject.SetActive(!on);
+            nearCheckBox.gameObject.SetActive(!on);
+            farCheckBox.gameObject.SetActive(!on);
+            showAllMyStoneLevel.gameObject.SetActive(!on);
         }
 
         void Awake()

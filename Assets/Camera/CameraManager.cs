@@ -4,8 +4,19 @@ using MCombat.Shared.Camera;
 [UnityEngine.DefaultExecutionOrder(1000)]
 public class CameraManager : CameraManagerCore
 {
+    readonly BattleShadowCoverage _shadowCoverage = new BattleShadowCoverage();
     public AllUnitsBattleCamera CurrentBattleCamera => CurrentMode as AllUnitsBattleCamera;
     protected override bool ReenterSameModeOnAssign => CurrentMode is not AllUnitsBattleCamera;
+
+    protected override void LateUpdate()
+    {
+        base.LateUpdate();
+        _shadowCoverage.Update(mainCamera, CurrentBattleCamera?.ShadowReceiverDistance ?? 0,
+            UnityEngine.Time.unscaledDeltaTime);
+    }
+
+    void OnDisable() => _shadowCoverage.Dispose();
+    void OnDestroy() => _shadowCoverage.Dispose();
 
     protected override IDictionary<C_Mode, CameraModeCore> CreateModeDictionary()
     {

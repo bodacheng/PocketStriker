@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using mainMenu;
 using UnityEngine;
+using DummyLayerSystem;
 
 public class TutorialRunner
 {
@@ -29,8 +30,6 @@ public class TutorialRunner
     
     void GenerateStep1Tutorial()
     {
-        var goToUnitList = new GoTo(MainSceneStep.UnitList);
-        var openSkillEdit = new OpenSkillEdit("3");
         var skillEditTry = new SkillEditTry("openInstruction1");
         //var explainCombo = new ExplainCombo();
         _tutorialProcesses.Clear();
@@ -85,7 +84,7 @@ public class TutorialRunner
         if (ProcessesRunner.Main.currentProcess == null || ProcessesRunner.Main.currentProcess.Step != MainSceneStep.UnitList)
         {
             MainMenuNote.GoingTo = MainSceneStep.UnitList;
-            PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+            PreScene.target.trySwitchToStep(MainSceneStep.UnitList, false);
         }
         
         var openSkillEdit = new OpenSkillEdit("1");
@@ -102,7 +101,8 @@ public class TutorialRunner
         if (ProcessesRunner.Main.currentProcess == null || ProcessesRunner.Main.currentProcess.Step != MainSceneStep.FrontPage)
         {
             ReturnLayer.Stack(MainSceneStep.FrontPage, (x)=> PreScene.target.trySwitchToStep(x, false));
-            PreScene.target.trySwitchToStep(MainMenuNote.GoingTo, false);
+            MainMenuNote.GoingTo = MainSceneStep.FrontPage;
+            PreScene.target.trySwitchToStep(MainSceneStep.FrontPage, false);
         }
         
         var goTo = new GoTo(MainSceneStep.QuestInfo);
@@ -190,6 +190,8 @@ public class TutorialRunner
                 break;
             case "Finished":
                 PlayFabReadClient.DontShowFrontFight = "True";
+                UILayerLoader.Get<LowerMainBar>()?.RestoreAfterTutorial();
+                UILayerLoader.Get<UpperInfoBar>()?.SetInteractive(true);
                 break;
             default:
                 break;

@@ -146,5 +146,11 @@ public class LowerMainBar : UILayer
         stoneTab.Indicator.SetActive(false);
         gotchaTab.Indicator.SetActive(false);
     }
+
+    public void RestoreAfterTutorial()
+    {
+        foreach (var icon in icons) icon.BOButton.interactable = true;
+        CloseIndicators();
+    }
     #endregion
 }

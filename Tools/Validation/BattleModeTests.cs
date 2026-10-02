@@ -18,6 +18,7 @@ internal static class BattleModeTests
             Check(args.Length == 1, "stage-mode table path supplied");
             CheckAdventureTable(args[0]);
             CheckAdventureTeams();
+            CheckEvolutionHpRates();
             CheckNavigation();
             CheckBossRewards();
             Console.WriteLine("PASS: " + checks + " battle mode checks");
@@ -101,6 +102,23 @@ internal static class BattleModeTests
                 Check(AdventureModeRules.IsValidHeroCount(stage, false, valid), "squad accepts one to three owned heroes");
             foreach (int invalid in new[] { -1, 0, 4, int.MaxValue })
                 Check(!AdventureModeRules.IsValidHeroCount(stage, false, invalid), "squad rejects empty or oversized teams");
+        }
+    }
+
+    static void CheckEvolutionHpRates()
+    {
+        foreach (float rate in new[] { 0.4f, 0.55f, 0.7f, 0.8f, 1f, 1.25f, 1.5f, 2f, 3f, 4f })
+        {
+            for (int member = 0; member < 4; member++)
+            {
+                Check(AdventureModeRules.GetRotationMemberHpRate(rate, false, member) == rate,
+                    "ordinary rotation preserves each team's configured HP rate");
+                float evolution = AdventureModeRules.GetRotationMemberHpRate(rate, true, member);
+                Check(evolution == (member < 3 ? Math.Min(rate, 1f) : rate),
+                    "evolution applies early reductions and reserves boss bonuses for the last opponent");
+                Check(rate >= 1 || evolution < 1,
+                    "reduced evolution HP is never silently replaced with a full-health enemy");
+            }
         }
     }
 

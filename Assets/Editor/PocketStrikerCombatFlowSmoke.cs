@@ -17,10 +17,11 @@ using UnityEngine.SceneManagement;
 
 /// <summary>Runs killable production Group battles through countdown, elimination and results.</summary>
 [InitializeOnLoad]
-public static class PocketStrikerCombatFlowSmoke
+public static partial class PocketStrikerCombatFlowSmoke
 {
     const string Key = "PocketStriker.CombatFlowSmoke";
-    static string Output => SessionState.GetBool(Key + ".EvolutionHeal", false) ? "Logs/Evolution/Playmode"
+    static string Output => SessionState.GetBool(Key + ".TutorialBalance", false) ? "Logs/Tutorial/Balance"
+        : SessionState.GetBool(Key + ".EvolutionHeal", false) ? "Logs/Evolution/Playmode"
         : SessionState.GetBool(Key + ".StoryFailures", false) ? "Logs/AIStory/Playmode" : "Logs/CombatFlow/Playmode";
     const string Account = "local-combat-flow-smoke";
     static readonly BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
@@ -52,6 +53,7 @@ public static class PocketStrikerCombatFlowSmoke
         public bool cancelledEvolutionChoice;
         public int evolutionSkillRecalculations;
         public int evolutionHealthBarChecks;
+        public int evolutionEnemyHpChecks;
         public bool evolutionFinalDefeatHeal;
         public bool normalRotationHealthUnchanged;
         public bool deadPlayerNotRevived;
@@ -83,6 +85,10 @@ public static class PocketStrikerCombatFlowSmoke
         public bool resultPreservesWinner;
         public bool resultLocalWinnerContract;
         public string storyFault;
+        public float playerRemainingHpFraction;
+        public float playerMaxHp;
+        public float playerHpRate;
+        public float enemyHpRate;
         public bool resultWhileStoryPending;
     }
 
@@ -94,6 +100,7 @@ public static class PocketStrikerCombatFlowSmoke
     [MenuItem("PocketStriker/Validation/Combat Flow Playmode Smoke")]
     public static void StartBatch()
     {
+        SessionState.SetBool(Key + ".TutorialBalance", false);
         SessionState.SetBool(Key + ".EvolutionHeal", false);
         SessionState.SetBool(Key + ".StoryFailures", false);
         Begin();
@@ -102,6 +109,7 @@ public static class PocketStrikerCombatFlowSmoke
     [MenuItem("PocketStriker/Validation/AI Story Failure Playmode Smoke")]
     public static void StartStoryFailureBatch()
     {
+        SessionState.SetBool(Key + ".TutorialBalance", false);
         SessionState.SetBool(Key + ".EvolutionHeal", false);
         SessionState.SetBool(Key + ".StoryFailures", true);
         Begin();
@@ -110,6 +118,7 @@ public static class PocketStrikerCombatFlowSmoke
     [MenuItem("PocketStriker/Validation/Evolution Heal Playmode Smoke")]
     public static void StartEvolutionHealBatch()
     {
+        SessionState.SetBool(Key + ".TutorialBalance", false);
         SessionState.SetBool(Key + ".EvolutionHeal", true);
         SessionState.SetBool(Key + ".StoryFailures", false);
         Begin();
@@ -143,6 +152,8 @@ public static class PocketStrikerCombatFlowSmoke
         gameViewType.GetMethod("SetCustomResolution", PrivateInstance)?.Invoke(view,
             new object[] { new Vector2(540, 960), "PocketStriker Combat Flow Smoke" });
         Attach();
+        AssetDatabase.DisallowAutoRefresh();
+        SessionState.SetBool(Key + ".RefreshLocked", true);
         EditorSceneManager.OpenScene(EditorBuildSettings.scenes.First(scene => scene.enabled).path, OpenSceneMode.Single);
         EditorApplication.isPlaying = true;
     }
@@ -202,9 +213,17 @@ public static class PocketStrikerCombatFlowSmoke
             // Validation must not rewrite the user's persistent skill-analysis data.
             FightGlobalSetting.HitBoxLogger = false;
             Directory.CreateDirectory(Output);
-            if (!SessionState.GetBool(Key + ".EvolutionHeal", false)) ValidateSaturatedQuery();
+            if (!SessionState.GetBool(Key + ".EvolutionHeal", false) && !SessionState.GetBool(Key + ".TutorialBalance", false)) ValidateSaturatedQuery();
             var manager = new ArcadeModeManager();
             await manager.Initialize().Timeout(TimeSpan.FromSeconds(30));
+            if (SessionState.GetBool(Key + ".TutorialBalance", false))
+            {
+                report.scope = "Published tutorial stages 1 and 2, three seeded level-1 samples covering two legal human loadouts each, real AI/animation/damage/death/countdown/results. Stage HP/AI settings remain exactly as authored; no invincibility, manual deaths or damage/stat injection.";
+                report.limitation = "Local Self event isolates account, story and reward services. Legal fixtures cover haruka and adam with his native skill; the remote starter inventory is not available as an authoritative repository fixture. Auto battle provides a repeatable difficulty baseline, not a guarantee for every player skill set or device.";
+                await ValidateTutorialBalance(manager);
+                report.passed = true;
+                return;
+            }
             var authored = await manager.LoadStage(4).Timeout(TimeSpan.FromSeconds(30));
             Require(authored is GangbangInfo && authored.UnitsData.Count > 0, "Registered Group stage 4 did not load.");
             var leader = authored.UnitsData[0].DeepCopy();
@@ -376,10 +395,10 @@ public static class PocketStrikerCombatFlowSmoke
         return fight;
     }
 
-    static async UniTask RunBattle(GangbangInfo fight, string name, bool inScene)
+    static async UniTask RunBattle(FightInfo fight, string name, bool inScene)
     {
         var item = new Case { name = name, team1 = fight.FightMembers.HeroSets.Count,
-            team2 = fight.FightMembers.EnemySets.Count };
+            team2 = fight.FightMembers.EnemySets.Count, playerHpRate = fight.team1HpRate, enemyHpRate = fight.team2HpRate };
         report.cases.Add(item);
         var hp = new Dictionary<Data_Center, float>();
         var beforeManager = RTFightManager.Target;
@@ -438,6 +457,7 @@ public static class PocketStrikerCombatFlowSmoke
                     Require(units.All(unit => !unit.FightDataRef.Invincible), name + " contains an invincible fighter.");
                 }
                 item.fightingFrames++;
+                item.playerMaxHp = manager.team1.teamMembers.mDict.Values.First().FightDataRef.MaxHp;
                 foreach (var unit in units)
                 {
                     float current = unit.FightDataRef.CurrentHp.Value;
@@ -497,6 +517,9 @@ public static class PocketStrikerCombatFlowSmoke
                         Require(unit.Sensor.GetEnemiesByDistance(false).Count == 0,
                             "The winning team's cached target list retained eliminated opponents.");
                 }
+                item.playerRemainingHpFraction = manager.team1.teamMembers.mDict.Values
+                    .Where(unit => !unit.FightDataRef.IsDead.Value)
+                    .Select(unit => unit.FightDataRef.CurrentHp.Value / unit.FightDataRef.MaxHp).DefaultIfEmpty(0).Max();
                 item.battleSeconds = Time.realtimeSinceStartup - fightingStart;
                 item.finalEnemySeconds = finalEnemyStart < 0 ? 0 : Time.realtimeSinceStartup - finalEnemyStart;
                 item.deathCount = units.Count(unit => unit.FightDataRef.IsDead.Value);
@@ -523,7 +546,7 @@ public static class PocketStrikerCombatFlowSmoke
                 await UniTask.WaitUntil(() => storyCase ? UnityEngine.Object.FindFirstObjectByType<ArenaFightOver>() != null
                     : UnityEngine.Object.FindFirstObjectByType<CommonFightResult>() != null)
                     .Timeout(TimeSpan.FromSeconds(15));
-                if (item.team2 == 1)
+                if (fight is GangbangInfo && item.team2 == 1)
                     Require(winner == manager.team1.teamConfig.myTeam && item.oneEnemyFrames > 0 && item.oneEnemyAcquiredFrames > 0,
                         "The sparse last-enemy battle did not acquire and eliminate its only enemy.");
                 Debug.Log("[CombatFlowSmoke] " + name + " PASS: damage=" + item.damageEvents + ", deaths=" + item.deathCount
@@ -550,6 +573,7 @@ public static class PocketStrikerCombatFlowSmoke
             fight.Team1ID = Account; fight.Team2ID = Account + "-enemy";
             fight.battleGroundID = 0;
             fight.team1HpRate = 1.7f;
+            fight.team2HpRate = evolution ? 2f : 1f;
             fight.FightMembers = new FightMembers();
             var hero = leader.DeepCopy(); hero.id = "0";
             fight.FightMembers.HeroSets.Set(0, 0, hero);
@@ -575,6 +599,14 @@ public static class PocketStrikerCombatFlowSmoke
             float expected = SkillSet.INI_Hp(hero.UnitInfo.set.SkillIDList(), hero.UnitInfo.level) * FightLoad.Fight.team1HpRate;
             Require(expected > 0 && Mathf.Approximately(hero.FightDataRef.MaxHp, expected)
                 && Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, expected), "Initial MaxHp lost the configured team HP multiplier.");
+            foreach (var enemy in manager.team2.teamMembers.mDict.Values)
+            {
+                float rate = fight.EvolutionMode && int.Parse(enemy.UnitInfo.id) < 3 ? 1f : fight.team2HpRate;
+                float enemyExpected = SkillSet.INI_Hp(enemy.UnitInfo.set.SkillIDList(), enemy.UnitInfo.level) * rate;
+                Require(Mathf.Approximately(enemy.FightDataRef.MaxHp, enemyExpected),
+                    "Evolution's opening enemies inherited the final opponent's HP bonus: " + enemy.UnitInfo.id);
+                report.evolutionEnemyHpChecks++;
+            }
             return hero;
         }
 
@@ -789,6 +821,11 @@ public static class PocketStrikerCombatFlowSmoke
         if (settings != null) settings.ActivePlayModeDataBuilderIndex = SessionState.GetInt(Key + ".Builder", 0);
         if (SessionState.GetBool(Key + ".HadAuto", false)) PlayerPrefs.SetInt("auto", SessionState.GetInt(Key + ".Auto", 0));
         else PlayerPrefs.DeleteKey("auto");
+        if (SessionState.GetBool(Key + ".RefreshLocked", false))
+        {
+            SessionState.SetBool(Key + ".RefreshLocked", false);
+            AssetDatabase.AllowAutoRefresh();
+        }
         Debug.Log("[CombatFlowSmoke] " + (report.passed ? "PASS" : "FAIL") + ": " + Path.GetFullPath(Path.Combine(Output, "report.json")));
         if (!report.passed) Debug.LogError(string.Join("\n", report.errors));
         if (Application.isBatchMode) EditorApplication.Exit(report.passed ? 0 : 1);

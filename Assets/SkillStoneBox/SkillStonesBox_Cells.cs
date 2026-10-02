@@ -167,6 +167,23 @@ namespace mainMenu
             return null;
         }
 
+        public StoneCell GetVisibleStoneCell(int spLevel)
+        {
+            foreach (var cell in _cells)
+            {
+                if (cell == null || !cell.gameObject.activeSelf) continue;
+                cell.UpdateMyItem();
+                var item = cell.GetItem();
+                if (item != null && item._SkillConfig != null && item._SkillConfig.SP_LEVEL == spLevel)
+                {
+                    var viewport = scrollRect.viewport != null ? scrollRect.viewport : (RectTransform)scrollRect.transform;
+                    var rect = (RectTransform)cell.transform;
+                    if (viewport.rect.Contains(viewport.InverseTransformPoint(rect.TransformPoint(rect.rect.center)))) return cell;
+                }
+            }
+            return null;
+        }
+
         public void ReturnStoneToBox(SKStoneItem item)
         {
             if (item._SkillConfig.SP_LEVEL == FocusingExType)

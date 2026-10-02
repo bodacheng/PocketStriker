@@ -20,11 +20,11 @@ MonoBehaviour:
     level: 1
     set:
       a1: 5
-      a2: 113
+      a2: 53
       a3: 10
       b1: 68
       b2: 58
-      b3: 184
+      b3: 95
       c1: 99
       c2: 27
       c3: 80
@@ -33,21 +33,22 @@ MonoBehaviour:
     level: 1
     set:
       a1: 53
-      a2: 113
+      a2: 5
       a3: 27
-      b1: 90
+      b1: 68
       b2: 10
       b3: 99
       c1: 95
       c2: 58
       c3: 80
-  team1HpRate: 1
-  team2HpRate: 0.7
+  team1HpRate: 1.5
+  team2HpRate: 0.4
   team1CGMode: 0
   team2CGMode: 0
   team1Mode: 2
   team2Mode: 2
   team1AIMode: 0
   team2AIMode: 1
-  dumbAIDecisionDelay: 10
+  dumbAIDecisionDelay: 30
+  dreamComboAIRateNum: 0
   stageRefLevel: 1

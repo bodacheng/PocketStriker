@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using DummyLayerSystem;
 using mainMenu;
-using PlayFab.ClientModels;
 
 public class TryGotcha : TutorialProcess
 {
@@ -9,6 +7,7 @@ public class TryGotcha : TutorialProcess
     private GotchaResultLayer gotchaResultLayer;
     private LowerMainBar _lowerMainBar;
     private ReturnLayer returnLayer;
+    private GotchaFront _gotchaFront;
     
     public override void LocalUpdate()
     {
@@ -17,24 +16,14 @@ public class TryGotcha : TutorialProcess
             gotchaLayer = UILayerLoader.Get<GotchaLayer>();
             if (gotchaLayer != null)
             {
-                var gotchaFront  = (GotchaFront)ProcessesRunner.Main.GetProcess(MainSceneStep.GotchaFront);
-                gotchaFront.SetExtraSuccessAction(
+                _gotchaFront = (GotchaFront)ProcessesRunner.Main.GetProcess(MainSceneStep.GotchaFront);
+                _gotchaFront.SetExtraSuccessAction(
                     (x) =>
                     {
-                        PlayFabReadClient.UpdateUserData(
-                            new UpdateUserDataRequest()
-                            {
-                                Data = new Dictionary<string, string>()
-                                {
-                                    { "TutorialProgress", "GotchaFinished" }
-                                }
-                            },
-                            () =>
-                            {
-                                PlayerAccountInfo.Me.tutorialProgress = "GotchaFinished";
-                                x.Invoke();
-                            }
-                        );
+                        PlayFabReadClient.RememberPendingTutorialProgress("GotchaFinished");
+                        PlayerAccountInfo.Me.tutorialProgress = "GotchaFinished";
+                        SkillEditTry.SaveProgress("GotchaFinished");
+                        x.Invoke();
                     }
                 );
             }
@@ -70,5 +59,6 @@ public class TryGotcha : TutorialProcess
     
     public override void ProcessEnd()
     {
+        _gotchaFront?.SetExtraSuccessAction(null);
     }
 }

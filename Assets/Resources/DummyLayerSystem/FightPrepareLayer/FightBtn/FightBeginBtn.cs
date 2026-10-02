@@ -34,12 +34,12 @@ public class FightBeginBtn : MonoBehaviour
     public void Enable(bool on, bool guide = false)
     {
         btn.interactable = on;
-        _guide = guide;
-        if (_preparationSkin != null) _preparationSkin.SetGuide(guide);
+        _guide = guide && on;
+        if (_preparationSkin != null) _preparationSkin.SetGuide(_guide);
         else
         {
             animator.SetBool("On", on);
-            animator.SetBool("Guide", guide);
+            animator.SetBool("Guide", _guide);
         }
     }
 }

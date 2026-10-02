@@ -19,14 +19,20 @@ namespace mainMenu
         public void ValidationWarn(SkillSet.SkillEditError skillEditError)
         {
             confirmBtnColorSwapper.ChangeColor(skillEditError == SkillSet.SkillEditError.Perfect ? new Color(0.96f, 0.78f, 0.43f) : Color.white);
-            validationWarn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished");
+            // New players also need the reason when a filled set is illegal.
+            // The staged drag instructions explain ordinary empty slots.
+            validationWarn.gameObject.SetActive(PlayerAccountInfo.Me.tutorialProgress == "Finished"
+                || skillEditError == SkillSet.SkillEditError.UnBalanced
+                || skillEditError == SkillSet.SkillEditError.RepeatedSkill
+                || skillEditError == SkillSet.SkillEditError.NoNormalStart
+                || skillEditError == SkillSet.SkillEditError.NoAtLeastTwoEx);
             normalSkillIndicator.gameObject.SetActive(false);
             overHeatIndicator.gameObject.SetActive(skillEditError == SkillSet.SkillEditError.UnBalanced);
             switch(skillEditError)
             {
-                // case SkillSet.SkillEditError.RepeatedSkill:
-                //     validationWarn.text = Translate.Get("CantEquipSameSkill");
-                // break;
+                case SkillSet.SkillEditError.RepeatedSkill:
+                    validationWarn.text = Translate.Get("CantEquipSameSkill");
+                    break;
                 case SkillSet.SkillEditError.UnBalanced:
                     validationWarn.text = Translate.Get("UnBalanced");
                     break;

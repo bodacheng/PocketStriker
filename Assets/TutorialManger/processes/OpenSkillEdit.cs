@@ -31,7 +31,8 @@ public class OpenSkillEdit : TutorialProcess
     
     public override bool CanEnterOtherProcess()
     {
-        return ProcessesRunner.Main.currentProcess.Step == MainSceneStep.UnitSkillEdit;
+        var process = ProcessesRunner.Main.currentProcess;
+        return process != null && process.Step == MainSceneStep.UnitSkillEdit && process.GetLoaded();
     }
     
     public override void LocalUpdate()

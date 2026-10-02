@@ -32,8 +32,23 @@ public static class PocketStrikerRenderingValidation
     {
         var errors = new List<string>();
         ValidateOffscreen(errors);
+        PocketStrikerShadowCoverageValidation.ValidateOffscreen(errors);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join("\n", errors));
         Debug.Log("POCKETSTRIKER_RENDERING_FIXTURE_PASSED: colored material clone, independent realtime lighting and shadow-only proxy. " + Path.GetFullPath(OutputDirectory));
+    }
+
+    public static void ValidateBatch()
+    {
+        try
+        {
+            Validate();
+            EditorApplication.Exit(0);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            EditorApplication.Exit(1);
+        }
     }
 
     // Called from startup smoke after the fighters and the battleground are ready.
@@ -94,8 +109,17 @@ public static class PocketStrikerRenderingValidation
             if (groundCamera == null || !groundCamera.GetUniversalAdditionalCameraData().renderShadows)
                 report.errors.Add("Ground camera does not render shadows.");
         }
-        if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset pipeline && !pipeline.supportsMainLightShadows)
-            report.errors.Add("Active URP quality disables the ground's directional shadows.");
+        if (GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset pipeline)
+        {
+            if (!pipeline.supportsMainLightShadows)
+                report.errors.Add("Active URP quality disables the ground's directional shadows.");
+            var manager = UnityEngine.Object.FindFirstObjectByType<CameraManager>();
+            float required = manager?.CurrentBattleCamera?.ShadowReceiverDistance ?? 0;
+            float visible = pipeline.shadowDistance * (1 - pipeline.cascadeBorder);
+            report.observations.Add($"Ground shadow receiver range={required} fully-shadowed range={visible} atlas={pipeline.mainLightShadowmapResolution}");
+            if (required > 0 && visible + .01f < required)
+                report.errors.Add("Battle camera moved fielded fighters or their ground receivers into the shadow fade/outside shadow range.");
+        }
         FinishReport(report, "live-fight.json");
         errors.AddRange(report.errors);
     }

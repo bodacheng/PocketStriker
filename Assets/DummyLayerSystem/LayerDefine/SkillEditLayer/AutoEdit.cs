@@ -11,6 +11,21 @@ public partial class SkillEditLayer : UILayer
         var unitConfig = Units.GetUnitConfig(info.r_id);
         var now = nineSlot.GetCurrentNineAndTwo();
         var targetSkillSet = SkillSet.FixSkillSet(unitConfig.TYPE, now, true, info.id);
+        if (PlayerAccountInfo.Me.tutorialProgress != "Finished"
+            && (targetSkillSet == null || CheckTutorialSkillSet(targetSkillSet) != SkillSet.SkillEditError.Perfect))
+        {
+            // Auto Fill preserves occupied cells. It cannot repair overload in
+            // a full tutorial set, although the guide asks the player to use it.
+            // Build a legal replacement from owned stones before clearing anything.
+            targetSkillSet = null;
+            var originSkillInfo = Stones.GetOriginSkillOfUnit(info.id);
+            for (int attempt = 0; attempt < 12 && targetSkillSet == null; attempt++)
+            {
+                var candidate = SkillSet.RandomSkillSet(unitConfig.TYPE, originSkillInfo?.SkillId, true);
+                if (candidate != null && CheckTutorialSkillSet(candidate) == SkillSet.SkillEditError.Perfect)
+                    targetSkillSet = candidate;
+            }
+        }
         
         if (targetSkillSet == null)
         {
@@ -19,9 +34,15 @@ public partial class SkillEditLayer : UILayer
         }
         else
         {
+            // Apply the complete validated tutorial plan, including replacement
+            // of already occupied invalid skills.
+            if (PlayerAccountInfo.Me.tutorialProgress != "Finished") ForceClearAll();
             Finish(info, targetSkillSet);
         }
     }
+
+    static SkillSet.SkillEditError CheckTutorialSkillSet(SkillSet set) => SkillSet.CheckEdit(
+        set.a1, set.a2, set.a3, set.b1, set.b2, set.b3, set.c1, set.c2, set.c3, true);
     
     void RandomAll()
     {
@@ -34,7 +55,7 @@ public partial class SkillEditLayer : UILayer
         Finish(info, targetSkillSet);
     }
 
-    void Finish(UnitInfo info, SkillSet targetSkillSet)
+    protected virtual void Finish(UnitInfo info, SkillSet targetSkillSet)
     {
         AddRandomStoneToSlot(info.id, 1, targetSkillSet.a1);
         AddRandomStoneToSlot(info.id, 2, targetSkillSet.a2);
@@ -45,6 +66,11 @@ public partial class SkillEditLayer : UILayer
         AddRandomStoneToSlot(info.id, 7, targetSkillSet.c1);
         AddRandomStoneToSlot(info.id, 8, targetSkillSet.c2);
         AddRandomStoneToSlot(info.id, 9, targetSkillSet.c3);
+        RefreshAutoFillPresentation();
+    }
+
+    protected virtual void RefreshAutoFillPresentation()
+    {
         nineSlot.NineSlotsStatusRefresh();
         stonesBox.RestFilter();
     }
@@ -79,6 +105,11 @@ public partial class SkillEditLayer : UILayer
         }
         
         var skillConfig = SkillConfigTable.GetSkillConfigByRecordId(skillID);
+        PlayAutoFillSlotEffect(targetSlot, skillConfig);
+    }
+
+    protected virtual void PlayAutoFillSlotEffect(int targetSlot, Skill.SkillConfig skillConfig)
+    {
         stonesBox._tabEffects.SkillButtonExplosion(skillConfig.SP_LEVEL,
             PosCal.GetWorldPos(PreScene.target.postProcessCamera, 
                 nineSlot.AllSlot[targetSlot - 1]._cell.GetComponent<RectTransform>(), 
