@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -32,8 +33,58 @@ internal static class DownloadTests
         checks++;
     }
 
+    static void CheckDownloadText()
+    {
+        var examples = new Dictionary<long, string>
+        {
+            [0] = "0 B",
+            [1] = "1 B",
+            [1023] = "1023 B",
+            [1024] = "1 KB",
+            [1075] = "1 KB",
+            [1076] = "1.1 KB",
+            [51200] = "50 KB",
+            [52428] = "51.2 KB",
+            [1048575] = "1024 KB",
+            [1048576] = "1 MB",
+            [1572864] = "1.5 MB",
+            [1073741823] = "1024 MB",
+            [1073741824] = "1 GB",
+            [1610612736] = "1.5 GB",
+        };
+        foreach (var example in examples)
+            Check(PocketStrikerDownloadText.FormatSize(example.Key) == example.Value,
+                $"download size {example.Key} bytes displays as {example.Value}");
+        Check(Enumerable.Range(1, 1023).All(bytes => PocketStrikerDownloadText.FormatSize(bytes) == $"{bytes} B"),
+            "every positive size below one KB remains visibly nonzero");
+
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            Check(PocketStrikerDownloadText.FormatSize(52428) == "51.2 KB"
+                && PocketStrikerDownloadText.FormatSize(1572864) == "1.5 MB",
+                "download sizes retain a stable decimal separator across device cultures");
+        }
+        finally { CultureInfo.CurrentCulture = originalCulture; }
+
+        foreach (var language in new[] { SystemLanguage.Chinese, SystemLanguage.Japanese, SystemLanguage.English })
+        {
+            var confirmation = PocketStrikerDownloadText.Confirmation(51200, language);
+            Check(confirmation.Contains("50 KB"), $"{language} confirmation shows the actual small download size");
+            Check(PocketStrikerDownloadText.Progress(40, 100, language)
+                == AddressablesResourcePolicy.DownloadProgressText(language) + "\n40 B / 100 B",
+                $"{language} progress uses readable units for transferred and required bytes");
+        }
+        Check(PocketStrikerDownloadText.Confirmation(1, SystemLanguage.Chinese).Contains("下载")
+            && PocketStrikerDownloadText.Confirmation(1, SystemLanguage.Japanese).Contains("ダウンロード")
+            && PocketStrikerDownloadText.Confirmation(1, SystemLanguage.English).IndexOf("download", StringComparison.OrdinalIgnoreCase) >= 0,
+            "download confirmation remains localized in Chinese, Japanese, and English");
+    }
+
     static async UniTask Run()
     {
+        CheckDownloadText();
         Addressables.InternalIdTransformFunc = location => "preserved:" + location.InternalId;
         Addressables.WebRequestOverride = request => request.headers["X-Existing"] = "retained";
         PocketStrikerDownloadPolicy.Configure();
@@ -53,6 +104,8 @@ internal static class DownloadTests
         var size = await PocketStrikerDependencyDownloader.GetWholeDownloadSize(new[] { "unit", "effect", "unit", null, "" });
         Check(size == 100 && Addressables.Sizes == 1 && Addressables.LastKeys.SequenceEqual(new[] { "unit", "effect" }),
             "combined size query normalizes labels and counts a shared bundle once");
+        Check(PocketStrikerDownloadText.Confirmation(size, SystemLanguage.Chinese).Contains("100 B"),
+            "a nonzero Addressables requirement produces a visibly nonzero confirmation");
         Check(UnityEngine.ResourceManagement.WebRequestQueue.MaxRequests == 4, "initialization restoring an old queue value is overridden");
         Check(Addressables.Releases == 1, "size inspection releases its operation");
 
@@ -75,7 +128,7 @@ internal static class DownloadTests
             "successful retry counts earlier cached bytes and reaches complete progress");
         Check(progress.Any(value => value > 0 && value < 1) && progress.Last() == 1,
             "byte progress is visible while the operation is pending and completes");
-        Check(text.Any(value => value.Contains("连接")) && text.Any(value => value.Contains("重试")) && text.Any(value => value.Contains("MB")),
+        Check(text.Any(value => value.Contains("连接")) && text.Any(value => value.Contains("重试")) && text.Any(value => value.Contains("100 B / 100 B")),
             "localized status distinguishes connection, automatic retry, and transferred bytes");
         Check(Addressables.Releases == Addressables.Sizes + Addressables.DownloadCalls, "success and failed handles are all released exactly once");
 
@@ -89,8 +142,13 @@ internal static class DownloadTests
 
         Addressables.Reset();
         Addressables.Cached = 100;
-        Check(await PocketStrikerDependencyDownloader.DownloadRequiredDependencies(new[] { "unit" }, null, SystemLanguage.English) && Addressables.DownloadCalls == 0,
+        Check(await PocketStrikerDependencyDownloader.GetWholeDownloadSize(new[] { "unit" }) == 0,
+            "a fully cached resource inspection returns exactly zero required bytes");
+        var cachedProgressCalls = 0;
+        Check(await PocketStrikerDependencyDownloader.DownloadRequiredDependencies(new[] { "unit" }, _ => cachedProgressCalls++, SystemLanguage.English) && Addressables.DownloadCalls == 0,
             "fully cached resources skip a download");
+        Check(cachedProgressCalls == 0 && PocketStrikerDependencyDownloader.RequiredBytes == 0,
+            "fully cached resources do not enter download progress");
         Check(await PocketStrikerDependencyDownloader.GetWholeDownloadSize(Array.Empty<string>()) == 0, "empty labels need no Addressables request");
 
         Addressables.Reset();

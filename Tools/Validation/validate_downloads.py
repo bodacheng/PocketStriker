@@ -44,6 +44,7 @@ def main():
             str(mono), str(compiler), "/nologo", "/langversion:9.0", f"/out:{executable}",
             f"/reference:{unitask}", f"/reference:{netstandard}",
             str(temporary_source), str(root / "Assets/Addressables/PocketStrikerDownloadPolicy.cs"),
+            str(root / "Assets/Addressables/PocketStrikerDownloadText.cs"),
             str(root / "Tools/Validation/DownloadTests.cs"),
         ], check=True, cwd=root)
         environment = os.environ.copy()

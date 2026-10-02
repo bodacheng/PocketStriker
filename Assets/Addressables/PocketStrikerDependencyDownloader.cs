@@ -153,7 +153,6 @@ public static class PocketStrikerDependencyDownloader
                 SystemLanguage.Japanese => "リソースサーバーに接続中...",
                 _ => "Connecting to resource server..."
             };
-        var text = AddressablesResourcePolicy.DownloadProgressText(language);
-        return $"{text}\n{DownloadedBytes / 1048576d:F1} / {RequiredBytes / 1048576d:F1} MB";
+        return PocketStrikerDownloadText.Progress(DownloadedBytes, RequiredBytes, language);
     }
 }
