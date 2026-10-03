@@ -62,10 +62,24 @@ public class FightInfo : ScriptableObject
     public int dreamComboAIRateNum = 5;
 
     // Group is a battle mechanism; Quest remains the progression/reward contract.
-    public bool IsGroupBattle => this is GangbangInfo || EventType == FightEventType.Gangbang;
+    public bool IsGroupBattle => BattleModeRules.AllowsGroupBattle(EventType)
+        && (this is GangbangInfo || EventType == FightEventType.Gangbang);
     public bool AllowsManualUnitControl => !IsGroupBattle;
     public bool ShouldForceAutoBattle => FightControlPolicy.ShouldForceAutoBattle(FightMode, EventType);
     public bool ShouldRunFirstQuestTutorial => FightControlPolicy.ShouldRunFirstQuestTutorial(FightMode, ID, EventType);
+
+    public void ApplyBattleModeRules()
+    {
+        var mode = BattleModeRules.ResolveMode(EventType, ID, ArcadeFightMode, IsGroupBattle, FightMode);
+        // Apply the flag directly: retrying Evolution must not generate enemies again.
+        evolutionMode = mode == FightMode.Evolve;
+        if (!BattleModeRules.AllowsModeSwitch(EventType))
+        {
+            team1Mode = team2Mode = mode == FightMode.Multi || mode == FightMode.Group
+                ? TeamMode.MultiRaid : TeamMode.Rotation;
+            ArcadeFightMode = BattleModeRules.GetPreparationMode(mode);
+        }
+    }
 
     public FightMode FightMode
     {
@@ -81,6 +95,7 @@ public class FightInfo : ScriptableObject
         }
         set
         {
+            if (!BattleModeRules.AllowsGroupBattle(EventType)) value = FightMode.Rotate;
             evolutionMode = value == FightMode.Evolve;
             if (value is FightMode.Multi or FightMode.Group)
             {
@@ -126,6 +141,7 @@ public class FightInfo : ScriptableObject
         get => evolutionMode;
         set
         {
+            if (!BattleModeRules.AllowsGroupBattle(EventType)) value = false;
             if (value)
             {
                 team1Mode = TeamMode.Rotation;

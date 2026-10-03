@@ -25,7 +25,7 @@ public static class PocketStrikerBattleCameraValidation
         public int modelBoundsCases;
         public int centerLagCases;
         public int profileCases;
-        public string scope = "Production BattleCameraFraming with perspective Camera.WorldToViewportPoint: complete AABB corners, portrait phone/tablet aspect ratios, safe-area/HUD usable rectangles, 25/45/60 degree field of view, production Duel32/Multi33/Group46 and 30/45/65/90 degree pitch, 0.5/1/2 fighter scale, narrow/split/tall/airborne/200-fighter layouts. Checks independent profiles and mixed-team routing, emergency expansion, gradual shrink, center lag, production target selection, safe-area/HUD exclusion and local model renderer bounds.";
+        public string scope = "Production BattleCameraFraming with perspective Camera.WorldToViewportPoint: complete AABB corners, portrait phone/tablet aspect ratios, safe-area/HUD usable rectangles, 25/45/60 degree field of view, Duel32/Multi33 and synthetic 46/30/45/65/90 degree pitch, 0.5/1/2 fighter scale, narrow/split/tall/airborne/200-fighter layouts. Checks independent profiles and mixed-team routing, emergency expansion, gradual shrink, center lag, production target selection, safe-area/HUD exclusion and local model renderer bounds. Independent Group battlefield orbit is checked in Group Battle Camera validation.";
         public string limitation = "Offline geometric validation. No account, prefab gameplay, Addressables, render pipeline or battle simulation is initialized. Device safe-area rectangles are explicit fixture inputs. Runtime manager integration and moving animation bounds require Play-mode smoke.";
         public List<string> errors = new List<string>();
         public List<string> observations = new List<string>();
@@ -119,7 +119,7 @@ public static class PocketStrikerBattleCameraValidation
 
     static void CheckProfiles(Report report)
     {
-        var modes = new AllUnitsBattleCamera[] { new DuelBattleCamera(), new MultiRaidBattleCamera(), new GroupBattleCamera() };
+        var modes = new BattleCameraMode[] { new DuelBattleCamera(), new MultiRaidBattleCamera(), new GroupBattleCamera() };
         var profiles = new[] { BattleCameraProfiles.Duel, BattleCameraProfiles.MultiRaid, BattleCameraProfiles.Group };
         for (int index = 0; index < modes.Length; index++)
         {
@@ -144,7 +144,8 @@ public static class PocketStrikerBattleCameraValidation
                 "Battle camera routing ignores the opponent's fielded mode.");
             report.profileCases++;
         }
-        report.observations.Add("Duel32 raises the view over the fighters; Multi33 and Group46 retain their independent elevations. A rotation player against multiple fielded enemies uses MultiRaid framing.");
+        Require(modes[2] is not AllUnitsBattleCamera, "Group camera still inherits fighter tracking.");
+        report.observations.Add("Duel32 and Multi33 follow fielded fighters. Group46 uses its independent arena orbit. A rotation player against multiple fielded enemies uses MultiRaid framing.");
     }
 
     static IEnumerable<KeyValuePair<string, List<Bounds>>> Formations(float scale)
@@ -312,7 +313,7 @@ public static class PocketStrikerBattleCameraValidation
             Configure(camera, pose, 9f / 16, 45); CheckProjection(camera, selected, usable, "selected/" + mode, report);
             report.selectionCases++;
         }
-        report.observations.Add("Rotation excludes reserves; MultiRaid/Group includes every live active fighter regardless of which ally is focused. Inactive and dead targets are excluded.");
+        report.observations.Add("Rotation excludes reserves; MultiRaid includes every live active fighter regardless of which ally is focused. Inactive and dead targets are excluded. Group frames the arena without selecting fighters.");
     }
 
     static void CheckUsableViewports(Report report)

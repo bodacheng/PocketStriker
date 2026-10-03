@@ -49,7 +49,7 @@ public static class PocketStrikerAIStoryLifecycleValidation
             {
                 int calls = 0; FightLoad.Fight = Fight();
                 var controller = Controller(() => { calls++; return UniTask.FromResult<StoryInfo>(null); });
-                controller.PreloadAIStory(true); controller.PreloadAIStory();
+                controller.BeginStoryBattleAttempt(); controller.PreloadAIStory(true); controller.PreloadAIStory();
                 Require(controller.EnsureAIStory().GetAwaiter().GetResult() == null && calls == 1, "Ordinary reads restarted a failed network request.");
                 controller.PreloadAIStory(); Require(calls == 1, "Repeated startup preload reissued a failed request.");
             });
@@ -57,13 +57,13 @@ public static class PocketStrikerAIStoryLifecycleValidation
             {
                 int calls = 0; FightLoad.Fight = Fight(); var ready = Story("recovered");
                 var controller = Controller(() => UniTask.FromResult(++calls == 1 ? null : ready));
-                controller.PreloadAIStory(true); var failed = controller.EnsureAIStory();
+                controller.BeginStoryBattleAttempt(); var failed = controller.EnsureAIStory();
                 Require(failed.GetAwaiter().GetResult() == null, "First request should be empty.");
-                controller.PreloadAIStory(true);
+                controller.BeginStoryBattleAttempt();
                 Require(controller.EnsureAIStory().GetAwaiter().GetResult() == ready && controller.AIStoryInfo == ready && calls == 2,
                     "The same-fight retry retained the completed empty source.");
             });
-            Check("new attempt keeps one pending provider request", () =>
+            Check("repeated preload keeps one pending provider request", () =>
             {
                 int calls = 0; FightLoad.Fight = Fight(); var pending = new UniTaskCompletionSource<StoryInfo>(); var ready = Story("pending");
                 var controller = Controller(() => { calls++; return pending.Task; });
@@ -71,7 +71,7 @@ public static class PocketStrikerAIStoryLifecycleValidation
                 Require(calls == 1, "Pending request was duplicated."); pending.TrySetResult(ready);
                 Require(controller.EnsureAIStory().GetAwaiter().GetResult() == ready && calls == 1, "Pending response was lost.");
             });
-            Check("new attempt reuses a ready story without another provider call", () =>
+            Check("repeated preload reuses a ready story without another provider call", () =>
             {
                 int calls = 0; FightLoad.Fight = Fight(); var ready = Story("ready");
                 var controller = Controller(() => { calls++; return UniTask.FromResult(ready); });
@@ -108,15 +108,34 @@ public static class PocketStrikerAIStoryLifecycleValidation
             {
                 int calls = 0; FightLoad.Fight = Fight(); var ready = Story("recovered exception");
                 var controller = Controller(() => ++calls == 1 ? UniTask.FromException<StoryInfo>(new InvalidOperationException("fixture provider fault")) : UniTask.FromResult(ready));
-                controller.PreloadAIStory(true); Require(controller.EnsureAIStory().GetAwaiter().GetResult() == null && calls == 1, "Exception escaped or ordinary read retried.");
-                controller.PreloadAIStory(true); Require(controller.AIStoryInfo == ready && calls == 2, "Explicit next attempt could not recover exception.");
+                controller.BeginStoryBattleAttempt(); Require(controller.EnsureAIStory().GetAwaiter().GetResult() == null && calls == 1, "Exception escaped or ordinary read retried.");
+                controller.PreloadAIStory(true); Require(calls == 1, "Repeated preload retried a failed request.");
+                controller.BeginStoryBattleAttempt(); Require(controller.AIStoryInfo == ready && calls == 2, "Explicit next attempt could not recover exception.");
+            });
+            Check("real retry changes a ready story and attempt seed on the same FightInfo", () =>
+            {
+                int calls = 0; FightLoad.Fight = Fight(); var old = Story("old attempt"); var next = Story("new attempt");
+                var controller = Controller(() => UniTask.FromResult(++calls == 1 ? old : next));
+                controller.BeginStoryBattleAttempt(); string firstSeed = PocketStrikerStoryVariety.ForFight(FightLoad.Fight).Seed;
+                controller.PreloadAIStory(true); Require(controller.AIStoryInfo == old && calls == 1, "Repeated preload started another paid request.");
+                controller.BeginStoryBattleAttempt();
+                Require(controller.AIStoryInfo == next && calls == 2 && firstSeed != PocketStrikerStoryVariety.ForFight(FightLoad.Fight).Seed,
+                    "Real retry reused the previous story or provider cache identity.");
+            });
+            Check("real retry cancels pending story and ignores its late response", () =>
+            {
+                int calls = 0; FightLoad.Fight = Fight(); var old = new UniTaskCompletionSource<StoryInfo>(); var next = Story("new request");
+                var controller = Controller(() => ++calls == 1 ? old.Task : UniTask.FromResult(next));
+                controller.BeginStoryBattleAttempt(); var previousConsumer = controller.EnsureAIStory(); controller.BeginStoryBattleAttempt();
+                Require(previousConsumer.GetAwaiter().GetResult() == null && controller.AIStoryInfo == next && calls == 2, "Retry did not end the previous consumer.");
+                old.TrySetResult(Story("late old request")); Require(controller.AIStoryInfo == next, "Late old attempt replaced the new story.");
             });
         }
         finally
         {
             FightLoad.Fight = originalFight; global::FightScene.FightScene.target = originalController;
             for (int i = created.Count - 1; i >= 0; i--) if (created[i] != null) UnityEngine.Object.DestroyImmediate(created[i]);
-            report.passed = report.errors.Count == 0 && report.checks.Count == 8;
+            report.passed = report.errors.Count == 0 && report.checks.Count == 10;
             Directory.CreateDirectory("Logs/AIStory/Lifecycle"); File.WriteAllText("Logs/AIStory/Lifecycle/report.json", JsonUtility.ToJson(report, true));
             Debug.Log("[AIStoryLifecycle] " + (report.passed ? "PASS" : "FAIL"));
             EditorApplication.Exit(report.passed ? 0 : 1);

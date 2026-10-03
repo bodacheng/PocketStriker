@@ -13,12 +13,14 @@ public class NextOrAgainBtn : MonoBehaviour
     
     [SerializeField] private float normalAgainBtnWidth = 250;
     [SerializeField] private float longerAgainBtnWidth = 400;
+    bool _allowsModeSwitch;
 
-    public void SetUp(int fightMode, string title)
+    public void SetUp(int fightMode, string title, bool allowModeSwitch = false)
     {
+        _allowsModeSwitch = allowModeSwitch;
         stageTitle.text = title;
-        var showAgainFor1v1Btn = fightMode is 0 or 2;
-        var showAgainForMultiBtn = fightMode is 0 or 1;
+        var showAgainFor1v1Btn = allowModeSwitch && (fightMode is 0 or 2);
+        var showAgainForMultiBtn = allowModeSwitch && (fightMode is 0 or 1);
         againFor1v1Btn.gameObject.SetActive(showAgainFor1v1Btn);
         againForMultiBtn.gameObject.SetActive(showAgainForMultiBtn);
         modeRoot.gameObject.SetActive(showAgainFor1v1Btn || showAgainForMultiBtn);
@@ -30,7 +32,7 @@ public class NextOrAgainBtn : MonoBehaviour
     public void SetUpAction(Action mainAction, Action vsAction = null, Action multiAction = null)
     {
         againBtn.SetListener(mainAction);
-        againFor1v1Btn.SetListener(vsAction);
-        againForMultiBtn.SetListener(multiAction);
+        againFor1v1Btn.SetListener(_allowsModeSwitch ? vsAction : null);
+        againForMultiBtn.SetListener(_allowsModeSwitch ? multiAction : null);
     }
 }

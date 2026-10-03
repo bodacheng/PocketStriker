@@ -54,6 +54,7 @@ public static partial class PocketStrikerCombatFlowSmoke
         public int evolutionSkillRecalculations;
         public int evolutionHealthBarChecks;
         public int evolutionEnemyHpChecks;
+        public List<string> effectInvalidationChecks = new List<string>();
         public bool evolutionFinalDefeatHeal;
         public bool normalRotationHealthUnchanged;
         public bool deadPlayerNotRevived;
@@ -230,7 +231,7 @@ public static partial class PocketStrikerCombatFlowSmoke
             UnityEngine.Object.Destroy(authored);
             if (SessionState.GetBool(Key + ".EvolutionHeal", false))
             {
-                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three one-second real-time skill-choice delays with locked input, real UI callbacks/stat recalculations and live HP sliders. Fight exit cancels a pending choice. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
+                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three one-second real-time skill-choice delays with locked input, real UI callbacks/stat recalculations and live HP sliders. Each nonterminal defeat retires a real pooled hitbox and effect immediately; a controlled pending prefab load must not rent after invalidation. Retry retires a seeded previous-battle hitbox before loading. Fight exit cancels a pending choice. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
                 report.limitation = "Local Self battles isolate account/reward services. Invulnerability prevents incidental AI damage; fixture HP reductions and death notifications make boundary conditions deterministic. This checks production defeat handling and evolution transitions, not natural damage or device performance.";
                 await ValidateEvolutionHeal(leader);
                 report.passed = true;
@@ -264,6 +265,7 @@ public static partial class PocketStrikerCombatFlowSmoke
         catch (Exception exception) { report.errors.Add(exception + "\n" + Diagnostic()); }
         finally
         {
+            EffectsManager.PrefabLoaderForValidation = null;
             PlayerAccountInfo.Me = oldAccount;
             AppSetting.Value.Language = oldLanguage;
             FightGlobalSetting.HitBoxLogger = oldLogging;
@@ -585,9 +587,39 @@ public static partial class PocketStrikerCombatFlowSmoke
             return fight;
         }
 
-        async UniTask<Data_Center> StartFixture(FightInfo fight, bool reuse)
+        void RequireRetired(Decomposition effect, string boundary)
+        {
+            Require(effect != null && effect.IsBattleEffectInvalidated
+                && (!effect.IsWeapon || !effect._HitBox.Enabled)
+                && effect.GetComponentsInChildren<Collider>(true).All(collider => !collider.enabled)
+                && effect.GetComponentsInChildren<ParticleSystem>(true).All(particles => particles.particleCount == 0 && !particles.isPlaying)
+                && effect.GetComponentsInChildren<Renderer>(true).All(renderer => !renderer.enabled),
+                boundary + " preserved an old effect, collider or queued weapon.");
+            if (effect.IsWeapon)
+            {
+                effect._HitBox.EnableMarkers(); effect._HitBox.MarkersEnablingStarts();
+                effect.Step1(); effect.Step2();
+                Require(!effect._HitBox.Enabled, boundary + " allowed a late marker callback to reactivate an old weapon.");
+            }
+            report.effectInvalidationChecks.Add(boundary);
+        }
+
+        Decomposition SeedWeapon(Data_Center owner)
+        {
+            var weapon = HurtObjectManager.GetDPool().Rent();
+            weapon.transform.position = new Vector3(0, 100, 0);
+            weapon._HitBox.SetOwnerFACR(owner.FightDataRef);
+            weapon._HitBox.SetTeamConfig(owner._TeamConfig);
+            weapon._HitBox.MarkersEnablingStarts();
+            Require(weapon._HitBox.Enabled && weapon.GetComponentsInChildren<Collider>().Any(collider => collider.enabled),
+                "Old-round weapon fixture did not activate a real collider.");
+            return weapon;
+        }
+
+        async UniTask<Data_Center> StartFixture(FightInfo fight, bool reuse, Decomposition previousWeapon = null)
         {
             FightLoad.Go(fight, reuse);
+            if (previousWeapon != null) RequireRetired(previousWeapon, "retry-immediate");
             await UniTask.WaitUntil(() => SceneManager.GetActiveScene().name == "FightScene"
                 && FightLoad.Fight?.ID == fight.ID && FSceneProcessesRunner.Main.currentProcess is FightingProcess
                 && UnityEngine.Object.FindFirstObjectByType<FightingStepLayer>()?.Initialized == true)
@@ -622,6 +654,7 @@ public static partial class PocketStrikerCombatFlowSmoke
 
         var evolutionFight = CreateFixture("evolution-heal", true, 4);
         var hero = await StartFixture(evolutionFight, false);
+        await ValidateBodyPartEffectRace(hero);
         for (int index = 0; index < 4; index++)
         {
             var enemy = RTFightManager.Target.team2.RMode_Unit.Value;
@@ -641,11 +674,69 @@ public static partial class PocketStrikerCombatFlowSmoke
                 typeof(UltimateJoystick).GetProperty("VerticalAxis").SetValue(stick, -.5f);
             }
             if (index == 0) Time.timeScale = .25f;
+            Decomposition oldEffect = null, oldWeapon = null;
+            UniTask<Decomposition> delayedEffect = default;
+            UniTaskCompletionSource<GameObject> delayedPrefab = null;
+            if (index < 3)
+            {
+                oldEffect = await EffectsManager.GenerateEffect("super_hit", null, hero.geometryCenter.position, Quaternion.identity, null);
+                Require(oldEffect != null, "Evolution effect fixture did not rent its preloaded visual.");
+                oldWeapon = SeedWeapon(enemy);
+                if (index == 0)
+                {
+                    delayedPrefab = new UniTaskCompletionSource<GameObject>();
+                    EffectsManager.PrefabLoaderForValidation = _ => delayedPrefab.Task;
+                    delayedEffect = EffectsManager.GenerateEffect("effect-lifetime-pending-fixture", null, Vector3.zero, Quaternion.identity, null);
+                }
+            }
             float defeatedAt = Time.realtimeSinceStartup;
-            enemy.FightDataRef.IsDead.Value = true;
+            if (index == 0)
+            {
+                // First hit kills the enemy and opens Evolution synchronously.
+                // A second queued hit must not survive that boundary, while
+                // the completed killing hit retains its attacker statistics.
+                oldWeapon._HitBox.SetOwnerFACR(hero.FightDataRef);
+                var history = (List<HittingDetection.V_Damage>)typeof(FightParamsReference)
+                    .GetField("_causeDamages", PrivateInstance).GetValue(hero.FightDataRef);
+                int before = history.Count, unexpectedHits = 0;
+                hero.FightDataRef.AddGetHitTriggerEvent("effect-lifetime-second-hit", () => unexpectedHits++);
+                enemy.FightDataRef.Invincible = false;
+                enemy.FightDataRef.Resistance.Value = 0;
+                enemy.FightDataRef.CurrentHp.Value = .001f;
+                Require(oldWeapon._HitBox.GetDamageAmount() > .001f, "Killing-hit fixture has no attack power.");
+                var queued = (List<HittingDetection.V_Damage>)typeof(HittingDetection.HitBoxManager)
+                    .GetField("hitsOnHealthBody", PrivateInstance).GetValue(oldWeapon._HitBox);
+                queued.Add(new HittingDetection.V_Damage(oldWeapon._HitBox, null, enemy.FightDataRef,
+                    hero.FightDataRef, enemy.geometryCenter.position, hero.geometryCenter.position, Quaternion.identity));
+                queued.Add(new HittingDetection.V_Damage(oldWeapon._HitBox, null, hero.FightDataRef,
+                    hero.FightDataRef, hero.geometryCenter.position, enemy.geometryCenter.position, Quaternion.identity));
+                typeof(HittingDetection.HitBoxManager).GetField("HitFlesh", PrivateInstance).SetValue(oldWeapon._HitBox, true);
+                oldWeapon.Step2();
+                hero.FightDataRef.RemoveEventKey("effect-lifetime-second-hit");
+                Require(enemy.FightDataRef.IsDead.Value && history.Count == before + 1 && unexpectedHits == 0,
+                    "Killing-hit invalidation dropped the completed hit's statistics or applied its next queued hit.");
+                report.effectInvalidationChecks.Add("killing-hit-stats-retained-next-hit-cancelled");
+            }
+            else enemy.FightDataRef.IsDead.Value = true;
             Require(Mathf.Approximately(hero.FightDataRef.CurrentHp.Value, hero.FightDataRef.MaxHp),
                 "Opponent defeat did not immediately restore full HP before the skill choice: " + index);
             report.evolutionDefeatHeals++;
+            if (index < 3)
+            {
+                RequireRetired(oldWeapon, "evolution-" + index + "-weapon-immediate");
+                RequireRetired(oldEffect, "evolution-" + index + "-visual-immediate");
+                if (delayedPrefab != null)
+                {
+                    try
+                    {
+                        delayedPrefab.TrySetResult(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ExternalAssets/Effects/defaultmagic/super_hit.prefab"));
+                        Require(await delayedEffect.Timeout(TimeSpan.FromSeconds(15)) == null,
+                            "A prefab completion from the defeated round rented an effect after invalidation.");
+                        report.effectInvalidationChecks.Add("evolution-pending-prefab-expired");
+                    }
+                    finally { EffectsManager.PrefabLoaderForValidation = null; }
+                }
+            }
             if (index == 3)
             {
                 Require(FightLogger.value.GameOver.Value && FightLogger.value.GetWinnerTeam() == Team.player1
@@ -683,6 +774,11 @@ public static partial class PocketStrikerCombatFlowSmoke
             Time.timeScale = 1f;
             var evolution = ActiveEvolutionLayer();
             Require(evolution != null, "Opponent defeat omitted the real evolution layer.");
+            Require(BattleEffectLifetime.Suspended && BattleEffectLifetime.ActiveCount == 0,
+                "The evolution popup retained or generated an active battle effect.");
+            Require(await EffectsManager.GenerateEffect("super_hit", null, Vector3.zero, Quaternion.identity, null) == null,
+                "A late animation effect spawned while skill choice was open.");
+            report.effectInvalidationChecks.Add("evolution-" + index + "-popup-suspended");
             await UniTask.WaitUntil(() => ((UnityEngine.UI.Text)typeof(InBattleEvolution)
                 .GetField("upperText", PrivateInstance).GetValue(evolution)).text == Translate.Get("ChooseYourEvolution"))
                 .Timeout(TimeSpan.FromSeconds(20));
@@ -717,7 +813,8 @@ public static partial class PocketStrikerCombatFlowSmoke
             .Timeout(TimeSpan.FromSeconds(15));
 
         var rotationFight = CreateFixture("rotation-no-heal", false, 1);
-        hero = await StartFixture(rotationFight, true);
+        var previousWeapon = SeedWeapon(hero);
+        hero = await StartFixture(rotationFight, true, previousWeapon);
         float damagedHp = hero.FightDataRef.MaxHp * 0.35f;
         hero.FightDataRef.CurrentHp.Value = damagedHp;
         RTFightManager.Target.team2.RMode_Unit.Value.FightDataRef.IsDead.Value = true;
@@ -748,9 +845,56 @@ public static partial class PocketStrikerCombatFlowSmoke
             && report.evolutionHealthBarChecks == 4 && report.evolutionFinalDefeatHeal
             && report.normalRotationHealthUnchanged && report.deadPlayerNotRevived
             && report.evolutionInputLockChecks == 3 && report.evolutionChoiceDelaySeconds.Count == 3
-            && report.cancelledEvolutionChoice, "Evolution transition checks were incomplete.");
+            && report.cancelledEvolutionChoice && report.effectInvalidationChecks.Count == 13,
+            "Evolution transition/effect invalidation checks were incomplete.");
         UnityEngine.Object.Destroy(evolutionFight); UnityEngine.Object.Destroy(rotationFight);
         UnityEngine.Object.Destroy(cancelledFight); UnityEngine.Object.Destroy(simultaneousFight);
+    }
+
+    static async UniTask ValidateBodyPartEffectRace(Data_Center hero)
+    {
+        var events = hero._BO_Ani_E;
+        var pathField = typeof(BO_Ani_E).GetField("magic_path", PrivateInstance);
+        var targetField = typeof(BO_Ani_E).GetField("target", PrivateInstance);
+        var effects = (IDictionary<Transform, Decomposition>)typeof(BO_Ani_E)
+            .GetField("EffectsOnBodyParts", PrivateInstance).GetValue(events);
+        var hand = hero.right_hand_t;
+        Require(hand != null && effects.ContainsKey(hand), "Body-effect race fixture has no initialized right-hand entry.");
+        var originalPath = pathField.GetValue(events);
+        var originalTarget = targetField.GetValue(events);
+        var originalLoader = EffectsManager.PrefabLoaderForValidation;
+        var source = new UniTaskCompletionSource<GameObject>();
+        try
+        {
+            pathField.SetValue(events, "lifetime-race-" + Time.frameCount);
+            EffectsManager.PrefabLoaderForValidation = _ => source.Task;
+            events.EffectOnBodyPart(new AnimationEvent { stringParameter = "right_hand" });
+            BattleEffectLifetime.InvalidateAll();
+            effects[hand] = null;
+            // This request shares the first request's still-pending pool load.
+            events.EffectOnBodyPart(new AnimationEvent { stringParameter = "right_hand" });
+            // Another ordinary animation event can change the shared target
+            // before either asynchronous request completes.
+            targetField.SetValue(events, hero.left_hand_t);
+            source.TrySetResult(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ExternalAssets/Effects/defaultmagic/super_hit.prefab"));
+            await UniTask.WaitUntil(() => effects[hand] != null).Timeout(TimeSpan.FromSeconds(15));
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            var current = effects[hand];
+            Require(current != null && !current.IsBattleEffectInvalidated && current.Phase == 1
+                && current.GetPositionConstraint().constraintActive
+                && current.GetPositionConstraint().GetSource(0).sourceTransform == hand
+                && current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled),
+                "An old body-effect completion cleared, overwrote or rebound the new generation's effect.");
+            report.effectInvalidationChecks.Add("body-effect-old-new-generation-shared-pool-race");
+        }
+        finally
+        {
+            if (effects.TryGetValue(hand, out var current) && current != null) current.InvalidateBattleEffect();
+            effects[hand] = null;
+            pathField.SetValue(events, originalPath);
+            targetField.SetValue(events, originalTarget);
+            EffectsManager.PrefabLoaderForValidation = originalLoader;
+        }
     }
 
     static InBattleEvolution ActiveEvolutionLayer() => UnityEngine.Object

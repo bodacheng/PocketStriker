@@ -47,8 +47,7 @@ public static class RandomBossStageFactory
         stage.EventType = FightEventType.Event;
         stage.FightMembers = members;
         stage.FightMode = FightMode.Rotate;
-        // 0 keeps the existing preparation screen's team / rotation choice enabled.
-        stage.ArcadeFightMode = 0;
+        stage.ArcadeFightMode = AdventureModeRules.RotationMode;
         stage.team2CGMode = gaugeMode;
         stage.stageRefLevel = level;
         // SetUnitLevelByRefLevel operates on UnitsData, not the member dictionary.

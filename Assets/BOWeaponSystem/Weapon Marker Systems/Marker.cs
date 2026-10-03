@@ -36,11 +36,13 @@ namespace HittingDetection
         public virtual void EnableMarkerProcess(int weaponLayer)
         {
             gameObject.layer = weaponLayer;
+            if (myCollider != null) myCollider.enabled = true;
         }
         
         public virtual void DisableMarkerProcess()
         {
             ClearDetection();
+            if (myCollider != null) myCollider.enabled = false;
             gameObject.layer = 0;
         }
         

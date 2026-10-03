@@ -161,12 +161,20 @@ public partial class BO_Ani_E : MonoBehaviour
     }
 
     Transform target;
-    Decomposition effect;
     ConstraintSource myConstraintSource;
     public async void EffectOnBodyPart(AnimationEvent e)
 	{
+        var generation = BattleEffectLifetime.Generation;
+        if (!BattleEffectLifetime.IsCurrent(generation)) return;
         DecideTarget(e.stringParameter);
-        effect = await EffectsManager.GenerateEffect("normal_effect", magic_path, target.position, target.rotation,target);
+        var bodyTarget = target;
+        if (bodyTarget == null) return;
+        var effect = await EffectsManager.GenerateEffect("normal_effect", magic_path, bodyTarget.position, bodyTarget.rotation, bodyTarget);
+        if (!BattleEffectLifetime.IsCurrent(generation) || this == null || bodyTarget == null || effect == null)
+        {
+            if (effect != null) effect.InvalidateBattleEffect();
+            return;
+        }
         
         // 我真是不敢相信我们曾经把问题考虑的那么复杂
 		// switch (e.intParameter) 
@@ -185,14 +193,14 @@ public partial class BO_Ani_E : MonoBehaviour
   //               break;
 		// }
            
-        if (EffectsOnBodyParts.ContainsKey(target))
+        if (EffectsOnBodyParts.ContainsKey(bodyTarget))
         {
-            if (EffectsOnBodyParts[target] != null)
+            if (EffectsOnBodyParts[bodyTarget] != null)
             {
-                EffectsOnBodyParts[target].StopEmissions(true);
-                EffectsOnBodyParts[target].GetPositionConstraint().constraintActive = false;
+                EffectsOnBodyParts[bodyTarget].StopEmissions(true);
+                EffectsOnBodyParts[bodyTarget].GetPositionConstraint().constraintActive = false;
             }
-            EffectsOnBodyParts[target] = effect; 
+            EffectsOnBodyParts[bodyTarget] = effect;
         }
 	}
 

@@ -16,16 +16,31 @@ MonoBehaviour:
   geminiConfig: {fileID: 11400000, guid: f6225f17a842246d3900a7d25ea21407, type: 2}
   openAIConfig: {fileID: 0}
   storyThemes:
-  - A young magic-stone fighter learns to combine elemental stones through a friendly arena duel
-  - Rival adventurers cooperate to protect a village using nine-slot magic-stone combinations
-  - An underdog fighter discovers that patience, timing and teamwork beat brute force
+  - "Fairy tale: a novice sky-post carrier delivers a lost wish through a cloud village."
+  - "Detective mystery: a curious clockwork-town sleuth discovers who borrowed the moon-shaped bakery sign."
+  - "Seafaring adventure: a young navigator and a chatty crab find a treasure that can be shared with an island village."
+  - "Woodland rescue: an inventive animal caretaker helps a timid forest creature find its way home."
+  - "Kitchen comedy: a clumsy apprentice baker chases a runaway pudding before the town picnic."
+  - "Science-fiction comedy: a friendly maintenance robot repairs a moon carnival with an unexpected invention."
+  - "Prehistoric exploration: a small dinosaur gardener discovers a hidden valley of enormous singing flowers."
+  - "Steampunk invention: a tinkerer tests a wind-powered flying workshop above a bustling brass city."
+  - "Folklore: a lantern maker befriends a mischievous seasonal spirit and restores a village tradition."
+  - "Musical adventure: a wandering musician helps a silent valley rediscover its song."
+  - "Desert journey: a caravan mapmaker follows playful sand spirits to an oasis that needs help."
+  - "Undersea discovery: a coral gardener and a tiny whale rescue a drifting reef."
+  - "Miniature adventure: a beetle explorer builds a bridge across a puddle in a giant backyard."
+  - "Artistic fantasy: a young painter returns stolen colors to a town where murals come alive."
+  - "Time-travel mystery: a curious courier delivers a letter from tomorrow and untangles a harmless paradox."
+  - "Festival friendship: a shy little monster finds a surprising role in a crowded lantern festival."
+  - "Space exploration: a comet-orchard keeper and an alien visitor discover how to grow a new constellation."
+  - "Puzzle fantasy: a traveling librarian solves a mirror-library riddle to free a lost story."
   pageCount: 1
-  storyStyle: 1
-  customStoryStylePrompt: 
-  additionalStoryRequirements: PocketStriker magic-stone fighting adventure; a short complete aftermath with 2-3 concise lines, hopeful tone, no football or modern sports, no long exposition
-  imageStyle: 5
-  customImageStylePrompt: 
-  additionalImageRequirements: colorful stylized low-poly fantasy fighters, elemental magic stones, readable full-body action composition, warm adventurous cartoon tone, no football, no science-fiction HUD, no text or logos
+  storyStyle: 5
+  customStoryStylePrompt: varied standalone illustrated vignettes across mystery, comedy, fairy tale, folklore, science fiction, festivals and exploration; warm complete miniature narratives with surprising actions
+  additionalStoryRequirements: PocketStriker interlude; 2-3 concise narrative lines, total at most 200 characters; choose protagonists suited to each subject; stories may take place outside battles and arenas; no football or long exposition
+  imageStyle: 7
+  customImageStylePrompt: "playful 2D storybook cartoon, oversized expressive heads and eyes, compact bodies, soft rounded silhouettes, thick clean outlines, flat cel shading, vibrant candy colors with coral, turquoise, lemon yellow and lavender accents, simple backgrounds, readable full-body action, gentle lighting; no photorealism, realistic anatomy, oil-painting texture or cinematic lighting; no text, lettering, logos or HUD"
+  additionalImageRequirements: coherent cartoon character designs appropriate to the selected genre; animated poses, readable full-body action, rounded shapes, bright coral, turquoise, lemon and lavender accents
   imageAspectRatio: 16:9
   fallbackTone: 0
   fairyTaleFallbackConfigAddress: 

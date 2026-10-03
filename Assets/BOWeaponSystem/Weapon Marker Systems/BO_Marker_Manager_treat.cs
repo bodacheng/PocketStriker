@@ -74,10 +74,14 @@ namespace HittingDetection
 
             if (HitFlesh)
             {
-                foreach (V_Damage _hitOnHealthBody in hitsOnHealthBody)
+                for (int index = 0; _enabled && index < hitsOnHealthBody.Count; index++)
                 {
+                    var _hitOnHealthBody = hitsOnHealthBody[index];
                     _hitOnHealthBody.victim.ApplyDamage(_hitOnHealthBody);
                     _hitOnHealthBody.attacker.MyDamageCount(_hitOnHealthBody);
+                    // Preserve this completed hit's statistics, then stop if
+                    // its death callback retired the remaining damage batch.
+                    if (!_enabled) return;
                 }
             }
 
@@ -91,7 +95,7 @@ namespace HittingDetection
                 }
             }
 
-            for (var i = 0; i < _weaponEnergyExhaustMissions.Count; i++)
+            for (var i = 0; _enabled && i < _weaponEnergyExhaustMissions.Count; i++)
             {
                 _weaponEnergyExhaustMissions[i].Invoke();               
             }

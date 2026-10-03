@@ -24,49 +24,57 @@ public static class PocketStrikerQueuedStory
     static readonly HashSet<StoryInfo> Owned = new HashSet<StoryInfo>();
     [Serializable] sealed class Page { public string title; public string[] lines; public string visualPrompt; }
 
-    public static async UniTask<StoryInfo> Load(CancellationToken cancellationToken, string seed = null)
+    public static UniTask<StoryInfo> Load(CancellationToken cancellationToken, string seed = null)
+    {
+        var client = new PocketStrikerStoryJobClient();
+        return LoadStory(cancellationToken, seed,
+            (kind, prompt, token) => client.Generate(kind, prompt, token, kind == "text" ? 30000 : 90000, retryFailed: true),
+            DownloadImage, 100000);
+    }
+
+    public static UniTask<StoryInfo> LoadLegacy(CancellationToken cancellationToken, string seed = null)
+    {
+        var client = new PocketStrikerLegacyStoryClient();
+        return LoadStory(cancellationToken, seed, client.Generate, DownloadImage, 55000);
+    }
+
+#if UNITY_EDITOR
+    public static UniTask<StoryInfo> LoadForValidation(CancellationToken token, string seed,
+        Func<string, string, CancellationToken, UniTask<PocketStrikerStoryJobClient.Result>> generate,
+        Func<string, CancellationToken, UniTask<Texture2D>> download) => LoadStory(token, seed, generate, download, 100000);
+#endif
+
+    static async UniTask<StoryInfo> LoadStory(CancellationToken cancellationToken, string seed,
+        Func<string, string, CancellationToken, UniTask<PocketStrikerStoryJobClient.Result>> generate,
+        Func<string, CancellationToken, UniTask<Texture2D>> download, int deadlineMs)
     {
         // Cancel the owned pipeline before BattleStoryRequest's 110-second consumer deadline,
         // so a timed-out text/image chain cannot create an unobserved owned texture later.
         using var lifetime = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        lifetime.CancelAfter(100000);
+        lifetime.CancelAfter(deadlineMs);
         cancellationToken = lifetime.Token;
-        var client = new PocketStrikerStoryJobClient();
+        cancellationToken.ThrowIfCancellationRequested();
         string language = AIStoryRuntimeContext.GetLanguage().ToString();
-        var context = AIStoryRuntimeContext.GetCacheContext();
-        seed ??= context.FightId + ":" + context.EventType + ":" + context.FightMode + ":" + DateTime.UtcNow.ToString("yyyy-MM-dd");
-        string theme = "A red-crested Roman gladiator and a skeleton warrior learn teamwork through elemental magic stones.";
-        string prompt = "Write one short hopeful PocketStriker magic-stone fighting aftermath in " + language
-            + ". " + theme + " No football, no science-fiction HUD. Return only JSON with title (short), lines (2 or 3 brief narrative lines, total at most 200 characters), visualPrompt (English illustration description, no text). "
-            + "Keep characters recognizable: tan gladiator, silver crested helmet, gray cuirass, red scarf/cape and skirt; skeleton with beige skull, gray spiked armor and dark red belt. Story variation: "
-            + seed;
-        var text = await client.Generate("text", prompt, cancellationToken, 30000, retryFailed: true);
+        var variation = seed == null ? PocketStrikerStoryVariety.ForFight(FightLoad.Fight) : PocketStrikerStoryVariety.ForSeed(seed);
+        string prompt = PocketStrikerStoryVariety.BuildTextPrompt(variation, language);
+        var text = await generate("text", prompt, cancellationToken);
         Page page;
-        try { page = JsonUtility.FromJson<Page>(NormalizeJson(text.text)); }
+        try { page = JsonUtility.FromJson<Page>(NormalizeJson(text?.text)); }
         catch { throw new InvalidOperationException("Invalid story text JSON."); }
-        if (page?.lines == null || page.lines.Length < 1 || page.lines.Length > 3 || string.IsNullOrWhiteSpace(page.visualPrompt))
+        if (page?.lines == null || page.lines.Length < 2 || page.lines.Length > 3 || string.IsNullOrWhiteSpace(page.visualPrompt))
             throw new InvalidOperationException("Story text is incomplete.");
         var lines = new List<string>();
         foreach (string line in page.lines)
             if (!string.IsNullOrWhiteSpace(line)) lines.Add(line.Trim());
-        if (lines.Count == 0 || string.Join("", lines).Length > 200) throw new InvalidOperationException("Story caption is invalid.");
-        string imagePrompt = "Hand-painted colorful cartoon fantasy game illustration, faceted chunky silhouettes, warm adventurous tone, full-body readable duel, no text, no logos. "
-            + theme + " Character details: tan Roman gladiator with red-crested silver helmet, gray cuirass, red scarf/cape/skirt; skeleton in gray spiked armor, dark red belt. " + page.visualPrompt;
-        var generated = await client.Generate("image", imagePrompt, cancellationToken, retryFailed: true);
-        if (!Uri.TryCreate(generated.images[0].url, UriKind.Absolute, out var uri) || uri.Scheme != "https")
-            throw new InvalidOperationException("Invalid story image URL.");
+        if (lines.Count < 2 || string.Join("", lines).Length > 200) throw new InvalidOperationException("Story caption is invalid.");
+        string imagePrompt = PocketStrikerStoryVariety.BuildImagePrompt(variation, page.visualPrompt);
+        var generated = await generate("image", imagePrompt, cancellationToken);
+        string imageUrl = ValidateImageUrl(generated);
         Texture2D texture = null;
         Sprite sprite = null;
         try
         {
-            using (var download = UnityWebRequestTexture.GetTexture(uri.AbsoluteUri))
-            {
-                download.timeout = 15;
-                try { await download.SendWebRequest().ToUniTask(cancellationToken: cancellationToken); }
-                catch (OperationCanceledException) { throw; }
-                catch { throw new InvalidOperationException("Story image download failed."); }
-                texture = DownloadHandlerTexture.GetContent(download);
-            }
+            texture = await download(imageUrl, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (texture == null) throw new InvalidOperationException("Story image is empty.");
             sprite = Sprite.Create(texture, new Rect(0,0,texture.width,texture.height), new Vector2(.5f,.5f));
@@ -77,9 +85,29 @@ public static class PocketStrikerQueuedStory
         }
         catch
         {
-            if (sprite != null) UnityEngine.Object.Destroy(sprite);
-            if (texture != null) UnityEngine.Object.Destroy(texture);
+            DestroyOwned(sprite);
+            DestroyOwned(texture);
             throw;
+        }
+    }
+
+    public static string ValidateImageUrl(PocketStrikerStoryJobClient.Result result)
+    {
+        if (result?.images?.Length != 1 || !Uri.TryCreate(result.images[0]?.url, UriKind.Absolute, out var uri)
+            || uri.Scheme != "https" || string.IsNullOrEmpty(uri.Host) || !string.IsNullOrEmpty(uri.UserInfo))
+            throw new InvalidOperationException("Invalid story image URL.");
+        return uri.AbsoluteUri;
+    }
+
+    static async UniTask<Texture2D> DownloadImage(string url, CancellationToken cancellationToken)
+    {
+        using (var request = UnityWebRequestTexture.GetTexture(url))
+        {
+            request.timeout = 15;
+            try { await request.SendWebRequest().ToUniTask(cancellationToken: cancellationToken); }
+            catch (OperationCanceledException) { throw; }
+            catch { throw new InvalidOperationException("Story image download failed."); }
+            return DownloadHandlerTexture.GetContent(request);
         }
     }
     // Gemini may wrap otherwise valid JSON in Markdown even when the prompt requests JSON only.
@@ -103,10 +131,19 @@ public static class PocketStrikerQueuedStory
         foreach (var scene in story.StoryScenes)
         {
             if (scene?.Pic == null) continue;
-            UnityEngine.Object.Destroy(scene.Pic.texture);
-            UnityEngine.Object.Destroy(scene.Pic);
+            DestroyOwned(scene.Pic.texture);
+            DestroyOwned(scene.Pic);
         }
-        UnityEngine.Object.Destroy(story);
+        DestroyOwned(story);
+    }
+
+    static void DestroyOwned(UnityEngine.Object value)
+    {
+        if (value == null) return;
+#if UNITY_EDITOR
+        if (!Application.isPlaying) { UnityEngine.Object.DestroyImmediate(value); return; }
+#endif
+        UnityEngine.Object.Destroy(value);
     }
 
 }

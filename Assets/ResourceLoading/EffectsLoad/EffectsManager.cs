@@ -10,9 +10,15 @@ public static class EffectsManager
     static readonly ResourcePoolRegistry<DecompositionPool> EffectPools = new ResourcePoolRegistry<DecompositionPool>();
     static readonly IDictionary<string, UniTaskCompletionSource<DecompositionPool>> PendingPoolLoads =
         new Dictionary<string, UniTaskCompletionSource<DecompositionPool>>();
+#if UNITY_EDITOR
+    public static Func<string, UniTask<GameObject>> PrefabLoaderForValidation;
+#endif
     
     static UniTask<GameObject> TryLoadEffectPrefab(string key)
     {
+#if UNITY_EDITOR
+        if (PrefabLoaderForValidation != null) return PrefabLoaderForValidation(key);
+#endif
         return IndexedResourceLoadUtility.LoadIfKeyExists<GameObject>(
             EffectResourceKeyUtility.EffectLabel,
             key,
@@ -33,10 +39,11 @@ public static class EffectsManager
     
     public static async UniTask<Decomposition> GenerateEffect(string resourceName, string effectPath, Vector3 pos, Quaternion qua, Transform parentT)
     {
-        if (string.IsNullOrEmpty(resourceName))
+        var generation = BattleEffectLifetime.Generation;
+        if (string.IsNullOrEmpty(resourceName) || !BattleEffectLifetime.IsCurrent(generation))
             return default;
         var effectPool = await IniEffectsPool(resourceName, effectPath, 3);
-        if (effectPool == null)
+        if (effectPool == null || !BattleEffectLifetime.IsCurrent(generation))
             return default;
         var processingEffectObj = effectPool.Rent();
         var myConstraintSource = new ConstraintSource();

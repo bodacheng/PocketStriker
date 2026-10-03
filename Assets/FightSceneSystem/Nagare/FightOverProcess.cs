@@ -34,6 +34,9 @@ namespace FightScene
         
         void EnterProcess()
         {
+            // Every real battle result has one placement, regardless of victory,
+            // replay, progression, or reward-server success.
+            FightScene.target.JustShowAds();
             // 竞技场结束：显示排名变化？
             // quest结束：显示技能石经验获得情况和报酬信息？
             // 自我战斗结束：显示战斗分析？
@@ -235,8 +238,6 @@ namespace FightScene
                     layer.ShowAward(
                         reward.TryGetValue("diamond", out var diamond) ? Convert.ToInt32(diamond) : 0,
                         reward.TryGetValue("gold", out var gold) ? Convert.ToInt32(gold) : 0);
-                    if (!PlayerAccountInfo.Me.noAdsState)
-                        FightScene.target.JustShowAds();
                 }
             }
 

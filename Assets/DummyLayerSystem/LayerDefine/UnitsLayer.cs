@@ -75,7 +75,7 @@ namespace mainMenu
             }
 
             var cellSize = SetGridGroupSizeForUnitBox(grid, icons.Count);
-            selectedFrame.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize+ 50,cellSize+50);
+            selectedFrame.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize+ 25,cellSize+25);
             displayUnitIconsAfterAction?.Invoke();
         }
 

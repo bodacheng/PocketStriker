@@ -11,7 +11,9 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Build.DataBuilders;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>Local Play-mode smoke using the production fight scene, loaders, HUD and camera.</summary>
 [InitializeOnLoad]
@@ -32,7 +34,7 @@ public static partial class PocketStrikerBattleCameraSmoke
         public bool passed;
         public string unityVersion;
         public string utcTime;
-        public string scope = "Play mode in the actual FightScene through Addressables Fast Mode and FightLoad.Go. Production Preparing/CountDown/Fighting, RTFightManager, live animated models, FightingStepLayer and CameraManager. Duel 1v1, Rotation 3v3 (only current fighters), MultiRaid 3v3, Group 100v100 and production in-scene Group retry. Each first CountDown view must immediately fit the final fielded models at its independent Duel32/Multi33/Group46 pitch, without inherited staging distance. Fixture then moves active models around the arena and changes ordinary focus; each sampled frame projects complete visible renderer bounds through the actual camera.";
+        public string scope = "Play mode in the actual FightScene through Addressables Fast Mode and FightLoad.Go. Production Preparing/CountDown/Fighting, RTFightManager, live animated models, FightingStepLayer and CameraManager. Duel 1v1, Rotation 3v3 (only current fighters), MultiRaid 3v3, Group 100v100 and production in-scene Group retry. Each first CountDown view immediately fits its fielded fighters or complete Group arena at the independent profile, without inherited staging distance. Ordinary cameras keep complete renderer corners visible. Group checks the complete ground circle and all live model corners inside its fixed arena envelope; out-of-arena attack/knockback or AABB corners are recorded without making the arena camera chase them. Group pose is checked during movement, changes to the ignored camera focus argument and a production death, while Group input focus remains null.";
         public string limitation = "Local Self event bypasses login, rewards, advertising and AI story requests. A fixture sceneLoaded hook disables and destroys shop IAP startup objects before Start in every scene, cancelling their login subscriptions; production IAP code remains unchanged. Group mechanics still use GangbangInfo/IsGroupBattle. This is editor Play mode, not a physical-device performance test.";
         public int isolatedIAPObjects;
         public List<string> weaponLifecycleChecks = new List<string>();
@@ -52,10 +54,22 @@ public static partial class PocketStrikerBattleCameraSmoke
         public int frames;
         public int projectedCorners;
         public int focusChanges;
+        public int cameraFocusArgumentChecks;
         public float fieldOfView;
         public float aspect;
         public float pitch;
         public Rect usableViewport;
+        public int arenaBoundaryPoints;
+        public float arenaViewportWidth;
+        public float arenaSideMargin;
+        public float modelViewportMinX = 1;
+        public float modelViewportMaxX;
+        public int arenaModelCorners;
+        public int outsideArenaModelCorners;
+        public int clippedOutsideArenaModelCorners;
+        public List<string> outsideArenaSamples = new List<string>();
+        public int arenaStabilityChecks;
+        public int pointerAdmissionChecks;
         public string screenshot;
     }
 
@@ -208,6 +222,7 @@ public static partial class PocketStrikerBattleCameraSmoke
                 await Observe("multiraid", false, 3, 3);
 
                 var group = CreateGroup(leader);
+                group.battleGroundID = 1;
                 FightLoad.Go(group);
                 await WaitReady(100, 100, true, "group-200");
                 await Observe("group-200", true, 100, 100);
@@ -416,7 +431,7 @@ public static partial class PocketStrikerBattleCameraSmoke
             : key == C_Mode.CertainYAntiVibration ? BattleCameraProfiles.Duel : BattleCameraProfiles.MultiRaid;
     }
 
-    static void CheckLiveProfile(AllUnitsBattleCamera mode, Camera camera, bool group, UnitsManger first, UnitsManger second)
+    static void CheckLiveProfile(BattleCameraMode mode, Camera camera, bool group, UnitsManger first, UnitsManger second)
     {
         var profile = ExpectedProfile(group, first, second);
         Require(mode != null && (group ? mode is GroupBattleCamera
@@ -437,8 +452,8 @@ public static partial class PocketStrikerBattleCameraSmoke
             "Initial battle framing was observed after CountDown.");
         CheckLiveProfile(mode, camera, group, manager.team1, manager.team2);
         int required = manager.team1.TeamMode == TeamMode.Rotation ? 2 : expected1 + expected2;
-        Require(mode.IsFramingInitialized && mode.FramedUnitCount == required,
-            "CountDown did not immediately initialize its actual fielded fighters.");
+        Require(mode.IsFramingInitialized && mode.FramedUnitCount == (group ? 0 : required),
+            "CountDown did not immediately initialize the intended arena/fighter framing.");
         var entry = new StartCase { name = name, process = "CountDownProcess", framedUnits = mode.FramedUnitCount,
             pitch = mode.Pitch, distance = mode.CurrentPose.Distance, requiredDistance = mode.DesiredPose.Distance,
             centerLag = Vector3.Distance(mode.CurrentPose.Center, mode.DesiredPose.Center) };
@@ -448,7 +463,18 @@ public static partial class PocketStrikerBattleCameraSmoke
             + ", distance=" + entry.distance + ", required=" + entry.requiredDistance + ", centerLag=" + entry.centerLag);
         var corners = new Case { name = name + "-countdown" };
         var usable = mode.GetUsableViewport(camera);
-        Require(CheckTeam(manager.team1, camera, usable, corners) + CheckTeam(manager.team2, camera, usable, corners) == required,
+        if (group)
+        {
+            CheckArenaBoundary((GroupBattleCamera)mode, camera, usable, corners);
+            if (FightLoad.Fight.battleGroundID == 1)
+            {
+                var ground = BoundaryControlByGod.target.CurrentBattleGround;
+                var readability = ground != null ? ground.GetComponent<AncientEmpireReadability>() : null;
+                Require(readability != null && readability.IsApplied && readability.RuntimeMaterialCount > 0,
+                    "Loaded castle did not apply its runtime readability materials.");
+            }
+        }
+        Require(CheckTeam(manager.team1, camera, usable, corners, group) + CheckTeam(manager.team2, camera, usable, corners, group) == required,
             "CountDown camera did not show all actual fielded models.");
         entry.screenshot = Path.GetFullPath(Path.Combine(Output, name + "-countdown.png"));
         ScreenCapture.CaptureScreenshot(entry.screenshot);
@@ -470,6 +496,8 @@ public static partial class PocketStrikerBattleCameraSmoke
         Require(item.loadedTeam1 == expected1 && item.loadedTeam2 == expected2, "Wrong live fighter count in " + name);
         var mode = manager._CameraManager.CurrentBattleCamera;
         CheckLiveProfile(mode, camera, group, manager.team1, manager.team2);
+        var arenaPose = mode.CurrentPose;
+        if (group) CheckGroupPointerAdmission(camera, mode.GetUsableViewport(camera), item);
         var start = Time.realtimeSinceStartup;
         bool focused = false;
         Data_Center requestedFocus = null;
@@ -502,12 +530,35 @@ public static partial class PocketStrikerBattleCameraSmoke
             var usable = mode.GetUsableViewport(camera);
             item.usableViewport = usable; item.fieldOfView = camera.fieldOfView; item.aspect = camera.aspect;
             item.pitch = mode.Pitch;
-            int count = CheckTeam(manager.team1, camera, usable, item) + CheckTeam(manager.team2, camera, usable, item);
+            if (group)
+            {
+                CheckArenaBoundary((GroupBattleCamera)mode, camera, usable, item);
+                RequireSameArenaPose(mode, arenaPose, name + " movement");
+                item.arenaStabilityChecks++;
+            }
+            int count = CheckTeam(manager.team1, camera, usable, item, group) + CheckTeam(manager.team2, camera, usable, item, group);
             int required = manager.team1.TeamMode == TeamMode.Rotation ? 2 : expected1 + expected2;
             Require(count == required, name + " is missing fielded fighters: " + count + " vs " + required);
             item.minimumFielded = Math.Min(item.minimumFielded, count); item.frames++;
         }
         Require(group || expected1 == 1 || item.focusChanges == 1, "Ordinary focus did not change in " + name);
+        if (group)
+        {
+            var next = manager.team1.teamMembers.mDict.Values.First(unit => unit != layer.InputsManager.CurrentFocus.Value);
+            manager.CameraAdjustment(RTFightManager.playerTeam, manager.team1.TeamMode,
+                FightLoad.Fight.EventType, next.geometryCenter);
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            Require(layer.InputsManager.CurrentFocus.Value == null,
+                name + " camera focus argument changed Group input focus.");
+            RequireSameArenaPose(mode, arenaPose, name + " camera focus argument");
+            item.arenaStabilityChecks++; item.cameraFocusArgumentChecks++;
+            next._MyBehaviorRunner.ChangeState("Death");
+            await UniTask.WaitUntil(() => next.FightDataRef.IsDead.Value).Timeout(TimeSpan.FromSeconds(5));
+            await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
+            RequireSameArenaPose(mode, arenaPose, name + " death");
+            CheckArenaBoundary((GroupBattleCamera)mode, camera, mode.GetUsableViewport(camera), item);
+            item.arenaStabilityChecks++;
+        }
         item.screenshot = Path.GetFullPath(Path.Combine(Output, name + ".png"));
         ScreenCapture.CaptureScreenshot(item.screenshot);
         await UniTask.Delay(500, DelayType.Realtime);
@@ -532,8 +583,73 @@ public static partial class PocketStrikerBattleCameraSmoke
         }
     }
 
-    static int CheckTeam(UnitsManger team, Camera camera, Rect usable, Case item)
+    static void RequireSameArenaPose(BattleCameraMode mode, BattleCameraFraming.Pose expected, string label)
     {
+        Require(mode is GroupBattleCamera && mode.FramedUnitCount == 0 && !mode.IsHoldingReplacementFraming
+            && !mode.IsSettlingReplacementFraming, label + " switched to fighter tracking.");
+        Require(Vector3.Distance(mode.CurrentPose.Position, expected.Position) < .001f
+            && Vector3.Distance(mode.CurrentPose.Center, expected.Center) < .001f
+            && Quaternion.Angle(mode.CurrentPose.Rotation, expected.Rotation) < .001f,
+            label + " changed the arena camera pose.");
+    }
+
+    static void CheckArenaBoundary(GroupBattleCamera mode, Camera camera, Rect usable, Case item)
+    {
+        var boundary = BoundaryControlByGod.target;
+        Require(boundary != null && Mathf.Abs(mode.ArenaRadius - boundary.EffectiveBattleRadius) < .001f,
+            item.name + " arena camera does not use the configured battle boundary.");
+        Require(Vector3.Distance(mode.ArenaCenter, Vector3.zero) < .001f,
+            item.name + " arena pivot moved away from the battle center.");
+        float left = 1, right = 0;
+        for (int index = 0; index < 72; index++)
+        {
+            float angle = index * Mathf.PI * 2 / 72;
+            var point = mode.ArenaCenter + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * mode.ArenaRadius;
+            var viewport = camera.WorldToViewportPoint(point);
+            left = Mathf.Min(left, viewport.x); right = Mathf.Max(right, viewport.x);
+            Require(viewport.z > camera.nearClipPlane && viewport.x >= usable.xMin - .002f && viewport.x <= usable.xMax + .002f
+                && viewport.y >= usable.yMin - .002f && viewport.y <= usable.yMax + .002f,
+                item.name + " arena boundary clipped: " + viewport + " vs " + usable);
+            item.arenaBoundaryPoints++;
+        }
+        item.arenaViewportWidth = right - left;
+        item.arenaSideMargin = Mathf.Max(left, 1 - right);
+        if (camera.aspect < .6f && mode.ArenaRadius >= 20)
+            Require(item.arenaViewportWidth > .94f,
+                item.name + " group arena leaves excessive horizontal space: " + item.arenaViewportWidth);
+    }
+
+    static void CheckGroupPointerAdmission(Camera camera, Rect usable, Case item)
+    {
+        var events = EventSystem.current;
+        var button = GetHUD()?.PauseButton;
+        Require(events != null && button != null && button.gameObject.activeInHierarchy,
+            item.name + " has no live EventSystem or pause button for pointer admission checks.");
+        bool Blocked(Vector2 point)
+        {
+            var pointer = new PointerEventData(events) { position = point, pointerId = -1 };
+            var hits = new List<RaycastResult>();
+            events.RaycastAll(pointer, hits);
+            return hits.Any(hit => hit.module is GraphicRaycaster && GroupBattleCamera.IsOrbitBlockingUI(hit.gameObject));
+        }
+        var screen = camera.pixelRect;
+        var arenaPoint = screen.min + Vector2.Scale(usable.center, screen.size);
+        Require(!Blocked(arenaPoint), item.name + " HUD raycasts swallowed the arena touch surface.");
+        item.pointerAdmissionChecks++;
+        var canvas = button.GetComponentInParent<Canvas>().rootCanvas;
+        var rect = (RectTransform)button.transform;
+        var pausePoint = RectTransformUtility.WorldToScreenPoint(canvas.renderMode == RenderMode.ScreenSpaceOverlay
+            ? null : canvas.worldCamera, rect.TransformPoint(rect.rect.center));
+        Require(Blocked(pausePoint), item.name + " pause button touch was admitted to camera orbit.");
+        item.pointerAdmissionChecks++;
+    }
+
+    static int CheckTeam(UnitsManger team, Camera camera, Rect usable, Case item, bool arenaFraming = false)
+    {
+        // Arena ground fits the narrow safe-area rim; standing meshes may use
+        // that rim while their complete silhouette stays inside the screen.
+        if (arenaFraming) { usable.xMin = 0; usable.xMax = 1; }
+        var arena = arenaFraming ? RTFightManager.Target._CameraManager.CurrentBattleCamera as GroupBattleCamera : null;
         int count = 0;
         foreach (var unit in team.teamMembers.mDict.Values)
         {
@@ -544,10 +660,35 @@ public static partial class PocketStrikerBattleCameraSmoke
                 var point = bounds.center + Vector3.Scale(bounds.extents, new Vector3((corner & 1) == 0 ? -1 : 1,
                     (corner & 2) == 0 ? -1 : 1, (corner & 4) == 0 ? -1 : 1));
                 var viewport = camera.WorldToViewportPoint(point);
+                item.modelViewportMinX = Mathf.Min(item.modelViewportMinX, viewport.x);
+                item.modelViewportMaxX = Mathf.Max(item.modelViewportMaxX, viewport.x);
                 const float tolerance = 0.002f;
-                Require(viewport.z > camera.nearClipPlane && viewport.x >= usable.xMin - tolerance && viewport.x <= usable.xMax + tolerance
-                    && viewport.y >= usable.yMin - tolerance && viewport.y <= usable.yMax + tolerance,
-                    item.name + " live model corner clipped: " + unit.UnitInfo?.id + "/" + corner + " " + viewport + " vs " + usable);
+                Require(viewport.z > camera.nearClipPlane, item.name + " live model crossed the camera near plane.");
+                bool visible = viewport.x >= usable.xMin - tolerance && viewport.x <= usable.xMax + tolerance
+                    && viewport.y >= usable.yMin - tolerance && viewport.y <= usable.yMax + tolerance;
+                var relative = arena != null ? point - arena.ArenaCenter : Vector3.zero;
+                bool insideArena = arena == null || (new Vector2(relative.x, relative.z).magnitude
+                    <= arena.ArenaRadius + GroupBattleCamera.ArenaEdgeReserve && relative.y >= 0
+                    && relative.y <= GroupBattleCamera.ArenaHeightReserve);
+                if (arena != null)
+                {
+                    if (insideArena) item.arenaModelCorners++;
+                    else
+                    {
+                        item.outsideArenaModelCorners++;
+                        if (!visible)
+                        {
+                            item.clippedOutsideArenaModelCorners++;
+                            if (item.outsideArenaSamples.Count < 3)
+                                item.outsideArenaSamples.Add("world=" + point.ToString("F3") + "; root="
+                                    + unit.WholeT.position.ToString("F3") + "; radius=" + arena.ArenaRadius.ToString("F3"));
+                        }
+                    }
+                }
+                Require(visible || !insideArena,
+                    item.name + " live model corner clipped: " + unit.UnitInfo?.id + "/" + corner + " " + viewport.ToString("F5")
+                    + " vs " + usable + "; world=" + point.ToString("F3") + "; bounds=" + bounds
+                    + "; root=" + unit.WholeT.position.ToString("F3"));
                 item.projectedCorners++;
             }
             count++;

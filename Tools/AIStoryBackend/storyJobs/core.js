@@ -13,7 +13,10 @@ function normalize(request) {
   else { input.imageModel = 'gemini-3.1-flash-image'; input.sampleCount = 1; input.aspectRatio = '16:9'; input.timeoutMs = 60000; }
   const id = sha(JSON.stringify({ protocol: VERSION, kind, input }));
   input.cacheKey = `ps_${id}`;
-  if (kind === 'image') { input.storyId = 'pocketstriker'; input.sceneIndex = 1; }
+  // Index each generated story independently. Fresh battle attempts must not
+  // append forever to one shared pocketstriker.json blob or contend on its ETag.
+  // This metadata is assigned after hashing, preserving existing job identities.
+  if (kind === 'image') { input.storyId = input.cacheKey; input.sceneIndex = 1; }
   return { id, kind, input };
 }
 function validId(id) { return typeof id === 'string' && /^[a-f0-9]{64}$/.test(id); }

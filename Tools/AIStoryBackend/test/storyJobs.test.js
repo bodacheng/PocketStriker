@@ -1,6 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const { createService, normalize } = require('../storyJobs/core');
 function fixture(generate = async () => ({ images: [{blobName:'test.jpg'}] })) {
  const rows = new Map(), locks = new Set(), queue = []; let time = 1000, calls = 0;
@@ -21,3 +22,28 @@ test('new prompt is a true cold key; polling missing job never generates',async(
 test('provider budget cannot be raised by client, malformed requests rejected',async()=>{const s=normalize({...start,input:{...start.input,sampleCount:99,timeoutMs:999999,imageModel:'expensive'}});assert.equal(s.input.sampleCount,1);assert.equal(s.input.timeoutMs,60000);assert.equal(s.input.imageModel,'gemini-3.1-flash-image');const f=fixture();await assert.rejects(f.handle({operation:'status',id:'../secret'}));await assert.rejects(f.handle({operation:'delete'}));await assert.rejects(f.handle({...start,input:{prompt:'x'.repeat(24001)}}));});
 
 test('stale crashed worker can be explicitly retried, with a hard attempt ceiling',async()=>{const f=fixture();const a=await f.handle(start);const job=f.rows.get(a.id);f.rows.set(a.id,{...job,status:'running',attempts:1,updatedAt:-200000});assert.equal((await f.handle({operation:'status',id:a.id})).error,'GENERATION_EXPIRED');assert.equal((await f.handle({operation:'retry',id:a.id})).status,'queued');await f.work(a.id);assert.equal(f.calls,1);f.rows.set(a.id,{...job,status:'running',attempts:3,updatedAt:-200000});await f.work(a.id);assert.equal(f.calls,1);assert.equal((await f.handle({operation:'status',id:a.id})).error,'ATTEMPT_LIMIT');});
+
+test('fresh image jobs use separate story indexes while preserving protocol and content IDs', async () => {
+ const generated = [];
+ const f = fixture(async (kind, input) => { generated.push(input); return { images: [{blobName:'test.jpg'}] }; });
+ const a = await f.handle(start);
+ const b = await f.handle({...start,input:{prompt:'a tiny robot at a moon carnival'}});
+ await f.work(a.id); await f.work(b.id);
+ assert.equal(generated.length,2);
+ assert.notEqual(generated[0].storyId,generated[1].storyId);
+ for (const input of generated) { assert.equal(input.storyId,input.cacheKey); assert.equal(input.sceneIndex,1); }
+ const originalIdentityInput = {prompt:start.input.prompt,imageModel:'gemini-3.1-flash-image',sampleCount:1,aspectRatio:'16:9',timeoutMs:60000};
+ const originalId = crypto.createHash('sha256').update(JSON.stringify({protocol:'pocket-story-jobs-v1',kind:'image',input:originalIdentityInput})).digest('hex');
+ assert.equal(a.id,originalId);
+ assert.equal(a.protocol,'pocket-story-jobs-v1');
+});
+
+test('preexisting ready jobs retain their legacy image locations without regeneration', async () => {
+ const f = fixture(); const spec = normalize(start);
+ f.rows.set(spec.id,{...spec,input:{...spec.input,storyId:'pocketstriker'},status:'ready',attempts:1,updatedAt:1000,
+  result:{images:[{blobName:'pocketstriker/scene_1/legacy.jpg'}]}});
+ const replay = await f.handle(start);
+ assert.equal(replay.status,'ready'); assert.equal(replay.id,spec.id); assert.equal(replay.generationAttempts,1);
+ assert.equal(replay.result.images[0].blobName,'pocketstriker/scene_1/legacy.jpg');
+ assert.equal(f.calls,0); assert.equal(f.queue.length,0);
+});

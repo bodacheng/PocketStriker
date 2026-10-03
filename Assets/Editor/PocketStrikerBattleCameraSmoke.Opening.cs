@@ -14,7 +14,7 @@ public static partial class PocketStrikerBattleCameraSmoke
         public bool complete, passed;
         public int width, height, measuredFrames, fullModelCorners, clippedCorners;
         public string utcTime, unityVersion;
-        public string scope = "Actual FightScene, local Self account, authored haruka/baruk/earth-golem animated models, production countdown, native reserve pointer switch, enemy switch, death replacement and in-scene retry. Six-unit MultiRaid and 200-unit Group countdowns are included. Every recorded full-model corner and pixel-space team axis is checked. Explicit separated/airborne/landed placements isolate framing from combat. Countdown retains its diagonal; the separated fighting duel must settle to a horizontal ground axis while height-only launches/landings leave yaw stable.";
+        public string scope = "Actual FightScene, local Self account, authored haruka/baruk/earth-golem animated models, production countdown, native reserve pointer switch, enemy switch, death replacement and in-scene retry. Six-unit MultiRaid and 200-unit Group countdowns are included. Every recorded full-model corner is checked; Duel/MultiRaid pixel-space team axes retain their diagonal countdown, while Group frames the complete battlefield. Explicit separated/airborne/landed placements isolate framing from combat. The separated fighting duel must settle to a horizontal ground axis while height-only launches/landings leave yaw stable.";
         public string limitation = "Editor Play mode with controlled placements and invulnerability. No device touch/performance certification; the airborne case checks camera framing, while actual skill145 impact/landing mechanics are validated separately.";
         public List<OpeningSample> samples = new List<OpeningSample>();
         public List<string> errors = new List<string>();
@@ -128,14 +128,14 @@ public static partial class PocketStrikerBattleCameraSmoke
         await UniTask.NextFrame(PlayerLoopTiming.LastPostLateUpdate);
         await CheckCountDownStart(name, group, count, count);
         HoldTeams();
-        await MeasureOpening(name + "-countdown", 1.5f, true);
+        await MeasureOpening(name + "-countdown", 1.5f, !group);
         await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightingProcess)
             .Timeout(TimeSpan.FromSeconds(15));
         RTFightManager.Target.team1.TurnAllUnitsInvincible(true);
         RTFightManager.Target.team2.TurnAllUnitsInvincible(true);
         HoldTeams();
         await MeasureOpening(name + "-fight-start", .5f,
-            RTFightManager.Target._CameraManager.CurrentBattleCamera is not DuelBattleCamera, 6);
+            !group && RTFightManager.Target._CameraManager.CurrentBattleCamera is not DuelBattleCamera, 6);
     }
 
     static async UniTask MeasureOpening(string name, float seconds, bool diagonal, float angleTolerance = 5,

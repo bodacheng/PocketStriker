@@ -14,7 +14,7 @@ public static class AIStoryProjectContext
             return fight == null
                 ? AIStoryCacheContext.Empty
                 : new AIStoryCacheContext(
-                    fight.ID,
+                    fight.ID + ":" + PocketStrikerStoryVariety.ForFight(fight).Seed,
                     fight.EventType.ToString(),
                     fight.FightMode.ToString());
         };

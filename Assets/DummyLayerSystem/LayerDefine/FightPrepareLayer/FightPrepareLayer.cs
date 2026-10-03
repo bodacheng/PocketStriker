@@ -83,7 +83,7 @@ public partial class FightPrepareLayer : UILayer
     public void SetFightMode(int fightMode)
     {
         ApplyPreparationButtons();
-        fightModeSwitch.Setup(fightMode, PlayerPrefs.GetInt("preferAdventureMode",  PlayerPrefs.GetInt("preferAdventureMode", 2)));
+        fightModeSwitch.Setup(fightMode, (int)TeamMode.Rotation);
         // Gangbang already exposes its unit-count controls here. Setup enables
         // the shared button again, so keep this fixed-mode selector hidden while
         // retaining the configured TeamMode for GetSetFightMode().

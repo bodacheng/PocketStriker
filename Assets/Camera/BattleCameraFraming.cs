@@ -224,7 +224,7 @@ public static class BattleCameraFraming
         return found;
     }
 
-    static Rect ClampViewport(Rect viewport)
+    public static Rect ClampViewport(Rect viewport)
     {
         float left = Mathf.Clamp(viewport.xMin, 0, 0.9f);
         float bottom = Mathf.Clamp(viewport.yMin, 0, 0.9f);

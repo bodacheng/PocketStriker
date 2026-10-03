@@ -19,6 +19,9 @@ public class AdmobAdsButton : MonoBehaviour
     private bool _rewardedLoading;
     private bool _destroyed;
     private bool _waitingForAdsReady;
+    private static AdmobAdsButton fullScreenAdOwner;
+
+    public static bool IsFullScreenAdShowing => fullScreenAdOwner != null;
 
     private static void RunOnUnityThread(Action action)
     {
@@ -39,7 +42,7 @@ public class AdmobAdsButton : MonoBehaviour
         this._watchedAdExtraProcess = watchedAdProcess;
     }
 
-    // The fight result prefab is a rewarded-ad button. The passive event-battle
+    // The fight result prefab is a rewarded-ad button. The passive post-battle
     // placement uses a separate, hidden instance of that prefab as an interstitial.
     public void UseInterstitialAd()
     {
@@ -126,26 +129,30 @@ public class AdmobAdsButton : MonoBehaviour
     // Implement a method to execute when the user clicks the button:
     public void ShowAd()
     {
+        if (!TryShowAd())
+            Debug.LogWarning("Ad is not ready, disabled, or another full screen ad is showing.");
+    }
+
+    public bool TryShowAd()
+    {
+        if (_destroyed || IsFullScreenAdShowing ||
+            (PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState))
+            return false;
+
         switch (adType)
         {
             case AdType.Interstitial:
                 if (_interstitialAd != null && _interstitialAd.CanShowAd())
                 {
-                    AdIsReady = false;
-                    _interstitialAd.Show();
-                }
-                else
-                {
-                    Debug.LogError("Interstitial ad is not ready yet.");
+                    return PresentAd(() => _interstitialAd.Show());
                 }
                 break;
             case AdType.Reward:
                 if (_rewardedAd != null && _rewardedAd.CanShowAd())
                 {
-                    AdIsReady = false;
                     var rewardGranted = false;
                     var rewardAction = _watchedAdExtraProcess;
-                    _rewardedAd.Show((x) =>
+                    return PresentAd(() => _rewardedAd.Show((x) =>
                     {
                         RunOnUnityThread(() =>
                         {
@@ -154,14 +161,47 @@ public class AdmobAdsButton : MonoBehaviour
                             rewardGranted = true;
                             rewardAction?.Invoke();
                         });
-                    });
-                }
-                else
-                {
-                    Debug.LogError("Rewarded ad is not ready yet.");
+                    }));
                 }
                 break;
         }
+        return false;
+    }
+
+    private bool PresentAd(Action show)
+    {
+        fullScreenAdOwner = this;
+        AdIsReady = false;
+        try
+        {
+            show();
+            return true;
+        }
+        catch (Exception error)
+        {
+            ReleaseFullScreenAd();
+            AppSetting.Value.UnMute();
+            if (adType == AdType.Interstitial)
+            {
+                var failedAd = _interstitialAd;
+                _interstitialAd = null;
+                failedAd?.Destroy();
+            }
+            else
+            {
+                var failedAd = _rewardedAd;
+                _rewardedAd = null;
+                failedAd?.Destroy();
+            }
+            Debug.LogWarning("Ad could not open: " + error.Message);
+            LoadAd();
+            return false;
+        }
+    }
+
+    private void ReleaseFullScreenAd()
+    {
+        if (fullScreenAdOwner == this) fullScreenAdOwner = null;
     }
 
     private void RegisterEventHandlers(InterstitialAd interstitialAd)
@@ -188,7 +228,7 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed)
+                if (this == null || _destroyed || finished || _interstitialAd != interstitialAd)
                     return;
                 Debug.Log("Interstitial ad full screen content opened.");
                 AdIsReady = false;
@@ -200,16 +240,17 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed || finished)
+                if (this == null || _destroyed || finished || _interstitialAd != interstitialAd)
                     return;
                 finished = true;
+                ReleaseFullScreenAd();
                 Debug.Log("Interstitial ad full screen content closed.");
                 AdIsReady = false;
                 if (_interstitialAd == interstitialAd)
                     _interstitialAd = null;
                 interstitialAd.Destroy();
                 if (reloadAfterWatched)
-                    LoadInterstitialAd();
+                    LoadAd();
 
                 AppSetting.Value.UnMute();
             });
@@ -219,9 +260,10 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed || finished)
+                if (this == null || _destroyed || finished || _interstitialAd != interstitialAd)
                     return;
                 finished = true;
+                ReleaseFullScreenAd();
                 AdIsReady = false;
                 if (_interstitialAd == interstitialAd)
                     _interstitialAd = null;
@@ -229,7 +271,7 @@ public class AdmobAdsButton : MonoBehaviour
                 AppSetting.Value.UnMute();
                 Debug.LogError("Interstitial ad failed to open " +
                                "full screen content with error : " + error);
-                LoadInterstitialAd();
+                LoadAd();
             });
         };
     }
@@ -258,7 +300,7 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed)
+                if (this == null || _destroyed || finished || _rewardedAd != rewardedAd)
                     return;
                 Debug.Log("Rewarded ad full screen content opened.");
                 AdIsReady = false;
@@ -270,16 +312,17 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed || finished)
+                if (this == null || _destroyed || finished || _rewardedAd != rewardedAd)
                     return;
                 finished = true;
+                ReleaseFullScreenAd();
                 AdIsReady = false;
                 if (_rewardedAd == rewardedAd)
                     _rewardedAd = null;
                 rewardedAd.Destroy();
                 AppSetting.Value.UnMute();
                 if (reloadAfterWatched)
-                    LoadRewardAd();
+                    LoadAd();
             });
         };
         // Raised when the ad failed to open full screen content.
@@ -287,9 +330,10 @@ public class AdmobAdsButton : MonoBehaviour
         {
             RunOnUnityThread(() =>
             {
-                if (this == null || _destroyed || finished)
+                if (this == null || _destroyed || finished || _rewardedAd != rewardedAd)
                     return;
                 finished = true;
+                ReleaseFullScreenAd();
                 AdIsReady = false;
                 if (_rewardedAd == rewardedAd)
                     _rewardedAd = null;
@@ -297,15 +341,20 @@ public class AdmobAdsButton : MonoBehaviour
                 AppSetting.Value.UnMute();
                 Debug.LogError("Rewarded ad failed to open " +
                                "full screen content with error : " + error);
-                LoadRewardAd();
+                LoadAd();
             });
         };
     }
 
     public void LoadAd()
     {
-        if (_destroyed)
+        if (_destroyed || (PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState))
+        {
+            AdIsReady = false;
             return;
+        }
+        // Never replace an SDK instance whose full screen presentation is live.
+        if (fullScreenAdOwner == this) return;
 
         if (string.IsNullOrEmpty(_adUnitId))
             IniUnitId();
@@ -454,6 +503,11 @@ public class AdmobAdsButton : MonoBehaviour
     void OnDestroy()
     {
         _destroyed = true;
+        if (fullScreenAdOwner == this)
+        {
+            ReleaseFullScreenAd();
+            AppSetting.Value.UnMute();
+        }
         AdsInitializer.AdsReady -= OnAdsReady;
         _interstitialAd?.Destroy();
         _rewardedAd?.Destroy();

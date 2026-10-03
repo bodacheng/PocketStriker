@@ -3,7 +3,7 @@ using FightScene;
 using UnityEngine;
 
 /// <summary>Keeps every live, fielded model in view while retaining a controllable battle orbit.</summary>
-public class AllUnitsBattleCamera : CameraMode
+public class AllUnitsBattleCamera : BattleCameraMode
 {
     readonly float _pitch;
     readonly BattleCameraProfile _profile;
@@ -13,15 +13,11 @@ public class AllUnitsBattleCamera : CameraMode
     readonly Dictionary<Data_Center, ModelFramingReference> _models = new Dictionary<Data_Center, ModelFramingReference>();
     readonly HashSet<ModelFramingReference> _framedModels = new HashSet<ModelFramingReference>();
     readonly List<ModelFramingReference> _lastFieldedModels = new List<ModelFramingReference>();
-    readonly Vector3[] _corners = new Vector3[4];
-    FightingStepLayer _hud;
     Bounds _trackingBounds;
     bool _hasTrackingBounds;
     bool _autoOrbitEngaged;
     Data_Center _lastFirst, _lastSecond;
     float _handoffRemaining;
-    Rect _lastUsableViewport;
-    bool _hasUsableViewport;
 
     sealed class ModelFramingReference
     {
@@ -35,16 +31,15 @@ public class AllUnitsBattleCamera : CameraMode
         public BattleCameraFraming.BodyEnvelope BodyEnvelope;
     }
 
-    public float Pitch => _pitch;
-    public bool IsFramingInitialized => _stabilizer.IsInitialized;
-    public bool IsHoldingReplacementFraming { get; private set; }
-    public bool IsSettlingReplacementFraming => _handoffRemaining > 0;
-    public int FramedUnitCount => _bounds.Count;
-    public float ShadowReceiverDistance { get; private set; }
-    public BattleCameraFraming.Pose DesiredPose => _stabilizer.DesiredPose;
-    public BattleCameraFraming.Pose CurrentPose => _stabilizer.CurrentPose;
+    public override float Pitch => _pitch;
+    public override bool IsFramingInitialized => _stabilizer.IsInitialized;
+    public override bool IsHoldingReplacementFraming { get; protected set; }
+    public override bool IsSettlingReplacementFraming => _handoffRemaining > 0;
+    public override int FramedUnitCount => _bounds.Count;
+    public override float ShadowReceiverDistance { get; protected set; }
+    public override BattleCameraFraming.Pose DesiredPose => _stabilizer.DesiredPose;
+    public override BattleCameraFraming.Pose CurrentPose => _stabilizer.CurrentPose;
 
-    public bool CanSetH { get; set; } = true;
     public bool AutoRotateCamera
     {
         get => PlayerPrefs.GetInt("AutoRotateCamera", 1) == 1;
@@ -68,14 +63,13 @@ public class AllUnitsBattleCamera : CameraMode
         ApplyFieldOfView(camera, fieldOfView);
         CanSetH = true;
         ResetFraming(camera);
-        _hud = Object.FindFirstObjectByType<FightingStepLayer>(FindObjectsInactive.Include);
         UpdateCamera(camera, 0);
     }
 
     public override void Exit(Camera camera)
     {
         ResetFraming(camera);
-        _hud = null;
+        ReleaseHUD();
     }
 
     public override void LocalUpdate(Camera camera) => UpdateCamera(camera, Time.deltaTime);
@@ -130,7 +124,7 @@ public class AllUnitsBattleCamera : CameraMode
         }
         if (_bounds.Count == 0) return;
 
-        var usable = UsableViewport(camera);
+        var usable = GetUsableViewport(camera);
         bool countDown = FSceneProcessesRunner.Main.currentProcess is CountDownProcess;
         bool hasFirstAnchor = TryGetTeamAnchor(manager.team1, out var firstAnchor);
         bool hasSecondAnchor = TryGetTeamAnchor(manager.team2, out var secondAnchor);
@@ -211,7 +205,7 @@ public class AllUnitsBattleCamera : CameraMode
         _autoOrbitEngaged = false;
         _lastFirst = _lastSecond = null;
         _handoffRemaining = 0;
-        _hasUsableViewport = false;
+        ResetUsableViewport();
         ShadowReceiverDistance = 0;
     }
 
@@ -309,52 +303,6 @@ public class AllUnitsBattleCamera : CameraMode
         else _trackingBounds.Encapsulate(model.Anchor);
         _bodyEnvelopes.Add(model.BodyEnvelope);
         _bounds.Add(model.Bounds);
-    }
-
-    Rect UsableViewport(Camera camera)
-    {
-        var safe = ScreenRectToViewport(Screen.safeArea, camera);
-        var middle = safe;
-        var rail = new Rect();
-        bool excludeRail = false;
-        if (_hud == null) _hud = Object.FindFirstObjectByType<FightingStepLayer>(FindObjectsInactive.Include);
-        // Evolution and result flows temporarily hide/remove the HUD. Its
-        // disappearance is not a request to move or zoom the battle camera.
-        if ((_hud == null || !_hud.gameObject.activeInHierarchy) && _hasUsableViewport)
-            return _lastUsableViewport;
-        if (_hud != null)
-        {
-            if (_hud.MiddleArea != null) middle = UIViewport(_hud.MiddleArea, camera);
-            var portraits = _hud.Team1UI?.SideIconsContainer;
-            excludeRail = FightLoad.Fight != null && !FightLoad.Fight.IsGroupBattle
-                && portraits != null && portraits.gameObject.activeInHierarchy;
-            if (excludeRail) rail = UIViewport(portraits, camera);
-        }
-        _lastUsableViewport = this is DuelBattleCamera
-            ? BattleCameraFraming.CalculateDuelViewport(safe, middle, rail, excludeRail)
-            : BattleCameraFraming.CalculateUsableViewport(safe, middle, rail, excludeRail);
-        _hasUsableViewport = true;
-        return _lastUsableViewport;
-    }
-
-    public Rect GetUsableViewport(Camera camera) => UsableViewport(camera);
-
-    Rect UIViewport(RectTransform rect, Camera camera)
-    {
-        rect.GetWorldCorners(_corners);
-        var canvas = rect.GetComponentInParent<Canvas>();
-        var uiCamera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
-        var min = RectTransformUtility.WorldToScreenPoint(uiCamera, _corners[0]);
-        var max = RectTransformUtility.WorldToScreenPoint(uiCamera, _corners[2]);
-        return ScreenRectToViewport(Rect.MinMaxRect(min.x, min.y, max.x, max.y), camera);
-    }
-
-    static Rect ScreenRectToViewport(Rect pixels, Camera camera)
-    {
-        var viewport = camera.pixelRect;
-        return new Rect((pixels.x - viewport.x) / Mathf.Max(1, viewport.width),
-            (pixels.y - viewport.y) / Mathf.Max(1, viewport.height),
-            pixels.width / Mathf.Max(1, viewport.width), pixels.height / Mathf.Max(1, viewport.height));
     }
 
     static Vector3 Abs(Vector3 vector) => new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));

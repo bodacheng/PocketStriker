@@ -97,11 +97,13 @@ public static partial class PocketStrikerTutorialValidation
         public int stableLayoutsChecked;
         public int labelsChecked;
         public int localizedLabelCases;
+        public int autoPresentationChecks;
         public bool sourcePrefabsUnchanged;
         public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls, expanded action edges, player portraits, movement pad and full-screen camera touch points. Camera input checks cover a rejected second finger, simultaneous movement and action input, and captured gestures crossing controls. Authored action down/up callbacks verify countdown locking and recovery. This static fixture has no bound fighter focus and explicitly restores its manually displayed controls after verifying production no-focus hiding; live focus/energy behavior is covered separately. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
         public string limitation = "Stopped-editor fixture: battle simulation, accounts, Addressables downloads, pause scene navigation and live camera-follow bars are omitted. The pause's native Button press is observed with a local callback. Skill EventTriggers are reconstructed from their authored persistent method names because RuntimeOnly persistent callbacks do not run in Edit mode. Joystick pointer state is tested with transitions/gravity disabled; axis magnitude assumes a screen-space canvas and is left to Play-mode smoke. Static ground and boundary are fixture context, not a simulation of the runtime arena.";
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
+        public List<string> autoStateScreenshots = new List<string>();
         public List<HUDCase> cases = new List<HUDCase>();
     }
 
@@ -289,6 +291,9 @@ public static partial class PocketStrikerTutorialValidation
                     report.stableLayoutsChecked++;
                     HUDCheckInputs(layer, events, camera, report, () => automatic, () => pauseCount);
                     auto.ChangeAutoState(true);
+                    layer.RefreshPresentation(); Rebuild(root, camera, target);
+                    var autoOnPath = Path.Combine(HUDOutput, viewport.Name + "-auto-on.png");
+                    SaveLayoutRender(target, autoOnPath); report.autoStateScreenshots.Add(autoOnPath);
                     foreach (var language in new[] { SystemLanguage.English, SystemLanguage.Japanese, SystemLanguage.ChineseSimplified })
                     {
                         AppSetting.Value.Language = language;
@@ -299,6 +304,13 @@ public static partial class PocketStrikerTutorialValidation
                     }
                     auto.ChangeAutoState(false); layer.RefreshPresentation();
                     Rebuild(root, camera, target);
+                    var autoButton = Field<BOButton>(auto, "btn");
+                    autoButton.interactable = false;
+                    layer.RefreshPresentation(); Rebuild(root, camera, target);
+                    var autoDisabledPath = Path.Combine(HUDOutput, viewport.Name + "-auto-disabled.png");
+                    SaveLayoutRender(target, autoDisabledPath); report.autoStateScreenshots.Add(autoDisabledPath);
+                    autoButton.interactable = true;
+                    layer.RefreshPresentation(); Rebuild(root, camera, target);
                     var path = Path.Combine(HUDOutput, viewport.Name + ".png");
                     SaveLayoutRender(target, path); report.screenshots.Add(path);
                     report.viewportsChecked++;
@@ -325,7 +337,8 @@ public static partial class PocketStrikerTutorialValidation
             report.sourcePrefabsUnchanged = sources.All(pair => File.ReadAllText(pair.Key) == pair.Value);
             report.passed = report.errors.Count == 0 && report.sourcePrefabsUnchanged && report.viewportsChecked == 5
                 && report.stableLayoutsChecked == 5 && report.screenshots.Count == 5 && report.localizedLabelCases == 15
-                && report.cameraTouchPointsChecked == 45 && report.cameraPointerOwnershipChecks == 180;
+                && report.cameraTouchPointsChecked == 45 && report.cameraPointerOwnershipChecks == 180
+                && report.autoPresentationChecks >= 35 && report.autoStateScreenshots.Count == 10;
             File.WriteAllText(Path.Combine(HUDOutput, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
@@ -618,10 +631,49 @@ public static partial class PocketStrikerTutorialValidation
         typeof(Button).GetMethod("Press", Private).Invoke(layer.PauseButton, null);
         Require(pauseCount() == paused + 1, "Pause Button press did not reach its callback."); report.inputStatesChecked++;
         var autoButton = Field<BOButton>(layer.Team1UI.AutoSwitch, "btn");
+        var presentation = layer.GetComponent<BattleHUDPresentation>();
+        Image AutoImage(string name) => autoButton.GetComponentsInChildren<Image>(true).Single(image => image.name == name);
+        void CheckAuto(bool expected, bool interactable)
+        {
+            Invoke(presentation, "LateUpdate");
+            var text = autoButton.GetComponentsInChildren<Text>(true).Single(label => label.enabled && !string.IsNullOrWhiteSpace(label.text));
+            Require(text.text == (expected ? "AUTO ON" : "AUTO OFF"), "AUTO caption does not state its actual mode.");
+            var thumb = AutoImage("AutoStateThumb");
+            var track = AutoImage("AutoStateTrack");
+            Require(thumb.rectTransform.anchorMin.x == (expected ? 1 : 0)
+                && thumb.rectTransform.anchorMax.x == (expected ? 1 : 0), "AUTO switch marker does not match its state.");
+            Require(!thumb.raycastTarget && !track.raycastTarget && !text.raycastTarget,
+                "AUTO status decorations intercept the button's pointer input.");
+            Require(interactable ? thumb.color.a > .99f : thumb.color.a <= .6f,
+                "AUTO marker does not reflect the disabled state.");
+            Require(autoButton.IsInteractable() == interactable, "AUTO presentation changed button availability.");
+            report.autoPresentationChecks++;
+        }
+        CheckAuto(automatic(), true);
+        var offFill = autoButton.colors.normalColor;
         bool before = automatic(); typeof(Button).GetMethod("Press", Private).Invoke(autoButton, null);
         Require(automatic() != before, "AUTO did not toggle on.");
+        CheckAuto(automatic(), true);
+        Require(autoButton.colors.normalColor.grayscale > offFill.grayscale + .2f,
+            "AUTO ON is not visibly brighter than OFF.");
         typeof(Button).GetMethod("Press", Private).Invoke(autoButton, null);
-        Require(automatic() == before, "AUTO did not toggle off."); report.inputStatesChecked += 2;
+        Require(automatic() == before, "AUTO did not toggle off.");
+        CheckAuto(automatic(), true);
+        autoButton.interactable = false;
+        CheckAuto(automatic(), false);
+        typeof(Button).GetMethod("Press", Private).Invoke(autoButton, null);
+        Require(automatic() == before, "Disabled AUTO button still toggles AI.");
+        layer.Team1UI.AutoSwitch.ChangeAutoState(true);
+        CheckAuto(true, false);
+        autoButton.interactable = true;
+        CheckAuto(true, true);
+        layer.Team1UI.AutoSwitch.ChangeAutoState(before);
+        layer.Team1UI.AutoSwitch.gameObject.SetActive(false);
+        layer.RefreshPresentation();
+        Require(!layer.Team1UI.AutoSwitch.gameObject.activeSelf, "AUTO styling reopens a hidden mode/tutorial control.");
+        layer.Team1UI.AutoSwitch.gameObject.SetActive(true);
+        CheckAuto(before, true);
+        report.inputStatesChecked += 3;
         for (int index = 0; index < buttons.Length; index++)
         {
             Target(buttons[index].transform, buttons[index].name);

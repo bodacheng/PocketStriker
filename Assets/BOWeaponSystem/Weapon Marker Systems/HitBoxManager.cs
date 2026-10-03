@@ -149,6 +149,7 @@ namespace HittingDetection
         Coroutine _delayEnableMarkers;
         public void MarkersEnablingStarts()
         {
+            if (BattleEffectLifetime.Suspended || (_decomposition != null && _decomposition.IsBattleEffectInvalidated)) return;
             if (System.Math.Abs(ActivateAfterTime) == 0)
             {
                 EnableMarkers();
@@ -170,6 +171,7 @@ namespace HittingDetection
         {
             if (_delayEnableMarkers != null)
                 StopCoroutine(_delayEnableMarkers);
+            _delayEnableMarkers = null;
             DisableMarkers();
             SetTeamConfig(TeamConfig.DefaultSet);
         }
@@ -221,6 +223,7 @@ namespace HittingDetection
 
         public void EnableMarkers()
         {
+            if (BattleEffectLifetime.Suspended || (_decomposition != null && _decomposition.IsBattleEffectInvalidated)) return;
             _usedTargets?.Clear();
             _shieldsHit.Clear();
             for (var i = 0; i < _markers.Count; i++)
@@ -233,6 +236,11 @@ namespace HittingDetection
         public void DisableMarkers()
         {
             _enabled = false;
+            HitFlesh = HitShield = false;
+            hitsOnHealthBody.Clear();
+            _weaponEnergyExhaustMissions.Clear();
+            _Targets_Raw_Hit.Clear();
+            _Raw_Target_Instance = null;
             _usedTargets?.Clear();
             _shieldsHit.Clear();
             for (var i = 0; i < _markers.Count; i++)

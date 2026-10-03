@@ -70,7 +70,7 @@ public class BO_Weapon_Animation_Events : MonoBehaviour
         
         bool RegisterBodyPartWeapon(Transform t)
         {
-            if (BEs == null || !BEs.BodyWeaponsAssigned || t == null)
+            if (BEs == null || !BEs.BodyWeaponsAssigned || t == null || BattleEffectLifetime.Suspended)
                 return false;
             // Scene transitions clear this pool before the old Animator stops.
             // New models may also emit events before parallel pool prewarming ends.

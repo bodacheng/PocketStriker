@@ -47,8 +47,3 @@ public sealed class MultiRaidBattleCamera : AllUnitsBattleCamera
 {
     public MultiRaidBattleCamera() : base(BattleCameraProfiles.MultiRaid) { }
 }
-
-public sealed class GroupBattleCamera : AllUnitsBattleCamera
-{
-    public GroupBattleCamera() : base(BattleCameraProfiles.Group) { }
-}

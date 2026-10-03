@@ -41,6 +41,8 @@ namespace FightScene
         
         private AdmobAdsButton watchBtn;
         private AdmobAdsButton postBattleInterstitial;
+        private readonly PostBattleAdSession postBattleAds = new PostBattleAdSession();
+        private FightInfo postBattleAdFight;
         public void ShowAds(int extraAdReward, RectTransform btnTarget, Action afterWatched, int finishedStage = -1)
         {
             if (extraAdReward > 0 && watchBtn != null)
@@ -68,13 +70,39 @@ namespace FightScene
 
         public void JustShowAds()
         {
-            if (postBattleInterstitial != null)
+            postBattleAds.CompleteBattle();
+            TryShowPostBattleAd();
+        }
+
+        public void BeginBattleAds()
+        {
+            postBattleAdFight = FightLoad.Fight;
+            if (postBattleAdFight == null)
             {
-                if (postBattleInterstitial.AdIsReady)
-                {
-                    postBattleInterstitial.ShowAd();
-                }
+                postBattleAds.Cancel();
+                return;
             }
+            postBattleAds.BeginBattle(postBattleAdFight.EventType, postBattleAdFight.ID, postBattleAdFight.RunTutorial);
+            // Preserve the reusable rewarded placement before the previous
+            // result layer (its current parent) is removed during preparation.
+            if (watchBtn != null)
+            {
+                watchBtn.transform.SetParent(transform, false);
+                watchBtn.gameObject.SetActive(false);
+            }
+            LoadAds();
+        }
+
+        private void TryShowPostBattleAd()
+        {
+            if (!postBattleAds.Pending) return;
+            postBattleAds.TryPresent(
+                ReferenceEquals(postBattleAdFight, FightLoad.Fight)
+                    && FSceneProcessesRunner.Main.currentProcess is FightOverProcess,
+                PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState,
+                postBattleInterstitial != null && postBattleInterstitial.AdIsReady,
+                AdmobAdsButton.IsFullScreenAdShowing,
+                () => postBattleInterstitial.TryShowAd());
         }
 
         void Awake()
@@ -157,21 +185,23 @@ namespace FightScene
             PreloadAIStory();
         }
 
+        public void BeginStoryBattleAttempt()
+        {
+            // Preparing is the actual retry/next-battle boundary. Repeated
+            // preloads and ordinary result reads retain this attempt's job.
+            CancelAIStory();
+            aiStoryFight = FightLoad.Fight;
+            aiStoryInfo = null;
+            aiStoryLoadSource = null;
+            PocketStrikerStoryVariety.BeginBattleAttempt(aiStoryFight);
+            PreloadAIStory();
+        }
+
         public void PreloadAIStory(bool newBattleAttempt = false)
         {
             if (!ShouldLoadAIStory()) return;
-
-            // A result-screen retry can keep the same FightInfo. A completed
-            // empty response must not permanently disable stories for that fight.
-            // Reset only at a new attempt; ordinary reads never reissue network
-            // calls, and pending/ready stories remain shared.
-            if (newBattleAttempt && ReferenceEquals(aiStoryFight, FightLoad.Fight)
-                && aiStoryInfo == null && aiStoryLoadSource != null
-                && aiStoryLoadSource.Task.Status == UniTaskStatus.Succeeded)
-            {
-                CancelAIStory();
-                aiStoryLoadSource = null;
-            }
+            // Retain the optional argument for existing callers. Only the
+            // Preparing boundary starts another story, including after failure.
             EnsureAIStory().Forget();
         }
 
@@ -218,6 +248,7 @@ namespace FightScene
             if (aiStoryLoadSource == null)
             {
                 EnsureAIServiceManager();
+                PocketStrikerStoryVariety.ForFight(aiStoryFight);
                 aiStoryLoadSource = new UniTaskCompletionSource<StoryInfo>();
                 aiStoryCancellation = new CancellationTokenSource();
                 var loadSource = aiStoryLoadSource;
@@ -236,7 +267,7 @@ namespace FightScene
                 if (StoryLoaderForValidation != null) return StoryLoaderForValidation();
 #endif
                 if (PocketStrikerQueuedStory.Enabled) return PocketStrikerQueuedStory.Load(cancellationToken);
-                return aiServiceManager != null ? aiServiceManager.LoadAIStory() : UniTask.FromResult<StoryInfo>(null);
+                return PocketStrikerQueuedStory.LoadLegacy(cancellationToken);
             }
             var story = await BattleStoryRequest.Load(Request, cancellationToken, PocketStrikerQueuedStory.Enabled ? 110 : 60);
             // A late reply from the previous battle cannot replace the current story.
@@ -258,13 +289,15 @@ namespace FightScene
 
         void OnDestroy()
         {
+            BattleEffectLifetime.InvalidateAll();
+            postBattleAds.Cancel();
             CancelAIStory();
             if (target == this) target = null;
         }
 
         public void LoadAds()
         {
-            if (watchAdBtnPrefab == null || FightLoad.Fight == null ||
+            if (!AdsInitializer.ShouldEnableAds() || watchAdBtnPrefab == null || FightLoad.Fight == null ||
                 (PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState))
                 return;
 
@@ -280,22 +313,26 @@ namespace FightScene
                     }
                     watchBtn.LoadAd();
                     break;
-                case FightEventType.Event:
-                    if (postBattleInterstitial == null)
-                    {
-                        postBattleInterstitial = Instantiate(watchAdBtnPrefab, transform, false);
-                        postBattleInterstitial.UseInterstitialAd();
-                        postBattleInterstitial.HasTicket = true;
-                        postBattleInterstitial.gameObject.SetActive(false);
-                    }
-                    postBattleInterstitial.LoadAd();
-                    break;
             }
+
+            if (!PostBattleAdSession.IsEligible(FightLoad.Fight.EventType, FightLoad.Fight.ID, FightLoad.Fight.RunTutorial))
+                return;
+            if (postBattleInterstitial == null)
+            {
+                postBattleInterstitial = Instantiate(watchAdBtnPrefab, transform, false);
+                postBattleInterstitial.UseInterstitialAd();
+                postBattleInterstitial.HasTicket = true;
+                postBattleInterstitial.gameObject.SetActive(false);
+            }
+            postBattleInterstitial.LoadAd();
         }
         
         void Update()
         {
             FSceneProcessesRunner.Main.ProcessUpdate();
+            // An ad that finishes loading after settlement can still appear on
+            // this result screen, but never after a retry or return to the menu.
+            TryShowPostBattleAd();
             //TutorialRunner.Main.Process();
         }
 
@@ -306,6 +343,7 @@ namespace FightScene
 
         public void ReturnToFront(MainSceneStep mainSceneStep = MainSceneStep.FrontPage)
         {
+            postBattleAds.Cancel();
             CancelAIStory();
             FSceneProcessesRunner.Main.ChangeProcess(SceneStep.None);
             var cameraManager = RTFightManager.Target?._CameraManager;

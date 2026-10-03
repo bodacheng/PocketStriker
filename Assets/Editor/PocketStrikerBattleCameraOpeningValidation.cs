@@ -16,7 +16,7 @@ public static class PocketStrikerBattleCameraOpeningValidation
     {
         public bool passed;
         public string unityVersion, utcTime;
-        public string scope = "Production diagonal yaw solver, full renderer/body-envelope fit and stabilizer; five phone/tablet aspects, three battle profiles, four world-axis headings, duel/near/tall/multi/200-unit formations. Every local human model prefab is paired against haruka at all five aspects. Full-model corners and pixel-space team axis are checked with Unity Camera.WorldToViewportPoint. Side-view distance is a controlled same-model geometric comparison, not a historic runtime measurement.";
+        public string scope = "Production diagonal yaw solver, full renderer/body-envelope fit and stabilizer for Duel/MultiRaid, plus a synthetic 46-degree crowd profile; five phone/tablet aspects, four world-axis headings, duel/near/tall/multi/200-unit formations. Every local human model prefab is paired against haruka at all five aspects. Full-model corners and pixel-space team axis are checked with Unity Camera.WorldToViewportPoint. Side-view distance is a controlled same-model geometric comparison, not a historic runtime measurement. Independent Group camera frames the battlefield and does not use this diagonal solver.";
         public string limitation = "Stopped-editor geometry using actual imported neutral model bounds; it does not animate, initialize gameplay or emulate device performance. Opening/replacement callbacks and actual battle rendering require the separate Playmode opening review.";
         public int cases, actualModelPairs, projectedCorners;
         public List<Sample> samples = new List<Sample>();

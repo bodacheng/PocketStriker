@@ -154,6 +154,7 @@ public class EventModeManager
         var fightInfo = await AddressablesLogic.LoadT<FightInfo>(location);
         fightInfo.EventType = FightEventType.Event;
         fightInfo.ArcadeFightMode = _stageModeTable.GetModeById(fightInfo.ID);
+        fightInfo.ApplyBattleModeRules();
         fightInfo.SetUnitLevelByRefLevel();
         return fightInfo;
     }

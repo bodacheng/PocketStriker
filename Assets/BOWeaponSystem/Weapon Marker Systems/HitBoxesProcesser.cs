@@ -17,6 +17,7 @@ public class HitBoxesProcesser : MonoBehaviour
 
     public void Clear()
     {
+        BattleEffectLifetime.InvalidateAll();
         _processingDecompositions.Clear();
         _processingMembership.Clear();
     }
@@ -44,11 +45,7 @@ public class HitBoxesProcesser : MonoBehaviour
 
     public void AllProcessingFade()
     {
-        for (var i = 0; i < _processingDecompositions.Count; i++)
-        {
-            if (_processingDecompositions[i] != null)
-                _processingDecompositions[i].Phase = -1;
-        }
+        BattleEffectLifetime.InvalidateAll();
     }
 
     void Update()

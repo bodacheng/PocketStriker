@@ -17,8 +17,8 @@ public static class PocketStrikerBattleCameraStabilityValidation
     {
         public bool passed;
         public string unityVersion;
-        public string scope = "Production BattleCameraStabilizer, Duel/MultiRaid/Group profiles, 30/60/120 fps; oscillating animation bounds, high-frequency root punch, deliberate pan and orbit, abrupt separation/airborne bounds, pause, replacement hold and reset. Fixed-root slender bodies make repeated quarter/half and continuous turns at fixed camera yaw, using production neutral cylindrical envelopes; their startup distance is compared with the prior square envelope. A real large displacement must still expand immediately. Every raw body-bound corner projects through Unity Camera.WorldToViewportPoint on every moving frame. Fixed-world-marker screen travel is compared with the previous raw-AABB-center and asymmetric-distance camera. Automatic duel horizontal alignment covers five aspects, two HUD offsets, four ground headings, three gaps and unequal model heights; diagonal-to-horizontal settling preserves orbit speed and angular-twitch filtering.";
-        public string limitation = "Deterministic editor geometry fixtures, including a 200-body Group layout. Synthetic animation envelopes and punch motion isolate camera response; actual animator, combat callbacks, scene loading and HUD integration are covered by BattleCameraSmoke separately. This is not a device performance benchmark.";
+        public string scope = "Production BattleCameraStabilizer for Duel/MultiRaid and a synthetic 46-degree crowd profile, 30/60/120 fps; oscillating animation bounds, high-frequency root punch, deliberate pan and orbit, abrupt separation/airborne bounds, pause, replacement hold and reset. Fixed-root slender bodies make repeated quarter/half and continuous turns at fixed camera yaw, using production neutral cylindrical envelopes; their startup distance is compared with the prior square envelope. A real large displacement must still expand immediately. Every raw body-bound corner projects through Unity Camera.WorldToViewportPoint on every moving frame. Fixed-world-marker screen travel is compared with the previous raw-AABB-center and asymmetric-distance camera. Automatic duel horizontal alignment covers five aspects, two HUD offsets, four ground headings, three gaps and unequal model heights; diagonal-to-horizontal settling preserves orbit speed and angular-twitch filtering.";
+        public string limitation = "Deterministic editor geometry fixtures, including a synthetic 200-body layout. The independent Group camera does not use this fighter stabilizer. Synthetic animation envelopes and punch motion isolate camera response; actual animator, combat callbacks, scene loading and HUD integration are covered by BattleCameraSmoke separately. This is not a device performance benchmark.";
         public int projectedCorners;
         public int motionCases;
         public int yawCases;
@@ -139,7 +139,7 @@ public static class PocketStrikerBattleCameraStabilityValidation
         try
         {
             var profiles = new[] { BattleCameraProfiles.Duel, BattleCameraProfiles.MultiRaid, BattleCameraProfiles.Group };
-            var names = new[] { "Duel", "MultiRaid", "Group" };
+            var names = new[] { "Duel", "MultiRaid", "SyntheticCrowd46" };
             for (int index = 0; index < profiles.Length; index++)
             foreach (int fps in new[] { 30, 60, 120 })
             {

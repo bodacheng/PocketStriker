@@ -123,11 +123,18 @@ namespace FightScene
                             }
                         }
 
+                        var fight = FightLoad.Fight;
+                        var corpse = center.WholeT;
+                        var corpseGeometry = center.geometryCenter;
+                        bool CanHideCorpse() => this != null && ReferenceEquals(FightLoad.Fight, fight)
+                            && center != null && corpse != null && corpseGeometry != null
+                            && center.WholeT == corpse && center.geometryCenter == corpseGeometry
+                            && center.FightDataRef != null && center.FightDataRef.IsDead.Value;
                         var disposable = new SerialDisposable();
 
 // 假设你有一个 Observable<bool> 的布尔值监控（例如：boolObservable），这个值在变化时会发出事件。
                         var boolObservable = Observable.EveryUpdate()
-                            .Where(_ => center._BasicPhysicSupport.AtRing)  // 当 bool 值为 true 时触发
+                            .Where(_ => CanHideCorpse() && center._BasicPhysicSupport != null && center._BasicPhysicSupport.AtRing)
                             .Take(1)  // 只获取第一次触发的事件
                             .Select(_ => Unit.Default);  // 转换为 Unit 类型
 
@@ -138,14 +145,16 @@ namespace FightScene
                         disposable.Disposable = Observable.Amb<Unit>(boolObservable, timerObservable)
                             .Subscribe(async (_) =>
                             {
-                                if (center != null)
+                                try
                                 {
+                                    if (!CanHideCorpse()) return;
                                     await EffectsManager.GenerateEffect(CommonSetting.MemberShiftEffectCode, null,
-                                        center.geometryCenter.position, Quaternion.identity, null);
-                                    center.WholeT.gameObject.SetActive(false);
+                                        corpseGeometry.position, Quaternion.identity, null);
+                                    if (!CanHideCorpse()) return;
+                                    corpse.gameObject.SetActive(false);
                                 }
-
-                                disposable.Dispose();
+                                catch (OperationCanceledException) when (!CanHideCorpse()) { }
+                                finally { disposable.Dispose(); }
                             }).AddTo(center);
                         RTFightManager.Target.CameraAdjustment(RTFightManager.playerTeam, RTFightManager.Target.team1.TeamMode, FightLoad.Fight.EventType);
                     }
@@ -158,7 +167,7 @@ namespace FightScene
             var manager = RTFightManager.Target;
             var hero = manager.team1.RMode_Unit.Value;
             var fightingLayer = FightingStepLayer.Open();
-            HitBoxesProcesser.Instance.AllProcessingFade();
+            BattleEffectLifetime.InvalidateAll(true);
             hero._MyBehaviorRunner.ChangeToWaitingState();
             foreach (var stick in fightingLayer.GetComponentsInChildren<UltimateJoystick>(true))
                 stick.UpdatePositioning();
@@ -176,6 +185,7 @@ namespace FightScene
                         || FSceneProcessesRunner.Main.currentProcess is not FightingProcess)
                         return;
 
+                    BattleEffectLifetime.InvalidateAll(true);
                     manager.EvolutionManager.EvolutionCount++;
                     string bottomText = "";
                     switch (manager.EvolutionManager.EvolutionCount)
@@ -194,7 +204,7 @@ namespace FightScene
                     var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
                     inBattleEvolution.Setup(hero, () =>
                         {
-                            HitBoxesProcesser.Instance.AllProcessingFade();
+                            BattleEffectLifetime.InvalidateAll();
                             UILayerLoader.Remove<InBattleEvolution>();
                             ToNewUnit(0);
                             switch (manager.EvolutionManager.EvolutionCount)

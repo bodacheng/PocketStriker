@@ -27,6 +27,9 @@ public static class PocketStrikerFightPrepareValidation
     const string BackgroundGuid = "eeefd2f03ff5f4541bbbef04d1738e92";
     static readonly string[] Routes = { "Team", "Rotation", "Evolution", "Boss", "Gangbang", "ArenaReuse" };
     static readonly SystemLanguage[] Languages = { SystemLanguage.English, SystemLanguage.Japanese, SystemLanguage.Chinese };
+    const int PreparationButtonCasesPerLanguage = 11;
+    const int ExpectedResultButtons = 2;
+    static readonly int[] LockedResultModes = { 0, 1, 2, 3, 4, -1 };
     const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
     static readonly Viewport[] Viewports =
     {
@@ -52,9 +55,11 @@ public static class PocketStrikerFightPrepareValidation
         public int localizedSkillsChecked;
         public int skillDetailCasesChecked;
         public int buttonStatesChecked;
+        public int expectedButtonStates = Languages.Length
+            * (PreparationButtonCasesPerLanguage + ExpectedResultButtons * LockedResultModes.Length);
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
-        public string scope = "Real preparation prefabs, HeroIcon and stoneModel prefabs with local portrait/gem art, actual menu background, and static localized LowerMainBar/ReturnLayer prefabs inside the safe area. Runtime SetArcadeFeature/SetEventFeature/SetGangbangFeature/SetArenaFeature and SetFightMode cover three languages, large rewards, claim states, four phone/tablet and safe-area shapes, repeated layout stability, cached mode-animation position correction, and hint visibility with Arena mottos/hidden Edit. Shared sliced button textures, rectangular hit targets, disabled/enabled/guided Fight, Edit callback, mode switching and saved preferences are checked through Unity's Button.Press gate. All 96 authored skills have exact localized names/intros and populated metadata in three languages. Real slot callbacks open the detail card; every skill's title/metadata and scrollable introduction are checked on four device shapes. Preview, close, scrim, route reuse and character selection clear stale details; renderer work is blocked and cancelled locally during selection validation. Stage 55 Evolution fixture uses four enemies and one hero, plus a local character render sampled from its idle clip; the screenshot's remotely supplied skeletal enemy is not available locally. No network, Addressables, live account, or combat initialization is invoked.";
+        public string scope = "Real preparation prefabs, HeroIcon and stoneModel prefabs with local portrait/gem art, actual menu background, and static localized LowerMainBar/ReturnLayer prefabs inside the safe area. Runtime SetArcadeFeature/SetEventFeature/SetGangbangFeature/SetArenaFeature and SetFightMode cover three languages, large rewards, claim states, four phone/tablet and safe-area shapes, repeated layout stability, cached mode-animation position correction, and hint visibility with Arena mottos/hidden Edit. Shared sliced button textures, rectangular hit targets, disabled/enabled/guided Fight, Edit callback, locked encounter modes, practice mode switching and saved preferences are checked through Unity's Button.Press gate. Both actual result prefab buttons hide all alternate modes, and direct hidden UnityEvent invocation cannot trigger those actions. All 96 authored skills have exact localized names/intros and populated metadata in three languages. Real slot callbacks open the detail card; every skill's title/metadata and scrollable introduction are checked on four device shapes. Preview, close, scrim, route reuse and character selection clear stale details; renderer work is blocked and cancelled locally during selection validation. Stage 55 Evolution fixture uses four enemies and one hero, plus a local character render sampled from its idle clip; the screenshot's remotely supplied skeletal enemy is not available locally. No network, Addressables, live account, or combat initialization is invoked.";
     }
 
     [MenuItem("PocketStriker/Validation/Check Fight Preparation")]
@@ -209,7 +214,7 @@ public static class PocketStrikerFightPrepareValidation
                     root.localScale = Vector3.one;
                     layer.ResizeAreas();
                     foreach (var converter in instance.GetComponentsInChildren<LanguageConverter>(true)) converter.Change();
-                    var mode = route == "Team" || route == "Gangbang" ? 1 : route == "Evolution" ? 3 : route == "Rotation" ? 2 : 0;
+                    var mode = route == "Team" || route == "Gangbang" ? 1 : route == "Evolution" ? 3 : 2;
                     if (route == "Gangbang")
                     {
                         gang = ScriptableObject.CreateInstance<GangbangInfo>();
@@ -342,7 +347,8 @@ public static class PocketStrikerFightPrepareValidation
             EditorSceneManager.ClosePreviewScene(scene);
         }
         report.passed = report.errors.Count == 0 && report.casesChecked == 160 && report.screenshots.Count == 26
-            && report.localizedSkillsChecked == 288 && report.skillDetailCasesChecked == 12 && report.buttonStatesChecked == 30;
+            && report.localizedSkillsChecked == 288 && report.skillDetailCasesChecked == 12
+            && report.buttonStatesChecked == report.expectedButtonStates;
         File.WriteAllText(Path.Combine(OutputDirectory, "report.json"), JsonUtility.ToJson(report, true));
         return report;
     }
@@ -662,9 +668,18 @@ public static class PocketStrikerFightPrepareValidation
 
             var mode = Field<FightModeSwitch>(layer, "fightModeSwitch");
             var modeButton = Field<BOButton>(mode, "btn");
-            PlayerPrefs.SetInt("preferAdventureMode", 2);
+            PlayerPrefs.SetInt("preferAdventureMode", 1);
             layer.SetFightMode(0);
-            Require(mode.TeamMode == TeamMode.Rotation && modeButton.interactable, "Selectable mode does not retain the saved Rotation preference.");
+            Require(mode.TeamMode == TeamMode.Rotation && !modeButton.interactable,
+                "Unconfigured non-training preparation remains selectable or inherits the practice preference.");
+            Press(modeButton);
+            Require(mode.TeamMode == TeamMode.Rotation && PlayerPrefs.GetInt("preferAdventureMode") == 1,
+                "Non-training preparation changes the mode or saved practice preference.");
+            report.buttonStatesChecked++;
+            PlayerPrefs.SetInt("preferAdventureMode", 2);
+            mode.Setup(0, 2, BattleModeRules.AllowsModeSwitch(FightEventType.Self));
+            Require(mode.TeamMode == TeamMode.Rotation && modeButton.interactable,
+                "Practice mode does not retain its saved Rotation preference.");
             Press(modeButton);
             Require(mode.TeamMode == TeamMode.MultiRaid && PlayerPrefs.GetInt("preferAdventureMode") == 1,
                 "Skinned mode switch does not select/save Team mode.");
@@ -690,6 +705,37 @@ public static class PocketStrikerFightPrepareValidation
                 && PlayerPrefs.HasKey("gangbangCountOption") == originalGangbangPreferenceExisted,
                 "Preparation button checks change the Gangbang preference.");
             report.buttonStatesChecked++;
+
+            var resultPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/DummyLayerSystem/ArenaFightOver.prefab");
+            Require(resultPrefab != null, "The result-screen prefab is missing.");
+            var resultButtons = resultPrefab.GetComponentsInChildren<NextOrAgainBtn>(true);
+            Require(resultButtons.Length == ExpectedResultButtons, "The result prefab must include retry and next buttons.");
+            foreach (var resultButton in resultButtons)
+            {
+                var instance = UnityEngine.Object.Instantiate(resultButton.gameObject);
+                try
+                {
+                    var result = instance.GetComponent<NextOrAgainBtn>();
+                    foreach (var fixedMode in LockedResultModes)
+                    {
+                        result.SetUp(fixedMode, "Stage 6");
+                        Require(!Field<RectTransform>(result, "modeRoot").gameObject.activeSelf
+                            && !Field<BOButton>(result, "againFor1v1Btn").gameObject.activeSelf
+                            && !Field<BOButton>(result, "againForMultiBtn").gameObject.activeSelf,
+                            "A non-training retry/next result exposes mode choices.");
+                        var mainCalls = 0;
+                        var alternateCalls = 0;
+                        result.SetUpAction(() => mainCalls++, () => alternateCalls++, () => alternateCalls++);
+                        Field<BOButton>(result, "againBtn").onClick.Invoke();
+                        Field<BOButton>(result, "againFor1v1Btn").onClick.Invoke();
+                        Field<BOButton>(result, "againForMultiBtn").onClick.Invoke();
+                        Require(mainCalls == 1 && alternateCalls == 0,
+                            "A hidden result action still switches the encounter mode.");
+                        report.buttonStatesChecked++;
+                    }
+                }
+                finally { UnityEngine.Object.DestroyImmediate(instance); }
+            }
         }
         finally
         {

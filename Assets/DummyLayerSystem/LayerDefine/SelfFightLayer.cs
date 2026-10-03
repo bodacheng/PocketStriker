@@ -50,7 +50,8 @@ namespace mainMenu
             IniCells(new List<HeroCell> { team11_R, team12_R, team13_R }, Team.player1);
             IniCells(new List<HeroCell> { team21_R, team22_R, team23_R }, Team.player2);
             
-            _fightModeSwitch.Setup(0,PlayerPrefs.GetInt("preferAdventureMode",  PlayerPrefs.GetInt("preferAdventureMode", 2)));
+            _fightModeSwitch.Setup(0, PlayerPrefs.GetInt("preferAdventureMode", 2),
+                BattleModeRules.AllowsModeSwitch(_stage.EventType));
             fightStartBtn.SetAction(FightStart);
             // Reuse the adventure controls' visual language in practice setup.
             _fightModeSwitch.ApplyPreparationSkin();

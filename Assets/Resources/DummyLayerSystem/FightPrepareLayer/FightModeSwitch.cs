@@ -8,6 +8,7 @@ public class FightModeSwitch : MonoBehaviour
     [SerializeField] private Animator animator;
     
     private TeamMode _teamMode;
+    bool _allowsModeSwitch;
     PreparationButtonSkin _preparationSkin;
     public TeamMode TeamMode => _teamMode;
 
@@ -23,6 +24,7 @@ public class FightModeSwitch : MonoBehaviour
     
     void OnClick()
     {
+        if (!_allowsModeSwitch) return;
         if (_teamMode == TeamMode.Rotation)
         {
             PlayerPrefs.SetInt("preferAdventureMode", 1);
@@ -35,8 +37,9 @@ public class FightModeSwitch : MonoBehaviour
         }
     }
 
-    public void Setup(int arcadeFightMode, int defaultMode)
+    public void Setup(int arcadeFightMode, int defaultMode, bool allowModeSwitch = false)
     {
+        _allowsModeSwitch = allowModeSwitch && arcadeFightMode == 0;
         btn.onClick.RemoveAllListeners();
         btn.gameObject.SetActive(true);
         switch (arcadeFightMode)
@@ -55,11 +58,16 @@ public class FightModeSwitch : MonoBehaviour
                 btn.gameObject.SetActive(false);
                 SetMode(TeamMode.Rotation);
             break;
+            case 4:
+                btn.gameObject.SetActive(false);
+                SetMode(TeamMode.MultiRaid);
+            break;
             default:
-                btn.onClick.AddListener(OnClick);
-                btn.interactable = true;
-                animator.enabled = _preparationSkin == null;
-                SetMode(defaultMode == (int)TeamMode.MultiRaid ? TeamMode.MultiRaid : TeamMode.Rotation);
+                if (_allowsModeSwitch) btn.onClick.AddListener(OnClick);
+                btn.interactable = _allowsModeSwitch;
+                animator.enabled = _allowsModeSwitch && _preparationSkin == null;
+                SetMode(_allowsModeSwitch && defaultMode == (int)TeamMode.MultiRaid
+                    ? TeamMode.MultiRaid : TeamMode.Rotation);
             break;
         }
         _preparationSkin?.RefreshState();

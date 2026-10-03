@@ -18,18 +18,13 @@ public class PreparingProcess : FSceneProcess
     
     async UniTask EnterProcess()
     {
+        BattleEffectLifetime.InvalidateAll(true);
+        FightLoad.Fight?.ApplyBattleModeRules();
         RTFightManager.Target.team1.Clear();
         RTFightManager.Target.team2.Clear();
         BoundaryControlByGod.target.ConfigureBattleRadius(false);
         
         RTFightManager.Target._CameraManager.VisibilityControl.Clear();
-        
-        if ((FightLoad.Fight.EventType == FightEventType.Quest || FightLoad.Fight.EventType == FightEventType.Gangbang || FightLoad.Fight.EventType == FightEventType.Event))
-        {
-#if UNITY_IOS || UNITY_ANDROID || UNITY_EDITOR
-            FightScene.FightScene.target.LoadAds();
-#endif
-        }
         
         RTFightManager.Target.Disposables?.Dispose();
         RTFightManager.Target.Disposables = new CompositeDisposable();
@@ -245,12 +240,14 @@ public class PreparingProcess : FSceneProcess
     
     public override void ProcessEnter()
     {
+        // Result retries reuse this process and often the same FightInfo.
+        FightScene.FightScene.target.BeginBattleAds();
         // Result-screen retries enter Preparing directly and retain the previous
         // battle's AUTO state. Restore tutorial controls before each attempt.
         if (FightLoad.Fight != null && (FightLoad.Fight.RunTutorial || FightLoad.Fight.ShouldRunFirstQuestTutorial))
             FightLoad.ConfigureBattleControl(FightLoad.Fight);
         // Also starts a fresh optional request for an in-scene retry/next battle.
-        FightScene.FightScene.target.PreloadAIStory(newBattleAttempt: true);
+        FightScene.FightScene.target.BeginStoryBattleAttempt();
         //HighLightLayer.DarkOff(Color.white, 0, true);
         // Background covers the notch/home-indicator area; UILayer keeps text safe.
         // Place it above battle UI, then EnterProcess puts the progress bar on top.

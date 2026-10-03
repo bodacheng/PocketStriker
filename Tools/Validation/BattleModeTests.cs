@@ -17,6 +17,7 @@ internal static class BattleModeTests
         {
             Check(args.Length == 1, "stage-mode table path supplied");
             CheckAdventureTable(args[0]);
+            CheckModePolicy(args[0]);
             CheckAdventureTeams();
             CheckEvolutionHpRates();
             CheckNavigation();
@@ -103,6 +104,48 @@ internal static class BattleModeTests
             foreach (int invalid in new[] { -1, 0, 4, int.MaxValue })
                 Check(!AdventureModeRules.IsValidHeroCount(stage, false, invalid), "squad rejects empty or oversized teams");
         }
+    }
+
+    static void CheckModePolicy(string path)
+    {
+        foreach (FightEventType eventType in Enum.GetValues(typeof(FightEventType)))
+        {
+            Check(BattleModeRules.AllowsModeSwitch(eventType)
+                == (eventType == FightEventType.Self || eventType == FightEventType.SkillTest),
+                "only practice and skill training allow mode changes");
+        }
+        foreach (var eventType in new[] { FightEventType.Event, FightEventType.Arena })
+        foreach (int configured in new[] { -1, 0, 1, 2, 3, 4, int.MaxValue })
+        foreach (FightMode current in Enum.GetValues(typeof(FightMode)))
+        foreach (bool group in new[] { false, true })
+        {
+            Check(BattleModeRules.ResolveMode(eventType, "easy_20261003", configured, group, current) == FightMode.Rotate,
+                "Boss/Arena stays sequential despite a stale preference, retry mode or group metadata");
+            Check(!BattleModeRules.AllowsGroupBattle(eventType), "Boss/Arena cannot use group combat");
+        }
+        foreach (var row in File.ReadAllLines(path))
+        {
+            var columns = row.Split(',');
+            if (columns.Length != 2 || !int.TryParse(columns[0], out int stage)) continue;
+            int configured = int.Parse(columns[1]);
+            int mode = AdventureModeRules.ResolveMode(stage.ToString(), configured);
+            var expected = mode == 1 ? FightMode.Multi : mode == 3 ? FightMode.Evolve
+                : mode == 4 ? FightMode.Group : FightMode.Rotate;
+            foreach (FightMode stale in Enum.GetValues(typeof(FightMode)))
+            {
+                var resolved = BattleModeRules.ResolveMode(FightEventType.Quest, stage.ToString(), configured,
+                    configured == 4, stale);
+                Check(resolved == expected, "retry/next entry uses the target stage's configured mode: " + stage);
+                Check(BattleModeRules.GetPreparationMode(resolved) == mode,
+                    "preparation badge matches the locked target stage mode");
+            }
+        }
+        foreach (var training in new[] { FightEventType.Self, FightEventType.SkillTest })
+        foreach (FightMode choice in Enum.GetValues(typeof(FightMode)))
+            Check(BattleModeRules.ResolveMode(training, null, 0, false, choice) == choice,
+                "practice selection survives restart and battle loading");
+        Check(BattleModeRules.ResolveMode(FightEventType.Gangbang, "1", 0, false, FightMode.Rotate) == FightMode.Group,
+            "legacy group routing remains fixed");
     }
 
     static void CheckEvolutionHpRates()

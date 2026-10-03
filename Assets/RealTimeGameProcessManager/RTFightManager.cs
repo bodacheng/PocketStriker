@@ -98,6 +98,12 @@ namespace FightScene
         {
             var cMode = BattleCameraProfiles.ResolveMode(FightLoad.Fight.IsGroupBattle,
                 FightLoad.Fight.team1Mode, FightLoad.Fight.team2Mode);
+            if (FightLoad.Fight.IsGroupBattle)
+            {
+                // Group mode frames the arena itself; focus only selects controls.
+                _CameraManager.Assign_Camera(cMode, null, null);
+                return;
+            }
             
             var ts = myTeam == Team.player1 ? team1.GetFightingUnitTs() : team2.GetFightingUnitTs();
             var tsOpponents = GetOpponents();
@@ -121,7 +127,7 @@ namespace FightScene
             }
             
             // Focus selects controls; it must not narrow the camera target set.
-            // The active mode reads both teams' live model bounds every frame.
+            // Ordinary modes read both teams' live model bounds every frame.
             _CameraManager.Assign_Camera(cMode, me, tsOpponents, ts);
         }
         

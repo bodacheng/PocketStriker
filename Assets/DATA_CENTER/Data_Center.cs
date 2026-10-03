@@ -161,20 +161,30 @@ public partial class Data_Center : MonoBehaviour
         _MyBehaviorRunner.INIStates(this);
         Decomposition dreamBuffEffect = null;
         bool superDreamEnded = false;
+        int dreamSequenceSerial = 0;
         _MyBehaviorRunner.RegisterSequenceCommand(
             async () =>
             {
+                var generation = BattleEffectLifetime.Generation;
+                if (!BattleEffectLifetime.IsCurrent(generation)) return;
+                int sequenceSerial = ++dreamSequenceSerial;
                 superDreamEnded = false;
                 AnimationManger.AddSpeedBuff("dreamCombo", FightGlobalSetting.DreamComboSpeed);
                 this.FightDataRef.DreamComboGauge.Value = 0;
                 EffectsManager.GenerateEffect("super_combo_explosion", FightGlobalSetting.EffectPathDefine(), WholeT.position, WholeT.rotation, WholeT).Forget();
-                dreamBuffEffect = await EffectsManager.GenerateEffect("dream_buff", FightGlobalSetting.EffectPathDefine(), geometryCenter.position, default, geometryCenter);
-                if (superDreamEnded && dreamBuffEffect != null)
-                    dreamBuffEffect.Phase = -1;
+                var effect = await EffectsManager.GenerateEffect("dream_buff", FightGlobalSetting.EffectPathDefine(), geometryCenter.position, default, geometryCenter);
+                if (!BattleEffectLifetime.IsCurrent(generation) || sequenceSerial != dreamSequenceSerial
+                    || superDreamEnded || this == null || FightDataRef == null || FightDataRef.IsDead.Value)
+                {
+                    if (effect != null) effect.InvalidateBattleEffect();
+                    return;
+                }
+                dreamBuffEffect = effect;
                 this.FightDataRef.DreamComboStart();
             },
             () =>
             {
+                dreamSequenceSerial++;
                 if (dreamBuffEffect != null)
                     dreamBuffEffect.Phase = -1;
                 AnimationManger.RemoveSpeedBuff("dreamCombo");

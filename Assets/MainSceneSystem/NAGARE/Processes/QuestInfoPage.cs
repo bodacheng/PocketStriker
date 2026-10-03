@@ -20,6 +20,7 @@ public class QuestInfoPage : MSceneProcess
     async UniTask EnterProcess(FightInfo stage, int version, CancellationToken token)
     {
         if (stage == null) return;
+        stage.ApplyBattleModeRules();
         try
         {
             var represent = stage.GetRepresentUnitInfo();
@@ -102,7 +103,7 @@ public class QuestInfoPage : MSceneProcess
                     break;
             }
 
-            if (stage is GangbangInfo)
+            if (stage.IsGroupBattle)
             {
                 await _layer.GangbangStageUnitsDisplay(_controllingGangbangInfo, token);
             }
@@ -119,23 +120,7 @@ public class QuestInfoPage : MSceneProcess
             }
             else
             {
-                int FightMode()
-                {
-                    if (FightLoad.Fight.EvolutionMode)
-                    {
-                        return 3;
-                    }
-
-                    switch (FightLoad.Fight.EventType)
-                    {
-                        case FightEventType.Quest:
-                        case FightEventType.Event:
-                            return FightLoad.Fight.ArcadeFightMode;
-                        default:
-                            return 0;
-                    }
-                }
-                _layer.SetFightMode(FightMode());
+                _layer.SetFightMode(BattleModeRules.GetPreparationMode(FightLoad.Fight.FightMode));
                 _layer.SetFightBeginFeature(()=> GoToFight(FightLoad.Fight));
             }
 
@@ -286,8 +271,7 @@ public class QuestInfoPage : MSceneProcess
         //     return;
         // }
 
-        fightInfo.team1Mode = _layer.GetSetFightMode();
-        fightInfo.team2Mode = _layer.GetSetFightMode();
+        fightInfo.ApplyBattleModeRules();
 
         switch (fightInfo.EventType)
         {

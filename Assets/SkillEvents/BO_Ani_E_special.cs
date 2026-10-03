@@ -71,6 +71,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
         public void BlastAttack_core(Vector3 pos, Quaternion qua , Transform parentTarget, int grade, string logForStateKey)
         {
+            if (BattleEffectLifetime.Suspended) return;
             switch (grade)
             {
                 case 0:
@@ -124,6 +125,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
         public void Bullet_shoot_from_Core(Vector3 pos, Quaternion qua, int grade, float speed, string logForStateKey)
         {
+            if (BattleEffectLifetime.Suspended) return;
             switch (grade)
             {
                 case 1:
@@ -177,6 +179,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
         public void MagicForward_core(string objectName, Vector3 pos, Quaternion qua, int speedGrade, string logForStateKey, bool asFlyerWeapon = true)
         {
+            if (BattleEffectLifetime.Suspended) return;
             if (string.IsNullOrEmpty(objectName))
             {
                 return;
@@ -234,6 +237,7 @@ public partial class BO_Ani_E : MonoBehaviour
 
         public void ReleasePreparedMagic_core(Vector3 pos, Quaternion qua, Transform parentT, float trackSpeed, string logForStateKey)
         {
+            if (BattleEffectLifetime.Suspended) return;
             if (Ani_E.OnLoadMagic == null)
                 return;
             Ani_E.target_pool = HurtObjectManager.GetHurtObjectPool(Ani_E.OnLoadMagic, Ani_E.magic_path);

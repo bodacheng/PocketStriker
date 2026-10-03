@@ -34,6 +34,7 @@ public static class PocketStrikerBattleModeValidation
         public int skillConfigs;
         public int bossBattlesChecked;
         public int bossSkillSetsChecked;
+        public int modePolicyChecks;
         public int multiStages;
         public int rotationStages;
         public int evolutionStages;
@@ -122,6 +123,7 @@ public static class PocketStrikerBattleModeValidation
                 ? settings.ActivePlayModeDataBuilder.Name : "none";
             var entries = settings.groups.Where(group => group != null).SelectMany(group => group.entries).ToList();
             await LoadLocalTables(entries, report);
+            CheckModePolicy(report);
             CheckRandomBosses(entries, report);
             CheckPrefabEntries(report);
 
@@ -222,6 +224,12 @@ public static class PocketStrikerBattleModeValidation
                     var retry = FightInfo.Copy(stage);
                     try
                     {
+                        retry.team1Mode = retry.team2Mode = expectedFightMode == FightMode.Multi
+                            ? TeamMode.Rotation : TeamMode.MultiRaid;
+                        retry.ApplyBattleModeRules();
+                        Require(retry.FightMode == expectedFightMode,
+                            "Retry changed the configured encounter mode at stage " + number);
+                        report.modePolicyChecks++;
                         Require(retry.dumbAIDecisionDelay == stage.dumbAIDecisionDelay
                             && retry.dreamComboAIRateNum == stage.dreamComboAIRateNum
                             && Mathf.Approximately(retry.team1HpRate, stage.team1HpRate)
@@ -341,8 +349,20 @@ public static class PocketStrikerBattleModeValidation
                 {
                     stage = RandomBossStageFactory.Create(difficulties[difficulty] + "_20260927",
                         gauges[difficulty], 3 - difficulty, template.stageRefLevel);
-                    Require(stage.EventType == FightEventType.Event && stage.ArcadeFightMode == 0
+                    Require(stage.EventType == FightEventType.Event && stage.ArcadeFightMode == AdventureModeRules.RotationMode
                         && stage.FightMode == FightMode.Rotate && stage.team2CGMode == gauges[difficulty], "Incorrect Boss routing or energy mode.");
+                    stage.team1Mode = stage.team2Mode = TeamMode.MultiRaid;
+                    stage.ArcadeFightMode = AdventureModeRules.MultiMode;
+                    var retry = FightInfo.Copy(stage);
+                    try
+                    {
+                        retry.ApplyBattleModeRules();
+                        Require(retry.FightMode == FightMode.Rotate && !retry.IsGroupBattle
+                            && retry.team1Mode == TeamMode.Rotation && retry.team2Mode == TeamMode.Rotation,
+                            "A Boss retry retained a stale team-combat override.");
+                    }
+                    finally { UnityEngine.Object.DestroyImmediate(retry); }
+                    stage.ApplyBattleModeRules();
                     Require(stage.UnitsData.Count == 3 - difficulty, "Incorrect Boss enemy count.");
                     Require(stage.UnitsData.Select(unit => unit.id).Distinct().Count() == stage.UnitsData.Count, "Repeated Boss identity.");
                     foreach (var unit in stage.UnitsData)
@@ -375,6 +395,61 @@ public static class PocketStrikerBattleModeValidation
                     if (stage != null) UnityEngine.Object.DestroyImmediate(stage);
                 }
             }
+        }
+    }
+
+    static void CheckModePolicy(Report report)
+    {
+        foreach (var eventType in new[] { FightEventType.Event, FightEventType.Arena })
+        {
+            foreach (var configured in new[] { 0, 1, 2, 3, 4 })
+            {
+                var stage = ScriptableObject.CreateInstance<FightInfo>();
+                try
+                {
+                    stage.EventType = eventType;
+                    stage.ArcadeFightMode = configured;
+                    stage.team1Mode = stage.team2Mode = TeamMode.MultiRaid;
+                    stage.Team1Auto = false;
+                    stage.ApplyBattleModeRules();
+                    Require(stage.FightMode == FightMode.Rotate && stage.team1Mode == TeamMode.Rotation
+                        && stage.team2Mode == TeamMode.Rotation && !stage.Team1Auto
+                        && !BattleModeRules.AllowsModeSwitch(eventType),
+                        "Locked encounter retained a team override or changed AUTO: " + eventType);
+                    stage.FightMode = FightMode.Group;
+                    stage.EvolutionMode = true;
+                    Require(stage.EventType == eventType && stage.FightMode == FightMode.Rotate && !stage.EvolutionMode,
+                        "A mode setter changed the locked Boss/Arena routing.");
+                    report.modePolicyChecks++;
+                }
+                finally { UnityEngine.Object.DestroyImmediate(stage); }
+            }
+            var group = ScriptableObject.CreateInstance<GangbangInfo>();
+            try
+            {
+                group.EventType = eventType;
+                group.team1Mode = group.team2Mode = TeamMode.MultiRaid;
+                group.ApplyBattleModeRules();
+                Require(!group.IsGroupBattle && group.FightMode == FightMode.Rotate,
+                    "Boss/Arena entry retained group combat metadata.");
+                report.modePolicyChecks++;
+            }
+            finally { UnityEngine.Object.DestroyImmediate(group); }
+        }
+        foreach (var eventType in new[] { FightEventType.Self, FightEventType.SkillTest })
+        foreach (var selected in new[] { TeamMode.Rotation, TeamMode.MultiRaid })
+        {
+            var stage = ScriptableObject.CreateInstance<FightInfo>();
+            try
+            {
+                stage.EventType = eventType;
+                stage.team1Mode = stage.team2Mode = selected;
+                stage.ApplyBattleModeRules();
+                Require(stage.team1Mode == selected && stage.team2Mode == selected
+                    && BattleModeRules.AllowsModeSwitch(eventType), "Training selection was locked.");
+                report.modePolicyChecks++;
+            }
+            finally { UnityEngine.Object.DestroyImmediate(stage); }
         }
     }
 

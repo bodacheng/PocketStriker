@@ -22,15 +22,16 @@ public static class PocketStrikerCombatVisualValidation
             throw new InvalidOperationException("Stop Play mode before combat visual validation.");
         var report = new Report { unityVersion = Application.unityVersion, utcTime = DateTime.UtcNow.ToString("O") };
         Check("battle-framing", PocketStrikerBattleCameraValidation.Validate, report);
+        Check("group-arena-orbit", PocketStrikerGroupBattleCameraValidation.Validate, report);
         Check("countdown-opening", PocketStrikerBattleCameraOpeningValidation.Validate, report);
         Check("duel-horizontal-and-stability", PocketStrikerBattleCameraStabilityValidation.Validate, report);
         Check("skill-effect-resources-and-depth", PocketStrikerEffectResourceValidation.Validate, report);
         Check("preview-composition-and-loading", PocketStrikerCameraLoadingValidation.Validate, report);
-        report.passed = report.errors.Count == 0 && report.checks.Count == 5;
+        report.passed = report.errors.Count == 0 && report.checks.Count == 6;
         Directory.CreateDirectory("Logs/CombatVisuals");
         File.WriteAllText("Logs/CombatVisuals/report.json", JsonUtility.ToJson(report, true));
         if (!report.passed) throw new InvalidOperationException(string.Join("\n", report.errors));
-        Debug.Log("[CombatVisuals] PASS: all five validation suites.");
+        Debug.Log("[CombatVisuals] PASS: all six validation suites.");
     }
 
     static void Check(string name, Action validate, Report report)

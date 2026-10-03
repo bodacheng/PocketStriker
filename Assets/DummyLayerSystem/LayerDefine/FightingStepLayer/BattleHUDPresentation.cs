@@ -15,7 +15,8 @@ public sealed class BattleHUDPresentation : MonoBehaviour
     SystemLanguage _lastLanguage;
     Font _font;
     readonly Dictionary<BOButton, Text> _labels = new Dictionary<BOButton, Text>();
-    readonly Dictionary<AutoSwitch, bool> _autoStates = new Dictionary<AutoSwitch, bool>();
+    readonly Dictionary<AutoSwitch, (bool Automatic, bool Interactable)> _autoStates
+        = new Dictionary<AutoSwitch, (bool Automatic, bool Interactable)>();
     static readonly Color Cyan = new Color(0.40f, 0.68f, 0.76f, 0.78f);
     static readonly Color Gold = new Color(0.83f, 0.72f, 0.43f, 0.9f);
 
@@ -218,7 +219,7 @@ public sealed class BattleHUDPresentation : MonoBehaviour
         foreach (var animator in auto.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
         var button = auto.GetComponent<BOButton>();
         if (button == null) button = auto.GetComponentInChildren<BOButton>(true);
-        Skin(button, "AUTO", Cyan, 36, true);
+        Skin(button, "AUTO OFF", Cyan, 28, true);
         Place(auto.transform, center, new Vector2(164, 72) * u);
         _autoStates.Remove(auto);
         RefreshAutoState(auto);
@@ -228,14 +229,72 @@ public sealed class BattleHUDPresentation : MonoBehaviour
     {
         if (auto == null || auto.CurrentState == null) return;
         var state = auto.CurrentState();
-        if (_autoStates.TryGetValue(auto, out var previous) && previous == state) return;
-        _autoStates[auto] = state;
         var button = auto.GetComponent<BOButton>();
         if (button == null) button = auto.GetComponentInChildren<BOButton>(true);
-        var skin = button?.GetComponent<PreparationButtonSkin>();
-        skin?.SetAccent(state ? new Color(0.48f, 0.81f, 0.69f) : Cyan,
-            state ? new Color(0.77f, 0.95f, 0.86f) : new Color(0.72f, 0.78f, 0.82f));
-        if (button != null && _labels.TryGetValue(button, out var label)) label.text = state ? "AUTO •" : "AUTO";
+        if (button == null || !_labels.TryGetValue(button, out var label)) return;
+        bool interactable = button.IsInteractable();
+        if (_autoStates.TryGetValue(auto, out var previous)
+            && previous.Automatic == state && previous.Interactable == interactable) return;
+        _autoStates[auto] = (state, interactable);
+
+        // A solid illuminated ON button and a dark OFF button remain distinct
+        // without relying on a subtle outline-color change or a single dot.
+        var colors = button.colors;
+        colors.normalColor = state ? new Color(.08f, .56f, .40f, 1) : new Color(.045f, .075f, .095f, .98f);
+        colors.highlightedColor = state ? new Color(.13f, .68f, .50f, 1) : new Color(.10f, .16f, .19f, 1);
+        colors.selectedColor = colors.normalColor;
+        colors.pressedColor = state ? new Color(.04f, .34f, .24f, 1) : new Color(.025f, .045f, .06f, 1);
+        colors.disabledColor = new Color(.13f, .17f, .19f, .75f);
+        button.colors = colors;
+        button.GetComponent<PreparationButtonSkin>()?.SetAccent(
+            state ? new Color(.58f, .96f, .80f, 1) : new Color(.36f, .46f, .51f, .85f),
+            state ? new Color(.97f, 1, .98f, 1) : new Color(.70f, .78f, .82f, 1));
+        if (!interactable)
+        {
+            label.color = new Color(.58f, .65f, .70f);
+            var outline = button.transform.Find("PreparationOutline")?.GetComponent<Image>();
+            if (outline != null) outline.color = new Color(.36f, .45f, .51f, .55f);
+        }
+        label.text = state ? "AUTO ON" : "AUTO OFF";
+        label.rectTransform.anchorMin = new Vector2(0, .32f);
+        label.rectTransform.anchorMax = Vector2.one;
+        label.rectTransform.offsetMin = new Vector2(8, 0);
+        label.rectTransform.offsetMax = new Vector2(-8, -2);
+
+        var sprite = Resources.Load<Sprite>("UI/Preparation/PreparationButtonFill");
+        var track = AutoStatusImage(button.transform, "AutoStateTrack", sprite);
+        var thumb = AutoStatusImage(track.transform, "AutoStateThumb", sprite);
+        track.rectTransform.anchorMin = track.rectTransform.anchorMax = new Vector2(.5f, 0);
+        track.rectTransform.anchoredPosition = new Vector2(0, 14);
+        track.rectTransform.sizeDelta = new Vector2(48, 12);
+        track.color = !interactable ? new Color(.23f, .28f, .31f, .5f)
+            : state ? new Color(.035f, .25f, .18f, 1) : new Color(.21f, .27f, .30f, 1);
+        thumb.rectTransform.anchorMin = thumb.rectTransform.anchorMax = new Vector2(state ? 1 : 0, .5f);
+        thumb.rectTransform.anchoredPosition = new Vector2(state ? -8 : 8, 0);
+        thumb.rectTransform.sizeDelta = new Vector2(14, 14);
+        thumb.color = !interactable ? new Color(.48f, .55f, .59f, .55f)
+            : state ? new Color(.90f, 1, .96f, 1) : new Color(.55f, .64f, .68f, 1);
+        track.transform.SetAsLastSibling();
+    }
+
+    static Image AutoStatusImage(Transform parent, string name, Sprite sprite)
+    {
+        var child = parent.Find(name);
+        if (child == null)
+        {
+            var node = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            node.layer = parent.gameObject.layer;
+            child = node.transform;
+            child.SetParent(parent, false);
+        }
+        var image = child.GetComponent<Image>();
+        image.enabled = true;
+        image.sprite = sprite;
+        image.type = Image.Type.Sliced;
+        image.raycastTarget = false;
+        image.rectTransform.pivot = new Vector2(.5f, .5f);
+        image.rectTransform.localScale = Vector3.one;
+        return image;
     }
 
     void Skin(BOButton button, string caption, Color accent, int fontSize, bool legacyImages = false)

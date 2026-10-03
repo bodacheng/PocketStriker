@@ -85,12 +85,36 @@ Dash 使用原 `rush` 人物纹理的逐字节副本，由独立 UI glyph 显示
 
 **PocketStriker → Validation → Combat Visuals**（批处理入口
 `PocketStrikerCombatVisualValidation.Validate`，带 `-quit`）统一检查完整模型构图、
-倒计时、水平自动旋转／震动稳定性、技能特效依赖和准备页相机／loading 排版。
+大乱斗全战场轨道、倒计时、水平自动旋转／震动稳定性、技能特效依赖和准备页相机／loading 排版。
 总报告位于 `Logs/CombatVisuals/report.json`，特效审计和渲染对照位于
 `Logs/EffectResources`。场景中的 UnitCamera 和展示用 DedicatedCameraConnector
 显式请求深度纹理，各档 URP Renderer 在不透明物体之后复制深度，供随后的透明特效使用。
 MCombat 的软粒子材质依赖这一纹理，资源文件齐全也可能因相机缺少深度、或生成过晚而
 隐藏光柱、光环。特效验证使用全部六档画质，以及世界和角色相机均关闭深度的负对照。
+
+大乱斗全战场相机（2026-10-03）替代按角色动态取景的 Group 相机。**Group Battle Camera**
+专项检查完整圆形地面边界贴近屏幕侧边、站立体积和纵向技能高度余量、720 种屏幕／半径／旋角组合、手指捕获与 UI 控件隔离，
+报告位于 `Logs/CameraFraming/Group/report.json`。**Battle Camera Playmode Smoke** 的默认大乱斗
+及重试使用古城，检查真实地图配置、完整边界、角色移动／相机焦点参数变更／死亡后的镜头稳定，
+以及实际 EventSystem 对战场和暂停按钮的命中分流；不等同于真机触控验证。
+**Ancient Empire Readability** 用实际地图、角色和战斗灯光保存三种视角的前后对照，
+并检查角色亮度、共享材质与资源恢复，报告和图片位于 `Logs/Rendering/AncientEmpireReadability`。
+
+战斗 Auto 的亮暗底色、明确 ON/OFF 文本与左右滑块通过 **Battle HUD** 检查实际开关回调、
+禁用、程序状态变化与隐藏控件，五种屏幕保存开启／关闭／禁用对照。
+**Skill Icon MCombat Reference** 检查 96 个实际 Sprite 地址；
+`Tools/Validation/validate_skill_icon_reference.py --reference <MCombat项目目录>` 对照注册 GUID 与原图像素，
+替换 38、99、100、181、197、198、199 七张图，保留本项目 `.meta` 与引用。
+MCombat 的 108 地址重复绑定，首个正常目录图与本项目相同，未采用临时目录里的另一张图。
+报告和对照位于 `Logs/SkillIconReference`。
+
+**Battle Effect Invalidation** 验证当帧处理队列之外的特效也立即失效、碰撞与缓存命中关闭、
+子粒子清除、旧回调无法重启、新回合租借恢复；报告位于 `Logs/CombatEffects/report.json`。
+**Evolution Heal Playmode Smoke** 另检查真实重开边界、三次死亡／选技期间已有武器与视觉特效失效，
+以及失效前发起的延迟加载无法生成旧特效、同一池的新旧体部请求竞争不会清掉新效果。
+杀敌当帧保留已完成命中的统计并取消同批剩余命中；梦幻连击的迟到请求按回合及连击序列检查后才更新增益。
+角色死亡后的异步退场只操作原战斗的原模型，重开后不会生成旧退场效果或隐藏新角色。
+报告位于 `Logs/Evolution/Playmode/report.json`。
 
 准备页退出验证通过 `PocketStrikerUIInterruptionValidation.StartBatch` 运行
 （不带 `-quit`）；实际单人／团战准备页的角色及预览相机必须在释放动画资源前同步

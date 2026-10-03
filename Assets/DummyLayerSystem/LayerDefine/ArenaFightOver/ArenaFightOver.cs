@@ -110,9 +110,10 @@ public partial class ArenaFightOver : UILayer
         awardParent.gameObject.SetActive(false);
     }
 
-    void NextFight(TeamMode mode, FightInfo fight)
+    void NextFight(FightInfo fight)
     {
-        if (fight is GangbangInfo group)
+        fight.ApplyBattleModeRules();
+        if (fight.IsGroupBattle && fight is GangbangInfo group)
         {
             // Newly loaded quests contain group leaders. Retries already contain
             // expanded fighters and must retain those counts without multiplication.
@@ -134,19 +135,6 @@ public partial class ArenaFightOver : UILayer
             UILayerLoader.Remove<ArenaFightOver>();
             return;
         }
-        switch (mode)
-        {
-            case TeamMode.Keep:
-                fight.team1Mode =(TeamMode)PlayerPrefs.GetInt("preferAdventureMode", PlayerPrefs.GetInt("preferAdventureMode", 2));
-                break;
-            case TeamMode.MultiRaid:
-                fight.team1Mode = TeamMode.MultiRaid;
-                break;
-            case TeamMode.Rotation:
-                fight.team1Mode = TeamMode.Rotation;
-                break;
-        }
-        fight.team2Mode = fight.team1Mode;
         fight.Team1Auto = FightLoad.Fight.Team1Auto;
         fight.Team2Auto = true;
         if (!fight.IsGroupBattle)
@@ -177,21 +165,7 @@ public partial class ArenaFightOver : UILayer
         {
             nextTab.SetUp(nextFight.EvolutionMode ? 3 : nextFight.ArcadeFightMode, "Stage " + nextStageNo);
             nextTab.gameObject.SetActive(true);
-            nextTab.SetUpAction(
-                () =>
-                {
-                    NextFight(nextFight.IsGroupBattle ? TeamMode.MultiRaid
-                        : nextFight.EvolutionMode ? TeamMode.Rotation : (TeamMode)nextFight.ArcadeFightMode, nextFight);
-                },
-                () =>
-                {
-                    NextFight(TeamMode.Rotation, nextFight);
-                },
-                () =>
-                {
-                    NextFight(TeamMode.MultiRaid, nextFight);
-                }
-            );
+            nextTab.SetUpAction(() => NextFight(nextFight));
         }
     }
     
@@ -213,6 +187,7 @@ public partial class ArenaFightOver : UILayer
         switch (FightLoad.Fight.EventType)
         {
             case FightEventType.Arena:
+                againTab.SetUp(AdventureModeRules.RotationMode, null);
                 break;
             case FightEventType.Quest:
                 againTab.SetUp(FightLoad.Fight.EvolutionMode ? 3 : FightLoad.Fight.ArcadeFightMode, "Stage " + FightLoad.Fight.ID);
@@ -229,17 +204,7 @@ public partial class ArenaFightOver : UILayer
                 break;
         }
         
-        againTab.SetUpAction(
-            () =>
-            {
-                NextFight(FightLoad.Fight.team1Mode, FightLoad.Fight);
-            },
-            ()=> NextFight(TeamMode.Rotation, FightLoad.Fight),
-            () =>
-            {
-                NextFight(TeamMode.MultiRaid, FightLoad.Fight);
-            }
-        );
+        againTab.SetUpAction(() => NextFight(FightLoad.Fight));
         
         returnBtn.SetListener(()=>
         {

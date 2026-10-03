@@ -26,9 +26,12 @@ public partial class Decomposition : MonoBehaviour {
     public float Counter;
     public int Phase { get; set; }
     public bool IsWeapon { get; set; }
+    public bool IsBattleEffectInvalidated { get; private set; }
     public bool RequiresTransformSyncBeforePhysicsQuery =>
         Phase == 1 && IsWeapon && _HitBox != null && _HitBox.RequiresTransformSyncBeforePhysicsQuery;
     bool hasParticle { get; set; }
+    readonly Dictionary<Renderer, bool> invalidatedRenderers = new Dictionary<Renderer, bool>();
+    bool? invalidatedTrackEnabled;
     #endregion
 
     public AudioSource AudioSource
@@ -81,7 +84,20 @@ public partial class Decomposition : MonoBehaviour {
     // 如果Decomposition不基于对象池构建来生成，比如由addressable中直接创建instance，必须主动运行Local_OnEnable()
     public void OnEnableProcess()
     {
+        IsBattleEffectInvalidated = false;
+        foreach (var entry in invalidatedRenderers)
+            if (entry.Key != null) entry.Key.enabled = entry.Value;
+        invalidatedRenderers.Clear();
+        if (invalidatedTrackEnabled.HasValue && TrackControl != null)
+            TrackControl.enabled = invalidatedTrackEnabled.Value;
+        invalidatedTrackEnabled = null;
+        BattleEffectLifetime.Register(this);
         Phase = 1;
+        if (BattleEffectLifetime.Suspended)
+        {
+            InvalidateBattleEffect();
+            return;
+        }
         if (DestructionDelay >= 0)
         {
             Counter = 0;
@@ -105,6 +121,35 @@ public partial class Decomposition : MonoBehaviour {
         HitBoxesProcesser.AddToDecompositionProcessorList(this);
     }
 
+    void OnDisable() => BattleEffectLifetime.Unregister(this);
+    void OnDestroy() => BattleEffectLifetime.Unregister(this);
+
+    public void InvalidateBattleEffect()
+    {
+        if (IsBattleEffectInvalidated) return;
+        IsBattleEffectInvalidated = true;
+        BattleEffectLifetime.Unregister(this);
+        Phase = -1;
+        CloseMarkers();
+        StopEmissions(true);
+        foreach (var trail in GetComponentsInChildren<TrailRenderer>(true)) trail.Clear();
+        foreach (var source in GetComponentsInChildren<AudioSource>(true)) source.Stop();
+        if (positionConstraint != null) positionConstraint.constraintActive = false;
+        if (TrackControl != null)
+        {
+            invalidatedTrackEnabled = TrackControl.enabled;
+            TrackControl.enabled = false;
+        }
+        foreach (var renderer in GetComponentsInChildren<Renderer>(true))
+        {
+            invalidatedRenderers[renderer] = renderer.enabled;
+            renderer.enabled = false;
+        }
+        // Keep pool return deferred to Life: the damage callback that reached
+        // this boundary can still hold references to the current rental.
+        HitBoxesProcesser.AddToDecompositionProcessorList(this);
+    }
+
     void EnergyResolve()
     {
         if (Phase == 0)
@@ -123,7 +168,7 @@ public partial class Decomposition : MonoBehaviour {
     
     void CloseMarkers()
     {
-        if (IsWeapon)
+        if (IsWeapon && _HitBox != null)
         {
             _HitBox.Local_OnDisable();
             _HitBox.SetOwnerFACR(null);
@@ -149,21 +194,21 @@ public partial class Decomposition : MonoBehaviour {
 
     public void StopEmissions(bool clearParticles)
     {
-        if (hasParticle)
+        if (clearParticles)
+        {
+            foreach (var particles in GetComponentsInChildren<ParticleSystem>(true))
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+        else if (hasParticle)
         {
             if (to_be_stop_emissions.isPlaying)
-            {
-                if (clearParticles)
-                    to_be_stop_emissions.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                else
-                    to_be_stop_emissions.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            }
+                to_be_stop_emissions.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
     }
 
     public void SetMaterialsAlpha(float a)
     {
-        if (to_be_faded_renderers.Count == 0)
+        if (to_be_faded_renderers == null || to_be_faded_renderers.Count == 0)
             return;
         
         for (int i = 0; i < to_be_faded_renderers.Count; i++)
@@ -177,7 +222,7 @@ public partial class Decomposition : MonoBehaviour {
     
     public void SpecialTriggerEvent(string defined_event_code, HitBoxSubEventManger hitBoxSubEventManger)//这个就只能在这自定义了
     {
-        if (BO_Ani_E == null)
+        if (BO_Ani_E == null || IsBattleEffectInvalidated || Phase != 1 || BattleEffectLifetime.Suspended)
             return;
         switch (defined_event_code)
         {

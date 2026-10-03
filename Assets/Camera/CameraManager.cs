@@ -5,8 +5,8 @@ using MCombat.Shared.Camera;
 public class CameraManager : CameraManagerCore
 {
     readonly BattleShadowCoverage _shadowCoverage = new BattleShadowCoverage();
-    public AllUnitsBattleCamera CurrentBattleCamera => CurrentMode as AllUnitsBattleCamera;
-    protected override bool ReenterSameModeOnAssign => CurrentMode is not AllUnitsBattleCamera;
+    public BattleCameraMode CurrentBattleCamera => CurrentMode as BattleCameraMode;
+    protected override bool ReenterSameModeOnAssign => CurrentMode is not BattleCameraMode;
 
     protected override void LateUpdate()
     {
@@ -15,8 +15,27 @@ public class CameraManager : CameraManagerCore
             UnityEngine.Time.unscaledDeltaTime);
     }
 
-    void OnDisable() => _shadowCoverage.Dispose();
+    void OnDisable()
+    {
+        CancelArenaGesture();
+        _shadowCoverage.Dispose();
+    }
     void OnDestroy() => _shadowCoverage.Dispose();
+
+    void OnApplicationFocus(bool focused)
+    {
+        if (!focused) CancelArenaGesture();
+    }
+
+    void OnApplicationPause(bool paused)
+    {
+        if (paused) CancelArenaGesture();
+    }
+
+    void CancelArenaGesture()
+    {
+        if (CurrentMode is GroupBattleCamera arena) arena.OrbitGesture.Reset();
+    }
 
     protected override IDictionary<C_Mode, CameraModeCore> CreateModeDictionary()
     {

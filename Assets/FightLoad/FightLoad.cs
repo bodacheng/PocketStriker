@@ -16,6 +16,7 @@ public static class FightLoad
     public static void ConfigureBattleControl(FightInfo fightInfo)
     {
         if (fightInfo == null) return;
+        fightInfo.ApplyBattleModeRules();
         fightInfo.Team1Auto = fightInfo.ShouldForceAutoBattle || PlayerPrefs.GetInt("auto", 0) == 1;
         fightInfo.Team2Auto = true;
         fightInfo.RunTutorial = fightInfo.ShouldRunFirstQuestTutorial;
@@ -30,11 +31,13 @@ public static class FightLoad
     {
         if (fightInfo == null || (!inSceneLoad && sceneLoadInProgress))
             return;
+        BattleEffectLifetime.InvalidateAll(true);
         ConfigureBattleControl(fightInfo);
 
         Fight = fightInfo is GangbangInfo gangbangInfo
             ? GangbangInfo.Copy(gangbangInfo)
             : FightInfo.Copy(fightInfo);
+        Fight.ApplyBattleModeRules();
 
         if (!inSceneLoad)
         {

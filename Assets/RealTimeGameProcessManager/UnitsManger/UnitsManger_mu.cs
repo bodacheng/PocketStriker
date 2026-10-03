@@ -76,11 +76,18 @@ namespace FightScene
                             FightingStepLayer.Open()?.SetSensor();
                         }
 
+                        var fight = FightLoad.Fight;
+                        var corpse = center.WholeT;
+                        var corpseGeometry = center.geometryCenter;
+                        bool CanHideCorpse() => this != null && ReferenceEquals(FightLoad.Fight, fight)
+                            && center != null && corpse != null && corpseGeometry != null
+                            && center.WholeT == corpse && center.geometryCenter == corpseGeometry
+                            && center.FightDataRef != null && center.FightDataRef.IsDead.Value;
                         var disposable = new SerialDisposable();
 
                         // 这里假设你有一个 Observable<bool> 的布尔值监控（例如：boolObservable），这个值在变化时会发出事件。
                         var boolObservable = Observable.EveryUpdate()
-                            .Where(_ => center._BasicPhysicSupport.AtRing)
+                            .Where(_ => CanHideCorpse() && center._BasicPhysicSupport != null && center._BasicPhysicSupport.AtRing)
                             .Take(1)
                             .Select(_ => Unit.Default); // 将布尔值转为 Unit 类型
 
@@ -90,17 +97,20 @@ namespace FightScene
                         disposable.Disposable = Observable.Amb<Unit>(boolObservable, timerObservable)
                             .Subscribe(async (_) =>
                             {
-                                if (center != null)
+                                try
                                 {
+                                    if (!CanHideCorpse()) return;
                                     await EffectsManager.GenerateEffect(CommonSetting.MemberShiftEffectCode, null,
-                                        center.geometryCenter.position, Quaternion.identity, null);
-                                    center.WholeT.gameObject.SetActive(false);
-                                    if (InputsManager.CurrentFocus.Value == center)
+                                        corpseGeometry.position, Quaternion.identity, null);
+                                    if (!CanHideCorpse()) return;
+                                    corpse.gameObject.SetActive(false);
+                                    if (InputsManager != null && InputsManager.CurrentFocus.Value == center)
                                     {
                                         InputsManager.FocusUnit(null);
                                     }
                                 }
-                                disposable.Dispose();
+                                catch (OperationCanceledException) when (!CanHideCorpse()) { }
+                                finally { disposable.Dispose(); }
                             }).AddTo(center);
                     }
                 });

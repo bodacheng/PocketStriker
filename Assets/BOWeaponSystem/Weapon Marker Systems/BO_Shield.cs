@@ -71,13 +71,15 @@ public class BO_Shield : MonoBehaviour {
     Decomposition shieldbreaking;
     async void ShieldBreak()
     {
+        var generation = BattleEffectLifetime.Generation;
+        if (!BattleEffectLifetime.IsCurrent(generation)) return;
         if (this._ShieldCenterSpot != null)
         {
             if (shieldBreakSpark == null)
             {
                 shieldBreakSpark = await EffectsManager.IniEffectsPool("onEnableShieldSpark", personalEffectPath, 3);
             }
-            if (shieldBreakSpark != null)
+            if (this != null && shieldBreakSpark != null && BattleEffectLifetime.IsCurrent(generation))
             {
                 shieldbreaking = shieldBreakSpark.Rent();
                 shieldbreaking.transform.position = _ShieldCenterSpot.position;
@@ -107,10 +109,12 @@ public class BO_Shield : MonoBehaviour {
 
     public async void PassHitPointsFromWeaponToShiled(List<Vector3> _ShiledHitPositions)
     {
+        var generation = BattleEffectLifetime.Generation;
+        if (!BattleEffectLifetime.IsCurrent(generation)) return;
         if (_hitSparks == null)
             _hitSparks = await EffectsManager.IniEffectsPool("shield_hit", personalEffectPath, 3);
         
-        if (_hitSparks != null)
+        if (this != null && _hitSparks != null && BattleEffectLifetime.IsCurrent(generation))
         {
             for (int i3 = 0; i3 < _ShiledHitPositions.Count; i3++)
             {

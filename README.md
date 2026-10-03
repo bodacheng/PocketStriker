@@ -18,9 +18,16 @@ Unity 竖屏战斗游戏，通过 Git 子模块和 UPM 导入 MCombatShared。�
 不要直接从 FightScene 启动，战斗依赖启动场景初始化的配置和资源索引。
 
 冒险关卡混合团战、轮换和进化模式，前两关保留单人教学；首页提供随机 Boss，
-原「混沌」和固定 Boss 挑战入口已停用。规则和关卡配置见 [战斗模式说明](Tools/BattleModes.md)。
+原「混沌」和固定 Boss 挑战入口已停用。随机 Boss 和竞技场固定轮换；除训练外，准备、
+重开和下一场均不允许切换战斗模式。闯关前五关免自动广告，其余关卡及竞技场在战斗结束后
+展示插屏广告（保留免广告购买权益）。规则和关卡配置见 [战斗模式说明](Tools/BattleModes.md)。
 可运行 `python3 Tools/Validation/validate_battle_modes.py` 检查模式、队伍与奖励请求规则；
 Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes** 验证全部冒险资源和随机 Boss 技能生成。
+`python3 Tools/Validation/validate_post_battle_ads.py` 离线验证战后广告范围、重开、延迟加载和奖励广告互斥；
+`python3 Tools/Validation/validate_story_variety.py` 验证 18 类故事的洗牌与每场选择稳定性。
+AI 故事采用二维卡通、大头短身、粗描边和平涂；题材不再局限于竞技场。
+`PocketStrikerStoryVarietyValidation.ValidateBatch` 在 Unity 中验证排队和旧同步协议的实际提示词、图片释放及取消，
+报告位于 `Logs/AIStory/Variety/report.json`，不请求真实生成服务。
 
 **PocketStriker → Validation → Tutorial** 检查六页战斗教程的点击拦截、翻页、自动战斗引导和关闭后恢复输入，
 以及第 1、2 关跳过 AI 故事的规则。报告位于 `Logs/Tutorial/report.json`；此检查使用隔离的战斗 UI，
@@ -111,6 +118,11 @@ python3 Tools/Validation/validate_ios_pods.py
 **Check Bundled UI Fonts** 检查包内字体、中文／日文备用字体、全部 Resources 界面的翻译字符
 和战斗准备标题；**Check Character Rendering** 用实际角色调色板和六个画质档位检查颜色、
 实时光照与阴影模型，报告与预览位于 `Logs/Fonts` 和 `Logs/Rendering`。
+古城使用独立材质配置降低地面亮度和反光；**Ancient Empire Readability** 保存实际地图与角色的前后对照。
+大乱斗使用固定全战场视野，圆形边缘贴近屏幕两侧，左右拖动绕战场中心旋转；**Group Battle Camera** 验证各屏幕比例、边界和触控规则。
+战斗 Auto 明确显示 ON/OFF、亮暗底色和左右滑块；**Battle HUD** 保存五种屏幕的状态对照。
+**Skill Icon MCombat Reference** 验证按 MCombat 同步的七张图标与全部 96 个 Sprite 地址；
+**Battle Effect Invalidation** 和 **Evolution Heal Playmode Smoke** 检查重开、进化选技时旧特效立即失效及延迟生成隔离。
 战斗相机按实际角色及地面范围调整 URP 阴影距离，保留各画质的图集预算；渲染检查另覆盖
 六档画质的每队 12／24／48 人与最远镜头，开关对比图位于 `Logs/Rendering/ShadowCoverage`。
 iOS 默认画质显式设为支持阴影的 Ultra；Startup Smoke 还检查真实战斗的材质、光源和阴影，

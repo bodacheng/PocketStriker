@@ -32,6 +32,7 @@ def main():
     sources = [
         "Packages/com.mcombat.shared/Runtime/Combat/FightEnums.cs",
         "Assets/MainSceneSystem/NAGARE/Processes/AdventureModeRules.cs",
+        "Assets/StagesManagement/BattleModeRules.cs",
         "Assets/MainSceneSystem/NAGARE/SceneProcess.cs",
         "Assets/MainSceneSystem/NAGARE/MSceneProcess.cs",
         "Assets/MainSceneSystem/NAGARE/ProcessesRunner.cs",
