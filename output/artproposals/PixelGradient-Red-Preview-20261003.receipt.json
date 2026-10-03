@@ -1,0 +1,41 @@
+{
+  "operation": "create_library_file",
+  "status": "succeeded",
+  "path": "/PixelGradient-Red-Preview-20261003.png",
+  "file_id": "file_0000000037ec8209ac9b5a17f5be83b3",
+  "library_file_id": "libfile_49a5b68988b48191ac3c744444912f9e",
+  "file_name": "PixelGradient-Red-Preview-20261003.png",
+  "current_version_number": 0,
+  "restored_from_version_number": null,
+  "xattrs": [
+    {
+      "name": "user.library-file-version",
+      "value": "0"
+    }
+  ],
+  "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+  "mime_type": "image/png",
+  "library_artifact_type": "image_gen",
+  "file_size_bytes": 1083833,
+  "external_connectors_accessed": false,
+  "local_path": "/Users/daisei/PocketStriker/output/artproposals/PixelGradient-Red-Preview-20261003.png",
+  "local_size_bytes": 1083833,
+  "local_sha256": "5ec42f563c16282e8f8765c4fc1b5121fbae0a4f23a0b930183c5db6140a967d",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "runtimeApplied": false,
+  "librarySaved": true,
+  "proposalStatus": "static_vertical_pixel_gradient_pending_visual_confirmation",
+  "userIntent": "Abandon dynamic grid direction. Provide only one phone portrait red static vertical pixel-gradient sample. Do not change production assets/code/scrolling. Consider six colors and disabling movement only after approval.",
+  "generation": {
+    "tool": "imagegen",
+    "generated_path": "/Users/daisei/PocketStriker/generated_images/exec-66ea1079-246c-488c-8f36-6c952a0c8ba2.png",
+    "prompt": "Create ONE phone portrait static game menu background, exactly 941 by 1672 pixels. A purely VERTICAL color gradient: the full-width horizontal bands start warm muted dark terracotta / red brown at the very top, gradually shift through warm brick red and deep crimson in the middle, and become deep burgundy red / subtle dark plum at the bottom. The gradient must clearly progress TOP TO BOTTOM ONLY, with the same color at each height across the whole width: absolutely no left-to-right color gradient, diagonal lighting, radial vignette, central glow or bright edges. Quiet nostalgic 1990s game pixel-art atmosphere, simple comfortable colors, fairly dark overall so bright game UI can stand out. Use visible yet gentle quantized staircase COLOR BANDS, with fine nonregular pixel dithering only along transitions to blend adjacent colors. Native crisp little 1-3 pixel square steps, matte flat colors, no blurred texture. The colors remain attractive and warm, medium-dark muted terracotta top around #805040, deep brick red center around #6A343C, deep burgundy-plum base around #302330; harmonize the whole palette and avoid gray lifelessness. Simple clean empty wallpaper. The only visual information is the vertical stepped color progression with very fine pixel dithering at the transitions; continuous wide bands, not repeated motifs. NO grid, NO diamond lattice, NO patterned squares, NO repeating blocks, NO checkerboard or regular Bayer matrix, NO ornaments, NO gems, NO stars or star-like dots, NO sparks, NO characters, NO text, NO buttons, NO UI, NO scene or landscape. No horizontal gradient. Portrait full bleed, no border. This is a new standalone static color-gradient background, not an edit of any grid design. Output just the single image.",
+    "referencedImages": false
+  },
+  "productionScope": "No production edits in this task; existing game background and scrolling remain as before.",
+  "diagnostics": "Logs/MenuPixelGradientReview/color-diagnostics.json",
+  "validationLimit": "ImageGen visual sample; small horizontal texture variation remains and color bands are not a mathematically exact per-row flat gradient."
+}

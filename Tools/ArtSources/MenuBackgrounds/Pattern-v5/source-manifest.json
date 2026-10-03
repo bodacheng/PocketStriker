@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-03",
+  "mode": "built-in image_gen edit; one independent call per theme",
+  "generatorCalls": 6,
+  "status": "All six generated source themes complete; source QA and provenance verified. Runtime integration and scrolling verification are parent responsibilities.",
+  "sourceProcessing": "Byte-identical copies; previews are sips downscales only.",
+  "files": [
+    {
+      "theme": "red",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-0ea53944-0144-4295-8d4e-a6ffe0ffeb0f.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+      "exactPrompt": "red-prompt.txt",
+      "preview": "previews/red.png",
+      "imageReferences": [
+        {
+          "role": "only edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v4/red.png",
+          "sha256": "f25fb18368bbaa5dbc569cbe5d50c6b6561d3d12007b85cd0fa79caae877041d"
+        }
+      ],
+      "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "green",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-1e3fc236-2fef-4d0f-9fe8-8473995a187a.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/green.png",
+      "exactPrompt": "green-prompt.txt",
+      "preview": "previews/green.png",
+      "imageReferences": [
+        {
+          "role": "only primary reference and color edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+          "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+        }
+      ],
+      "sha256": "16c0270dcf805e4c781bdb606357590882e5e727a22710f5fb60e2b07b0edef8",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "blue",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-5544fa37-527e-4f77-b312-59888effca1b.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/blue.png",
+      "exactPrompt": "blue-prompt.txt",
+      "preview": "previews/blue.png",
+      "imageReferences": [
+        {
+          "role": "only primary reference and color edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+          "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+        }
+      ],
+      "sha256": "99956fe9d12ff57d1a98218a066c520e5db8a96f9464e065538c28a2c0ac48ea",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "light",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-033ed327-52e6-46c7-97c0-e02c99f3bc42.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/light.png",
+      "exactPrompt": "light-prompt.txt",
+      "preview": "previews/light.png",
+      "imageReferences": [
+        {
+          "role": "only primary reference and color edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+          "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+        }
+      ],
+      "sha256": "c892d350fffae563d9eda7d31f35655d83a09820e9242dfd778ea430f0457d9a",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "dark",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-79ac97af-63e8-4b4e-aac1-2b4841f6c9bb.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/dark.png",
+      "exactPrompt": "dark-prompt.txt",
+      "preview": "previews/dark.png",
+      "imageReferences": [
+        {
+          "role": "only primary reference and color edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+          "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+        }
+      ],
+      "sha256": "3fd144541526a15dfe185fc8763aa346ea33848bb2b699ae6f68b80da7f91fae",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "neutral",
+      "width": 1254,
+      "height": 1254,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-8f604109-d2f0-44fd-b4d5-ed8345174087.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/neutral.png",
+      "exactPrompt": "neutral-prompt.txt",
+      "preview": "previews/neutral.png",
+      "imageReferences": [
+        {
+          "role": "only primary reference and color edit target",
+          "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+          "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+        }
+      ],
+      "sha256": "9f39e24fbcd456301e3503365f0820e6c4979fd7393ed1104fecff099d890559",
+      "byteIdenticalToBuiltinSource": true
+    }
+  ],
+  "visualInspection": "Uniform staggered diamond lattice, soft pixel edges, small periodic skill-crystal outlines, tiny gap plus/star/chevrons and narrow contrast retained visually across all six themes. Muted moss/sage, denim/indigo, beige/ochre-grey, aubergine/plum and cool neutral grey variants; no new focal artwork. Pixel-exact geometry was not claimed.",
+  "seamlessScrolling": "Prompt intent only; mathematical edge/phase continuity and runtime scrolling not yet verified by source-art agent.",
+  "runtimeIntegration": "Not performed by source-art agent; no Assets or scenes edited."
+}

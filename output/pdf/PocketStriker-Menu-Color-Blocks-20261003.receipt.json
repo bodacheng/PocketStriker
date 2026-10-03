@@ -1,0 +1,3975 @@
+{
+  "path": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Color-Blocks-20261003.pdf",
+  "bytes": 2218213,
+  "sha256": "ce45b4cdf8e8ddaa3aebdb3b229286c1ab800bfb2f3953905b12dd5fc9fbcc0c",
+  "utc": "2026-10-03T05:56:29.129507+00:00",
+  "baseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+  "beforeSourceSet": "Pattern-v6",
+  "afterSourceSet": "Pattern-v7",
+  "approvedStaticRedSha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+  "previousPdfHashes": {
+    "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Backgrounds-20261003.pdf": "ecb78745710f76eaf92d300a4aa8d2faf6062063a4634547a170fa9f59ee34f7",
+    "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Simple-Grid-20261003.pdf": "878bf3279859dd0b1617ba1d9e102bdd4ed23ec9d968d42f1d088c35a9e2748c"
+  },
+  "reports": {
+    "before": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Before-v6/Runtime/report.json",
+      "sha256": "86eafcd16460b65443c22485b9d6525b8749c021423fd6ece475b5b06c3ad0bb"
+    },
+    "manifest": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Before-v6/Source/manifest.json",
+      "sha256": "b09787e95e85d075349de0e070e699269ef2504cc0878c2acb8d95e7e64aebd5"
+    },
+    "before_parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Before-v6/source-parity.json",
+      "sha256": "db7546a3df15f85a224f9cc43ac905fe9d14926540a679e13b74cb90a90250e6"
+    },
+    "after": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/After/Runtime/report.json",
+      "sha256": "27a6a2cf256e8aba4bc0d4fa201cf0b195f2a35dfb00fbc5862cd6412aa07dd3"
+    },
+    "build": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/build.json",
+      "sha256": "0a0b1a040bbae039ab70f294a97fe89c25431dc86fe9a05c89b00a4876c0962d"
+    },
+    "readback": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/build-readback-audit.json",
+      "sha256": "0f81d2f584ce3159736ef4d58b83642d41c1ca0c3943e71a8bda4b040914953e"
+    },
+    "configuration": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/scene-configuration.json",
+      "sha256": "55ab9e90e6735727f3edd8e60824c1942e5276c60e77979f6cd8ca7b499e0778"
+    },
+    "parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/After/source-parity.json",
+      "sha256": "19ad3b79989bab3a83b55e6188a8237999f5695226f512c48ee41028a7094263"
+    },
+    "after_run": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/After/run-receipt.json",
+      "sha256": "bd8c456427b7af6131b842a93500186d5db7478452ad683ec280b46030a0c3ce"
+    },
+    "regression_runs": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Regression/run-receipts.json",
+      "sha256": "adaea42374be58cdb8dd8b5be46db01d4e71ff278a2fd85588e90c270a34ff0a"
+    },
+    "geometry": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Regression/geometry-report.json",
+      "sha256": "174511140f642c6105feb4da4c8756a1771ee1c80b3b583a181542c46664c56d"
+    },
+    "pointer": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Regression/ui-pointer-report.json",
+      "sha256": "4dc0107f0d36b813a8f9f2c85a2133930841d33159cf61a619a216f50f137581"
+    },
+    "compile": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Regression/compile-iOS-report.json",
+      "sha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a"
+    },
+    "motion": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/report.json",
+      "sha256": "d537b7c00a17ae742dd7d063b278b8f574440347b94d580284802c492b74a8cc"
+    },
+    "motion_parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/source-parity.json",
+      "sha256": "02c29b0b64aec10b9e626833cff25ff999e9305b7dde88bb155859c5e36f6178"
+    },
+    "motion_run": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/run-receipt.json",
+      "sha256": "60fd2db486e3212807e7253144049e3547b2ab96aea416b725c9b4dae666570b"
+    },
+    "motion_gif_evidence": {
+      "path": "/Users/daisei/PocketStriker/output/artproposals/PocketStriker-Menu-Color-Blocks-Scroll-20261003.evidence.json",
+      "sha256": "33da7dc316223c2ff2216b65b2618bb038a8b3677a5bafa2acd5591f06869092"
+    },
+    "native_phase": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Runtime/report.json",
+      "sha256": "1fca3ff0972bd3b133862461609c91b0549d9f7a876b6f136309deaa892608ff"
+    },
+    "phase_run": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/run-receipt.json",
+      "sha256": "9f22d48f5e5afe12198246669d216174c0ed77899c4a90412fbfc63a532c25a0"
+    },
+    "phase_execution": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/execution-parity.json",
+      "sha256": "a9254871de01e1bde399131946b22457fb64311bb8aa1ba21801df6e48baed6b"
+    },
+    "phase_parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/source-parity.json",
+      "sha256": "a9254871de01e1bde399131946b22457fb64311bb8aa1ba21801df6e48baed6b"
+    },
+    "phase_restore": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/restore-parity.json",
+      "sha256": "4f1f4ab7cb758ca7ecfd7299d5010c82c2b14e9add899e638379f224d43a4006"
+    },
+    "phase_diff": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/minimal.diff",
+      "sha256": "5e4e378ce9b707dc35736073707504600e43f0b606b2e80d64b86363f43c02d9"
+    },
+    "phase_immutable_fixture": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/Immutable/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+      "sha256": "38c1b875275d56de03fa1809e11492196bef84e66dffee55f46e36843859f4ea"
+    },
+    "phase_instrumented_fixture": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/Instrumented/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+      "sha256": "d416392d4b770c2724d45abcac2b6276bf0954caed0e91d8f04c06a43da0de31"
+    }
+  },
+  "screenshotHashes": {
+    "Before-v6/375x667/red": "6506073b8db8361dc18e641dfaaf9827c2839d3ef9aacdc8d7198c27c68ace80",
+    "Before-v6/375x667/green": "5993919b5b867f952c529d39cf68a41531b26aa8ba23f29c0f02566d0f6be89f",
+    "Before-v6/375x667/blue": "89b376043a46f64a867f6fded90cdfcc7d2f4bf12ea66d891e0d59c132b77115",
+    "Before-v6/375x667/light": "d28ed2c6ddba92a8c5bbff0ff9fa6a8005495e173bb2a3082c5d3d19389d8b65",
+    "Before-v6/375x667/dark": "68d83feb523f7f2e9db81052cc0a216e9d9255a3c48876016f4d914939b1efd8",
+    "Before-v6/375x667/null": "1c8f8d1860566b9f47c6947b90a21ce309fc4c0a014ea8e5e93ccc7d1ef82c8f",
+    "Before-v6/390x844/red": "0a22e9ff4f74457de2722b50dc30a82b8a968d362ceefc688fed99d7a5f9045f",
+    "Before-v6/390x844/green": "593e9621b20ec0776f5f8af27c7c03e04f9aa457c11fed88fbf46c2d8d15b7b0",
+    "Before-v6/390x844/blue": "c62cf3e0c6a3694d8be57f6397ef5a05834aa6948d40ba8c31157983460166af",
+    "Before-v6/390x844/light": "8653b05e3c61dae7e6f637b55fb954aabacdacaafd91873ff6131d1856d55d85",
+    "Before-v6/390x844/dark": "17a284143d139d57ef0b8bc6b3d5ddf1bccd45d0b995ab90eba1d3aca451a404",
+    "Before-v6/390x844/null": "2567cbe4891e625d918346dc0f198d4aeaaadd80a4dd177af8e300361b5f0bb3",
+    "Before-v6/540x960/red": "9ee0eab47d593e1d4a037f4510de5ea26686fdeaeed4a30789b6dff491d5d7b5",
+    "Before-v6/540x960/green": "3399bc5d8d90fba84eef1edb3fadbf53b2e722dfe75bad7b771571b671dc780e",
+    "Before-v6/540x960/blue": "dd5a4536623bf9a4d78e7277cec8b4692873f41b842c20fa3d0ad24e4b9bd3bf",
+    "Before-v6/540x960/light": "7e4a4cd95231383d5ff6162a079c013839ef3693ebc24e3e0406c13e84a2d1ab",
+    "Before-v6/540x960/dark": "cc34dd3ab4036b0b1dc6877572bb3ba182d46f8365eb980e078fd410deb89c67",
+    "Before-v6/540x960/null": "345d71a2b77289fa031db94559e5995a971fad77e0203013c17d79627dc7d675",
+    "Before-v6/768x1024/red": "67538207e463323f65e88d24bdf7ff401b333bb709614cbcbe7e2eb477081a89",
+    "Before-v6/768x1024/green": "5e6ff4110921fbd2e7a920b52b21b785626db5a955e0968a9436141211a75b60",
+    "Before-v6/768x1024/blue": "aa64ea665b2e062062f0ae1b544d0786570ae799ec7c7ce7d94af1c23e14243d",
+    "Before-v6/768x1024/light": "81e6e5f80cfe37c40ac82a041cafe0de15cd8e466c45bb2157b5d5ce5b664cd9",
+    "Before-v6/768x1024/dark": "601d3f3fd178dbc494d7fd3963628eff9de5144648b3e425a0918edd2db37cdd",
+    "Before-v6/768x1024/null": "f04b64e77c3d2cdf300d95008f5892b63485cfd5035b22eab8fc0357d6cbb4e5",
+    "After/375x667/red": "5cd89e790371ef438dbd3c7063b541b0c40001be9a9d0f5206c4e42dd2d51588",
+    "After/375x667/green": "380afe1e2f2031b8f7687877b13980b9bf30e15f5f774937babec1e23d6422ad",
+    "After/375x667/blue": "b6e986af0b4448c841a9719d1c189fa41e38bc5871d09cd595ad13931ae378f4",
+    "After/375x667/light": "1a5622191bba918d12d1db26e51dcfba7bd33131b1d7f06b1fdf3ba9a8603e27",
+    "After/375x667/dark": "65df828d30d1d885cb524c412c06f2d0e77d99992fa058dbcabe10a00b696c64",
+    "After/375x667/null": "d515681dab531fe87633828d34056b9ac9d7301a9c7cf55e55aa8c5b9e08c59f",
+    "After/390x844/red": "9695f4014e19320a584bb483fb1f2139e86eaf401642e7c825f458979b58d3f3",
+    "After/390x844/green": "56bdec6674cbf28a0c604f2ba6b6e6c26848ce091b36453515349dcbcd79e47f",
+    "After/390x844/blue": "8102081c9dd5913c4d4aa5266bede99d31c9e3e08223189a2f2c2468e1cca994",
+    "After/390x844/light": "3156a98bd2a9ae14da50f92cce8ac2d3ec47b3e1e814fb1c5addeb96aa7f715a",
+    "After/390x844/dark": "69c7c1efc879495c26a7eb31ce81ba6f2a89c18070b339332126f37a160f450e",
+    "After/390x844/null": "4ec0327a5b077d78484eac069cae601725728dd58b3a293307b12a608ba1047c",
+    "After/540x960/red": "e1c56538453434e90852da0a61d181cd6a19b15082ff488bea02131ace3ad841",
+    "After/540x960/green": "e1da6896c977121f08905186e9b43704e85a1b6b0e158933ee6dc296f38bec4e",
+    "After/540x960/blue": "5a610f2c8c49ec0d7dc7729c9419e98ec7780c8f65698a33f41895ffc7ff3819",
+    "After/540x960/light": "77b707654248bf34a4b5c2cbdcd1b6aaa9b67800d8d805cfb5dfdd0bae86dd28",
+    "After/540x960/dark": "90d3957592dc035d37ec69969b28d739d1875bb437a666769260a9f0c53d2954",
+    "After/540x960/null": "2911883d9d146656a39ca019e3ea76dbcac6c030526f9c808184703fa5ba028e",
+    "After/768x1024/red": "6e0ee0730f95b38784d5a0034627cbe0b3f61453027f3508f3a76c1fffe913ff",
+    "After/768x1024/green": "8c7404d773029223654223391a2bbf8e357e05bdbd55213aef642c73f22c09ae",
+    "After/768x1024/blue": "4905769d3dfa2e2f37ed191837415386b91269981d3cb045e54c13eeef5c9146",
+    "After/768x1024/light": "07bf4dfd602aea290f809be906740be4daa067d616cc719ca4ac548cd6a22606",
+    "After/768x1024/dark": "071d3e4c968ecfa7df944527c0e7acb7c863013b3ab7eee2e982ddf7a5e6cfb9",
+    "After/768x1024/null": "c3c6b54ad54b1590038f6d1e97a3ae5c740468888078e44058d7c8f50d021243"
+  },
+  "comparison": {
+    "summary": {
+      "rootPositionDelta": 0.0,
+      "rootRotationDelta": 0.0,
+      "cameraPositionDelta": 0.01800537109375,
+      "cameraRotationDelta": 0.0,
+      "cameraSizeRelativeDelta": 0.01635466875076162,
+      "allRecordsAndPosesSame": true
+    },
+    "cases": [
+      {
+        "viewport": "375x667",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.01800537109375,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.01635466875076162
+      },
+      {
+        "viewport": "375x667",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00103759765625,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00092636776115763
+      },
+      {
+        "viewport": "375x667",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0037841796875,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.003610430573602198
+      },
+      {
+        "viewport": "375x667",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00616455078125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00592261664445094
+      },
+      {
+        "viewport": "375x667",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 9.623507800450393e-06
+      },
+      {
+        "viewport": "375x667",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00323486328125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0031118493658537625
+      },
+      {
+        "viewport": "390x844",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0006103515625,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0006873643349491462
+      },
+      {
+        "viewport": "390x844",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2419187365681895e-05
+      },
+      {
+        "viewport": "390x844",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 4.0485072632625354e-05
+      },
+      {
+        "viewport": "390x844",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00012322772746221672
+      },
+      {
+        "viewport": "390x844",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 9.604969909049729e-06
+      },
+      {
+        "viewport": "390x844",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 6.103515625e-05,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 4.639787462563814e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 7.23155315775658e-06
+      },
+      {
+        "viewport": "540x960",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "540x960",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 4.0486164148204515e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00012353923425451586
+      },
+      {
+        "viewport": "540x960",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.3000192349784767e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "768x1024",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 5.247688745425965e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 2.4729842009862608e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 9.040314298973413e-06
+      },
+      {
+        "viewport": "768x1024",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 6.591763143712039e-07
+      },
+      {
+        "viewport": "768x1024",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.449005688139977e-06
+      },
+      {
+        "viewport": "768x1024",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.581594662574982e-06
+      }
+    ]
+  },
+  "nativeGridChecks": {
+    "red": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "eb9e6e1b197985c12747f110b9db4af1c60719af4d689d235ce9940cf1cf9707",
+      "oppositeEdgesExact": true
+    },
+    "green": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "a371651a4a1a83e3ecbd4ccad2250fe98bda89c5fedc008c2e0ab7f5d5a2e98a",
+      "oppositeEdgesExact": true
+    },
+    "blue": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "d52f19ec6b24c3bbb29d1281a73ab7d6413aa0a6e32aab82b7daafe763135a08",
+      "oppositeEdgesExact": true
+    },
+    "light": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "19f0e721da6b430403d3854593e1ce7d0ad9fd1782374c25a5d47f3c2da54c7a",
+      "oppositeEdgesExact": true
+    },
+    "dark": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "b4d9c3cfec9d8cce928ad358b3b63f9af973939f70d741c6949620e8bbbe812e",
+      "oppositeEdgesExact": true
+    },
+    "null": {
+      "unitWidth": 260,
+      "unitHeight": 262,
+      "unitsCompared": 36,
+      "unitRgbaSha256": "db32cadc8c0f04788f5c44273eb17e8e58e6d2e2ee3f8728e7ff7f5315865766",
+      "oppositeEdgesExact": true
+    }
+  },
+  "nativeScrollSamples": [
+    {
+      "viewport": "375x667",
+      "color": "red",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999683126807213,
+        "y": 0.00999997928738594
+      },
+      "expectedUvDelta": {
+        "x": 0.0020119291730225086,
+        "y": 0.0020119291730225086
+      },
+      "actualUvDelta": {
+        "x": 0.0020118653774261475,
+        "y": 0.002011924982070923
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.277963787317276,
+        "y": -0.025977879762649536
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -6.22300910949707,
+        "y": -6.2710652351379395
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2011929154396057,
+      "uvDeltaError": 6.393310769681193e-08,
+      "realtimeElapsed": 0.20048683299999936,
+      "scaledClockElapsed": 0.20119292091836627,
+      "frames": 214,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/red-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/red-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "375x667",
+      "color": "green",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "measuredUvPerSecond": {
+        "x": 0.010000990703701973,
+        "y": 0.0
+      },
+      "expectedUvDelta": {
+        "x": 0.002006958005949855,
+        "y": 0.0
+      },
+      "actualUvDelta": {
+        "x": 0.0020071566104888916,
+        "y": 0.0
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27795907855033875,
+        "y": -0.02798980474472046
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -6.223822593688965,
+        "y": 0.0
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20069578289985657,
+      "uvDeltaError": 1.986045390367508e-07,
+      "realtimeElapsed": 0.2006918750000004,
+      "scaledClockElapsed": 0.20069579081632583,
+      "frames": 223,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/green-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/green-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "375x667",
+      "color": "blue",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.010000171139836311,
+        "y": 0.009999984875321388
+      },
+      "expectedUvDelta": {
+        "x": 0.002002710709348321,
+        "y": 0.002002710709348321
+      },
+      "actualUvDelta": {
+        "x": 0.0020027458667755127,
+        "y": 0.002002708613872528
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27795466780662537,
+        "y": -0.02598709613084793
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -6.223313331604004,
+        "y": -6.271068096160889
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20027115941047668,
+      "uvDeltaError": 3.521981994936141e-08,
+      "realtimeElapsed": 0.20028291700000267,
+      "scaledClockElapsed": 0.20027108134920724,
+      "frames": 216,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/blue-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/blue-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "375x667",
+      "color": "light",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000675916671753,
+        "y": -0.009999986737966537
+      },
+      "expectedUvDelta": {
+        "x": -0.00200082128867507,
+        "y": -0.00200082128867507
+      },
+      "actualUvDelta": {
+        "x": -0.002000957727432251,
+        "y": -0.002000819891691208
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.2739509642124176,
+        "y": -0.029990624636411667
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 6.223627090454102,
+        "y": 6.271069049835205
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20008225739002228,
+      "uvDeltaError": 1.3644590524108935e-07,
+      "realtimeElapsed": 0.2000860830000022,
+      "scaledClockElapsed": 0.20008216411564206,
+      "frames": 220,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/light-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/light-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "375x667",
+      "color": "dark",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000188834965229,
+        "y": -0.010000058449804783
+      },
+      "expectedUvDelta": {
+        "x": -0.00200431770645082,
+        "y": -0.00200431770645082
+      },
+      "actualUvDelta": {
+        "x": -0.0020043551921844482,
+        "y": -0.002004329115152359
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.2739475667476654,
+        "y": -0.029994133859872818
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 6.223324298858643,
+        "y": 6.271113872528076
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2004317343235016,
+      "uvDeltaError": 3.918339785968783e-08,
+      "realtimeElapsed": 0.2003454170000012,
+      "scaledClockElapsed": 0.2004317885487552,
+      "frames": 218,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/dark-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/dark-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "375x667",
+      "color": "null",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000640526413918,
+        "y": -0.010000045411288738
+      },
+      "expectedUvDelta": {
+        "x": -0.0020028860308229923,
+        "y": -0.0020028860308229923
+      },
+      "actualUvDelta": {
+        "x": -0.002003014087677002,
+        "y": -0.002002894878387451
+      },
+      "startUvPosition": {
+        "x": 0.27595192193984985,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27394890785217285,
+        "y": -0.02999269962310791
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 6.223605155944824,
+        "y": 6.271105766296387
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2002885788679123,
+      "uvDeltaError": 1.2836213159062027e-07,
+      "realtimeElapsed": 0.2002971669999951,
+      "scaledClockElapsed": 0.20028858418367435,
+      "frames": 221,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6025832891464233,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/null-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/375x667/null-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "red",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.010000071488320827,
+        "y": 0.010000034235417843
+      },
+      "expectedUvDelta": {
+        "x": 0.002000198932364583,
+        "y": 0.002000198932364583
+      },
+      "actualUvDelta": {
+        "x": 0.0020002126693725586,
+        "y": 0.0020002052187919617
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.3316134512424469,
+        "y": -0.025989599525928497
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -7.874697685241699,
+        "y": -7.935245037078857
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20001983642578125,
+      "uvDeltaError": 1.5107103124023524e-08,
+      "realtimeElapsed": 0.20001600000000508,
+      "scaledClockElapsed": 0.20001991213152337,
+      "frames": 221,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/red-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/red-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "green",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999376721680164,
+        "y": 0.0
+      },
+      "expectedUvDelta": {
+        "x": 0.002007310977205634,
+        "y": 0.0
+      },
+      "actualUvDelta": {
+        "x": 0.0020071864128112793,
+        "y": 0.0
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.3316204249858856,
+        "y": -0.02798980474472046
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -7.874150276184082,
+        "y": 0.0
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20073114335536957,
+      "uvDeltaError": 1.2456439435482025e-07,
+      "realtimeElapsed": 0.20072541700000102,
+      "scaledClockElapsed": 0.2007310799319839,
+      "frames": 221,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/green-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/green-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "blue",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009998397901654243,
+        "y": 0.009999975562095642
+      },
+      "expectedUvDelta": {
+        "x": 0.00200673402287066,
+        "y": 0.00200673402287066
+      },
+      "actualUvDelta": {
+        "x": 0.0020064115524291992,
+        "y": 0.0020067282021045685
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.33161965012550354,
+        "y": -0.02598307654261589
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -7.873380184173584,
+        "y": -7.935196399688721
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20067331194877625,
+      "uvDeltaError": 3.225229647796368e-07,
+      "realtimeElapsed": 0.20058254100000283,
+      "scaledClockElapsed": 0.2006733347505616,
+      "frames": 209,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/blue-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/blue-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "light",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000884532928467,
+        "y": -0.010000000707805157
+      },
+      "expectedUvDelta": {
+        "x": -0.002002598950639367,
+        "y": -0.002002598950639367
+      },
+      "actualUvDelta": {
+        "x": -0.0020027756690979004,
+        "y": -0.0020025987178087234
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.32761046290397644,
+        "y": -0.029992403462529182
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 7.875338554382324,
+        "y": 7.935216426849365
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20025984942913055,
+      "uvDeltaError": 1.7671861485268892e-07,
+      "realtimeElapsed": 0.2002363750000029,
+      "scaledClockElapsed": 0.20025987103174714,
+      "frames": 219,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/light-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/light-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "dark",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.009999940171837807,
+        "y": -0.010000004433095455
+      },
+      "expectedUvDelta": {
+        "x": -0.0020020122174173594,
+        "y": -0.0020020122174173594
+      },
+      "actualUvDelta": {
+        "x": -0.0020020008087158203,
+        "y": -0.002002013847231865
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.3276112377643585,
+        "y": -0.029991818591952324
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 7.874594688415527,
+        "y": 7.9352192878723145
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20020128786563873,
+      "uvDeltaError": 1.1524528886752705e-08,
+      "realtimeElapsed": 0.20016679199999032,
+      "scaledClockElapsed": 0.20020120464852198,
+      "frames": 214,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/dark-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/dark-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "390x844",
+      "color": "null",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.009999578818678856,
+        "y": -0.010000006295740604
+      },
+      "expectedUvDelta": {
+        "x": -0.0020079254172742367,
+        "y": -0.0020079254172742367
+      },
+      "actualUvDelta": {
+        "x": -0.0020078420639038086,
+        "y": -0.0020079277455806732
+      },
+      "startUvPosition": {
+        "x": 0.32961323857307434,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.32760539650917053,
+        "y": -0.029997732490301132
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 7.87431001663208,
+        "y": 7.935220718383789
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20079265534877777,
+      "uvDeltaError": 8.338588486367371e-08,
+      "realtimeElapsed": 0.20082075000000543,
+      "scaledClockElapsed": 0.200792630385493,
+      "frames": 222,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.49526065587997437,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/null-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/390x844/null-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "red",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999430738389492,
+        "y": 0.010000024922192097
+      },
+      "expectedUvDelta": {
+        "x": 0.0020037847571074963,
+        "y": 0.0020037847571074963
+      },
+      "actualUvDelta": {
+        "x": 0.0020036697387695312,
+        "y": 0.002003788948059082
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.2778049409389496,
+        "y": -0.025986015796661377
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -8.956428527832031,
+        "y": -9.025864601135254
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2003783881664276,
+      "uvDeltaError": 1.1509466446568695e-07,
+      "realtimeElapsed": 0.20037987499999588,
+      "scaledClockElapsed": 0.20037850056688455,
+      "frames": 222,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/red-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/red-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "green",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "measuredUvPerSecond": {
+        "x": 0.010001258924603462,
+        "y": 0.0
+      },
+      "expectedUvDelta": {
+        "x": 0.0020039237570017576,
+        "y": 0.0
+      },
+      "actualUvDelta": {
+        "x": 0.002004176378250122,
+        "y": 0.0
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.2778054475784302,
+        "y": -0.02798980474472046
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -8.9580659866333,
+        "y": 0.0
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20039241015911102,
+      "uvDeltaError": 2.5262124836444855e-07,
+      "realtimeElapsed": 0.20038858300000584,
+      "scaledClockElapsed": 0.20039237528344245,
+      "frames": 228,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/green-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/green-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "blue",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.00999924074858427,
+        "y": 0.01000004168599844
+      },
+      "expectedUvDelta": {
+        "x": 0.0020010501611977816,
+        "y": 0.0020010501611977816
+      },
+      "actualUvDelta": {
+        "x": 0.0020008981227874756,
+        "y": 0.0020010583102703094
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27780216932296753,
+        "y": -0.02598874643445015
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -8.956259727478027,
+        "y": -9.02587604522705
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2001049965620041,
+      "uvDeltaError": 1.5225664640183822e-07,
+      "realtimeElapsed": 0.20008883299999525,
+      "scaledClockElapsed": 0.20010496031746072,
+      "frames": 217,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/blue-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/blue-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "light",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000032372772694,
+        "y": -0.010000060312449932
+      },
+      "expectedUvDelta": {
+        "x": -0.002002828288823366,
+        "y": -0.002002828288823366
+      },
+      "actualUvDelta": {
+        "x": -0.0020028352737426758,
+        "y": -0.0020028408616781235
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.2737984359264374,
+        "y": -0.029992645606398582
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 8.956969261169434,
+        "y": 9.025893211364746
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20028288662433624,
+      "uvDeltaError": 1.438282914989486e-08,
+      "realtimeElapsed": 0.2002944580000019,
+      "scaledClockElapsed": 0.20028287273242995,
+      "frames": 221,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/light-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/light-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "dark",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.009999713860452175,
+        "y": -0.009999983012676239
+      },
+      "expectedUvDelta": {
+        "x": -0.0020060210954397917,
+        "y": -0.0020060210954397917
+      },
+      "actualUvDelta": {
+        "x": -0.002005964517593384,
+        "y": -0.0020060185343027115
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27379530668258667,
+        "y": -0.02999582327902317
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 8.956684112548828,
+        "y": 9.025822639465332
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.200602188706398,
+      "uvDeltaError": 5.66357840625642e-08,
+      "realtimeElapsed": 0.20055899999999838,
+      "scaledClockElapsed": 0.20060216836733957,
+      "frames": 219,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/dark-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/dark-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "540x960",
+      "color": "null",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010000118054449558,
+        "y": -0.009999996982514858
+      },
+      "expectedUvDelta": {
+        "x": -0.0020030203741043806,
+        "y": -0.0020030203741043806
+      },
+      "actualUvDelta": {
+        "x": -0.0020030438899993896,
+        "y": -0.0020030196756124496
+      },
+      "startUvPosition": {
+        "x": 0.27580127120018005,
+        "y": -0.02798980474472046
+      },
+      "endUvPosition": {
+        "x": 0.27379822731018066,
+        "y": -0.02999282442033291
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 8.957045555114746,
+        "y": 9.025835990905762
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20030201971530914,
+      "uvDeltaError": 2.352626715662609e-08,
+      "realtimeElapsed": 0.2003104169999972,
+      "scaledClockElapsed": 0.2003019982993237,
+      "frames": 227,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.6028845906257629,
+        "height": 1.0636131763458252
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/null-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/540x960/null-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "red",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999891743063927,
+        "y": 0.009999928064644337
+      },
+      "expectedUvDelta": {
+        "x": 0.002001248300075531,
+        "y": 0.002001248300075531
+      },
+      "actualUvDelta": {
+        "x": 0.0020012259483337402,
+        "y": 0.002001233398914337
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.27764222025871277,
+        "y": 0.10675100237131119
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -12.73184871673584,
+        "y": -12.829838752746582
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20012477040290833,
+      "uvDeltaError": 2.686345013103164e-08,
+      "realtimeElapsed": 0.20011666599998534,
+      "scaledClockElapsed": 0.20012479450113574,
+      "frames": 221,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/red-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/red-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "green",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.0
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999115020036697,
+        "y": 0.0
+      },
+      "expectedUvDelta": {
+        "x": 0.0020059924572706223,
+        "y": 0.0
+      },
+      "actualUvDelta": {
+        "x": 0.0020058155059814453,
+        "y": 0.0
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.2776468098163605,
+        "y": 0.10474976897239685
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -12.730859756469727,
+        "y": 0.0
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2005992978811264,
+      "uvDeltaError": 1.7695128917694092e-07,
+      "realtimeElapsed": 0.20061062499999593,
+      "scaledClockElapsed": 0.20059933390021456,
+      "frames": 223,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/green-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/green-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "blue",
+      "configuredDirection": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": 0.009999999776482582,
+        "y": 0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": 0.009999857284128666,
+        "y": 0.010000191628932953
+      },
+      "expectedUvDelta": {
+        "x": 0.0020089438185095787,
+        "y": 0.0020089438185095787
+      },
+      "actualUvDelta": {
+        "x": 0.0020089149475097656,
+        "y": 0.002008982002735138
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.2776499092578888,
+        "y": 0.10675875097513199
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": -12.731804847717285,
+        "y": -12.830171585083008
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20089435577392578,
+      "uvDeltaError": 4.7870344133116305e-08,
+      "realtimeElapsed": 0.2008237910000048,
+      "scaledClockElapsed": 0.2008944586167729,
+      "frames": 213,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/blue-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/blue-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "light",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.00999938789755106,
+        "y": -0.010000242851674557
+      },
+      "expectedUvDelta": {
+        "x": -0.0020037333015352488,
+        "y": -0.0020037333015352488
+      },
+      "actualUvDelta": {
+        "x": -0.002003610134124756,
+        "y": -0.002003781497478485
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.2736373841762543,
+        "y": 0.10274598747491837
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 12.731207847595215,
+        "y": 12.83023738861084
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20037327706813812,
+      "uvDeltaError": 1.3226133432908682e-07,
+      "realtimeElapsed": 0.20036391700000422,
+      "scaledClockElapsed": 0.2003733276644084,
+      "frames": 218,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/light-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/light-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "dark",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.009999705478549004,
+        "y": -0.010000077076256275
+      },
+      "expectedUvDelta": {
+        "x": -0.0020055468194186687,
+        "y": -0.0020055468194186687
+      },
+      "actualUvDelta": {
+        "x": -0.0020054876804351807,
+        "y": -0.00200556218624115
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.27363550662994385,
+        "y": 0.1027442067861557
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 12.731612205505371,
+        "y": 12.830023765563965
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.20055466890335083,
+      "uvDeltaError": 6.110285255545023e-08,
+      "realtimeElapsed": 0.20046958400001813,
+      "scaledClockElapsed": 0.20055466978456593,
+      "frames": 219,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/dark-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/dark-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    },
+    {
+      "viewport": "768x1024",
+      "color": "null",
+      "configuredDirection": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "configuredUvPerSecond": {
+        "x": -0.009999999776482582,
+        "y": -0.009999999776482582
+      },
+      "measuredUvPerSecond": {
+        "x": -0.010001125745475292,
+        "y": -0.010000121779739857
+      },
+      "expectedUvDelta": {
+        "x": -0.002003860892727971,
+        "y": -0.002003860892727971
+      },
+      "actualUvDelta": {
+        "x": -0.002004086971282959,
+        "y": -0.002003885805606842
+      },
+      "startUvPosition": {
+        "x": 0.27564099431037903,
+        "y": 0.10474976897239685
+      },
+      "endUvPosition": {
+        "x": 0.27363690733909607,
+        "y": 0.10274588316679001
+      },
+      "patternScreenPixelsPerSecond": {
+        "x": 12.733420372009277,
+        "y": 12.830081939697266
+      },
+      "configuredSpeed": 1.0,
+      "scaledElapsed": 0.2003861367702484,
+      "uvDeltaError": 2.2744706029698136e-07,
+      "realtimeElapsed": 0.20037483400000156,
+      "scaledClockElapsed": 0.20038616071428805,
+      "frames": 227,
+      "wrapBeforeUv": {
+        "serializedVersion": "2",
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapAfterUv": {
+        "serializedVersion": "2",
+        "x": 1.0099999904632568,
+        "y": 1.0099999904632568,
+        "width": 0.603205144405365,
+        "height": 0.7981340289115906
+      },
+      "wrapBeforeScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/null-wrap-before.png",
+      "wrapAfterScreenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/Runtime/768x1024/null-wrap-after.png",
+      "timing": "Actual production Update interval, aligned at LastPostLateUpdate; expected UV delta sums each sampled frame's scaled Time.deltaTime. Screen pattern motion has the opposite sign to texture sampling motion."
+    }
+  ],
+  "motion": {
+    "reportPath": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/report.json",
+    "reportSha256": "d537b7c00a17ae742dd7d063b278b8f574440347b94d580284802c492b74a8cc",
+    "sourceParityPath": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/source-parity.json",
+    "sourceParitySha256": "02c29b0b64aec10b9e626833cff25ff999e9305b7dde88bb155859c5e36f6178",
+    "runnerReceiptPath": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/run-receipt.json",
+    "runnerReceiptSha256": "60fd2db486e3212807e7253144049e3547b2ab96aea416b725c9b4dae666570b",
+    "runner": {
+      "name": "Preview-red",
+      "startedUtc": "2026-10-03T05:25:21.365541Z",
+      "finishedUtc": "2026-10-03T05:26:09.138124Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerMenuBackgroundValidation.StartRedArtPreviewBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/unity.log"
+      ],
+      "environment": {
+        "POCKETSTRIKER_MENU_REVIEW_ROOT": "Logs/MenuColorBlockReview",
+        "POCKETSTRIKER_MENU_REVIEW": "Preview-red",
+        "POCKETSTRIKER_MENU_SOURCE_SET": "Pattern-v7",
+        "POCKETSTRIKER_MENU_DYNAMIC_REVIEW": "1",
+        "POCKETSTRIKER_MENU_SOURCE_HEAD": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+        "POCKETSTRIKER_MENU_UNIT_WIDTH": "260",
+        "POCKETSTRIKER_MENU_UNIT_HEIGHT": "262"
+      },
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "02c29b0b64aec10b9e626833cff25ff999e9305b7dde88bb155859c5e36f6178",
+      "nativeReportSha256": "d537b7c00a17ae742dd7d063b278b8f574440347b94d580284802c492b74a8cc"
+    },
+    "sequences": [
+      {
+        "viewport": "375x667",
+        "color": "red",
+        "timing": "Native ScreenCapture requests at LastPostLateUpdate, approximately every 0.2 realtime seconds for 7 seconds. UV, UTC and frame clocks are recorded at request time; the actual screenshot dimensions are read back. Fighter idle pose/camera are frozen by the offline fixture; background OffsetScrolling runs at its authored speed.",
+        "configuredDirection": {
+          "x": 0.009999999776482582,
+          "y": 0.009999999776482582
+        },
+        "startUvPosition": {
+          "x": 0.27595192193984985,
+          "y": -0.02798980474472046
+        },
+        "endUvPosition": {
+          "x": 0.34595468640327454,
+          "y": 0.042012833058834076
+        },
+        "expectedUvDelta": {
+          "x": 0.07000257819890976,
+          "y": 0.07000257819890976
+        },
+        "actualUvDelta": {
+          "x": 0.07000276446342468,
+          "y": 0.07000263780355453
+        },
+        "configuredSpeed": 1.0,
+        "scaledElapsed": 7.000251770019531,
+        "uvDeltaError": 1.955688730959082e-07,
+        "realtimeElapsed": 7.000164250000003,
+        "updateFrames": 7174,
+        "samples": [
+          {
+            "index": 0,
+            "unityFrame": 10072,
+            "utcTime": "2026-10-03T05:25:45.3400720Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-000.png",
+            "deltaTime": 0.00333883217535913,
+            "scaledElapsed": 0.0,
+            "realtimeElapsed": 0.0003530000000004918,
+            "scaledClockElapsed": 0.0,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.27595192193984985,
+              "y": -0.02798980474472046,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.27595192193984985,
+              "y": -0.02798980474472046
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-000.png",
+            "pngSha256": "a091c3f9a71eadc747f1412cee3cd430f8dc00c427ca06638f5d3669af6eb55e"
+          },
+          {
+            "index": 1,
+            "unityFrame": 10278,
+            "utcTime": "2026-10-03T05:25:45.5405300Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-001.png",
+            "deltaTime": 0.001027876976877451,
+            "scaledElapsed": 0.20078882575035095,
+            "realtimeElapsed": 0.20080000000000098,
+            "scaledClockElapsed": 0.2007888321995459,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2779598832130432,
+              "y": -0.025981910526752472,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.27795982360839844,
+              "y": -0.02598191611468792
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-001.png",
+            "pngSha256": "1fe740f9b332079c03c47454828693cc1146ba70e71487e44c94545d1c09687b"
+          },
+          {
+            "index": 2,
+            "unityFrame": 10484,
+            "utcTime": "2026-10-03T05:25:45.7406430Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-002.png",
+            "deltaTime": 0.0008752905414439738,
+            "scaledElapsed": 0.40085747838020325,
+            "realtimeElapsed": 0.40090687500000044,
+            "scaledClockElapsed": 0.40085745464852707,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.27996063232421875,
+              "y": -0.023981239646673203,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2799604833126068,
+              "y": -0.023981230333447456
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-002.png",
+            "pngSha256": "75a6cfcbb82f00508ff51355062c65b3d828e39aa77dcf9082ca3d711326ef99"
+          },
+          {
+            "index": 3,
+            "unityFrame": 10690,
+            "utcTime": "2026-10-03T05:25:45.9400460Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-003.png",
+            "deltaTime": 0.0010204152204096317,
+            "scaledElapsed": 0.6002876162528992,
+            "realtimeElapsed": 0.6003036250000022,
+            "scaledClockElapsed": 0.6002876629818594,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.28195515275001526,
+              "y": -0.02198694460093975,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2819547951221466,
+              "y": -0.021986929699778557
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-003.png",
+            "pngSha256": "cbf4c885305d07e34fe4ad3a4293c34eaf7e0d1044644a48b8db1edf66ce3dd8"
+          },
+          {
+            "index": 4,
+            "unityFrame": 10896,
+            "utcTime": "2026-10-03T05:25:46.1400350Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-004.png",
+            "deltaTime": 0.0010063350200653076,
+            "scaledElapsed": 0.8002902269363403,
+            "realtimeElapsed": 0.8002874579999997,
+            "scaledClockElapsed": 0.8002902069161006,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.28395509719848633,
+              "y": -0.019986925646662712,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.28395482897758484,
+              "y": -0.01998690702021122
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-004.png",
+            "pngSha256": "663a335ac3fb7691f258225e3b6d66550cb80d0d12fedb3aff2b7c8b6bf9d192"
+          },
+          {
+            "index": 5,
+            "unityFrame": 11076,
+            "utcTime": "2026-10-03T05:25:46.3406440Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-005.png",
+            "deltaTime": 0.0010050878627225757,
+            "scaledElapsed": 1.0008829832077026,
+            "realtimeElapsed": 1.0008895419999995,
+            "scaledClockElapsed": 1.0008829577664393,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.28596100211143494,
+              "y": -0.01798097975552082,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.28596073389053345,
+              "y": -0.01798098161816597
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-005.png",
+            "pngSha256": "62b6cb338a2c9a4438857ddd401bc6305f2e763efd5e2675e45cfe5832f21206"
+          },
+          {
+            "index": 6,
+            "unityFrame": 11282,
+            "utcTime": "2026-10-03T05:25:46.5403440Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-006.png",
+            "deltaTime": 0.0008800028590485454,
+            "scaledElapsed": 1.2005643844604492,
+            "realtimeElapsed": 1.2005842080000022,
+            "scaledClockElapsed": 1.20056491638322,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2879578769207001,
+              "y": -0.01598416641354561,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2879575490951538,
+              "y": -0.01598416641354561
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-006.png",
+            "pngSha256": "dbd9a55f52663d49a0fb943bb2a8080b735bd062025ca85805c79578aca8b5fa"
+          },
+          {
+            "index": 7,
+            "unityFrame": 11486,
+            "utcTime": "2026-10-03T05:25:46.7404550Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-007.png",
+            "deltaTime": 0.000984502607025206,
+            "scaledElapsed": 1.4006766080856323,
+            "realtimeElapsed": 1.4006892920000027,
+            "scaledClockElapsed": 1.4006778344671211,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2899591326713562,
+              "y": -0.013983036391437054,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2899586856365204,
+              "y": -0.01398303359746933
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-007.png",
+            "pngSha256": "a723b6f92c677f30752b4d7dc1d04aea376ccedff39323bfc046bc890d14951b"
+          },
+          {
+            "index": 8,
+            "unityFrame": 11693,
+            "utcTime": "2026-10-03T05:25:46.9400580Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-008.png",
+            "deltaTime": 0.0009054988622665405,
+            "scaledElapsed": 1.6002676486968994,
+            "realtimeElapsed": 1.6002860830000003,
+            "scaledClockElapsed": 1.6002698696145128,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2919551730155945,
+              "y": -0.011987113393843174,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2919546067714691,
+              "y": -0.011987116187810898
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-008.png",
+            "pngSha256": "9b25d2b03c8e8935dabe904b77181597ec1b0d475842de717b8246ab13be7056"
+          },
+          {
+            "index": 9,
+            "unityFrame": 11900,
+            "utcTime": "2026-10-03T05:25:47.1402880Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-009.png",
+            "deltaTime": 0.0010040390770882368,
+            "scaledElapsed": 1.800484538078308,
+            "realtimeElapsed": 1.800509667,
+            "scaledClockElapsed": 1.800487124433106,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2939574420452118,
+              "y": -0.009984937496483326,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.29395678639411926,
+              "y": -0.009984949603676796
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-009.png",
+            "pngSha256": "f0641abbed2cbc7c42f3e16424233bb7ff7d52aeb78ebbb6e9b41b4685659525"
+          },
+          {
+            "index": 10,
+            "unityFrame": 12108,
+            "utcTime": "2026-10-03T05:25:47.3399860Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-010.png",
+            "deltaTime": 0.0009020408033393323,
+            "scaledElapsed": 2.0001556873321533,
+            "realtimeElapsed": 2.000202167000001,
+            "scaledClockElapsed": 2.000157624716554,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2959541976451874,
+              "y": -0.007988229393959045,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2959534823894501,
+              "y": -0.007988255470991135
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-010.png",
+            "pngSha256": "6592ca7c3d0a8a21a70b4cbf5419d07eb7f973e6f021d085f81bb325f17a8a12"
+          },
+          {
+            "index": 11,
+            "unityFrame": 12315,
+            "utcTime": "2026-10-03T05:25:47.5403710Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-011.png",
+            "deltaTime": 0.0008771258289925754,
+            "scaledElapsed": 2.2005558013916016,
+            "realtimeElapsed": 2.200580792000002,
+            "scaledClockElapsed": 2.2005569160997727,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2979580760002136,
+              "y": -0.005984237417578697,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.2979574501514435,
+              "y": -0.0059842634946107864
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-011.png",
+            "pngSha256": "d4f0db3d2ca9a266cc6031d310ed63e67c006ad09ee6f7b1c32d0c8c7dd85cb4"
+          },
+          {
+            "index": 12,
+            "unityFrame": 12515,
+            "utcTime": "2026-10-03T05:25:47.7400660Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-012.png",
+            "deltaTime": 0.0008973710355348885,
+            "scaledElapsed": 2.4002578258514404,
+            "realtimeElapsed": 2.400270125000004,
+            "scaledClockElapsed": 2.4002584963151925,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.29995495080947876,
+              "y": -0.003987220581620932,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.29995447397232056,
+              "y": -0.003987248986959457
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-012.png",
+            "pngSha256": "3530c91cc2ddf83775a108a66da623a39f0783b043c17556dac5aad62c5dcc95"
+          },
+          {
+            "index": 13,
+            "unityFrame": 12716,
+            "utcTime": "2026-10-03T05:25:47.9406610Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-013.png",
+            "deltaTime": 0.0008658730075694621,
+            "scaledElapsed": 2.6008522510528564,
+            "realtimeElapsed": 2.600858624999999,
+            "scaledClockElapsed": 2.6008541666666662,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3019607365131378,
+              "y": -0.001981264678761363,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.30196040868759155,
+              "y": -0.001981304958462715
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-013.png",
+            "pngSha256": "51e3c1a098985837cd4101814090d734ce77cd6283e0c3adafecc45b42f57469"
+          },
+          {
+            "index": 14,
+            "unityFrame": 12923,
+            "utcTime": "2026-10-03T05:25:48.1400810Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-014.png",
+            "deltaTime": 0.0008714994182810187,
+            "scaledElapsed": 2.800259828567505,
+            "realtimeElapsed": 2.800272583,
+            "scaledClockElapsed": 2.800261415816326,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3039546012878418,
+              "y": 1.2808016435883474e-05,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.30395451188087463,
+              "y": 1.2779608368873596e-05
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-014.png",
+            "pngSha256": "967b3b628ae951d252c71b5d9e0c8cc6786fb7b4811c9892f358da882c88da95"
+          },
+          {
+            "index": 15,
+            "unityFrame": 13130,
+            "utcTime": "2026-10-03T05:25:48.3406050Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-015.png",
+            "deltaTime": 0.000878961174748838,
+            "scaledElapsed": 3.0007574558258057,
+            "realtimeElapsed": 3.000790874999998,
+            "scaledClockElapsed": 3.0007593749999995,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30595964193344116,
+              "y": 0.0020177881233394146,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3059594929218292,
+              "y": 0.0020177531987428665
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-015.png",
+            "pngSha256": "6e2816793e6b3c4e65a697fed8bf2e9768b6d307d82fba4dd63a49dd612bded7"
+          },
+          {
+            "index": 16,
+            "unityFrame": 13338,
+            "utcTime": "2026-10-03T05:25:48.5408090Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-016.png",
+            "deltaTime": 0.0009144628420472145,
+            "scaledElapsed": 3.200969696044922,
+            "realtimeElapsed": 3.2009892500000046,
+            "scaledClockElapsed": 3.20097058531746,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30796167254447937,
+              "y": 0.004019899759441614,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3079615831375122,
+              "y": 0.004019871354103088
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-016.png",
+            "pngSha256": "408b733320005c0ec66fb0a85dbeeb05918c85c20bf8e26fba014a6d1f5fce90"
+          },
+          {
+            "index": 17,
+            "unityFrame": 13545,
+            "utcTime": "2026-10-03T05:25:48.7405210Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-017.png",
+            "deltaTime": 0.001000375603325665,
+            "scaledElapsed": 3.4006857872009277,
+            "realtimeElapsed": 3.400694917000001,
+            "scaledClockElapsed": 3.4006858701814053,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30995890498161316,
+              "y": 0.006017053034156561,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3099587559700012,
+              "y": 0.006017033010721207
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-017.png",
+            "pngSha256": "c26748e84baabe48bb768e07f3ad4135bd67b73f112003619c279b102fbf202e"
+          },
+          {
+            "index": 18,
+            "unityFrame": 13753,
+            "utcTime": "2026-10-03T05:25:48.9409410Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-018.png",
+            "deltaTime": 0.0010155824711546302,
+            "scaledElapsed": 3.6010801792144775,
+            "realtimeElapsed": 3.601108833000003,
+            "scaledClockElapsed": 3.601081079931973,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31196296215057373,
+              "y": 0.008021003566682339,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.31196269392967224,
+              "y": 0.008020959794521332
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-018.png",
+            "pngSha256": "ca481a87dabfe5914c85efd2f090d8c199f52507872dceace177bb346e4ae569"
+          },
+          {
+            "index": 19,
+            "unityFrame": 13954,
+            "utcTime": "2026-10-03T05:25:49.1405270Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-019.png",
+            "deltaTime": 0.0010097080375999212,
+            "scaledElapsed": 3.800682544708252,
+            "realtimeElapsed": 3.800689375000003,
+            "scaledClockElapsed": 3.8006851686507943,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3139590919017792,
+              "y": 0.01001705415546894,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3139587342739105,
+              "y": 0.010017011314630508
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-019.png",
+            "pngSha256": "db6d98f463683e575fe7a442a9374f08993e35594704a17d43f6785f90671fe1"
+          },
+          {
+            "index": 20,
+            "unityFrame": 14162,
+            "utcTime": "2026-10-03T05:25:49.3403210Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-020.png",
+            "deltaTime": 0.0009131660917773843,
+            "scaledElapsed": 4.000473976135254,
+            "realtimeElapsed": 4.000477375000001,
+            "scaledClockElapsed": 4.00047628968254,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31595686078071594,
+              "y": 0.012014968320727348,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.31595665216445923,
+              "y": 0.012014918029308319
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-020.png",
+            "pngSha256": "d05c721905604d7200f580bd73916d14e5f9187cc5edc4559508a6cbb0d5ae38"
+          },
+          {
+            "index": 21,
+            "unityFrame": 14365,
+            "utcTime": "2026-10-03T05:25:49.5405100Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-021.png",
+            "deltaTime": 0.0008947066380642354,
+            "scaledElapsed": 4.200653076171875,
+            "realtimeElapsed": 4.200660125000004,
+            "scaledClockElapsed": 4.200656037414966,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31795868277549744,
+              "y": 0.014016767032444477,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.31795844435691833,
+              "y": 0.014016713947057724
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-021.png",
+            "pngSha256": "f78d312727c7d9a635688ac667e224554a189f259ed7c8e7229d20cbc340ca18"
+          },
+          {
+            "index": 22,
+            "unityFrame": 14573,
+            "utcTime": "2026-10-03T05:25:49.7406650Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-022.png",
+            "deltaTime": 0.0010330852819606662,
+            "scaledElapsed": 4.400784492492676,
+            "realtimeElapsed": 4.400809167000004,
+            "scaledClockElapsed": 4.400788123582766,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31996017694473267,
+              "y": 0.016018087044358253,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.31995975971221924,
+              "y": 0.016018029302358627
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-022.png",
+            "pngSha256": "4cd051654cb47e6b9f8f11af76f46a1e23a75678ce1a4f2abea776386425f8a2"
+          },
+          {
+            "index": 23,
+            "unityFrame": 14781,
+            "utcTime": "2026-10-03T05:25:49.9404210Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-023.png",
+            "deltaTime": 0.0008917020750232041,
+            "scaledElapsed": 4.600551128387451,
+            "realtimeElapsed": 4.600558875000003,
+            "scaledClockElapsed": 4.600557745181407,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3219577670097351,
+              "y": 0.018015779554843903,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.32195746898651123,
+              "y": 0.018015757203102112
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-023.png",
+            "pngSha256": "9c7b81f2bc0b12111602a73e9641ebc3aefd3da27735e9fadd95d51b8fee9950"
+          },
+          {
+            "index": 24,
+            "unityFrame": 14987,
+            "utcTime": "2026-10-03T05:25:50.1403650Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-024.png",
+            "deltaTime": 0.0009027069318108261,
+            "scaledElapsed": 4.800462245941162,
+            "realtimeElapsed": 4.800496458000003,
+            "scaledClockElapsed": 4.800469954648527,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3239569664001465,
+              "y": 0.020014900714159012,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3239566385746002,
+              "y": 0.02001490816473961
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-024.png",
+            "pngSha256": "baa1299022ece4a691995d15dcd6f78dd2f83263f1d7f78c6a4d8fa6a54e5302"
+          },
+          {
+            "index": 25,
+            "unityFrame": 15196,
+            "utcTime": "2026-10-03T05:25:50.3406640Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-025.png",
+            "deltaTime": 0.0009105016943067312,
+            "scaledElapsed": 5.000766277313232,
+            "realtimeElapsed": 5.0007897080000046,
+            "scaledClockElapsed": 5.000770415249432,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3259597420692444,
+              "y": 0.022017911076545715,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3259596526622772,
+              "y": 0.02201792225241661
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-025.png",
+            "pngSha256": "19b2b4eb2e2cb39d2334297e906867c299781eeb8c0bfabf5460853553d4818e"
+          },
+          {
+            "index": 26,
+            "unityFrame": 15405,
+            "utcTime": "2026-10-03T05:25:50.5407430Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-026.png",
+            "deltaTime": 0.0008958758553490043,
+            "scaledElapsed": 5.2008562088012695,
+            "realtimeElapsed": 5.200863416999999,
+            "scaledClockElapsed": 5.200860707199547,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3279608190059662,
+              "y": 0.024018803611397743,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3279605507850647,
+              "y": 0.024018824100494385
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-026.png",
+            "pngSha256": "27b7aec7035369a20450f655cc96251ac7529a70a9e2d99cd327b28a9e5d8794"
+          },
+          {
+            "index": 27,
+            "unityFrame": 15612,
+            "utcTime": "2026-10-03T05:25:50.7400410Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-027.png",
+            "deltaTime": 0.0008916666847653687,
+            "scaledElapsed": 5.400155067443848,
+            "realtimeElapsed": 5.400154417000001,
+            "scaledClockElapsed": 5.400157787698413,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3299538791179657,
+              "y": 0.02601178176701069,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.32995352149009705,
+              "y": 0.026011787354946136
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-027.png",
+            "pngSha256": "6777f107c588f84b435bf31ae23c46bddf4c9f4dff2884f5e82fb7b6a0651790"
+          },
+          {
+            "index": 28,
+            "unityFrame": 15820,
+            "utcTime": "2026-10-03T05:25:50.9405740Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-028.png",
+            "deltaTime": 0.000900162965990603,
+            "scaledElapsed": 5.600658893585205,
+            "realtimeElapsed": 5.600682083000001,
+            "scaledClockElapsed": 5.600659623015874,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3319588303565979,
+              "y": 0.028016800060868263,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.331958532333374,
+              "y": 0.02801680564880371
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-028.png",
+            "pngSha256": "57cedf78338275e8c9b7aa91e1af1f1b9db424db9721ef553532f9e46625a66f"
+          },
+          {
+            "index": 29,
+            "unityFrame": 16023,
+            "utcTime": "2026-10-03T05:25:51.1408600Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-029.png",
+            "deltaTime": 0.0008822066592983902,
+            "scaledElapsed": 5.800958156585693,
+            "realtimeElapsed": 5.800961708000001,
+            "scaledClockElapsed": 5.800959998582767,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.33396172523498535,
+              "y": 0.030019816011190414,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.333961546421051,
+              "y": 0.03001982346177101
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-029.png",
+            "pngSha256": "de4ad11c69df76b539eea5b353686059d82b5d30a0a4b1757b1f67f8f87fc636"
+          },
+          {
+            "index": 30,
+            "unityFrame": 16226,
+            "utcTime": "2026-10-03T05:25:51.3409160Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-030.png",
+            "deltaTime": 0.0010184949496760964,
+            "scaledElapsed": 6.000988960266113,
+            "realtimeElapsed": 6.0010124580000035,
+            "scaledClockElapsed": 6.000990454931973,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3359619677066803,
+              "y": 0.032020121812820435,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.33596187829971313,
+              "y": 0.03202013671398163
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-030.png",
+            "pngSha256": "f4e2e69c43a381441b7eb55f20104ab579f6204805f4fba0768db8c3beb6bc1e"
+          },
+          {
+            "index": 31,
+            "unityFrame": 16429,
+            "utcTime": "2026-10-03T05:25:51.5405720Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-031.png",
+            "deltaTime": 0.0008998370030894876,
+            "scaledElapsed": 6.200662136077881,
+            "realtimeElapsed": 6.200662167000003,
+            "scaledClockElapsed": 6.200663874716554,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.33795878291130066,
+              "y": 0.03401685506105423,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.33795860409736633,
+              "y": 0.034016869962215424
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-031.png",
+            "pngSha256": "de0c5fdc3687ffee1717cf3fbdde5d06e9999d458015a4dcc5f9c08ae8994fe2"
+          },
+          {
+            "index": 32,
+            "unityFrame": 16636,
+            "utcTime": "2026-10-03T05:25:51.7405020Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-032.png",
+            "deltaTime": 0.0009119614260271192,
+            "scaledElapsed": 6.400566577911377,
+            "realtimeElapsed": 6.400586166999998,
+            "scaledClockElapsed": 6.400571208900228,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3399577736854553,
+              "y": 0.03601595014333725,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.33995768427848816,
+              "y": 0.03601595014333725
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-032.png",
+            "pngSha256": "132d9728a9da9519a56f40cff294da7b8936b9b17901d3290034f112dfb477a0"
+          },
+          {
+            "index": 33,
+            "unityFrame": 16844,
+            "utcTime": "2026-10-03T05:25:51.9408980Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-033.png",
+            "deltaTime": 0.0009037485579028726,
+            "scaledElapsed": 6.6009626388549805,
+            "realtimeElapsed": 6.600975457999999,
+            "scaledClockElapsed": 6.600966163548751,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3419615924358368,
+              "y": 0.03801991418004036,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3419616222381592,
+              "y": 0.03801988065242767
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-033.png",
+            "pngSha256": "03bc17a9110cde35a2e921b01058686179ef01cfa7bc1f8552d74b8eb7cb8514"
+          },
+          {
+            "index": 34,
+            "unityFrame": 17045,
+            "utcTime": "2026-10-03T05:25:52.1405210Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-034.png",
+            "deltaTime": 0.0008956632809713483,
+            "scaledElapsed": 6.8005523681640625,
+            "realtimeElapsed": 6.800593250000004,
+            "scaledClockElapsed": 6.800554329648527,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3439575135707855,
+              "y": 0.040015824139118195,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.34395748376846313,
+              "y": 0.04001575708389282
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-034.png",
+            "pngSha256": "b268928e9437c0803658aff42e8f0553de7fb5484f0b2aa03c295093a161a9a8"
+          },
+          {
+            "index": 35,
+            "unityFrame": 17246,
+            "utcTime": "2026-10-03T05:25:52.3401990Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-035.png",
+            "deltaTime": 0.000891411560587585,
+            "scaledElapsed": 7.000251770019531,
+            "realtimeElapsed": 7.000265083,
+            "scaledClockElapsed": 7.000256370464854,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.34595468640327454,
+              "y": 0.042012833058834076,
+              "width": 0.6025832891464233,
+              "height": 1.0636131763458252
+            },
+            "expectedUvPosition": {
+              "x": 0.3459545075893402,
+              "y": 0.0420127734541893
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-035.png",
+            "pngSha256": "209d92b8ed8f158bee961ff26dcda76503cc5ae41abdc407250baa26c85df906"
+          }
+        ]
+      },
+      {
+        "viewport": "768x1024",
+        "color": "red",
+        "timing": "Native ScreenCapture requests at LastPostLateUpdate, approximately every 0.2 realtime seconds for 7 seconds. UV, UTC and frame clocks are recorded at request time; the actual screenshot dimensions are read back. Fighter idle pose/camera are frozen by the offline fixture; background OffsetScrolling runs at its authored speed.",
+        "configuredDirection": {
+          "x": 0.009999999776482582,
+          "y": 0.009999999776482582
+        },
+        "startUvPosition": {
+          "x": 0.27564099431037903,
+          "y": 0.10474976897239685
+        },
+        "endUvPosition": {
+          "x": 0.34564080834388733,
+          "y": 0.17475105822086334
+        },
+        "expectedUvDelta": {
+          "x": 0.070001021027565,
+          "y": 0.070001021027565
+        },
+        "actualUvDelta": {
+          "x": 0.0699998140335083,
+          "y": 0.07000128924846649
+        },
+        "configuredSpeed": 1.0,
+        "scaledElapsed": 7.000098705291748,
+        "uvDeltaError": 1.2364372423689929e-06,
+        "realtimeElapsed": 7.000124583999998,
+        "updateFrames": 6519,
+        "samples": [
+          {
+            "index": 0,
+            "unityFrame": 25224,
+            "utcTime": "2026-10-03T05:26:00.1314260Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-000.png",
+            "deltaTime": 0.00768200121819973,
+            "scaledElapsed": 0.0,
+            "realtimeElapsed": 0.00010870899999559924,
+            "scaledClockElapsed": 0.0,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.27564099431037903,
+              "y": 0.10474976897239685,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.27564099431037903,
+              "y": 0.10474976897239685
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-000.png",
+            "pngSha256": "b6ac507a08741e3f5522e2883faf0b98d2fb9f9c9c6cdeeea4da262868818f1e"
+          },
+          {
+            "index": 1,
+            "unityFrame": 25412,
+            "utcTime": "2026-10-03T05:26:00.3320040Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-001.png",
+            "deltaTime": 0.0008771258289925754,
+            "scaledElapsed": 0.20049963891506195,
+            "realtimeElapsed": 0.2006815419999981,
+            "scaledClockElapsed": 0.20049962443310676,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2776457667350769,
+              "y": 0.10675478726625443,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.277646005153656,
+              "y": 0.10675476491451263
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-001.png",
+            "pngSha256": "ba336aba0fc1b95a78e2cbea198b911d54caa96bca297a6209717791a8853f77"
+          },
+          {
+            "index": 2,
+            "unityFrame": 25602,
+            "utcTime": "2026-10-03T05:26:00.5321630Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-002.png",
+            "deltaTime": 0.0009085388155654073,
+            "scaledElapsed": 0.40070292353630066,
+            "realtimeElapsed": 0.4008344999999949,
+            "scaledClockElapsed": 0.40070283446712196,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2796476185321808,
+              "y": 0.10875679552555084,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2796480357646942,
+              "y": 0.10875679552555084
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-002.png",
+            "pngSha256": "1a7088efc1f02d053dd16873da8604c52bfa150f4dff9650c0f096412835e9c3"
+          },
+          {
+            "index": 3,
+            "unityFrame": 25784,
+            "utcTime": "2026-10-03T05:26:00.7317890Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-003.png",
+            "deltaTime": 0.0009267503046430647,
+            "scaledElapsed": 0.600318431854248,
+            "realtimeElapsed": 0.6004542919999949,
+            "scaledClockElapsed": 0.6003184169501132,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2816436290740967,
+              "y": 0.11075297743082047,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.28164416551589966,
+              "y": 0.11075295507907867
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-003.png",
+            "pngSha256": "c0311868fe270e625291ee52165cf4655756cea40c52ff3368203cce2a0ea939"
+          },
+          {
+            "index": 4,
+            "unityFrame": 25966,
+            "utcTime": "2026-10-03T05:26:00.9315830Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-004.png",
+            "deltaTime": 0.0010293367085978389,
+            "scaledElapsed": 0.80012047290802,
+            "realtimeElapsed": 0.8002422499999966,
+            "scaledClockElapsed": 0.8001206703514754,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2836414575576782,
+              "y": 0.11275095492601395,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2836422026157379,
+              "y": 0.11275097727775574
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-004.png",
+            "pngSha256": "ed54c8efce3fd407de4cbe6514b25ad01c3e67807907487a0f71e3156ceed5a4"
+          },
+          {
+            "index": 5,
+            "unityFrame": 26155,
+            "utcTime": "2026-10-03T05:26:01.1318770Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-005.png",
+            "deltaTime": 0.0008848710567690432,
+            "scaledElapsed": 1.0004013776779175,
+            "realtimeElapsed": 1.0005304170000002,
+            "scaledClockElapsed": 1.0004016652494343,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2856443524360657,
+              "y": 0.11475376784801483,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2856450080871582,
+              "y": 0.11475378274917603
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-005.png",
+            "pngSha256": "337ca17409b2786ce6e06a8ce8eda4f23bc9b3b2304b381f8e43ce5e02385b27"
+          },
+          {
+            "index": 6,
+            "unityFrame": 26344,
+            "utcTime": "2026-10-03T05:26:01.3317100Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-006.png",
+            "deltaTime": 0.0009282525279559195,
+            "scaledElapsed": 1.2002334594726562,
+            "realtimeElapsed": 1.2003574589999957,
+            "scaledClockElapsed": 1.200234084467123,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2876427471637726,
+              "y": 0.11675209552049637,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.28764334321022034,
+              "y": 0.11675211042165756
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-006.png",
+            "pngSha256": "3ae6c319ccd7c96ee8f31ab476b92767c28d05c5ea26492bf8e54903e0085148"
+          },
+          {
+            "index": 7,
+            "unityFrame": 26530,
+            "utcTime": "2026-10-03T05:26:01.5316240Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-007.png",
+            "deltaTime": 0.0010352891404181719,
+            "scaledElapsed": 1.4001290798187256,
+            "realtimeElapsed": 1.400264749999998,
+            "scaledClockElapsed": 1.4001297902494336,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2896415889263153,
+              "y": 0.11875103414058685,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2896423041820526,
+              "y": 0.11875107139348984
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-007.png",
+            "pngSha256": "daa76bfc7e425564ea159c6aa0bffd7a60a2c539358e1875b20f6ccd7fed3767"
+          },
+          {
+            "index": 8,
+            "unityFrame": 26718,
+            "utcTime": "2026-10-03T05:26:01.7319150Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-008.png",
+            "deltaTime": 0.0010362457251176238,
+            "scaledElapsed": 1.6004276275634766,
+            "realtimeElapsed": 1.6005504589999973,
+            "scaledClockElapsed": 1.6004294571995494,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.29164454340934753,
+              "y": 0.12075402587652206,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2916452884674072,
+              "y": 0.12075405567884445
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-008.png",
+            "pngSha256": "af65b8ac9776ef15378fb8e50180fbd45d3bdab5ffd605aa5d954dc798d85672"
+          },
+          {
+            "index": 9,
+            "unityFrame": 26906,
+            "utcTime": "2026-10-03T05:26:01.9315050Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-009.png",
+            "deltaTime": 0.0010052083525806665,
+            "scaledElapsed": 1.8000127077102661,
+            "realtimeElapsed": 1.8001338340000004,
+            "scaledClockElapsed": 1.80001466836735,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.29364028573036194,
+              "y": 0.12274987250566483,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2936411201953888,
+              "y": 0.12274990975856781
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-009.png",
+            "pngSha256": "acf330135745ddc3199456741ab4aad29fbe6a4580c459bb8a32f7fc0b135472"
+          },
+          {
+            "index": 10,
+            "unityFrame": 27090,
+            "utcTime": "2026-10-03T05:26:02.1318070Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-010.png",
+            "deltaTime": 0.000883999455254525,
+            "scaledElapsed": 2.0003068447113037,
+            "realtimeElapsed": 2.0004307499999996,
+            "scaledClockElapsed": 2.0003095025510227,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.29564329981803894,
+              "y": 0.12475279718637466,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2956441044807434,
+              "y": 0.12475286424160004
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-010.png",
+            "pngSha256": "7b64570add218a889c85aab312cda58419e0d160894f4e6674f1f025ba18a22b"
+          },
+          {
+            "index": 11,
+            "unityFrame": 27278,
+            "utcTime": "2026-10-03T05:26:02.3323180Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-011.png",
+            "deltaTime": 0.00099070998840034,
+            "scaledElapsed": 2.2008118629455566,
+            "realtimeElapsed": 2.200934708999995,
+            "scaledClockElapsed": 2.200814002267574,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.2976483106613159,
+              "y": 0.12675786018371582,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.2976491451263428,
+              "y": 0.1267579197883606
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-011.png",
+            "pngSha256": "4188d19db1b438a250a2ec0a6def5759da5b093cf2d95f2d480f1958dfc09c73"
+          },
+          {
+            "index": 12,
+            "unityFrame": 27466,
+            "utcTime": "2026-10-03T05:26:02.5316170Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-012.png",
+            "deltaTime": 0.000910544244106859,
+            "scaledElapsed": 2.400104284286499,
+            "realtimeElapsed": 2.400227833999999,
+            "scaledClockElapsed": 2.4001060019841276,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.29964113235473633,
+              "y": 0.12875080108642578,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.29964205622673035,
+              "y": 0.12875083088874817
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-012.png",
+            "pngSha256": "49faaced7ea13fe775e74ca20c207036042108d80181fa5722439c230a32313d"
+          },
+          {
+            "index": 13,
+            "unityFrame": 27655,
+            "utcTime": "2026-10-03T05:26:02.7316160Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-013.png",
+            "deltaTime": 0.0008772038272581995,
+            "scaledElapsed": 2.6000921726226807,
+            "realtimeElapsed": 2.6002212920000005,
+            "scaledClockElapsed": 2.6000954152494344,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30164098739624023,
+              "y": 0.13075076043605804,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.30164194107055664,
+              "y": 0.13075071573257446
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-013.png",
+            "pngSha256": "d7b094d803be23e761a2205195e09eeb533378693374996373172fc376085e2b"
+          },
+          {
+            "index": 14,
+            "unityFrame": 27844,
+            "utcTime": "2026-10-03T05:26:02.9317240Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-014.png",
+            "deltaTime": 0.0008843750110827386,
+            "scaledElapsed": 2.80019211769104,
+            "realtimeElapsed": 2.8003235839999974,
+            "scaledClockElapsed": 2.8001971230158738,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30364206433296204,
+              "y": 0.1327517330646515,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.30364295840263367,
+              "y": 0.1327517330646515
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-014.png",
+            "pngSha256": "b9752c813f3b393b6738e4192eb7c52e585a0db9c05267ce1077441a308e999e"
+          },
+          {
+            "index": 15,
+            "unityFrame": 28029,
+            "utcTime": "2026-10-03T05:26:03.1321940Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-015.png",
+            "deltaTime": 0.0009235473116859794,
+            "scaledElapsed": 3.0006346702575684,
+            "realtimeElapsed": 3.0007871669999986,
+            "scaledClockElapsed": 3.0006397534013622,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.30564644932746887,
+              "y": 0.1347561478614807,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3056474030017853,
+              "y": 0.1347561627626419
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-015.png",
+            "pngSha256": "5203e8b16d66191b331c6c722835b430e1a8738083afe5017544a562898bafb0"
+          },
+          {
+            "index": 16,
+            "unityFrame": 28217,
+            "utcTime": "2026-10-03T05:26:03.3320280Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-016.png",
+            "deltaTime": 0.0008765448001213372,
+            "scaledElapsed": 3.2004897594451904,
+            "realtimeElapsed": 3.2006154169999945,
+            "scaledClockElapsed": 3.2004947916666673,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3076450526714325,
+              "y": 0.13675472140312195,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3076459467411041,
+              "y": 0.13675472140312195
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-016.png",
+            "pngSha256": "bc2238b6693fbb4ce4ca5a347c426ae5b8a73690e61dbab34c7af53470f8d742"
+          },
+          {
+            "index": 17,
+            "unityFrame": 28398,
+            "utcTime": "2026-10-03T05:26:03.5316630Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-017.png",
+            "deltaTime": 0.000919706653803587,
+            "scaledElapsed": 3.4001071453094482,
+            "realtimeElapsed": 3.4002440840000006,
+            "scaledClockElapsed": 3.4001111678004534,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3096410036087036,
+              "y": 0.13875097036361694,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.30964210629463196,
+              "y": 0.13875088095664978
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-017.png",
+            "pngSha256": "e4fce85d00deba0804dda73ae9388a05067a2c200e2091d854d3fd9356738862"
+          },
+          {
+            "index": 18,
+            "unityFrame": 28587,
+            "utcTime": "2026-10-03T05:26:03.7320780Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-018.png",
+            "deltaTime": 0.0009170422563329339,
+            "scaledElapsed": 3.6005072593688965,
+            "realtimeElapsed": 3.6006530419999976,
+            "scaledClockElapsed": 3.600512414965987,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3116450905799866,
+              "y": 0.14075502753257751,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.31164613366127014,
+              "y": 0.14075490832328796
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-018.png",
+            "pngSha256": "6f9f58308555338451b4a373f58e5f24e1a1d71956404ffe76cd1d3fc63579df"
+          },
+          {
+            "index": 19,
+            "unityFrame": 28775,
+            "utcTime": "2026-10-03T05:26:03.9315580Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-019.png",
+            "deltaTime": 0.0008963293512351811,
+            "scaledElapsed": 3.799997568130493,
+            "realtimeElapsed": 3.8001270419999997,
+            "scaledClockElapsed": 3.800003125,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31363993883132935,
+              "y": 0.14274989068508148,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3136410415172577,
+              "y": 0.14274980127811432
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-019.png",
+            "pngSha256": "fc260e1c0cc9ef3f686e826569212261501c5a081e18b4b138890cf5a1fe2d63"
+          },
+          {
+            "index": 20,
+            "unityFrame": 28964,
+            "utcTime": "2026-10-03T05:26:04.1318960Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-020.png",
+            "deltaTime": 0.0009251629817299545,
+            "scaledElapsed": 4.000309944152832,
+            "realtimeElapsed": 4.000459458999998,
+            "scaledClockElapsed": 4.00031633361678,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3156430125236511,
+              "y": 0.14475303888320923,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.31564414501190186,
+              "y": 0.14475291967391968
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-020.png",
+            "pngSha256": "d68f3f81af796a32ccdb4b272eb77ff7383f69db7e1700eb9d0824ab4f52c2f4"
+          },
+          {
+            "index": 21,
+            "unityFrame": 29145,
+            "utcTime": "2026-10-03T05:26:04.3322990Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-021.png",
+            "deltaTime": 0.0010030824923887849,
+            "scaledElapsed": 4.200723648071289,
+            "realtimeElapsed": 4.200855749999995,
+            "scaledClockElapsed": 4.200731001984128,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31764715909957886,
+              "y": 0.14675727486610413,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3176482915878296,
+              "y": 0.14675705134868622
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-021.png",
+            "pngSha256": "2f69d6022558f73f0678926b44d2e9978a60f503a8a4b8927030eb24026aab9c"
+          },
+          {
+            "index": 22,
+            "unityFrame": 29329,
+            "utcTime": "2026-10-03T05:26:04.5315800Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-022.png",
+            "deltaTime": 0.0009955853456631303,
+            "scaledElapsed": 4.400006294250488,
+            "realtimeElapsed": 4.400130999999995,
+            "scaledClockElapsed": 4.400012585034016,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.31963983178138733,
+              "y": 0.14875006675720215,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.31964111328125,
+              "y": 0.14874987304210663
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-022.png",
+            "pngSha256": "f92b72e1f78a34f5e1e26e98645774a5a9a62858629de50cd94bcb5a9fbf6bb6"
+          },
+          {
+            "index": 23,
+            "unityFrame": 29518,
+            "utcTime": "2026-10-03T05:26:04.7319760Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-023.png",
+            "deltaTime": 0.0008974985685199499,
+            "scaledElapsed": 4.600399971008301,
+            "realtimeElapsed": 4.600520709000001,
+            "scaledClockElapsed": 4.6004058744331076,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3216436803340912,
+              "y": 0.1507539302110672,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.321645051240921,
+              "y": 0.15075382590293884
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-023.png",
+            "pngSha256": "096d37641a62a3373e008e59626019ba444f531860dbb45923edd25db992642a"
+          },
+          {
+            "index": 24,
+            "unityFrame": 29707,
+            "utcTime": "2026-10-03T05:26:04.9323780Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-024.png",
+            "deltaTime": 0.0008926233276724815,
+            "scaledElapsed": 4.800790786743164,
+            "realtimeElapsed": 4.800917249999998,
+            "scaledClockElapsed": 4.80079933390023,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.32364749908447266,
+              "y": 0.1527578979730606,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.32364898920059204,
+              "y": 0.15275776386260986
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-024.png",
+            "pngSha256": "31ffb1b897ad4d8318515afbdea0098a7937e6214e08aad43f0f0adeb917bdd8"
+          },
+          {
+            "index": 25,
+            "unityFrame": 29887,
+            "utcTime": "2026-10-03T05:26:05.1317640Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-025.png",
+            "deltaTime": 0.0008861678070388734,
+            "scaledElapsed": 5.0001912117004395,
+            "realtimeElapsed": 5.000296708999997,
+            "scaledClockElapsed": 5.000200503117917,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.325641393661499,
+              "y": 0.15475189685821533,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.32564303278923035,
+              "y": 0.15475180745124817
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-025.png",
+            "pngSha256": "6d69f7bbd9b053791617652a86ec1164102d4e1309e4d60810f6b4ca6a7ea2ef"
+          },
+          {
+            "index": 26,
+            "unityFrame": 30075,
+            "utcTime": "2026-10-03T05:26:05.3320960Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-026.png",
+            "deltaTime": 0.0008828372810967267,
+            "scaledElapsed": 5.200489521026611,
+            "realtimeElapsed": 5.200622750000001,
+            "scaledClockElapsed": 5.200499085884356,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.327644407749176,
+              "y": 0.15675488114356995,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.32764601707458496,
+              "y": 0.15675480663776398
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-026.png",
+            "pngSha256": "fe1a124e466bb985feacb8a59a276888ae536ff8046b26e461241b890ffebd74"
+          },
+          {
+            "index": 27,
+            "unityFrame": 30257,
+            "utcTime": "2026-10-03T05:26:05.5318340Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-027.png",
+            "deltaTime": 0.0009133786661550403,
+            "scaledElapsed": 5.400213241577148,
+            "realtimeElapsed": 5.400355417,
+            "scaledClockElapsed": 5.4002230442176895,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.32964181900024414,
+              "y": 0.15875203907489777,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.32964327931404114,
+              "y": 0.15875203907489777
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-027.png",
+            "pngSha256": "fedcfb8875272eb1bb3c3e248821bc162ffcc43f2ece9641a6f8809591e4a584"
+          },
+          {
+            "index": 28,
+            "unityFrame": 30447,
+            "utcTime": "2026-10-03T05:26:05.7323030Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-028.png",
+            "deltaTime": 0.0009263746906071901,
+            "scaledElapsed": 5.600708961486816,
+            "realtimeElapsed": 5.600818083999997,
+            "scaledClockElapsed": 5.60071766581633,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3316468596458435,
+              "y": 0.1607569456100464,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.33164820075035095,
+              "y": 0.16075697541236877
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-028.png",
+            "pngSha256": "127948c0d15206505c90d88e26762f8f78489a053bc6aa56d3381157f88cd0f4"
+          },
+          {
+            "index": 29,
+            "unityFrame": 30635,
+            "utcTime": "2026-10-03T05:26:05.9317290Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-029.png",
+            "deltaTime": 0.0009190050768665969,
+            "scaledElapsed": 5.800098896026611,
+            "realtimeElapsed": 5.800238,
+            "scaledClockElapsed": 5.800107837301589,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.33364078402519226,
+              "y": 0.1627509444952011,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3336421549320221,
+              "y": 0.16275091469287872
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-029.png",
+            "pngSha256": "de8e64c5fbe4f117ea0ca2964ecf0fd8030ec49d0de6082a8de485d549b28b12"
+          },
+          {
+            "index": 30,
+            "unityFrame": 30822,
+            "utcTime": "2026-10-03T05:26:06.1320670Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-030.png",
+            "deltaTime": 0.0010303712915629148,
+            "scaledElapsed": 6.0004143714904785,
+            "realtimeElapsed": 6.000569792,
+            "scaledClockElapsed": 6.0004245819161,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3356439173221588,
+              "y": 0.1647540181875229,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.33564531803131104,
+              "y": 0.16475407779216766
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-030.png",
+            "pngSha256": "1b9f14107d39c5f6e74fb2ed6d1911804d4072d224ae48186a2a14cd7fcfd2e4"
+          },
+          {
+            "index": 31,
+            "unityFrame": 31006,
+            "utcTime": "2026-10-03T05:26:06.3324420Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-031.png",
+            "deltaTime": 0.0010165816638618708,
+            "scaledElapsed": 6.200802326202393,
+            "realtimeElapsed": 6.200939292000001,
+            "scaledClockElapsed": 6.200812039399093,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.3376477062702179,
+              "y": 0.1667579561471939,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3376491665840149,
+              "y": 0.1667579561471939
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-031.png",
+            "pngSha256": "6a532e057bae70380093f61b90a6529309f63db60778a9f057ca3afed0ab3def"
+          },
+          {
+            "index": 32,
+            "unityFrame": 31190,
+            "utcTime": "2026-10-03T05:26:06.5323210Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-032.png",
+            "deltaTime": 0.0008967474568635225,
+            "scaledElapsed": 6.400594711303711,
+            "realtimeElapsed": 6.4008117499999955,
+            "scaledClockElapsed": 6.400605959467121,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.33964571356773376,
+              "y": 0.1687559336423874,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3396470844745636,
+              "y": 0.16875585913658142
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-032.png",
+            "pngSha256": "90f920c8dddf2783f9e6229f99dd8d8214f769512b6a497577a5c0901ea3b3e3"
+          },
+          {
+            "index": 33,
+            "unityFrame": 31374,
+            "utcTime": "2026-10-03T05:26:06.7323650Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-033.png",
+            "deltaTime": 0.0008649518131278455,
+            "scaledElapsed": 6.600681304931641,
+            "realtimeElapsed": 6.600849791999998,
+            "scaledClockElapsed": 6.6006915391156475,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.34164664149284363,
+              "y": 0.17075683176517487,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3416478931903839,
+              "y": 0.17075666785240173
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-033.png",
+            "pngSha256": "e47afce548360e57d435566af3405b3c024a29b81de501c634178208ea71c62a"
+          },
+          {
+            "index": 34,
+            "unityFrame": 31558,
+            "utcTime": "2026-10-03T05:26:06.9321830Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-034.png",
+            "deltaTime": 0.0008852962055243552,
+            "scaledElapsed": 6.800489902496338,
+            "realtimeElapsed": 6.8006616249999965,
+            "scaledClockElapsed": 6.800501169217689,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.34364479780197144,
+              "y": 0.1727549284696579,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.34364601969718933,
+              "y": 0.17275479435920715
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-034.png",
+            "pngSha256": "ae7e4e9be4e1110493613dd7d192c254318f2cfd9d3d64b67803a6041319f22c"
+          },
+          {
+            "index": 35,
+            "unityFrame": 31743,
+            "utcTime": "2026-10-03T05:26:07.1317530Z",
+            "screenshot": "/private/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-035.png",
+            "deltaTime": 0.0008853316539898515,
+            "scaledElapsed": 7.000098705291748,
+            "realtimeElapsed": 7.000225999999998,
+            "scaledClockElapsed": 7.000105413832202,
+            "uvRect": {
+              "serializedVersion": "2",
+              "x": 0.34564080834388733,
+              "y": 0.17475105822086334,
+              "width": 0.603205144405365,
+              "height": 0.7981340289115906
+            },
+            "expectedUvPosition": {
+              "x": 0.3456420302391052,
+              "y": 0.17475078999996185
+            },
+            "canonicalScreenshot": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-035.png",
+            "pngSha256": "f8fc303ae4ea108fddf6f288e535ffaf060ebab3701957bb26fa7cd498fb0c6c"
+          }
+        ]
+      }
+    ],
+    "screenshotHashes": {
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-000.png": "a091c3f9a71eadc747f1412cee3cd430f8dc00c427ca06638f5d3669af6eb55e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-001.png": "1fe740f9b332079c03c47454828693cc1146ba70e71487e44c94545d1c09687b",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-002.png": "75a6cfcbb82f00508ff51355062c65b3d828e39aa77dcf9082ca3d711326ef99",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-003.png": "cbf4c885305d07e34fe4ad3a4293c34eaf7e0d1044644a48b8db1edf66ce3dd8",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-004.png": "663a335ac3fb7691f258225e3b6d66550cb80d0d12fedb3aff2b7c8b6bf9d192",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-005.png": "62b6cb338a2c9a4438857ddd401bc6305f2e763efd5e2675e45cfe5832f21206",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-006.png": "dbd9a55f52663d49a0fb943bb2a8080b735bd062025ca85805c79578aca8b5fa",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-007.png": "a723b6f92c677f30752b4d7dc1d04aea376ccedff39323bfc046bc890d14951b",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-008.png": "9b25d2b03c8e8935dabe904b77181597ec1b0d475842de717b8246ab13be7056",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-009.png": "f0641abbed2cbc7c42f3e16424233bb7ff7d52aeb78ebbb6e9b41b4685659525",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-010.png": "6592ca7c3d0a8a21a70b4cbf5419d07eb7f973e6f021d085f81bb325f17a8a12",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-011.png": "d4f0db3d2ca9a266cc6031d310ed63e67c006ad09ee6f7b1c32d0c8c7dd85cb4",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-012.png": "3530c91cc2ddf83775a108a66da623a39f0783b043c17556dac5aad62c5dcc95",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-013.png": "51e3c1a098985837cd4101814090d734ce77cd6283e0c3adafecc45b42f57469",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-014.png": "967b3b628ae951d252c71b5d9e0c8cc6786fb7b4811c9892f358da882c88da95",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-015.png": "6e2816793e6b3c4e65a697fed8bf2e9768b6d307d82fba4dd63a49dd612bded7",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-016.png": "408b733320005c0ec66fb0a85dbeeb05918c85c20bf8e26fba014a6d1f5fce90",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-017.png": "c26748e84baabe48bb768e07f3ad4135bd67b73f112003619c279b102fbf202e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-018.png": "ca481a87dabfe5914c85efd2f090d8c199f52507872dceace177bb346e4ae569",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-019.png": "db6d98f463683e575fe7a442a9374f08993e35594704a17d43f6785f90671fe1",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-020.png": "d05c721905604d7200f580bd73916d14e5f9187cc5edc4559508a6cbb0d5ae38",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-021.png": "f78d312727c7d9a635688ac667e224554a189f259ed7c8e7229d20cbc340ca18",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-022.png": "4cd051654cb47e6b9f8f11af76f46a1e23a75678ce1a4f2abea776386425f8a2",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-023.png": "9c7b81f2bc0b12111602a73e9641ebc3aefd3da27735e9fadd95d51b8fee9950",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-024.png": "baa1299022ece4a691995d15dcd6f78dd2f83263f1d7f78c6a4d8fa6a54e5302",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-025.png": "19b2b4eb2e2cb39d2334297e906867c299781eeb8c0bfabf5460853553d4818e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-026.png": "27b7aec7035369a20450f655cc96251ac7529a70a9e2d99cd327b28a9e5d8794",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-027.png": "6777f107c588f84b435bf31ae23c46bddf4c9f4dff2884f5e82fb7b6a0651790",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-028.png": "57cedf78338275e8c9b7aa91e1af1f1b9db424db9721ef553532f9e46625a66f",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-029.png": "de4ad11c69df76b539eea5b353686059d82b5d30a0a4b1757b1f67f8f87fc636",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-030.png": "f4e2e69c43a381441b7eb55f20104ab579f6204805f4fba0768db8c3beb6bc1e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-031.png": "de0c5fdc3687ffee1717cf3fbdde5d06e9999d458015a4dcc5f9c08ae8994fe2",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-032.png": "132d9728a9da9519a56f40cff294da7b8936b9b17901d3290034f112dfb477a0",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-033.png": "03bc17a9110cde35a2e921b01058686179ef01cfa7bc1f8552d74b8eb7cb8514",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-034.png": "b268928e9437c0803658aff42e8f0553de7fb5484f0b2aa03c295093a161a9a8",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/375x667/dynamic-red/red-035.png": "209d92b8ed8f158bee961ff26dcda76503cc5ae41abdc407250baa26c85df906",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-000.png": "b6ac507a08741e3f5522e2883faf0b98d2fb9f9c9c6cdeeea4da262868818f1e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-001.png": "ba336aba0fc1b95a78e2cbea198b911d54caa96bca297a6209717791a8853f77",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-002.png": "1a7088efc1f02d053dd16873da8604c52bfa150f4dff9650c0f096412835e9c3",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-003.png": "c0311868fe270e625291ee52165cf4655756cea40c52ff3368203cce2a0ea939",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-004.png": "ed54c8efce3fd407de4cbe6514b25ad01c3e67807907487a0f71e3156ceed5a4",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-005.png": "337ca17409b2786ce6e06a8ce8eda4f23bc9b3b2304b381f8e43ce5e02385b27",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-006.png": "3ae6c319ccd7c96ee8f31ab476b92767c28d05c5ea26492bf8e54903e0085148",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-007.png": "daa76bfc7e425564ea159c6aa0bffd7a60a2c539358e1875b20f6ccd7fed3767",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-008.png": "af65b8ac9776ef15378fb8e50180fbd45d3bdab5ffd605aa5d954dc798d85672",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-009.png": "acf330135745ddc3199456741ab4aad29fbe6a4580c459bb8a32f7fc0b135472",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-010.png": "7b64570add218a889c85aab312cda58419e0d160894f4e6674f1f025ba18a22b",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-011.png": "4188d19db1b438a250a2ec0a6def5759da5b093cf2d95f2d480f1958dfc09c73",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-012.png": "49faaced7ea13fe775e74ca20c207036042108d80181fa5722439c230a32313d",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-013.png": "d7b094d803be23e761a2205195e09eeb533378693374996373172fc376085e2b",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-014.png": "b9752c813f3b393b6738e4192eb7c52e585a0db9c05267ce1077441a308e999e",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-015.png": "5203e8b16d66191b331c6c722835b430e1a8738083afe5017544a562898bafb0",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-016.png": "bc2238b6693fbb4ce4ca5a347c426ae5b8a73690e61dbab34c7af53470f8d742",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-017.png": "e4fce85d00deba0804dda73ae9388a05067a2c200e2091d854d3fd9356738862",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-018.png": "6f9f58308555338451b4a373f58e5f24e1a1d71956404ffe76cd1d3fc63579df",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-019.png": "fc260e1c0cc9ef3f686e826569212261501c5a081e18b4b138890cf5a1fe2d63",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-020.png": "d68f3f81af796a32ccdb4b272eb77ff7383f69db7e1700eb9d0824ab4f52c2f4",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-021.png": "2f69d6022558f73f0678926b44d2e9978a60f503a8a4b8927030eb24026aab9c",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-022.png": "f92b72e1f78a34f5e1e26e98645774a5a9a62858629de50cd94bcb5a9fbf6bb6",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-023.png": "096d37641a62a3373e008e59626019ba444f531860dbb45923edd25db992642a",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-024.png": "31ffb1b897ad4d8318515afbdea0098a7937e6214e08aad43f0f0adeb917bdd8",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-025.png": "6d69f7bbd9b053791617652a86ec1164102d4e1309e4d60810f6b4ca6a7ea2ef",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-026.png": "fe1a124e466bb985feacb8a59a276888ae536ff8046b26e461241b890ffebd74",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-027.png": "fedcfb8875272eb1bb3c3e248821bc162ffcc43f2ece9641a6f8809591e4a584",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-028.png": "127948c0d15206505c90d88e26762f8f78489a053bc6aa56d3381157f88cd0f4",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-029.png": "de8e64c5fbe4f117ea0ca2964ecf0fd8030ec49d0de6082a8de485d549b28b12",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-030.png": "1b9f14107d39c5f6e74fb2ed6d1911804d4072d224ae48186a2a14cd7fcfd2e4",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-031.png": "6a532e057bae70380093f61b90a6529309f63db60778a9f057ca3afed0ab3def",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-032.png": "90f920c8dddf2783f9e6229f99dd8d8214f769512b6a497577a5c0901ea3b3e3",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-033.png": "e47afce548360e57d435566af3405b3c024a29b81de501c634178208ea71c62a",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-034.png": "ae7e4e9be4e1110493613dd7d192c254318f2cfd9d3d64b67803a6041319f22c",
+      "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Preview-red/Runtime/768x1024/dynamic-red/red-035.png": "f8fc303ae4ea108fddf6f288e535ffaf060ebab3701957bb26fa7cd498fb0c6c"
+    },
+    "frameCount": 72,
+    "limitation": "Phone/tablet recorded in separate sessions. Frame UTC/UV are capture-request measurements. Native PNG frames remain whole; GIF may align relative time and loop replay is not a tile seam.",
+    "gif": {
+      "path": "/Users/daisei/PocketStriker/output/artproposals/PocketStriker-Menu-Color-Blocks-Scroll-20261003.gif",
+      "sha256": "af901433ec952afc85d2005ea1a183432af8bc5e59628db43ccd08843853a974",
+      "bytes": 6161010,
+      "evidencePath": "/Users/daisei/PocketStriker/output/artproposals/PocketStriker-Menu-Color-Blocks-Scroll-20261003.evidence.json",
+      "evidenceSha256": "33da7dc316223c2ff2216b65b2618bb038a8b3677a5bafa2acd5591f06869092",
+      "frames": 36,
+      "size": [
+        845,
+        700
+      ],
+      "playbackMs": 7200,
+      "recordedIntervalPlaybackMs": 7000,
+      "finalHoldMs": 200,
+      "limitation": "Actual separate Editor recordings aligned by relative realtime. ScreenCapture UV clocks are recorded at request time. Full frames are scaled for this comparison. The GIF repeats its recorded segment, so the playback-loop jump is not a game texture seam. This is not a device recording."
+    }
+  },
+  "newRegressionReceipts": {
+    "After": {
+      "name": "After",
+      "startedUtc": "2026-10-03T05:28:28.426031Z",
+      "finishedUtc": "2026-10-03T05:32:06.368080Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerMenuBackgroundValidation.StartAfterBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/After/unity.log"
+      ],
+      "environment": {
+        "POCKETSTRIKER_MENU_REVIEW_ROOT": "Logs/MenuColorBlockReview",
+        "POCKETSTRIKER_MENU_REVIEW": "After",
+        "POCKETSTRIKER_MENU_SOURCE_SET": "Pattern-v7",
+        "POCKETSTRIKER_MENU_DYNAMIC_REVIEW": "0",
+        "POCKETSTRIKER_MENU_SOURCE_HEAD": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+        "POCKETSTRIKER_MENU_UNIT_WIDTH": "260",
+        "POCKETSTRIKER_MENU_UNIT_HEIGHT": "262"
+      },
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "19ad3b79989bab3a83b55e6188a8237999f5695226f512c48ee41028a7094263",
+      "nativeReportSha256": "27a6a2cf256e8aba4bc0d4fa201cf0b195f2a35dfb00fbc5862cd6412aa07dd3"
+    },
+    "geometry": {
+      "name": "geometry",
+      "startedUtc": "2026-10-03T05:33:29.617762Z",
+      "finishedUtc": "2026-10-03T05:33:39.308831Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerUIArtValidation.ValidateGeometryBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Regression/geometry.log"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "19ad3b79989bab3a83b55e6188a8237999f5695226f512c48ee41028a7094263",
+      "nativeReportSha256": "174511140f642c6105feb4da4c8756a1771ee1c80b3b583a181542c46664c56d",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/UIArt/Current/report.json.pre-run-20261003T053329614654Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 17,
+      "nativeReportModifiedUtc": "2026-10-03T05:33:38.423299Z",
+      "nativeReportUtcTime": "2026-10-03T05:33:35.9791650Z",
+      "sourceFilesVerifiedAfterExit": 17
+    },
+    "pointer": {
+      "name": "pointer",
+      "startedUtc": "2026-10-03T05:35:08.866478Z",
+      "finishedUtc": "2026-10-03T05:35:47.020460Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerUIArtValidation.StartBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Regression/pointer.log"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "19ad3b79989bab3a83b55e6188a8237999f5695226f512c48ee41028a7094263",
+      "nativeReportSha256": "4dc0107f0d36b813a8f9f2c85a2133930841d33159cf61a619a216f50f137581",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/UIArt/Playmode/report.json.pre-run-20261003T053508863357Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 17,
+      "nativeReportModifiedUtc": "2026-10-03T05:35:46.229218Z",
+      "nativeReportUtcTime": "2026-10-03T05:35:18.4311980Z",
+      "sourceFilesVerifiedAfterExit": 17
+    },
+    "compile": {
+      "name": "compile",
+      "startedUtc": "2026-10-03T05:37:33.625494Z",
+      "finishedUtc": "2026-10-03T05:37:49.114515Z",
+      "command": [
+        "/tmp/pocketstriker-menu-art-20261002/Tools/validate_unity.sh",
+        "compile"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "19ad3b79989bab3a83b55e6188a8237999f5695226f512c48ee41028a7094263",
+      "nativeReportSha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/Revival/compile-iOS-report.json.pre-run-20261003T053733622129Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 17,
+      "nativeReportModifiedUtc": "2026-10-03T05:37:48.039237Z",
+      "nativeReportUtcTime": null,
+      "sourceFilesVerifiedAfterExit": 17
+    }
+  },
+  "jpegQuality": 88,
+  "librarySaved": true,
+  "pages": 4,
+  "embeddedChineseTrueType": true,
+  "renderedPages": [
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-colorblock/page-01.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-colorblock/page-02.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-colorblock/page-03.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-colorblock/page-04.png"
+  ],
+  "visualInspectionRequired": true,
+  "independentNativePhaseProbe": {
+    "returnChecks": 24,
+    "homeReloadChecks": 24,
+    "navigationChecks": 48,
+    "backgroundRectComparisons": 288,
+    "maximumRectError": 0.0,
+    "minimumNondefaultCenterDistance": 0.33128216464682797,
+    "scrollersPaused": true,
+    "assertionsBeforeCenterUV": true,
+    "controlledFixtureDifferences": 1,
+    "unchangedOtherInputs": 16,
+    "restoredInputs": 17,
+    "runner": {
+      "name": "Native-phase",
+      "startedUtc": "2026-10-03T05:46:47.310056Z",
+      "finishedUtc": "2026-10-03T05:49:53.759704Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerMenuBackgroundValidation.StartArtRefreshBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuColorBlockReview/Native-phase/unity.log"
+      ],
+      "environment": {
+        "POCKETSTRIKER_MENU_REVIEW_ROOT": "Logs/MenuColorBlockReview",
+        "POCKETSTRIKER_MENU_REVIEW": "Native-phase",
+        "POCKETSTRIKER_MENU_SOURCE_SET": "Pattern-v7",
+        "POCKETSTRIKER_MENU_DYNAMIC_REVIEW": "0",
+        "POCKETSTRIKER_MENU_SOURCE_HEAD": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+        "POCKETSTRIKER_MENU_UNIT_WIDTH": "260",
+        "POCKETSTRIKER_MENU_UNIT_HEIGHT": "262"
+      },
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "a9254871de01e1bde399131946b22457fb64311bb8aa1ba21801df6e48baed6b",
+      "nativeReportSha256": "1fca3ff0972bd3b133862461609c91b0549d9f7a876b6f136309deaa892608ff"
+    },
+    "scope": "Clone-only Editor instrumentation; all six scrollers paused. Nondefault raw UV rectangles are recorded immediately before and after native Return/HOME reload, and checked before any fixture CenterUV. Separate immutable Final After provides actual moving-speed evidence. This companion does not recheck resize/reference recovery or player compilation.",
+    "bindings": {
+      "native_phase": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Runtime/report.json",
+        "sha256": "1fca3ff0972bd3b133862461609c91b0549d9f7a876b6f136309deaa892608ff"
+      },
+      "phase_run": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/run-receipt.json",
+        "sha256": "9f22d48f5e5afe12198246669d216174c0ed77899c4a90412fbfc63a532c25a0"
+      },
+      "phase_execution": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/execution-parity.json",
+        "sha256": "a9254871de01e1bde399131946b22457fb64311bb8aa1ba21801df6e48baed6b"
+      },
+      "phase_parity": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/source-parity.json",
+        "sha256": "a9254871de01e1bde399131946b22457fb64311bb8aa1ba21801df6e48baed6b"
+      },
+      "phase_restore": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/restore-parity.json",
+        "sha256": "4f1f4ab7cb758ca7ecfd7299d5010c82c2b14e9add899e638379f224d43a4006"
+      },
+      "phase_diff": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/minimal.diff",
+        "sha256": "5e4e378ce9b707dc35736073707504600e43f0b606b2e80d64b86363f43c02d9"
+      },
+      "phase_immutable_fixture": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/Immutable/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+        "sha256": "38c1b875275d56de03fa1809e11492196bef84e66dffee55f46e36843859f4ea"
+      },
+      "phase_instrumented_fixture": {
+        "path": "/Users/daisei/PocketStriker/Logs/MenuColorBlockReview/Native-phase/Source/Instrumented/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+        "sha256": "d416392d4b770c2724d45abcac2b6276bf0954caed0e91d8f04c06a43da0de31"
+      }
+    }
+  },
+  "libraryIdentity": {
+    "operation": "create_library_file",
+    "status": "succeeded",
+    "path": "/PocketStriker-Menu-Color-Blocks-20261003.pdf",
+    "file_id": "file_0000000048588209b9554486d938e453",
+    "library_file_id": "libfile_2fe046a29418819188e34e97976ca851",
+    "file_name": "PocketStriker-Menu-Color-Blocks-20261003.pdf",
+    "current_version_number": 0,
+    "restored_from_version_number": null,
+    "xattrs": [
+      {
+        "name": "user.library-file-version",
+        "value": "0"
+      }
+    ],
+    "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+    "mime_type": "application/pdf",
+    "library_artifact_type": "report",
+    "file_size_bytes": 2243182,
+    "external_connectors_accessed": false
+  },
+  "localPath": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Color-Blocks-20261003.pdf",
+  "localSizeBytes": 2218213,
+  "localSha256": "ce45b4cdf8e8ddaa3aebdb3b229286c1ab800bfb2f3953905b12dd5fc9fbcc0c",
+  "localIdentityPersisted": true
+}

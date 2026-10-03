@@ -1,0 +1,72 @@
+{
+  "operation": "create_library_file",
+  "status": "static_brightness_proposal",
+  "path": "/RedGrid-Preview-Darker-20261003.png",
+  "file_id": "file_00000000b3dc8206951814e424648947",
+  "library_file_id": "libfile_441651cce5a48191a4bf5a615f7cfca4",
+  "file_name": "RedGrid-Preview-Darker-20261003.png",
+  "current_version_number": 0,
+  "restored_from_version_number": null,
+  "xattrs": [
+    {
+      "name": "user.library-file-version",
+      "value": "0"
+    }
+  ],
+  "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+  "mime_type": "image/png",
+  "library_artifact_type": "image_gen",
+  "file_size_bytes": 1375950,
+  "external_connectors_accessed": false,
+  "local_path": "/Users/daisei/PocketStriker/output/artproposals/RedGrid-Preview-Darker-20261003.png",
+  "local_size_bytes": 1375950,
+  "local_sha256": "ce6159071c9e77ecff9d85ea9cbd8b45c4733b27035dbecbd1a0b85885a887c7",
+  "dimensions": [
+    941,
+    1672
+  ],
+  "runtimeApplied": false,
+  "librarySaved": true,
+  "pinnedApprovedReference": {
+    "local_path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+    "library_file_id": "libfile_c51aea8368b48191b15ae85a958fd0c8",
+    "version": 3,
+    "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d"
+  },
+  "runtimeReference": {
+    "local_path": "/Users/daisei/PocketStriker/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+    "sha256": "e09303784404ca27ebc213102c56e5b9798145d4526c23fd3e98ee168a6a21bc"
+  },
+  "generation": {
+    "tool": "imagegen",
+    "source_path": "generated_images/exec-2adbe569-b653-40e1-b32c-dc31c0b9c194.png",
+    "prompt": "Edit the FIRST referenced image, the approved v3 portrait red color-block background. The SECOND referenced image is the ACTUAL currently integrated runtime texture from that same v3 design; use it to confirm the exact existing plain filled squares, linked stepped diamond grid and warm palette. Return ONE static portrait image with the first image's exact framing, dimensions 941x1672, cell size, 260px horizontal / 262px vertical repeat pitch, every square location and every lattice line placement preserved. Make only a moderate GLOBAL BRIGHTNESS reduction, approximately 16 percent darker than the references: darken the red-brown ground, the dusty terracotta grid lines and the flat solid red center squares together proportionally. Preserve their warm terracotta hue and existing saturation; this must still be red / clay brown, not gray, blackened, desaturated or purple. Keep the same relative contrasts and the small existing accepted tonal variation. Do not add or increase texture or gradients. Do not change the grid geometry, scale, count, silhouette, stagger, spacing or pattern arrangement. Every center motif remains the very same simple flat axis-aligned solid color square. NO outlines or pixel bevels around the squares, NO highlight or shadow strips, NO glints, chips, facets, symbols, extra shapes, stars, decorative dots, detail, text or UI. Do not redesign anything. It is exactly the currently approved v3 background, only its whole brightness is a little lower. This is a static brightness preview, not a new art style."
+  },
+  "limitations": [
+    "Static ImageGen edit; no production assets, code, UV or scrolling changes.",
+    "Requested roughly 16% darkness in prompt is not a measured exact reduction; measured float64 sRGB code-value weighted luma is approximately 27% lower.",
+    "Geometry and palette require visual review rather than a pixel-identical recolor guarantee."
+  ],
+  "visualValidation": {
+    "status": "passed_for_static_user_review",
+    "sourceMeanHSVOfRGB": [
+      12.9623007433,
+      0.5844790277,
+      0.5182044351
+    ],
+    "candidateMeanHSVOfRGB": [
+      12.1316216925,
+      0.6388095514,
+      0.4044415375
+    ],
+    "sourceMeanSrgbLumaCode": 83.2613604,
+    "candidateMeanSrgbLumaCode": 60.7841763,
+    "lumaCodeReductionFraction": 0.26996,
+    "completeSquaresChecked": 36,
+    "squareBoundaryMaxChangePixels": 1,
+    "squareCenterMaxChangePixels": 1.414,
+    "pixelIdenticalGeometryGuaranteed": false,
+    "productionInputsUnchanged": 17,
+    "evidencePath": "Logs/MenuDarkerPreviewReview/production-unchanged.json"
+  }
+}

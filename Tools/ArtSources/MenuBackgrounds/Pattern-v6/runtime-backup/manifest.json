@@ -1,0 +1,70 @@
+{
+  "sourceSet": "Pattern-v6",
+  "baseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+  "snapshotRoot": "Logs/MenuColorBlockReview/Before-v6",
+  "sourceParityManifestSha256": "db7546a3df15f85a224f9cc43ac905fe9d14926540a679e13b74cb90a90250e6",
+  "runtimeFiles": [
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+      "sha256": "3a2820514acc309a9cbeb4d428bccffc5282534de75cdfeb6e7aeaf244016e28",
+      "bytes": 387043
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png",
+      "sha256": "0f7eafd25c952515e156dc94b9a39c5f5423b9cc1b223e233e1d7718c63339ac",
+      "bytes": 387496
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png",
+      "sha256": "b41adba21e626171c622180a787bcf410eda3f7beda868afd9f236805d54493f",
+      "bytes": 385401
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png",
+      "sha256": "d188bb17c43e4091b838d868562664f4b12821d344b80783567f0daff94bfe25",
+      "bytes": 385577
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png",
+      "sha256": "c2bf44ce4922d8738fdfbfb3cae3eb6324fca9f34c6cdf5572921e0baf14ca17",
+      "bytes": 387485
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png",
+      "sha256": "45e7ee5d44b2e32567eb5ef13062b746be620a64b632e5475b98199a45e2fe93",
+      "bytes": 381726
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png.meta",
+      "sha256": "50841f7ab48bf5cfc0edeefb624cf99cdc31404ee862f5e9c6d59917a150f731",
+      "bytes": 3692
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png.meta",
+      "sha256": "17753280637916e6076594c0e34b5ade778fae715a06e9e5b8755f4fd0d7ed7b",
+      "bytes": 3692
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png.meta",
+      "sha256": "ae573027ac4ad93492c6345f291e34654e55e65ddc2314a61fa1868c38cd039c",
+      "bytes": 3692
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png.meta",
+      "sha256": "54d87852b3bdb97f5a9735e659e3274644db0d5059b7fcf858036280a03776af",
+      "bytes": 3692
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png.meta",
+      "sha256": "55fc9d89085eb4f8ba50af7313e45cf7c91276a1cf66fa9ae319accfc01163c9",
+      "bytes": 3692
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png.meta",
+      "sha256": "dcd581cbe50e7b1585a1d628836880d9bc6a6ac78d35f03a685f37f71ac745f3",
+      "bytes": 3692
+    }
+  ],
+  "restore": "python3 Tools/Art/build_menu_backgrounds.py --restore-pattern-v6",
+  "scope": "Exact frozen V6 PNG and .meta bytes; production code and Scene are separately preserved."
+}

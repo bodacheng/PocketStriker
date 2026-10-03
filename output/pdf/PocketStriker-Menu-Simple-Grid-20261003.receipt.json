@@ -1,0 +1,705 @@
+{
+  "path": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Simple-Grid-20261003.pdf",
+  "bytes": 1188543,
+  "sha256": "878bf3279859dd0b1617ba1d9e102bdd4ed23ec9d968d42f1d088c35a9e2748c",
+  "utc": "2026-10-03T01:55:48.174573+00:00",
+  "baseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+  "beforeSourceSet": "Pattern-v5",
+  "afterSourceSet": "Pattern-v6",
+  "previousPdfUnchangedSha256": "ecb78745710f76eaf92d300a4aa8d2faf6062063a4634547a170fa9f59ee34f7",
+  "reports": {
+    "snapshot": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/Before-v5/baseline-snapshot.json",
+      "sha256": "803d43663f8b7d89da4019aa2a68bf70b8575f0a2a1fa4b6a63d722bd81f999c"
+    },
+    "before": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/Before-v5/Runtime/report.json",
+      "sha256": "4257ee333e0bd3d2bff9e1be9079315b7e9c753a30546577360f9083714afd25"
+    },
+    "before_build": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/Before-v5/build.json",
+      "sha256": "d07e4afee6a3bb327e87b9b954f32d29a423bb167e2228ee9a650ce22a2b39da"
+    },
+    "before_parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/Before-v5/source-parity.json",
+      "sha256": "754f43fe27730560fc6e3930a5a25677dd11855e1765e1c00fa05a15ea38b28d"
+    },
+    "after": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/After/Runtime/report.json",
+      "sha256": "86eafcd16460b65443c22485b9d6525b8749c021423fd6ece475b5b06c3ad0bb"
+    },
+    "build": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/build.json",
+      "sha256": "56b13b55452d44e0c1b83acb1d9e8789e7f9df5a509811a33fcd7a1d0cea49af"
+    },
+    "parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/After/source-parity.json",
+      "sha256": "db7546a3df15f85a224f9cc43ac905fe9d14926540a679e13b74cb90a90250e6"
+    },
+    "after_run": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundSimplifyReview/After/run-receipt.json",
+      "sha256": "76245895f443b17ea247e49d2bf5a3f99e83c1f84cd43bd8e396c61228fa1208"
+    },
+    "prior_geometry": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/geometry-report.json",
+      "sha256": "6aad979593b028e7048c334d0ba1e81a49440fe7d8e5aa2d1765a68464635912"
+    },
+    "prior_pointer": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/ui-pointer-report.json",
+      "sha256": "53ed566608afa5de4ecf597ed54d8be0c839b18c7f734ced8cf46565493516c1"
+    },
+    "prior_compile": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/compile-iOS-report.json",
+      "sha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a"
+    },
+    "prior_runs": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/run-receipts.json",
+      "sha256": "b254791ffc904e3f9ec84fe49172d3b58d6aadcac949c3f79e3c1da3fd631a96"
+    },
+    "prior_pdf_receipt": {
+      "path": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Backgrounds-20261003.receipt.json",
+      "sha256": "3a04da5997dc6f98f38b97930467d2ff70ecdb93022eb8a0c40d2123cdde5e99"
+    },
+    "backup_manifest": {
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/runtime-backup/manifest.json",
+      "sha256": "53e7d2115449bbd6b467e361edbabbc76df87bdb258675efbdb666562a0863c4"
+    }
+  },
+  "screenshotHashes": {
+    "Before-v5/375x667/red": "9d7ea92de9ed7a90a2a3d6793462b8a58c5b5bc3af6d67969e317d4a8882df60",
+    "Before-v5/375x667/green": "88e45b1de87b0daee5ffdca073c53500798f42466724fff0a5781748c4e77307",
+    "Before-v5/375x667/blue": "dffe82b284e85d494c17ba390905af53621d71590faceeab29f54c0a94bdade7",
+    "Before-v5/375x667/light": "2eee2c9ded029353324e9b610f77a15e4ba2eedf6acad8430248e003c8f91027",
+    "Before-v5/375x667/dark": "eb1b767c8ee16f2ead7f87b643cb0866017a231e8b30cc2c6d1cebbc69802bad",
+    "Before-v5/375x667/null": "1017fd781b105fc1ba84a43edc634d26e7faee26a21f375c98ccf839ebbcb63c",
+    "Before-v5/390x844/red": "54f678f7ec6857675944f2fbf742cf07d3473eb8c57fc3534801e1123c0a2c31",
+    "Before-v5/390x844/green": "73172ea14a7df44aa1fd479352d26423e142ee01f3b165c93915599fb5daa434",
+    "Before-v5/390x844/blue": "4582be8a1b2d3a9a174311e3354f7c314ac2d50d23954411a728c12c11326b47",
+    "Before-v5/390x844/light": "49da823f0bce2a594270e7b06d986e79bbb3130e3d5c979d4aa1807db5d8faa5",
+    "Before-v5/390x844/dark": "28e7425357b928b1fe4089a367636673b7ef792641dcfb69fa0ec0c3b0853f7e",
+    "Before-v5/390x844/null": "b64435c9a2000da348c0fee251f14d1218d893921a401017895cd27f64a3641f",
+    "Before-v5/540x960/red": "ebbd1062231d96f05eb409508e907737f52b11a51c5d60ea520d1b03883b87d6",
+    "Before-v5/540x960/green": "e12476a591e97478cfb23c7ac96bd859f29f20f1a90a14dbe62756726b8445af",
+    "Before-v5/540x960/blue": "06e3db8d3ff995e704343552d5a6cab986f522518f5f02e07beec8ba7f79d87a",
+    "Before-v5/540x960/light": "a3b562ac0e66431a3db47f0a1d5fde9da7666b7d4c10b2ae448cb137c9ef5ccb",
+    "Before-v5/540x960/dark": "f9220b544918b843fef33c32f001b470c1ec943b9046d429848019395969a77b",
+    "Before-v5/540x960/null": "ed0fcd279241e7523e37075865200ee7a831e2c9c08dab53b5c7981dcaba11ca",
+    "Before-v5/768x1024/red": "e004bb37d771165da61fc415bdb86409ea3fa1526b451ca562adf66dbd34eb38",
+    "Before-v5/768x1024/green": "119e9daab050f94b20573a4ec2cd9e8238ae2720d614a3d3ad94bac56ea3013c",
+    "Before-v5/768x1024/blue": "f2fd6d2e6e978f0b5d98d565c47649d61534c301b6c7cebead9d6b86ae52cb78",
+    "Before-v5/768x1024/light": "1e4c396ecdd613d763e16ef9eb156a9737fe0604c0f2e545028c63b522ba27e5",
+    "Before-v5/768x1024/dark": "bd196e5ac0c7edd89107c906a54852deacc6bd5742bf3de6206909907fa73c00",
+    "Before-v5/768x1024/null": "5106afb6943228e44ea285410c248fb950435a5aa3769eed68533a8ad4b6e6b8",
+    "After/375x667/red": "6506073b8db8361dc18e641dfaaf9827c2839d3ef9aacdc8d7198c27c68ace80",
+    "After/375x667/green": "5993919b5b867f952c529d39cf68a41531b26aa8ba23f29c0f02566d0f6be89f",
+    "After/375x667/blue": "89b376043a46f64a867f6fded90cdfcc7d2f4bf12ea66d891e0d59c132b77115",
+    "After/375x667/light": "d28ed2c6ddba92a8c5bbff0ff9fa6a8005495e173bb2a3082c5d3d19389d8b65",
+    "After/375x667/dark": "68d83feb523f7f2e9db81052cc0a216e9d9255a3c48876016f4d914939b1efd8",
+    "After/375x667/null": "1c8f8d1860566b9f47c6947b90a21ce309fc4c0a014ea8e5e93ccc7d1ef82c8f",
+    "After/390x844/red": "0a22e9ff4f74457de2722b50dc30a82b8a968d362ceefc688fed99d7a5f9045f",
+    "After/390x844/green": "593e9621b20ec0776f5f8af27c7c03e04f9aa457c11fed88fbf46c2d8d15b7b0",
+    "After/390x844/blue": "c62cf3e0c6a3694d8be57f6397ef5a05834aa6948d40ba8c31157983460166af",
+    "After/390x844/light": "8653b05e3c61dae7e6f637b55fb954aabacdacaafd91873ff6131d1856d55d85",
+    "After/390x844/dark": "17a284143d139d57ef0b8bc6b3d5ddf1bccd45d0b995ab90eba1d3aca451a404",
+    "After/390x844/null": "2567cbe4891e625d918346dc0f198d4aeaaadd80a4dd177af8e300361b5f0bb3",
+    "After/540x960/red": "9ee0eab47d593e1d4a037f4510de5ea26686fdeaeed4a30789b6dff491d5d7b5",
+    "After/540x960/green": "3399bc5d8d90fba84eef1edb3fadbf53b2e722dfe75bad7b771571b671dc780e",
+    "After/540x960/blue": "dd5a4536623bf9a4d78e7277cec8b4692873f41b842c20fa3d0ad24e4b9bd3bf",
+    "After/540x960/light": "7e4a4cd95231383d5ff6162a079c013839ef3693ebc24e3e0406c13e84a2d1ab",
+    "After/540x960/dark": "cc34dd3ab4036b0b1dc6877572bb3ba182d46f8365eb980e078fd410deb89c67",
+    "After/540x960/null": "345d71a2b77289fa031db94559e5995a971fad77e0203013c17d79627dc7d675",
+    "After/768x1024/red": "67538207e463323f65e88d24bdf7ff401b333bb709614cbcbe7e2eb477081a89",
+    "After/768x1024/green": "5e6ff4110921fbd2e7a920b52b21b785626db5a955e0968a9436141211a75b60",
+    "After/768x1024/blue": "aa64ea665b2e062062f0ae1b544d0786570ae799ec7c7ce7d94af1c23e14243d",
+    "After/768x1024/light": "81e6e5f80cfe37c40ac82a041cafe0de15cd8e466c45bb2157b5d5ce5b664cd9",
+    "After/768x1024/dark": "601d3f3fd178dbc494d7fd3963628eff9de5144648b3e425a0918edd2db37cdd",
+    "After/768x1024/null": "f04b64e77c3d2cdf300d95008f5892b63485cfd5035b22eab8fc0357d6cbb4e5"
+  },
+  "productionEquality": {
+    "Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs": "6c4e3c2820e4c5585c07727850a0a9bba675c1573db9bd9675e81c73f8ff5c50",
+    "Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs.meta": "94938154f0f01e0536ee838b746db858240f2de1a3c143cca966947b2510793f",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png.meta": "17753280637916e6076594c0e34b5ade778fae715a06e9e5b8755f4fd0d7ed7b",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png.meta": "54d87852b3bdb97f5a9735e659e3274644db0d5059b7fcf858036280a03776af",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png.meta": "ae573027ac4ad93492c6345f291e34654e55e65ddc2314a61fa1868c38cd039c",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png.meta": "dcd581cbe50e7b1585a1d628836880d9bc6a6ac78d35f03a685f37f71ac745f3",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png.meta": "55fc9d89085eb4f8ba50af7313e45cf7c91276a1cf66fa9ae319accfc01163c9",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png.meta": "50841f7ab48bf5cfc0edeefb624cf99cdc31404ee862f5e9c6d59917a150f731",
+    "Assets/Scene/MainScene/MainMenuScene.unity": "c1907a69740994c98e32498d22f1c6d952075a8caaa0900db1de8e0f3de2babc"
+  },
+  "gridChecks": {
+    "red": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "5ef5a87c88a28f5d0384537fafbb021ed9086e76ee4daa4efd40dd736f8e943b"
+    },
+    "green": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "a51ffd6ede1afaf1b8b01c0b54c2257df1f99b4bbc0ad43a3645b192d4717ad7"
+    },
+    "blue": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "6adb34f69f48217707495ddacd74632501f6da21e3d86a4f1c6557c0bd98f28d"
+    },
+    "light": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "3ed35b60def8bfb6f06ebcddc16ecf671bbf5d7a62f42c6993c4450f6b7c3860"
+    },
+    "dark": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "6500eb280ac86da31f37a568f798dabc1f9aefe9e15973f6221a8f2a8d273c52"
+    },
+    "null": {
+      "unitPixels": 256,
+      "columns": 6,
+      "rows": 6,
+      "cellsCompared": 36,
+      "mismatchingCells": 0,
+      "horizontalSeamExact": true,
+      "verticalSeamExact": true,
+      "unitRgbaSha256": "ed9d4c7b1283a77d21742160c79201bf80ab93d895a9a6dc631c5e6a820aa712"
+    }
+  },
+  "areaEquivalentMethod": {
+    "v5SameRowPitchPixels": 156.5,
+    "v5StaggeredRowPitchPixels": 78.25,
+    "v6OrthogonalUnitPixels": 256,
+    "scope": "Background sampled-area equivalents, not complete uncovered native UI motif counts"
+  },
+  "density": [
+    {
+      "viewport": "375x667",
+      "color": "red",
+      "v5AreaEquivalent": 71.96402016539162,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.718750001524203
+    },
+    {
+      "viewport": "375x667",
+      "color": "green",
+      "v5AreaEquivalent": 71.73428641907635,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "375x667",
+      "color": "blue",
+      "v5AreaEquivalent": 71.73428641907635,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "375x667",
+      "color": "light",
+      "v5AreaEquivalent": 72.19412119249938,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.7196464168064223
+    },
+    {
+      "viewport": "375x667",
+      "color": "dark",
+      "v5AreaEquivalent": 72.19412119249938,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.7196464168064223
+    },
+    {
+      "viewport": "375x667",
+      "color": "null",
+      "v5AreaEquivalent": 72.19412119249938,
+      "v6AreaEquivalent": 20.239880561828613,
+      "relativeReduction": 0.7196464168064223
+    },
+    {
+      "viewport": "390x844",
+      "color": "red",
+      "v5AreaEquivalent": 59.146922998154125,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.7187499996812583
+    },
+    {
+      "viewport": "390x844",
+      "color": "green",
+      "v5AreaEquivalent": 58.958106192617315,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "390x844",
+      "color": "blue",
+      "v5AreaEquivalent": 58.958106192617315,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "390x844",
+      "color": "light",
+      "v5AreaEquivalent": 59.33604166898048,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.7196464131381405
+    },
+    {
+      "viewport": "390x844",
+      "color": "dark",
+      "v5AreaEquivalent": 59.33604166898048,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.7196464131381405
+    },
+    {
+      "viewport": "390x844",
+      "color": "null",
+      "v5AreaEquivalent": 59.33604166898048,
+      "v6AreaEquivalent": 16.635072112083435,
+      "relativeReduction": 0.7196464131381405
+    },
+    {
+      "viewport": "540x960",
+      "color": "red",
+      "v5AreaEquivalent": 72.00000385125986,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.7187500150439831
+    },
+    {
+      "viewport": "540x960",
+      "color": "green",
+      "v5AreaEquivalent": 71.77015178270678,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "540x960",
+      "color": "blue",
+      "v5AreaEquivalent": 71.77015178270678,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "540x960",
+      "color": "light",
+      "v5AreaEquivalent": 72.23021576591935,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.7196464141042394
+    },
+    {
+      "viewport": "540x960",
+      "color": "dark",
+      "v5AreaEquivalent": 72.23021576591935,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.7196464141042394
+    },
+    {
+      "viewport": "540x960",
+      "color": "null",
+      "v5AreaEquivalent": 72.23021576591935,
+      "v6AreaEquivalent": 20.25,
+      "relativeReduction": 0.7196464141042394
+    },
+    {
+      "viewport": "768x1024",
+      "color": "red",
+      "v5AreaEquivalent": 96.00000259594414,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.7187500076053048
+    },
+    {
+      "viewport": "768x1024",
+      "color": "green",
+      "v5AreaEquivalent": 95.6935357102757,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "768x1024",
+      "color": "blue",
+      "v5AreaEquivalent": 95.6935357102757,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.71784928
+    },
+    {
+      "viewport": "768x1024",
+      "color": "light",
+      "v5AreaEquivalent": 96.30695181143412,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.7196464067010955
+    },
+    {
+      "viewport": "768x1024",
+      "color": "dark",
+      "v5AreaEquivalent": 96.30695181143412,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.7196464067010955
+    },
+    {
+      "viewport": "768x1024",
+      "color": "null",
+      "v5AreaEquivalent": 96.30695181143412,
+      "v6AreaEquivalent": 27.0,
+      "relativeReduction": 0.7196464067010955
+    }
+  ],
+  "comparison": {
+    "summary": {
+      "rootPositionDelta": 0.0,
+      "rootRotationDelta": 0.0,
+      "cameraPositionDelta": 0.098876953125,
+      "cameraRotationDelta": 0.0,
+      "cameraSizeRelativeDelta": 0.08714452286834076,
+      "allRecordsAndPosesSame": true
+    },
+    "cases": [
+      {
+        "viewport": "375x667",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00048828125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0004024703386064148
+      },
+      {
+        "viewport": "375x667",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.000244140625,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00022497772770255816
+      },
+      {
+        "viewport": "375x667",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0013427734375,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.001288827266247532
+      },
+      {
+        "viewport": "375x667",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 9.151661452442626e-05
+      },
+      {
+        "viewport": "375x667",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.8848446214399085e-05
+      },
+      {
+        "viewport": "375x667",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.001953125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0018639616321053237
+      },
+      {
+        "viewport": "390x844",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0006103515625,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0006868921897559528
+      },
+      {
+        "viewport": "390x844",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2419033131382536e-05
+      },
+      {
+        "viewport": "390x844",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "390x844",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 9.121918848398414e-05
+      },
+      {
+        "viewport": "390x844",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "390x844",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 6.103515625e-05,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 6.513711904677677e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.8665711872239506e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "540x960",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.853943695271402e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.098876953125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.08714452286834076
+      },
+      {
+        "viewport": "540x960",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 6.103515625e-05,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 7.163319981258632e-06
+      },
+      {
+        "viewport": "540x960",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.664787976649193e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.526689436384582e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2302634366825039e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 2.92836146907837e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.137777709807243e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.448993792540768e-06
+      },
+      {
+        "viewport": "768x1024",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      }
+    ]
+  },
+  "jpegQuality": 88,
+  "priorValidationReused": [
+    "V5 geometry",
+    "V5 native UI pointer",
+    "V5 iOS player-script compile"
+  ],
+  "librarySaved": true,
+  "pages": 4,
+  "embeddedChineseTrueType": true,
+  "renderedPages": [
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-simple-grid/page-01.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-simple-grid/page-02.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-simple-grid/page-03.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-simple-grid/page-04.png"
+  ],
+  "visualInspectionRequired": false,
+  "rootVisualInspection": {
+    "passed": true,
+    "pagesViewed": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "utc": "2026-10-03T01:57:05.660162+00:00",
+    "scope": "Latest four rendered pages: full native V5/V6 screenshots, Chinese glyphs, spacing, native phone/tablet ratios, measured density, tested/reused scope and camera/device limitations."
+  },
+  "libraryIdentity": {
+    "operation": "create_library_file",
+    "status": "succeeded",
+    "path": "/PocketStriker-Menu-Simple-Grid-20261003.pdf",
+    "file_id": "file_000000005d108206aea7d7073be568aa",
+    "library_file_id": "libfile_c71172b78b8c8191a5fe75042ba7f27d",
+    "file_name": "PocketStriker-Menu-Simple-Grid-20261003.pdf",
+    "current_version_number": 0,
+    "restored_from_version_number": null,
+    "xattrs": [
+      {
+        "name": "user.library-file-version",
+        "value": "0"
+      }
+    ],
+    "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+    "mime_type": "application/pdf",
+    "library_artifact_type": "report",
+    "file_size_bytes": 1213512,
+    "external_connectors_accessed": false
+  },
+  "localIdentityPersisted": true,
+  "librarySavedUtc": "2026-10-03T01:57:10.289121+00:00",
+  "fileSizes": {
+    "localPdfBytes": 1188543,
+    "libraryReportedFileSizeBytes": 1213512
+  },
+  "independentPdfQa": {
+    "path": "Logs/MenuBackgroundSimplifyReview/After/pdf-independent-qa.json",
+    "sha256": "1882fb74769fa168fa911c8e23331d0551aa0ad79766c79ab86c6e52bebff046",
+    "status": "passed",
+    "deliverableReady": true,
+    "pdfSha256": "878bf3279859dd0b1617ba1d9e102bdd4ed23ec9d968d42f1d088c35a9e2748c",
+    "utc": "2026-10-03T01:59:22.560003+00:00"
+  }
+}

@@ -1,0 +1,450 @@
+{
+  "path": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Backgrounds-20261003.pdf",
+  "bytes": 2700248,
+  "sha256": "ecb78745710f76eaf92d300a4aa8d2faf6062063a4634547a170fa9f59ee34f7",
+  "utc": "2026-10-03T01:10:14.217768+00:00",
+  "baseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+  "sourceSet": "Pattern-v5",
+  "styleDescription": "低饱和的规则菱形底纹，点缀少量小像素技能石与星点。保留温和、素朴的老游戏感，让角色和白色界面保持清晰。",
+  "jpegQuality": 88,
+  "maxBytes": 10000000,
+  "reports": {
+    "workspace": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Before/workspace.json",
+      "sha256": "986f3993fcbbe434e86d2d657aec3b33a81d9ed0daac6613c2c387efaa86c041"
+    },
+    "before": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Before/Runtime/report.json",
+      "sha256": "c44b44e43767a38be764966a319889bff885941b42b15f4a3a0265612ca46904"
+    },
+    "after": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/After/Runtime/report.json",
+      "sha256": "4257ee333e0bd3d2bff9e1be9079315b7e9c753a30546577360f9083714afd25"
+    },
+    "build": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/build.json",
+      "sha256": "d07e4afee6a3bb327e87b9b954f32d29a423bb167e2228ee9a650ce22a2b39da"
+    },
+    "parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/After/source-parity.json",
+      "sha256": "754f43fe27730560fc6e3930a5a25677dd11855e1765e1c00fa05a15ea38b28d"
+    },
+    "geometry": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/geometry-report.json",
+      "sha256": "6aad979593b028e7048c334d0ba1e81a49440fe7d8e5aa2d1765a68464635912"
+    },
+    "pointer": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/ui-pointer-report.json",
+      "sha256": "53ed566608afa5de4ecf597ed54d8be0c839b18c7f734ced8cf46565493516c1"
+    },
+    "compile": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/compile-iOS-report.json",
+      "sha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a"
+    },
+    "run_receipts": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/Regression/run-receipts.json",
+      "sha256": "b254791ffc904e3f9ec84fe49172d3b58d6aadcac949c3f79e3c1da3fd631a96"
+    }
+  },
+  "screenshotHashes": {
+    "Before/375x667/red": "7cfadc15f3813b7041b590c6dd0007408c3ba1d0a6b5d267b52d6cc50b406f6e",
+    "Before/375x667/green": "7772f9849b45461a20b889f9431358edcf9cf6a934cf827c0d50c111b05da7ae",
+    "Before/375x667/blue": "2808598e6f0c78692e828c0e563d724125b30638efa9bbe50b91eb5f0351afbf",
+    "Before/375x667/light": "4ee56be3cf3f1cbb5590720d75bd9fd84973bba203b38a526368514a96c1c221",
+    "Before/375x667/dark": "09afeec896b26119442149a4a252c6c241a80c6954a20225eb2131620596b5c4",
+    "Before/375x667/null": "0dcb6dbdf2e105876466b1a17d623fecaf505f7c7aa4c6a716c3f4bcdf796af5",
+    "Before/390x844/red": "f820cd4d626e958f98585a0fe70a14f5c5959ce0609fb647cb8cb52c1172d4ed",
+    "Before/390x844/green": "946a121b888cfcfc68a0891e0ba1fcc3fb54746238b0f569e3f5f1af1f8741d2",
+    "Before/390x844/blue": "05b0525e35a65d1dcd249d82cc26ac9a5ff9af103dedebed0e4ac87905d736fe",
+    "Before/390x844/light": "32d43f12682f18f0ceb731f6a167718f78b8aaef4e96869370d74af84e5f9f74",
+    "Before/390x844/dark": "0fcdd8b3a78c8cbfdf291123f54bfd42229c8a3fcc8e739d1490fa1fa94c3b80",
+    "Before/390x844/null": "b5abe25857b851d2fd37a73f4e23e874db8ff3b1b7dc3d29433f2e9bcbff1ee6",
+    "Before/540x960/red": "7d7e46ac7269354f8fc87ce225a78bb4b539d2c310adcefa5265d2f024152d0b",
+    "Before/540x960/green": "413e07fdf0ea7affb557d618ad7490b3218d2940b3638edba1f3a7b426c505d0",
+    "Before/540x960/blue": "3e27f122ac90d2105385d8c0542f0915ba266a256a0aa8880f22574ad456b02a",
+    "Before/540x960/light": "159f57d3a69712734c760b5616390fe750d01189f27a069f91e104c67ce59c5b",
+    "Before/540x960/dark": "b205699848c4df7725b634fbc684e52305477b7802deab1bf0c22cf99607321b",
+    "Before/540x960/null": "982bd25264c6746140a8610d0fa6d3657c822b022ee7adb1ceaa8ea9090d970d",
+    "Before/768x1024/red": "fc6fed5063b383fa10957346e7face628a783e2a8ecf430861f0d4ca5039e683",
+    "Before/768x1024/green": "17b6f3b16af55e8be43a5d0c3f7dea053e2c2c1128611671208f71219079156e",
+    "Before/768x1024/blue": "bebf827abc3fafd8a0c5fb55c53cd9dd2f0fb4432852f81a5af315fae05df8ec",
+    "Before/768x1024/light": "8a195d121829f40fcc8eb4586c8a426fa99ea7c371ee36cf1341b76fc953567d",
+    "Before/768x1024/dark": "4ad7a5eaf01e4c92976ee1e6263c3c7cbc74abac5de62d70610999c30a47f61a",
+    "Before/768x1024/null": "c63d86e6c21c0d078934989d6bd758ed030bc978389330b8bbfa643cd9bda42f",
+    "After/375x667/red": "9d7ea92de9ed7a90a2a3d6793462b8a58c5b5bc3af6d67969e317d4a8882df60",
+    "After/375x667/green": "88e45b1de87b0daee5ffdca073c53500798f42466724fff0a5781748c4e77307",
+    "After/375x667/blue": "dffe82b284e85d494c17ba390905af53621d71590faceeab29f54c0a94bdade7",
+    "After/375x667/light": "2eee2c9ded029353324e9b610f77a15e4ba2eedf6acad8430248e003c8f91027",
+    "After/375x667/dark": "eb1b767c8ee16f2ead7f87b643cb0866017a231e8b30cc2c6d1cebbc69802bad",
+    "After/375x667/null": "1017fd781b105fc1ba84a43edc634d26e7faee26a21f375c98ccf839ebbcb63c",
+    "After/390x844/red": "54f678f7ec6857675944f2fbf742cf07d3473eb8c57fc3534801e1123c0a2c31",
+    "After/390x844/green": "73172ea14a7df44aa1fd479352d26423e142ee01f3b165c93915599fb5daa434",
+    "After/390x844/blue": "4582be8a1b2d3a9a174311e3354f7c314ac2d50d23954411a728c12c11326b47",
+    "After/390x844/light": "49da823f0bce2a594270e7b06d986e79bbb3130e3d5c979d4aa1807db5d8faa5",
+    "After/390x844/dark": "28e7425357b928b1fe4089a367636673b7ef792641dcfb69fa0ec0c3b0853f7e",
+    "After/390x844/null": "b64435c9a2000da348c0fee251f14d1218d893921a401017895cd27f64a3641f",
+    "After/540x960/red": "ebbd1062231d96f05eb409508e907737f52b11a51c5d60ea520d1b03883b87d6",
+    "After/540x960/green": "e12476a591e97478cfb23c7ac96bd859f29f20f1a90a14dbe62756726b8445af",
+    "After/540x960/blue": "06e3db8d3ff995e704343552d5a6cab986f522518f5f02e07beec8ba7f79d87a",
+    "After/540x960/light": "a3b562ac0e66431a3db47f0a1d5fde9da7666b7d4c10b2ae448cb137c9ef5ccb",
+    "After/540x960/dark": "f9220b544918b843fef33c32f001b470c1ec943b9046d429848019395969a77b",
+    "After/540x960/null": "ed0fcd279241e7523e37075865200ee7a831e2c9c08dab53b5c7981dcaba11ca",
+    "After/768x1024/red": "e004bb37d771165da61fc415bdb86409ea3fa1526b451ca562adf66dbd34eb38",
+    "After/768x1024/green": "119e9daab050f94b20573a4ec2cd9e8238ae2720d614a3d3ad94bac56ea3013c",
+    "After/768x1024/blue": "f2fd6d2e6e978f0b5d98d565c47649d61534c301b6c7cebead9d6b86ae52cb78",
+    "After/768x1024/light": "1e4c396ecdd613d763e16ef9eb156a9737fe0604c0f2e545028c63b522ba27e5",
+    "After/768x1024/dark": "bd196e5ac0c7edd89107c906a54852deacc6bd5742bf3de6206909907fa73c00",
+    "After/768x1024/null": "5106afb6943228e44ea285410c248fb950435a5aa3769eed68533a8ad4b6e6b8"
+  },
+  "comparison": {
+    "summary": {
+      "rootPositionDelta": 0.0,
+      "rootRotationDelta": 0.0,
+      "cameraPositionDelta": 0.09881591796875,
+      "cameraRotationDelta": 0.0,
+      "cameraSizeRelativeDelta": 0.09537873837064513,
+      "allRecordsAndPosesSame": true
+    },
+    "cases": [
+      {
+        "viewport": "375x667",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.01007080078125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.00927115924666749
+      },
+      {
+        "viewport": "375x667",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 6.103515625e-05,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 6.493267806061018e-05
+      },
+      {
+        "viewport": "375x667",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00518798828125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.004961317144711198
+      },
+      {
+        "viewport": "375x667",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00103759765625,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0009784543468888147
+      },
+      {
+        "viewport": "375x667",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "375x667",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.00079345703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0007555373265495896
+      },
+      {
+        "viewport": "390x844",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "390x844",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2419187365681895e-05
+      },
+      {
+        "viewport": "390x844",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 2.2046278077187763e-06
+      },
+      {
+        "viewport": "390x844",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 6.722116961339627e-07
+      },
+      {
+        "viewport": "390x844",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "390x844",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2987008594761704e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.7209194231190365e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.2426749746944774e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.29053779002544e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.09881591796875,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.09537873837064513
+      },
+      {
+        "viewport": "540x960",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 6.103515625e-05,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 2.255170110134549e-05
+      },
+      {
+        "viewport": "540x960",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.6648156923006718e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "blue",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0001220703125,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.387263764622255e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "dark",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 0.0
+      },
+      {
+        "viewport": "768x1024",
+        "color": "green",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 1.631208303466062e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "light",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.071763649803651e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "null",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 2.2550604717679363e-05
+      },
+      {
+        "viewport": "768x1024",
+        "color": "red",
+        "recordIdSame": true,
+        "poseSame": true,
+        "rootPositionDelta": 0.0,
+        "rootRotationDelta": 0.0,
+        "cameraPositionDelta": 0.0,
+        "cameraRotationDelta": 0.0,
+        "cameraSizeRelativeDelta": 3.581581834800599e-06
+      }
+    ]
+  },
+  "parityFiles": 17,
+  "preservedTextureMetadata": 6,
+  "functionalEvidence": "after",
+  "trackedChangedPaths": [
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png",
+    "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+    "Assets/Scene/MainScene/MainMenuScene.unity",
+    "Tools/Art/build_menu_backgrounds.py",
+    "Tools/ArtSources/MenuBackgrounds/README.md"
+  ],
+  "librarySaved": true,
+  "pages": 8,
+  "embeddedChineseTrueType": true,
+  "renderedPages": [
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-01.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-02.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-03.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-04.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-05.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-06.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-07.png",
+    "/Users/daisei/PocketStriker/tmp/pdfs/menu-review/page-08.png"
+  ],
+  "visualInspectionRequired": false,
+  "rootVisualInspection": {
+    "passed": true,
+    "pagesViewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "utc": "2026-10-03T01:12:08.818392+00:00",
+    "scope": "Latest rendered PNGs for all eight pages: Chinese glyphs, complete screenshots, labels, spacing, measured camera differences, raw-layout dirty finding and local-editor/device limitations."
+  },
+  "libraryIdentity": {
+    "operation": "create_library_file",
+    "status": "succeeded",
+    "path": "/PocketStriker-Menu-Backgrounds-20261003.pdf",
+    "file_id": "file_00000000f2ec82098e64c8054ba157e9",
+    "library_file_id": "libfile_8c512ab6d3c481918ffb7a1db1b46d99",
+    "file_name": "PocketStriker-Menu-Backgrounds-20261003.pdf",
+    "current_version_number": 0,
+    "restored_from_version_number": null,
+    "xattrs": [
+      {
+        "name": "user.library-file-version",
+        "value": "0"
+      }
+    ],
+    "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+    "mime_type": "application/pdf",
+    "library_artifact_type": "report",
+    "file_size_bytes": 2725217,
+    "external_connectors_accessed": false
+  },
+  "localIdentityPersisted": true,
+  "librarySavedUtc": "2026-10-03T01:12:57.953925+00:00",
+  "independentPdfQa": {
+    "path": "/Users/daisei/PocketStriker/Logs/MenuBackgroundReview/After/pdf-independent-qa.json",
+    "sha256": "9b30f304c3c786d35b6a3101bf78db0beafab550dd9256adc486af65030fea92",
+    "passed": true
+  },
+  "fileSizes": {
+    "localPdfBytes": 2700248,
+    "libraryReportedFileSizeBytes": 2725217
+  }
+}

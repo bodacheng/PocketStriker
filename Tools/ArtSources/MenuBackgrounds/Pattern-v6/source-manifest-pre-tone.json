@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "mode": "built-in image_gen edit",
+  "generatorCalls": 2,
+  "status": "Historical pre-tone Red record; preserved source now red-strong-outline.png, not the final master.",
+  "theme": "red",
+  "width": 1254,
+  "height": 1254,
+  "format": "RGB PNG",
+  "sourceProcessing": "Byte-identical copies; preview is sips downscale only. No procedural drawing/recoloring.",
+  "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-9df4bf0f-bbc0-45b5-a6eb-f8a31480563d.png",
+  "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-strong-outline.png",
+  "exactPrompt": "red-flat-edit-prompt.txt",
+  "sha256": "ccb903f9d5faf7d5478848263ad79360df951f3483e5612db5dc1d7955c4570d",
+  "byteIdenticalToBuiltinSource": true,
+  "reference": {
+    "role": "surface cleanup edit target",
+    "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-initial.png",
+    "sha256": "d6664cc864fe82d01acf6a5ddc7e8e8e9ecad106eaf42922db0dea4470903b96"
+  },
+  "initialGeneration": {
+    "source": "/Users/daisei/PocketStriker/generated_images/exec-64586f8c-6494-4856-b2cc-382283d1a60c.png",
+    "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-initial.png",
+    "exactPrompt": "red-prompt.txt",
+    "reference": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+    "sha256": "d6664cc864fe82d01acf6a5ddc7e8e8e9ecad106eaf42922db0dea4470903b96"
+  },
+  "preview": "previews/red-strong-outline.png",
+  "pixelInspection": "red-strong-outline-pixel-inspection.json",
+  "visualInspection": "Exactly one centered hollow pixel-step diamond; no center or gap marks. Large clean empty interior/margins. Very weak background color variation remains; parent allowed weak texture, pending parent review.",
+  "runtimeIntegration": "No Assets/Scene edits or Unity runs by source-art agent. Parent plans identical-cell 6x6 array; not yet tested by this agent."
+}

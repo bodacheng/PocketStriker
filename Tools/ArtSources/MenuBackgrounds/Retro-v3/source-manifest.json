@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-03",
+  "mode": "built-in image_gen",
+  "generatorCalls": 6,
+  "status": "Preserved source drafts. User requested regular repeat geometry after review; this is not the final adopted direction.",
+  "sourceProcessing": "Byte-identical copies; previews are sips downscales only.",
+  "layoutInspected": "Logs/MenuBackgroundReview/Before/Runtime/375x667/red-home.png",
+  "files": [
+    {
+      "theme": "red",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-70fd1a5d-866d-47b6-badf-087d1e7bc1c7.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png",
+      "exactPrompt": "red-prompt.txt",
+      "preview": "previews/red.png",
+      "imageReferences": [],
+      "sha256": "f162cc59d2fd8de3ea1adba329588112366c6157cbe9cbff1caf579374bc8839",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "green",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-ea06fb8a-e5de-4656-8161-17d22f4b6619.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/green.png",
+      "exactPrompt": "green-prompt.txt",
+      "preview": "previews/green.png",
+      "imageReferences": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png"
+      ],
+      "sha256": "b648691fb6842b9c472a722d7dd0ce976837e514fbeacd34eaccafff1e046459",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "blue",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-adfff50e-2db1-420c-9030-84a966c20e93.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/blue.png",
+      "exactPrompt": "blue-prompt.txt",
+      "preview": "previews/blue.png",
+      "imageReferences": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png"
+      ],
+      "sha256": "d3dc358e7324d93a2736c69bde9068a58d82d10477a94f6e00c9fb9770d11ec4",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "light",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-67f1099c-22bd-48ff-97a7-2882cd344e79.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/light.png",
+      "exactPrompt": "light-prompt.txt",
+      "preview": "previews/light.png",
+      "imageReferences": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png"
+      ],
+      "sha256": "0cdebc4b5e7bc18a56e350470a5530bb8f2b8727c47de1f18a53da917eb52aad",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "dark",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-99e34be6-4b9d-4e44-bbcb-0ac4737340a8.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/dark.png",
+      "exactPrompt": "dark-prompt.txt",
+      "preview": "previews/dark.png",
+      "imageReferences": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png"
+      ],
+      "sha256": "907e58b0201e4d04f1173a234432af55a157f62331ce9de7fdf08703ef3343c0",
+      "byteIdenticalToBuiltinSource": true
+    },
+    {
+      "theme": "neutral",
+      "width": 941,
+      "height": 1672,
+      "format": "RGB PNG",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-b1b53f6a-4752-440c-961e-76738ee9fc80.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/neutral.png",
+      "exactPrompt": "neutral-prompt.txt",
+      "preview": "previews/neutral.png",
+      "imageReferences": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Retro-v3/red.png"
+      ],
+      "sha256": "3baf197ac0e61823c3097517e52992b94a6a06c46de5ea1d2f6669f775f0a5d5",
+      "byteIdenticalToBuiltinSource": true
+    }
+  ],
+  "runtimeIntegration": "Not performed by source-art agent; seamless looping and actual UI require separate parent verification."
+}

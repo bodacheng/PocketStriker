@@ -1,0 +1,351 @@
+{
+  "createdUtc": "2026-10-03T08:46:34.553633+00:00",
+  "output": "/Users/daisei/PocketStriker/output/pdf/PocketStriker-Menu-Static-Pixel-Gradient-20261003.pdf",
+  "sha256": "9960e550d3a4b321b88e83aef3c3a5a89071414d5e97eedd3d66e0907d2a079c",
+  "bytes": 1247710,
+  "pages": 3,
+  "reports": {
+    "after": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/report.json",
+      "sha256": "c21941732e045da8eafaf287e66c263bf8fb66e210776b88db11e27f758e4efd"
+    },
+    "parity": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/source-parity.json",
+      "sha256": "c24a5e4e66784c27ff7dddb1c08a0ecee58f48789477738f88e2c95887726201"
+    },
+    "nativeReceipt": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/run-receipt.json",
+      "sha256": "074de016e313791fb323ef23afa2828fe7566d3b90fb2b0c6f55e52a43bb0cad"
+    },
+    "manifest": {
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/manifest.json",
+      "sha256": "c5a669d6921c94bad1e778622e2dd8a9f9eaecb921dcfd06eb6714709d68b900"
+    },
+    "sourceAudit": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/source-implementation-audit.json",
+      "sha256": "80362ffbf8bb22c6c0d23314d1ffa9d2c10487d8c71920ebd3bfbafcc756838d"
+    },
+    "aspectAudit": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/aspect-source-audit.json",
+      "sha256": "5ffa3d571d6593eadf72f7a85a32c941a38e70c52eb6a255894db2ae70e8effd"
+    },
+    "sceneWrite": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/scene-material-write.json",
+      "sha256": "556c50bc8e2dc30b6bc27e96559aebe5d5319ecfbd51e61837558014b0d234cf"
+    },
+    "installation": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/asset-installation.json",
+      "sha256": "90a9e6777110655415df6f3afec45a414201539bd2d453b63ba0cb5f6c598638"
+    },
+    "geometry": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/Regression/geometry-report.json",
+      "sha256": "78d354124aea194e73d208402804db7805935cbb998dff404d906741112cc27f"
+    },
+    "pointer": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/Regression/ui-pointer-report.json",
+      "sha256": "57509643afbdc3166b9d85f685588991a4cd97f74c03c6f21b364976f0c50120"
+    },
+    "compile": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/Regression/compile-iOS-report.json",
+      "sha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a"
+    },
+    "regressionReceipt": {
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/Regression/run-receipts.json",
+      "sha256": "273164436626818d477819e6970e0abbc1233b716e0847ec8a743ad03f35148d"
+    }
+  },
+  "sourceSet": "StaticPixelGradient-v1",
+  "sourceInputs": 32,
+  "nativeScreenshotInventory": {
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/red-home.png": "9cb484b575708ba99e05df2388309613bc93a5a50bb2cd9dd14b5f971194f6c3",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/red-reloaded.png": "329091a0f2ae79b923604f9f3df17930048396b650284a1bfad4690ed805b639",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/red-scene-reloaded.png": "c316e70aa61a0d94f57c64b3d79e882e7d4408a5ac06f3e100c58b072594b96b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/green-home.png": "2db14a1042030ac48f0f2a2ab9994311303a0f24ceca78463124f256183cb98e",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/green-reloaded.png": "0e25101c14f2855bab98ade72cc5f4f83b8c94e83ee6f443064abfbafdb8f263",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/green-scene-reloaded.png": "149b5f93c1bf9ed9b9ee08ab2694c969e5d161b22c38832d6d52757055f2aa39",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/blue-home.png": "3635079f0e399dc32c69c14d6650e896e7f572f6160d45474ccf245fec75fc68",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/blue-reloaded.png": "28d1d016731ccbec43aa9074c6b10e657ea76cd4d7092f2f2cd14d71e768bd4d",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/blue-scene-reloaded.png": "743a19fc588ce5f816bed97cc7c2e530eb74040f2960a0ec6c97ec968c835d19",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/light-home.png": "7c7f962bf9e262bdefe37dabc7a5ea130697816480abb4936394c3e6151e07a2",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/light-reloaded.png": "355df97eb7053082399bcce6124c16ffac4d4af3c7a37b9f76d85ad3db0f5ab2",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/light-scene-reloaded.png": "a854f3e195ec5d39b0ff123418adf931d63a1703df90afb76c74da912e1a8654",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/dark-home.png": "189b6749bb40d4d76e342a9e486e488b84cd812d391606891ec5491d36e3f140",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/dark-reloaded.png": "f11e5a80c60c7c74846a322ce9ec68e14a3664b417ce054bd0de3e74b316c9b6",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/dark-scene-reloaded.png": "94fdff4575c5b2c222facbc98d4de22ed45cfab5bb6b289034a750bd9b5f6918",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/null-home.png": "ae1d7bcf20666cf97c474fba814394e61c30822cf1be919c8bea1ab0236155cf",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/null-reloaded.png": "5c8da6177c52f497a220c74c8317f4e6fca9821bac18cb58e2da15ab763916f4",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/null-scene-reloaded.png": "dfcb4d8931037ee1eeae5ec59077a5ba195d688c248b862ee1e7678d8eb6bcfd",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/red-home.png": "88cfdeb9217402eeeb62669016ef26390ac82ac1167c9350f3bdd420915a82f3",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/red-reloaded.png": "0195536afe38dda42e02093c7a15badf13d49366f83d2e36a4608891219a0c5d",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/red-scene-reloaded.png": "0497fdf73837b1baaf9acf8790179033187dff4ad16f218a63d456f46570f62e",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/green-home.png": "4e5e3d8e88e8795806dda5c2e37aa41b76058e337c629cec24b43481208653d1",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/green-reloaded.png": "3416f651dacdb4eaa3056ae8c0ab64874ebc5e501ab3afdcf6c1b6de33967248",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/green-scene-reloaded.png": "4215bef74b4ae44576b7916f2d5f1a4743739fdec419ddb4e35a047dfd876175",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/blue-home.png": "3fffdcf77916a3bb1a9974c9cad19d80bcf6d4d1c9bd63db0bd6bebf9ac3581f",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/blue-reloaded.png": "bb9d2d971dd42f1931848f965100de23d4f7d473c1dad280f31482a3aee631a4",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/blue-scene-reloaded.png": "378e75704b0443812126bc6d82451ce75990dd0ad89941edac33037e19fe4739",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/light-home.png": "808edcd6ec05426b7d515ac732a4786c346d36bedb863d952e7ebcce898bdd36",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/light-reloaded.png": "ac40180814c865daeda83ef2acd11e9bf735e3813c9615b803bcadb9c280c875",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/light-scene-reloaded.png": "ceb332482888530bbe6bd86cc2a4b3d53438890255a8fba79a1856e34f2bb704",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/dark-home.png": "f23da28e01882a74b98b3bb8dfe75635d513787d2213b50cdefb49dca8833e20",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/dark-reloaded.png": "a8eee3265cbb772b4da12bb5ec152173a80dd7ba3017730afe3d7734924bab25",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/dark-scene-reloaded.png": "fc39e173569716ed24a29ec977204aa265a7888179483f624a30e8109713983a",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/null-home.png": "91af54e0722f881c0f4003351515333bed7be5c84bb4d96730b7d5228b561875",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/null-reloaded.png": "ee7797edf2cf4dbc5e75c98c9107fcf45d221312bfe3c90f36dadce2d1284220",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/390x844/null-scene-reloaded.png": "07ee77cc5ca0ed293ef38f9ad903f997db71eb298c02e0b38854581777401eb4",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/red-home.png": "976a116dc287d56c50bb23d6516662b5a8b01b52cd872e6f18c2e8dfd4f35373",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/red-reloaded.png": "eb87906d78b81b39fc05d006dba23390cfe8d41035c017e3844db8db9475ffd1",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/red-scene-reloaded.png": "e4269cc4a0594b0242bd8dfa4848567f5722031fab461012cd0ddec643f66f60",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/green-home.png": "964407b557c29aab6ceabd0113508947cc2e3bb7cd64c34af9b303f20326871b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/green-reloaded.png": "2cac68f5d1330898cb971ef39a26664b326bea0f432466abc363cbad5ae8a0df",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/green-scene-reloaded.png": "2b4f21385fe249fa12ce8a6081eec72c9772c0afa262ceacabaa984f8eb87b18",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/blue-home.png": "fcae69db38a51d675f0b1580b01377134116923cc41637d403f74631927973ae",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/blue-reloaded.png": "7d4b006f0609ba6c4281688522b13179f8f571ea3a4d703f7260362944c1db7c",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/blue-scene-reloaded.png": "d1da43d9dfc3e2aba238bebd4b1d0dbe2fd759dfebc16f889f45a86aa5d0522d",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/light-home.png": "55ec67e4c1bf9be7003a85c3adadaf45f9f4b3769edeb1ac5c840ea5454d70c5",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/light-reloaded.png": "e3f4bbcbcd05c6287c72fe7b2b65c07c40a8c2f45d780c13230944bf2304f6e4",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/light-scene-reloaded.png": "c4ddb18d2ca43582d08bbae05e91feb92d16be1e5bc8582718ec06a27682044a",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/dark-home.png": "ee206d29dabbe5889870f9ae06cf119ee7f03429dbb86dc6c28982d86d851206",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/dark-reloaded.png": "90dd9e9ee4e086ee6d2f88d25b31c26d4cc8034d45e29b85ec9b88513c03d9a3",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/dark-scene-reloaded.png": "2fa6cce41c8044caf3d82c7a1ce6c8b1f7183f270a729fefa82bb659e20031e0",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/null-home.png": "ad07978aed0a2fae282022bec692154dee6e669894695d92ba5bf4e339fe0a63",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/null-reloaded.png": "4a6fcbaf12bfa51b67a18f76fa3ac4334682b53d28edfeea9c4545b84f099282",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/540x960/null-scene-reloaded.png": "1d97389e2ca5567b7fb4196149a4d62f0e59025cc97c7d1eec8124b7025a9e30",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/red-home.png": "2e4342d53d0703a7778dac07b08986d203c99fa67c6abbdb5672017ccbef5dfb",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/red-reloaded.png": "9f980573308836008f372bd2a0134f10a71a57fd623f1e66aaad25862e822ce6",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/red-scene-reloaded.png": "c12426da72a1356cb07f63d01c5e285b38a42bc3e0ddc67a52dd022529b17323",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/green-home.png": "1c2487609305b4a4cf434af0fa4977f0f6dfe0b6228434cacab941eb3d593742",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/green-reloaded.png": "1a0f77ca01d501bdde76fcb2e3aa24f7c454c9d0e81a206a555a9ca934d30692",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/green-scene-reloaded.png": "2e33da9ba67f34cc4e0a392e4bd4a8e9d3b046cd79f49203cae74be8e8c1febd",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/blue-home.png": "bb351b9ffead7a8674d54efb7a598b9d45d60a2b3f1c6a07f5f7e2cd296834b5",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/blue-reloaded.png": "dee552375642f174a97cb2553c79d0f8d9efbd65490b676ba399c3e897c3c742",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/blue-scene-reloaded.png": "55beeb6712f0ce3d32020b13c7916319376a270e663214de9350235094eb205a",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/light-home.png": "ab025f3d164c887a9464556be224df0c01bf1c0847abc6c748c974add60ed49b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/light-reloaded.png": "b2601dfaebdd16ff97692466a850e2c285698d174febee5ddd3f5a060bb101bc",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/light-scene-reloaded.png": "986701d6a9a7dc02585af368ea0e0428f0579d427f30ccd7ac92e7c3d993ae45",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/dark-home.png": "19ffaaa48befdb5c870d8f4fa2660b5f0a57767b0945ca706aa9388099636cbd",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/dark-reloaded.png": "88563dd8d0e44a0c449c419298e892300813b6f7a747185094c44fa10264535b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/dark-scene-reloaded.png": "c843467483d7b9633fcf90536cd98d6ab492e9a48f17056d467cdb3d8a632312",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/null-home.png": "82e3ab55c1182ae2a98419eb360ec45fa46e84c8999c2c955cddca58f846f93d",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/null-reloaded.png": "ab70e729994847bb67b9bf062ebafd1a6033cc48dd8bc2846488e96eda83b78e",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/null-scene-reloaded.png": "ae5533f2f297ef5c3681217dbdc37f7e8168954441aad8c00a498f1b9043c600",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/red-palette-gpu-only.png": "e2a980bb8e9e97621c19a2bcbf2bdc0216a21af242e04f6cf17b985477563b4b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/green-palette-gpu-only.png": "3353bd3df5721170ecba008cb1d9d17590b00447d1de14fa72d7690db522173b",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/blue-palette-gpu-only.png": "4a19ebff6c17ac04d86c01d9d2984f86c9275874ca08b239fdf1c713f84dec64",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/light-palette-gpu-only.png": "9969836d934ef28c8c29a79c992ad9284232774051aa35fbd5275ff37ade76ef",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/dark-palette-gpu-only.png": "e901ed35393ba4e632f3013b80eda994cc9095f178f2d75ee75923d99e22820e",
+    "Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/null-palette-gpu-only.png": "dc8397a1f8e4cf1cb3102b759efc20228f83b08051ecf1c604cf0bc42f4f796a"
+  },
+  "embeddedFrames": [
+    {
+      "viewport": "375x667",
+      "color": "red",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/red-home.png",
+      "sha256": "9cb484b575708ba99e05df2388309613bc93a5a50bb2cd9dd14b5f971194f6c3"
+    },
+    {
+      "viewport": "375x667",
+      "color": "green",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/green-home.png",
+      "sha256": "2db14a1042030ac48f0f2a2ab9994311303a0f24ceca78463124f256183cb98e"
+    },
+    {
+      "viewport": "375x667",
+      "color": "blue",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/blue-home.png",
+      "sha256": "3635079f0e399dc32c69c14d6650e896e7f572f6160d45474ccf245fec75fc68"
+    },
+    {
+      "viewport": "375x667",
+      "color": "light",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/light-home.png",
+      "sha256": "7c7f962bf9e262bdefe37dabc7a5ea130697816480abb4936394c3e6151e07a2"
+    },
+    {
+      "viewport": "375x667",
+      "color": "dark",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/dark-home.png",
+      "sha256": "189b6749bb40d4d76e342a9e486e488b84cd812d391606891ec5491d36e3f140"
+    },
+    {
+      "viewport": "375x667",
+      "color": "null",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/375x667/null-home.png",
+      "sha256": "ae1d7bcf20666cf97c474fba814394e61c30822cf1be919c8bea1ab0236155cf"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "red",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/red-home.png",
+      "sha256": "2e4342d53d0703a7778dac07b08986d203c99fa67c6abbdb5672017ccbef5dfb"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "green",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/green-home.png",
+      "sha256": "1c2487609305b4a4cf434af0fa4977f0f6dfe0b6228434cacab941eb3d593742"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "blue",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/blue-home.png",
+      "sha256": "bb351b9ffead7a8674d54efb7a598b9d45d60a2b3f1c6a07f5f7e2cd296834b5"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "light",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/light-home.png",
+      "sha256": "ab025f3d164c887a9464556be224df0c01bf1c0847abc6c748c974add60ed49b"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "dark",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/dark-home.png",
+      "sha256": "19ffaaa48befdb5c870d8f4fa2660b5f0a57767b0945ca706aa9388099636cbd"
+    },
+    {
+      "viewport": "768x1024",
+      "color": "null",
+      "path": "/Users/daisei/PocketStriker/Logs/MenuStaticPixelGradientReview/After/Runtime/768x1024/null-home.png",
+      "sha256": "82e3ab55c1182ae2a98419eb360ec45fa46e84c8999c2c955cddca58f846f93d"
+    }
+  ],
+  "jpegQuality": 88,
+  "fullFramesPreserved": true,
+  "render": {
+    "pages": 3,
+    "embeddedChineseTrueType": true,
+    "renderedPages": [
+      "/Users/daisei/PocketStriker/tmp/pdfs/menu-static-gradient/page-01.png",
+      "/Users/daisei/PocketStriker/tmp/pdfs/menu-static-gradient/page-02.png",
+      "/Users/daisei/PocketStriker/tmp/pdfs/menu-static-gradient/page-03.png"
+    ],
+    "visualInspectionRequired": true
+  },
+  "measurements": {
+    "rawUvPairs": 576,
+    "maxRawUvDelta": 0.0,
+    "waitRange": [
+      0.6001037919999987,
+      0.6009771669999964
+    ],
+    "gpuPixels": 168,
+    "maxGpuError8Bit": 0.5
+  },
+  "actualRunnerReceipts": {
+    "After": {
+      "name": "After",
+      "startedUtc": "2026-10-03T08:31:34.954407Z",
+      "finishedUtc": "2026-10-03T08:34:21.489107Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerMenuBackgroundValidation.StartStaticGradientBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuStaticPixelGradientReview/After/unity.log"
+      ],
+      "environment": {
+        "POCKETSTRIKER_MENU_REVIEW_ROOT": "Logs/MenuStaticPixelGradientReview",
+        "POCKETSTRIKER_MENU_REVIEW": "After",
+        "POCKETSTRIKER_MENU_SOURCE_SET": "StaticPixelGradient-v1",
+        "POCKETSTRIKER_MENU_DYNAMIC_REVIEW": "0",
+        "POCKETSTRIKER_MENU_SOURCE_HEAD": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185"
+      },
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "c24a5e4e66784c27ff7dddb1c08a0ecee58f48789477738f88e2c95887726201",
+      "nativeReportSha256": "c21941732e045da8eafaf287e66c263bf8fb66e210776b88db11e27f758e4efd",
+      "runnerSha256": "ef66c1a9215e430cce9ec187d9b01be64677c8c85e879dec19bafd69a0f701a2",
+      "sourceFilesVerifiedBeforeStart": 32,
+      "sourceFilesVerifiedAfterExit": 32,
+      "nativeReportModifiedUtc": "2026-10-03T08:34:20.043909Z"
+    },
+    "geometry": {
+      "name": "geometry",
+      "startedUtc": "2026-10-03T08:35:09.347908Z",
+      "finishedUtc": "2026-10-03T08:35:19.499207Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerUIArtValidation.ValidateGeometryBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuStaticPixelGradientReview/Regression/geometry.log"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "c24a5e4e66784c27ff7dddb1c08a0ecee58f48789477738f88e2c95887726201",
+      "nativeReportSha256": "78d354124aea194e73d208402804db7805935cbb998dff404d906741112cc27f",
+      "runnerSha256": "8be08e7faf7ab5c5aea49aec7b001e43feee1f77588aa1e8e7a09f86a6729e0d",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/UIArt/Current/report.json.pre-run-20261003T083509341711Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 32,
+      "nativeReportModifiedUtc": "2026-10-03T08:35:18.406205Z",
+      "nativeReportUtcTime": "2026-10-03T08:35:15.9452220Z",
+      "sourceFilesVerifiedAfterExit": 32
+    },
+    "pointer": {
+      "name": "pointer",
+      "startedUtc": "2026-10-03T08:36:59.059563Z",
+      "finishedUtc": "2026-10-03T08:37:37.289103Z",
+      "command": [
+        "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity",
+        "-batchmode",
+        "-projectPath",
+        "/tmp/pocketstriker-menu-art-20261002",
+        "-buildTarget",
+        "iOS",
+        "-executeMethod",
+        "PocketStrikerUIArtValidation.StartBatch",
+        "-logFile",
+        "/tmp/pocketstriker-menu-art-20261002/Logs/MenuStaticPixelGradientReview/Regression/pointer.log"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "c24a5e4e66784c27ff7dddb1c08a0ecee58f48789477738f88e2c95887726201",
+      "nativeReportSha256": "57509643afbdc3166b9d85f685588991a4cd97f74c03c6f21b364976f0c50120",
+      "runnerSha256": "8be08e7faf7ab5c5aea49aec7b001e43feee1f77588aa1e8e7a09f86a6729e0d",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/UIArt/Playmode/report.json.pre-run-20261003T083659053009Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 32,
+      "nativeReportModifiedUtc": "2026-10-03T08:37:36.257957Z",
+      "nativeReportUtcTime": "2026-10-03T08:37:08.4568930Z",
+      "sourceFilesVerifiedAfterExit": 32
+    },
+    "compile": {
+      "name": "compile",
+      "startedUtc": "2026-10-03T08:38:28.412537Z",
+      "finishedUtc": "2026-10-03T08:38:43.468984Z",
+      "command": [
+        "/tmp/pocketstriker-menu-art-20261002/Tools/validate_unity.sh",
+        "compile"
+      ],
+      "exitCode": 0,
+      "sourceBaseHead": "5e4ff2bb3f725912018b7105ddd8b0ca67d40185",
+      "sourceParityManifestSha256": "c24a5e4e66784c27ff7dddb1c08a0ecee58f48789477738f88e2c95887726201",
+      "nativeReportSha256": "56c32133270d7dda69a97df06edc4acfef51162f7a0aa50578f07e7bd701754a",
+      "runnerSha256": "8be08e7faf7ab5c5aea49aec7b001e43feee1f77588aa1e8e7a09f86a6729e0d",
+      "previousReportArchived": "/tmp/pocketstriker-menu-art-20261002/Logs/Revival/compile-iOS-report.json.pre-run-20261003T083828406289Z",
+      "targetReportAbsentBeforeStart": true,
+      "sourceFilesVerifiedBeforeStart": 32,
+      "nativeReportModifiedUtc": "2026-10-03T08:38:42.571705Z",
+      "nativeReportUtcTime": null,
+      "sourceFilesVerifiedAfterExit": 32
+    }
+  },
+  "protectedPreviousPdfSha256": {
+    "PocketStriker-Menu-Backgrounds-20261003.pdf": "ecb78745710f76eaf92d300a4aa8d2faf6062063a4634547a170fa9f59ee34f7",
+    "PocketStriker-Menu-Simple-Grid-20261003.pdf": "878bf3279859dd0b1617ba1d9e102bdd4ed23ec9d968d42f1d088c35a9e2748c",
+    "PocketStriker-Menu-Color-Blocks-20261003.pdf": "ce45b4cdf8e8ddaa3aebdb3b229286c1ab800bfb2f3953905b12dd5fc9fbcc0c"
+  },
+  "scope": "Local Editor native static evidence, independent Gamma GPU probes and fresh PlayerScripts compile; no device/IPA/network/Library verification"
+}

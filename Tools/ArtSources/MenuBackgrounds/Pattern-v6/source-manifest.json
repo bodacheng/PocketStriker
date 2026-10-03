@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 2,
+  "date": "2026-10-03",
+  "mode": "built-in image_gen edits only",
+  "generatorCallsTotal": 8,
+  "generatorCallBreakdown": {
+    "redInitial": 1,
+    "redSurfaceCleanup": 1,
+    "redToneSoftening": 1,
+    "fiveColorVariants": 5
+  },
+  "finalEntryCount": 6,
+  "draftEntryCount": 2,
+  "entries": [
+    {
+      "theme": "red",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+      "sourceSha": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-d44a623c-da6c-432d-be37-d2763c0cbbec.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-strong-outline.png",
+        "sha256": "ccb903f9d5faf7d5478848263ad79360df951f3483e5612db5dc1d7955c4570d",
+        "role": "only tone edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-soft-outline-edit-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/red.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Parent accepted Red source geometry and strength"
+    },
+    {
+      "theme": "green",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/green.png",
+      "sourceSha": "f1941b275725ce7a0e28c1128d33d5e2a769327b83a78d11e67cf7a309a7ea1e",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-dad7cef6-0e12-43f6-b95e-ccef375327be.png",
+        "sha256": "f1941b275725ce7a0e28c1128d33d5e2a769327b83a78d11e67cf7a309a7ea1e"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+        "role": "only primary reference and color edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/green-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/green.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Source visual inspection complete; actual runtime parent verification pending"
+    },
+    {
+      "theme": "blue",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/blue.png",
+      "sourceSha": "b9a32371d1ac87ad10fa85b9af676f064d2cf052cff8c2a274dc6b12de791732",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-d293bc8c-c402-41b0-b934-85f1e1e1422d.png",
+        "sha256": "b9a32371d1ac87ad10fa85b9af676f064d2cf052cff8c2a274dc6b12de791732"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+        "role": "only primary reference and color edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/blue-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/blue.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Source visual inspection complete; actual runtime parent verification pending"
+    },
+    {
+      "theme": "light",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/light.png",
+      "sourceSha": "9f07b848d076c63acb96dfbbbf920119db1c863fb9a5942f7a2647cc908adcbf",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-4d3454cb-ef37-4567-95af-0cc39c7733f6.png",
+        "sha256": "9f07b848d076c63acb96dfbbbf920119db1c863fb9a5942f7a2647cc908adcbf"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+        "role": "only primary reference and color edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/light-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/light.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Source visual inspection complete; actual runtime parent verification pending"
+    },
+    {
+      "theme": "dark",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/dark.png",
+      "sourceSha": "6d0c4a62a3f79477b263fd7b5dfa7ccf46cb2fcf478bc289245c3f557bcfd4cc",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-8de6488f-a631-4189-a029-0329ce7a79c2.png",
+        "sha256": "6d0c4a62a3f79477b263fd7b5dfa7ccf46cb2fcf478bc289245c3f557bcfd4cc"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+        "role": "only primary reference and color edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/dark-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/dark.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Source visual inspection complete; actual runtime parent verification pending"
+    },
+    {
+      "theme": "neutral",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/neutral.png",
+      "sourceSha": "6eae7b6ac589267ba1ff984cedf737db41c6ec8523e68d9de7da223ca6b9705b",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-4c305be0-2682-4e06-97f2-cda463301859.png",
+        "sha256": "6eae7b6ac589267ba1ff984cedf737db41c6ec8523e68d9de7da223ca6b9705b"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red.png",
+        "sha256": "9c1896dd45973c5c3e0337c51b4370e12c8c7fdc873dade5c92dd4a10a7d4e39",
+        "role": "only primary reference and color edit target"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/neutral-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/neutral.png",
+      "byteIdenticalToOriginal": true,
+      "status": "Source visual inspection complete; actual runtime parent verification pending"
+    }
+  ],
+  "drafts": [
+    {
+      "name": "red-initial.png",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-initial.png",
+      "sourceSha": "d6664cc864fe82d01acf6a5ddc7e8e8e9ecad106eaf42922db0dea4470903b96",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-64586f8c-6494-4856-b2cc-382283d1a60c.png",
+        "sha256": "d6664cc864fe82d01acf6a5ddc7e8e8e9ecad106eaf42922db0dea4470903b96"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v5/red.png",
+        "sha256": "5636b0a026cbd10670f115ea553534dd05e030e9726763117c13fbeb0eed6c70"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-prompt.txt",
+      "byteIdenticalToOriginal": true,
+      "status": "Preserved earlier Red draft; not a final set entry",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/red-initial.png"
+    },
+    {
+      "name": "red-strong-outline.png",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-strong-outline.png",
+      "sourceSha": "ccb903f9d5faf7d5478848263ad79360df951f3483e5612db5dc1d7955c4570d",
+      "dims": [
+        1254,
+        1254
+      ],
+      "format": "RGB PNG",
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-9df4bf0f-bbc0-45b5-a6eb-f8a31480563d.png",
+        "sha256": "ccb903f9d5faf7d5478848263ad79360df951f3483e5612db5dc1d7955c4570d"
+      },
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-initial.png",
+        "sha256": "d6664cc864fe82d01acf6a5ddc7e8e8e9ecad106eaf42922db0dea4470903b96"
+      },
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/red-flat-edit-prompt.txt",
+      "byteIdenticalToOriginal": true,
+      "status": "Preserved earlier Red draft; not a final set entry",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/previews/red-strong-outline.png"
+    }
+  ],
+  "sourceProcessing": "Byte-identical copies of generated originals. Previews use sips resize. No procedural drawing/recolor/denoise.",
+  "visualInspection": "One centered hollow pixel-step diamond per cell, empty interior/margins, restrained faded theme hue on charcoal, no stars/dots/crystals/chevrons. Source geometry visually consistent; no claim of exact pixel geometry shared between different independently generated colors.",
+  "runtimeScope": "Parent copies identical cell within each theme into a 6x6 array and verifies actual menu/scrolling. No Assets/Scene edits or Unity execution by source-art agent.",
+  "weakTextureLimitation": "Very weak native noise may remain; parent permitted weak variation when visually clean. No claim of exact two-color PNG.",
+  "pixelInspection": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/pixel-inspection.json",
+  "readOnlyInspectionScript": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v6/inspect-master-cells.py"
+}

@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 2,
+  "sourceSet": "Pattern-v7",
+  "date": "2026-10-03",
+  "recordedUtc": "2026-10-03T05:02:48.557661+00:00",
+  "status": "Six original source images complete; accepted Red preserved and five colour-only variants visually inspected. Runtime work is separate.",
+  "generatorCallsThisSourceSet": 5,
+  "redRegenerated": false,
+  "finalEntryCount": 6,
+  "approvedRed": {
+    "path": "/Users/daisei/PocketStriker/output/artproposals/RedGrid-Preview-ColorBlock-20261003.png",
+    "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+    "dims": [
+      941,
+      1672
+    ],
+    "librarySnapshot": {
+      "operation": "replace_library_file",
+      "status": "succeeded",
+      "path": "/RedGrid-Preview-ColorBlock-20261003.png",
+      "file_id": "file_000000002ea48209af45122f91434eef",
+      "library_file_id": "libfile_c51aea8368b48191b15ae85a958fd0c8",
+      "file_name": "RedGrid-Preview-ColorBlock-20261003.png",
+      "current_version_number": 3,
+      "restored_from_version_number": null,
+      "xattrs": [
+        {
+          "name": "user.library-file-version",
+          "value": "3"
+        }
+      ],
+      "directory_id": "libdir_e2c506164bb88191875ac8de2221b3fe",
+      "mime_type": "image/png",
+      "library_artifact_type": "image_gen",
+      "file_size_bytes": 1277755,
+      "external_connectors_accessed": false
+    },
+    "approvalEvidence": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/approval-evidence/approval-confirmation.json",
+    "originalReceipt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/approval-evidence/original-proposal.receipt.json",
+    "historicalPromptCount": 4
+  },
+  "entries": [
+    {
+      "theme": "red",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+      "sourceSha": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+      "dims": [
+        941,
+        1672
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        0
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-5e4419c1-d003-4a12-8886-fb6a0a96d6d1.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/output/artproposals/RedGrid-Preview-ColorBlock-20261003.png",
+      "ref": null,
+      "generationMode": "byte-identical approved source copy; not regenerated for v7",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red-original-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/red.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    },
+    {
+      "theme": "green",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/green.png",
+      "sourceSha": "6681e2f1241081c704b1d3190a92b402e9f78392b188c9fd55a648cf1ed4870e",
+      "dims": [
+        941,
+        1672
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        0
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-458a064a-0586-40ca-8cad-2360dd689fd0.png",
+        "sha256": "6681e2f1241081c704b1d3190a92b402e9f78392b188c9fd55a648cf1ed4870e"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/generated_images/exec-458a064a-0586-40ca-8cad-2360dd689fd0.png",
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+        "role": "only user-approved Red reference / colour edit target"
+      },
+      "generationMode": "one built-in ImageGen colour-only edit",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/green-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/green.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    },
+    {
+      "theme": "blue",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/blue.png",
+      "sourceSha": "e3a6efc0f0e150860564de5ab68a818422793c243431cc9a0aed76ad57e1ddb1",
+      "dims": [
+        941,
+        1672
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        0
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-dbf09764-23e3-4fec-973b-ea0541454eb2.png",
+        "sha256": "e3a6efc0f0e150860564de5ab68a818422793c243431cc9a0aed76ad57e1ddb1"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/generated_images/exec-dbf09764-23e3-4fec-973b-ea0541454eb2.png",
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+        "role": "only user-approved Red reference / colour edit target"
+      },
+      "generationMode": "one built-in ImageGen colour-only edit",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/blue-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/blue.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    },
+    {
+      "theme": "light",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/light.png",
+      "sourceSha": "b184523f7d199c9daee79d15bf4aa4b7a29685347fbce7f917048743ffd1ca6d",
+      "dims": [
+        941,
+        1671
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        -1
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-1cf5cadc-54b5-4e7a-ad01-bffcea4f3a8b.png",
+        "sha256": "b184523f7d199c9daee79d15bf4aa4b7a29685347fbce7f917048743ffd1ca6d"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/generated_images/exec-1cf5cadc-54b5-4e7a-ad01-bffcea4f3a8b.png",
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+        "role": "only user-approved Red reference / colour edit target"
+      },
+      "generationMode": "one built-in ImageGen colour-only edit",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/light-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/light.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    },
+    {
+      "theme": "dark",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/dark.png",
+      "sourceSha": "9fd50a3683bcd274501d8a8442014fc3c5f9d9ae4f7bae778c275f0bbb2754a2",
+      "dims": [
+        941,
+        1672
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        0
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-d10ad85e-03c6-4a35-945b-d57bd76ef4ec.png",
+        "sha256": "9fd50a3683bcd274501d8a8442014fc3c5f9d9ae4f7bae778c275f0bbb2754a2"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/generated_images/exec-d10ad85e-03c6-4a35-945b-d57bd76ef4ec.png",
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+        "role": "only user-approved Red reference / colour edit target"
+      },
+      "generationMode": "one built-in ImageGen colour-only edit",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/dark-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/dark.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    },
+    {
+      "theme": "neutral",
+      "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/neutral.png",
+      "sourceSha": "088e0250a3bfd00cf4a15f8c860bbba7e0399821c84bf86cf136d78a2698cf0d",
+      "dims": [
+        941,
+        1672
+      ],
+      "format": "RGB PNG",
+      "dimensionDeltaFromApprovedRed": [
+        0,
+        0
+      ],
+      "original": {
+        "path": "/Users/daisei/PocketStriker/generated_images/exec-b76ae44e-030a-4b00-ab7d-f4de6be4f8d9.png",
+        "sha256": "088e0250a3bfd00cf4a15f8c860bbba7e0399821c84bf86cf136d78a2698cf0d"
+      },
+      "copiedFrom": "/Users/daisei/PocketStriker/generated_images/exec-b76ae44e-030a-4b00-ab7d-f4de6be4f8d9.png",
+      "ref": {
+        "path": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/red.png",
+        "sha256": "d52cc22932de74214244f71b01dc24bc882853b5a98f8250226f2fa2e0fcf89d",
+        "role": "only user-approved Red reference / colour edit target"
+      },
+      "generationMode": "one built-in ImageGen colour-only edit",
+      "exactPrompt": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/neutral-prompt.txt",
+      "previewPath": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Pattern-v7/previews/neutral.png",
+      "previewDims": [
+        360,
+        640
+      ],
+      "byteIdenticalToOriginal": true,
+      "runtimeCrop": {
+        "x": 350,
+        "y": 580,
+        "width": 260,
+        "height": 262
+      },
+      "runtimeCropStatus": "Native phase measured by /root/opening_camera within 1 pixel across themes; complete native crop only; parent runtime build/verification pending."
+    }
+  ],
+  "sourceProcessing": "All saved source PNGs are byte-identical originals. No program drawing, recoloring, resizing, denoising, flattening or cropping of source images. Previews alone use sips downscale.",
+  "geometryStatus": "Visually retained full portrait shared-edge stepped diamond lattice, regular staggered rows, and one plain axis-aligned solid square per cell. Pixel-exact cross-theme geometry is not claimed.",
+  "acceptedVariation": "Approved Red light tonal variation was retained; no flatten/retry passes on new variants.",
+  "dimensionException": "Light is native 941x1671, one pixel shorter than the 941x1672 approved reference; no source resize performed.",
+  "runtimeScope": "Parent /root and /root/opening_camera own native repeat-unit detection/crop/edge matching/runtime textures/Unity. Source-art agent did not edit Assets, builder or Scene, run Unity, or certify runtime scrolling.",
+  "repeatUnitMeasurement": {
+    "reportedBy": "/root/opening_camera",
+    "sourceThemes": [
+      "red",
+      "green",
+      "blue",
+      "light",
+      "dark",
+      "neutral"
+    ],
+    "bestGrayscalePeriods": [
+      260,
+      262
+    ],
+    "commonNativeCrop": {
+      "x": 350,
+      "y": 580,
+      "width": 260,
+      "height": 262
+    },
+    "crossThemePhaseDeviationMaxPixels": 1,
+    "lightOnePixelHeightDifferenceAffectsCrop": false,
+    "sourceImagesResized": false,
+    "evidenceKind": "Measurement results reported in runtime-owner collaboration message, 2026-10-03. Runtime reports are owned by parent."
+  }
+}

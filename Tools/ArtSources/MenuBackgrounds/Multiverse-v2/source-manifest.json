@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-02",
+  "mode": "built-in image_gen",
+  "generatorCalls": 6,
+  "sourceProcessing": "Full-resolution source files copied without pixel modification; preview files are sips downscales only.",
+  "referencePolicy": "Red uses approved login artwork as style reference only. Five variants each use approved Red as primary composition/value reference and approved login as secondary shape/print reference.",
+  "integrationStatus": "Source artwork only; runtime texture assembly, tiling, scene integration and rendered UI QA are owned by parent task.",
+  "images": [
+    {
+      "theme": "red",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-7aaff8c1-c3da-4332-9305-7726cc39a3c6.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+      "prompt": "prompts/red-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "3e16fc485f75cd847617287ada8a83cd21c556e3c8dbbc2eb6bc55472c557a90"
+    },
+    {
+      "theme": "green",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-630269d3-5878-49d4-82ac-2237380ee8da.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/green.png",
+      "prompt": "prompts/green-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "850fe6766b78b3d4813c1f23d5a78f93554190a54346f9166e5d4840701ef5e0"
+    },
+    {
+      "theme": "blue",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-e7cdd16e-da03-4c1e-b9c9-0e38f0b4af98.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/blue.png",
+      "prompt": "prompts/blue-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "eef7be773602b4a60751926c50c3a2f2861f3c98b686a3db377020a42ed6b921"
+    },
+    {
+      "theme": "light",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-59c27b03-9389-4b2b-ad3e-ea99b51f890d.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/light.png",
+      "prompt": "prompts/light-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "43f419bae3410d27e2878ee183de18d5365499ad686c85f6c1d88be0131dd690"
+    },
+    {
+      "theme": "dark",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-c5e5d2a3-5fd3-4556-ba28-98e968d89b79.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/dark.png",
+      "prompt": "prompts/dark-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "713ceefe620f174a5a7a003cc72a6f9d98423cc265ce79ff2059c2a7c25e68a8"
+    },
+    {
+      "theme": "neutral",
+      "builtinSource": "/Users/daisei/PocketStriker/generated_images/exec-1d5c223d-fa0c-4c3e-92ac-509e9aa1172c.png",
+      "savedSource": "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/neutral.png",
+      "prompt": "prompts/neutral-call.txt",
+      "references": [
+        "/Users/daisei/PocketStriker/Tools/ArtSources/MenuBackgrounds/Multiverse-v2/red.png",
+        "/Users/daisei/PocketStriker/Assets/AIStory/Art/PocketStrikerLoginMultiverse-v2.png"
+      ],
+      "width": 941,
+      "height": 1672,
+      "format": "PNG RGB",
+      "sha256": "13c97021a8065b03afdd240d38dca05cf669feafae95000accc6a9bd0dd09a37"
+    }
+  ]
+}

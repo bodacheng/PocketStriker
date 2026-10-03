@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "utcTime": "2026-10-03T08:25:48.613827+00:00",
+  "approvedSource": {
+    "path": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/approved-red.png",
+    "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+    "bytes": 898948,
+    "dimensions": [
+      942,
+      1670
+    ],
+    "libraryFileId": "libfile_49a5b68988b48191ac3c744444912f9e",
+    "libraryVersion": 3,
+    "approval": "2026-10-03 08:06:51 UTC user: 可以; near-black 1-2 code-value residue accepted"
+  },
+  "installation": "Byte-for-byte copies only; no resize, crop, tile, redraw, image edit or recolor",
+  "paletteRendering": "Red uses original sampled RGB; alternate materials multiply display-sRGB source red intensity by a fixed Vector palette, with exact sRGB conversion in Linear projects",
+  "importerContract": {
+    "pointFilter": true,
+    "wrapU": "Repeat",
+    "wrapV": "Clamp",
+    "mipmaps": false,
+    "npotScale": "None",
+    "compression": "None",
+    "maxTextureSize": 2048,
+    "platformOverrides": false,
+    "preservedGuids": true
+  },
+  "allSixTextureFilesMatchApprovedBytes": true,
+  "shaderPath": "Assets/MainSceneSystem/StaticPixelGradientUI.shader",
+  "shaderGuid": "4de53e6b211c4c3180cda34df221a14a",
+  "shader": {
+    "path": "Assets/MainSceneSystem/StaticPixelGradientUI.shader",
+    "sha256": "d46ae16cacc1a942913a57d1506b15332476b7d1f79ec69c9d5a5da888e0b631",
+    "bytes": 4850
+  },
+  "shaderImporter": {
+    "path": "Assets/MainSceneSystem/StaticPixelGradientUI.shader.meta",
+    "sha256": "b9279e3926cdf0600d5dd83f5adc94fa54c6052d45cc6a0f328b53548c76e5b9",
+    "bytes": 201
+  },
+  "runtimeRestoreManifest": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/runtime-backup/manifest.json",
+  "fullIntegrationBackup": "Logs/MenuStaticPixelGradientReview/Before/manifest.json",
+  "sceneAndMotionOwnership": "This copier does not edit Scene, Aspect script, scrolling components, other materials, packages or tests",
+  "backgrounds": [
+    {
+      "element": "red",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png.meta",
+        "sha256": "1579ffba926f3447c588aa6ba6c37d28f356d56cc799addee20819517cf658fa",
+        "bytes": 3693
+      },
+      "textureGuid": "eeefd2f03ff5f4541bbbef04d1738e92",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientRed.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientRed.mat",
+        "sha256": "fb7ac6c5a3e6cc2603fb108215552bf53b6a2dfccdb35d01c8bfd21c3ad516c2",
+        "bytes": 1137
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientRed.mat.meta",
+        "sha256": "3f68bfab225f4d5bc7d5a321b4482902b01f5f9751562d059c7eea496d141555",
+        "bytes": 185
+      },
+      "srgbVector": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "preserveSource": true,
+      "materialGuid": "0ec943ad094d431a97af0eac47d1ec54"
+    },
+    {
+      "element": "green",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png.meta",
+        "sha256": "de619efed164ffb0e08015271cecfbc40851a0894e712ebdeb2f7be0baeb094f",
+        "bytes": 3693
+      },
+      "textureGuid": "e8e966676cb5e46fdb42579bb766cc9d",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientGreen.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientGreen.mat",
+        "sha256": "27fc15089f12b82ef688e3f47efd9609367da9895780168c8ea86561f490a42f",
+        "bytes": 1147
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientGreen.mat.meta",
+        "sha256": "92e48791a740e8667a23addb861fecc3bba8de86bbcd0936a7457bae0ea2c434",
+        "bytes": 185
+      },
+      "srgbVector": [
+        0.12,
+        0.6,
+        0.22
+      ],
+      "preserveSource": false,
+      "materialGuid": "673c0d6ef6ee4477b8272cae66f238a1"
+    },
+    {
+      "element": "blue",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png.meta",
+        "sha256": "97d4dcd77f3e62c7849867ca3d9d5616d8d889f5b5d160dd927391715bdd4b19",
+        "bytes": 3693
+      },
+      "textureGuid": "b3fe5a1162ddb4abb81010d278b820c7",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientBlue.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientBlue.mat",
+        "sha256": "9701f4297a9b1cee65f72d648dc123ab779be7e3cb5ba4cf57bd21e5d87991f3",
+        "bytes": 1146
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientBlue.mat.meta",
+        "sha256": "0338db4dcfaa06cb24338b525758f7843aed571fe06e866503956589a3798ab4",
+        "bytes": 185
+      },
+      "srgbVector": [
+        0.1,
+        0.32,
+        0.78
+      ],
+      "preserveSource": false,
+      "materialGuid": "429004f572464d74b8ab2aa791c1f9d2"
+    },
+    {
+      "element": "light",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png.meta",
+        "sha256": "151148d8fed80a8966e7a75a16f2e885d2100f6b16169748412273baeb30c1ac",
+        "bytes": 3693
+      },
+      "textureGuid": "ac31607d78a8a4677b2dd1a525c3e5da",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientLight.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientLight.mat",
+        "sha256": "20c19cf78d5837d251cb34ba275bf42a0bf87e308788e0dc2fde5b3188d99957",
+        "bytes": 1147
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientLight.mat.meta",
+        "sha256": "5bcefb103856cb07dd53b08d1b649f96cc27f88cd6aa7d4f033b777dfefd3e57",
+        "bytes": 185
+      },
+      "srgbVector": [
+        0.82,
+        0.58,
+        0.1
+      ],
+      "preserveSource": false,
+      "materialGuid": "7c4f852465bf40f1936c01d98345032d"
+    },
+    {
+      "element": "dark",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png.meta",
+        "sha256": "bdc3e576a8ee2919935c4e87c0f62da65dc904213894d37233e95858b1c678e9",
+        "bytes": 3693
+      },
+      "textureGuid": "404e72dee7db1419299acd1370911f1a",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientDark.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientDark.mat",
+        "sha256": "4ec2280876d0959f171700c48ff4156ef71615959befa3c1e4475616e0006700",
+        "bytes": 1147
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientDark.mat.meta",
+        "sha256": "208785c060cef125b565fffe511c20a9da7240897f5df230d320383a79d5fdff",
+        "bytes": 185
+      },
+      "srgbVector": [
+        0.48,
+        0.13,
+        0.65
+      ],
+      "preserveSource": false,
+      "materialGuid": "be4db68e24eb4eea9df58996ddcbd802"
+    },
+    {
+      "element": "neutral",
+      "texture": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png",
+        "sha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+        "bytes": 898948
+      },
+      "importer": {
+        "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png.meta",
+        "sha256": "8fff2db9176e69601cfc22ca92daa55a1ffc76512dc087fc66b2ebbfe0349b3e",
+        "bytes": 3693
+      },
+      "textureGuid": "532a8e9fc730c44af96fd53fbe0a41d8",
+      "materialPath": "Assets/MainSceneSystem/StaticPixelGradientNeutral.mat",
+      "material": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientNeutral.mat",
+        "sha256": "1161200f737e4b92251361a9652babc4a7cd496382b1fb9c9703fe25c3a9aca5",
+        "bytes": 1150
+      },
+      "materialImporter": {
+        "path": "Assets/MainSceneSystem/StaticPixelGradientNeutral.mat.meta",
+        "sha256": "e2d4365d46b507206b7213ba1719f08a1837c4826b2662c9b7b4d89109064e64",
+        "bytes": 185
+      },
+      "srgbVector": [
+        0.56,
+        0.56,
+        0.56
+      ],
+      "preserveSource": false,
+      "materialGuid": "b779056d5a7d4bf1b0c3d8380507f433"
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "capturedAfterUtc": "2026-10-03T08:32:31.385737+00:00",
+  "fileCount": 28,
+  "allOriginalCopiesVerified": true,
+  "scope": "Complete original pre-static-integration state including existing user modifications, MainMenuScene/meta, Aspect/fixture source/meta, original runtime PNG/meta, old builder/ArtSources README, BackGroundPS/OffsetScrolling/PreScene controls",
+  "frozenBeforeManifests": [
+    {
+      "path": "Logs/MenuStaticPixelGradientReview/Before/manifest.json",
+      "sha256": "ed0ec7921dde71a9314544cefca9625e7625fe77b51249825cff131b90151246"
+    },
+    {
+      "path": "Logs/MenuStaticPixelGradientReview/Before/supplemental-controls-manifest.json",
+      "sha256": "1a5c45e49b8ab6573b1626ff121588b4392fbd92d9e32bb94a2a6d2b209df968"
+    }
+  ],
+  "restorationTool": "Tools/Art/restore_menu_static_gradient_backgrounds.py",
+  "newShaderMaterialsAndSourceAssetsRetained": true,
+  "currentHashPolicy": "Each current file must match originalSha256 OR acceptedAfterSha256; a later unregistered edit rejects the complete restoration before any production write. Only record a new acceptedAfterSha256 after reviewing that authorized change; original copies and hashes must never change.",
+  "files": [
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png",
+      "originalSha256": "e09303784404ca27ebc213102c56e5b9798145d4526c23fd3e98ee168a6a21bc",
+      "originalBytes": 381849,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png",
+      "originalSha256": "a4bddc8596c48036d53cfabc1b5818de5e17a3567a9356463b6a78bcdc36685c",
+      "originalBytes": 378107,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png",
+      "originalSha256": "18ad1cf5a997ac0c883625d68b3a5c2b3b7a34698cb0a7e592c8dafc229d179c",
+      "originalBytes": 379251,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png",
+      "originalSha256": "f6b5bdd77e009f178468a854e29936eb66c50a6da18484b5e40a6e6ad91ce568",
+      "originalBytes": 441144,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png",
+      "originalSha256": "b2e9c479d6fb11956e6feaa09b9ee9f92a32a0e741a25c1b89de0d2aa2259d9c",
+      "originalBytes": 427488,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png",
+      "originalSha256": "2c5acf6097e531a1f29d83d9eb9b574d47b0dae443bf8e48463ad25e04f7cc97",
+      "originalBytes": 389656,
+      "acceptedAfterSha256": "d69af0e4378b3b61abd9eb3b1481faa9ce2135c619cae7e42218bf2b3e7b753f",
+      "acceptedAfterBytes": 898948,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblackdark_redwarmgamecartoon_b2820319-6293-4895-98f5-ccb12908afc7.png.meta",
+      "originalSha256": "50841f7ab48bf5cfc0edeefb624cf99cdc31404ee862f5e9c6d59917a150f731",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "1579ffba926f3447c588aa6ba6c37d28f356d56cc799addee20819517cf658fa",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_leaf8bits2dpixelatedsimpleblackdark_greencolda_55806a54-6561-4472-96b9-bce79487ea03.png.meta",
+      "originalSha256": "17753280637916e6076594c0e34b5ade778fae715a06e9e5b8755f4fd0d7ed7b",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "de619efed164ffb0e08015271cecfbc40851a0894e712ebdeb2f7be0baeb094f",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackcoldabstract_62782879-5a4b-4676-bdcd-4b40d2ff98b9.png.meta",
+      "originalSha256": "ae573027ac4ad93492c6345f291e34654e55e65ddc2314a61fa1868c38cd039c",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "97d4dcd77f3e62c7849867ca3d9d5616d8d889f5b5d160dd927391715bdd4b19",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_ancient_pattern8bits2dpixelatedsimpleblackabstractflat_0378dac9-3b6d-4058-b449-3866dcab9c0e.png.meta",
+      "originalSha256": "54d87852b3bdb97f5a9735e659e3274644db0d5059b7fcf858036280a03776af",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "151148d8fed80a8966e7a75a16f2e885d2100f6b16169748412273baeb30c1ac",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_neon8bits2dpixelatedsimpleblack_and_whiteabstractflat_374dc487-6147-4697-bff4-9c1b3e821f70.png.meta",
+      "originalSha256": "55fc9d89085eb4f8ba50af7313e45cf7c91276a1cf66fa9ae319accfc01163c9",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "bdc3e576a8ee2919935c4e87c0f62da65dc904213894d37233e95858b1c678e9",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/OrganizedResources/InUse/ExternalAssets/bg/bg_main/haku1034_lighting_skyin_the_style_of_2d_game_art2dsimplecartoon_04dc2ebb-8c63-4475-a089-21d04afd9ae3 (1).png.meta",
+      "originalSha256": "dcd581cbe50e7b1585a1d628836880d9bc6a6ac78d35f03a685f37f71ac745f3",
+      "originalBytes": 3692,
+      "acceptedAfterSha256": "8fff2db9176e69601cfc22ca92daa55a1ffc76512dc087fc66b2ebbfe0349b3e",
+      "acceptedAfterBytes": 3693,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Scene/MainScene/MainMenuScene.unity",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Scene/MainScene/MainMenuScene.unity",
+      "originalSha256": "aa459e7fc8c32e190f4182e1f037370504e2daba3bfd940c51aa20718d5cd44f",
+      "originalBytes": 108987,
+      "acceptedAfterSha256": "b5fa6f3939960422b0e9df61419d62b9e7ff2349bc473e7b3d04aa374eb51ab0",
+      "acceptedAfterBytes": 109335,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs",
+      "originalSha256": "8abc0d2f696f0d5099dc739a0a2cdb862603fe7372d0c0357755e9b49a47926a",
+      "originalBytes": 3409,
+      "acceptedAfterSha256": "b1d7b875b7246f51c4fb33f7fbf7f850cb476a83eb539703462fd3ea55fa2b82",
+      "acceptedAfterBytes": 5121,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs.meta",
+      "originalSha256": "94938154f0f01e0536ee838b746db858240f2de1a3c143cca966947b2510793f",
+      "originalBytes": 240,
+      "acceptedAfterSha256": "94938154f0f01e0536ee838b746db858240f2de1a3c143cca966947b2510793f",
+      "acceptedAfterBytes": 240,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+      "originalSha256": "38c1b875275d56de03fa1809e11492196bef84e66dffee55f46e36843859f4ea",
+      "originalBytes": 77955,
+      "acceptedAfterSha256": "f1afd37325e2067e7cbbf79215f2a88bd929c6bb5909a63c9b13169e36018d79",
+      "acceptedAfterBytes": 117402,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Editor/PocketStrikerMenuBackgroundValidation.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Editor/PocketStrikerMenuBackgroundValidation.cs.meta",
+      "originalSha256": "e4e4a29850787adc65726246d7b3842af1603207f4f12875008f3b2206328258",
+      "originalBytes": 240,
+      "acceptedAfterSha256": "e4e4a29850787adc65726246d7b3842af1603207f4f12875008f3b2206328258",
+      "acceptedAfterBytes": 240,
+      "copyVerified": true
+    },
+    {
+      "path": "Tools/Art/build_menu_backgrounds.py",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Tools/Art/build_menu_backgrounds.py",
+      "originalSha256": "0b5a5079e3b2a58d7835e4697cef4fdf820e02193b07411415f158ad52aa7f4d",
+      "originalBytes": 24826,
+      "acceptedAfterSha256": "0b5a5079e3b2a58d7835e4697cef4fdf820e02193b07411415f158ad52aa7f4d",
+      "acceptedAfterBytes": 24826,
+      "copyVerified": true
+    },
+    {
+      "path": "Tools/ArtSources/MenuBackgrounds/README.md",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Tools/ArtSources/MenuBackgrounds/README.md",
+      "originalSha256": "653b2ecdc1b55faa7ba0dd13501400d0875c2e45d6bd6d62225a4455af1e2e81",
+      "originalBytes": 11499,
+      "acceptedAfterSha256": "e032ede64e1d6158970eaaf79597eeef2f4b95a18619d0fd34f6dc381a3be0b0",
+      "acceptedAfterBytes": 13428,
+      "copyVerified": true
+    },
+    {
+      "path": "Packages/com.mcombat.shared/Runtime/UI/BackGroundPS.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Packages/com.mcombat.shared/Runtime/UI/BackGroundPS.cs",
+      "originalSha256": "5473c83a6e8325199cdaa9e7b167c9d5cf5202645161a14c0e304aefa1a7cd52",
+      "originalBytes": 1757,
+      "acceptedAfterSha256": "5473c83a6e8325199cdaa9e7b167c9d5cf5202645161a14c0e304aefa1a7cd52",
+      "acceptedAfterBytes": 1757,
+      "copyVerified": true
+    },
+    {
+      "path": "Packages/com.mcombat.shared/Runtime/UI/BackGroundPS.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Packages/com.mcombat.shared/Runtime/UI/BackGroundPS.cs.meta",
+      "originalSha256": "ff94f78d3d668cb21a69f37441914a508512cbaf8ac6b0d717f01f76e230d2f1",
+      "originalBytes": 243,
+      "acceptedAfterSha256": "ff94f78d3d668cb21a69f37441914a508512cbaf8ac6b0d717f01f76e230d2f1",
+      "acceptedAfterBytes": 243,
+      "copyVerified": true
+    },
+    {
+      "path": "Packages/com.mcombat.shared/Runtime/UI/OffsetScrolling.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Packages/com.mcombat.shared/Runtime/UI/OffsetScrolling.cs",
+      "originalSha256": "62c81d931b00e4fcef0079a0767446a01714bf982cb95894b41d96f3eeacc587",
+      "originalBytes": 368,
+      "acceptedAfterSha256": "62c81d931b00e4fcef0079a0767446a01714bf982cb95894b41d96f3eeacc587",
+      "acceptedAfterBytes": 368,
+      "copyVerified": true
+    },
+    {
+      "path": "Packages/com.mcombat.shared/Runtime/UI/OffsetScrolling.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Packages/com.mcombat.shared/Runtime/UI/OffsetScrolling.cs.meta",
+      "originalSha256": "c106f8c2f8395339d498a31344e674c9fa31810da0265cbb61793c07f8b78756",
+      "originalBytes": 243,
+      "acceptedAfterSha256": "c106f8c2f8395339d498a31344e674c9fa31810da0265cbb61793c07f8b78756",
+      "acceptedAfterBytes": 243,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Prescene/PreScene.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Prescene/PreScene.cs",
+      "originalSha256": "41c550ca9d77f8bdd5fdbaaecc7ae9ff697ee0528a6a1bbc8153fb69071b0ebd",
+      "originalBytes": 13550,
+      "acceptedAfterSha256": "41c550ca9d77f8bdd5fdbaaecc7ae9ff697ee0528a6a1bbc8153fb69071b0ebd",
+      "acceptedAfterBytes": 13550,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Prescene/PreScene.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Prescene/PreScene.cs.meta",
+      "originalSha256": "f0850e98c43631dd10b374ff4f65a9137e54dd3314aabd2b759db5ba82323d69",
+      "originalBytes": 244,
+      "acceptedAfterSha256": "f0850e98c43631dd10b374ff4f65a9137e54dd3314aabd2b759db5ba82323d69",
+      "acceptedAfterBytes": 244,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Prescene/PreSceneData.cs",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Prescene/PreSceneData.cs",
+      "originalSha256": "9d6788b446ae32926c67378b82f0737c1efb47b3f769e79f4a8ac04583591091",
+      "originalBytes": 5778,
+      "acceptedAfterSha256": "9d6788b446ae32926c67378b82f0737c1efb47b3f769e79f4a8ac04583591091",
+      "acceptedAfterBytes": 5778,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Prescene/PreSceneData.cs.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Prescene/PreSceneData.cs.meta",
+      "originalSha256": "4260d2e25f560c864199e6c77129679cd9cf436ea619a208d471dd7cc5d6f88d",
+      "originalBytes": 243,
+      "acceptedAfterSha256": "4260d2e25f560c864199e6c77129679cd9cf436ea619a208d471dd7cc5d6f88d",
+      "acceptedAfterBytes": 243,
+      "copyVerified": true
+    },
+    {
+      "path": "Assets/Scene/MainScene/MainMenuScene.unity.meta",
+      "backupPath": "Tools/ArtSources/MenuBackgrounds/StaticPixelGradient-v1/integration-backup/Source/Assets/Scene/MainScene/MainMenuScene.unity.meta",
+      "originalSha256": "09719785ed8ff1ac4d2d863d41f2f8bb7c6ac665368790e79ea5daf156507c27",
+      "originalBytes": 176,
+      "acceptedAfterSha256": "09719785ed8ff1ac4d2d863d41f2f8bb7c6ac665368790e79ea5daf156507c27",
+      "acceptedAfterBytes": 176,
+      "copyVerified": true
+    }
+  ],
+  "lastAuthorizedReview": {
+    "utcTime": "2026-10-03T09:14:32.828606+00:00",
+    "change": "Display-only vertical flip of six static backgrounds; image bytes, original backup bytes and hashes remain unchanged",
+    "frozenBeforeRoot": "Logs/MenuStaticPixelGradientFlipReview/Before",
+    "acceptedAfterUpdates": [
+      {
+        "path": "Assets/Scene/MainScene/MainMenuScene.unity",
+        "priorAcceptedAfterSha256": "33aa47b0ded51296c737d16fe5803838b174227b9067e897ff4e98b1bb7dfd53",
+        "acceptedAfterSha256": "b5fa6f3939960422b0e9df61419d62b9e7ff2349bc473e7b3d04aa374eb51ab0",
+        "acceptedAfterBytes": 109335
+      },
+      {
+        "path": "Assets/MainSceneSystem/ScrollingBackgroundAspectFill.cs",
+        "priorAcceptedAfterSha256": "2d7f17cdd820ee2032eb570c983dc8c3393b82381b38a32fde49407787ba5667",
+        "acceptedAfterSha256": "b1d7b875b7246f51c4fb33f7fbf7f850cb476a83eb539703462fd3ea55fa2b82",
+        "acceptedAfterBytes": 5121
+      },
+      {
+        "path": "Assets/Editor/PocketStrikerMenuBackgroundValidation.cs",
+        "priorAcceptedAfterSha256": "370c1c7701091bcc2a7fee21f4be376551384b2029a094f44a7832468d058337",
+        "acceptedAfterSha256": "f1afd37325e2067e7cbbf79215f2a88bd929c6bb5909a63c9b13169e36018d79",
+        "acceptedAfterBytes": 117402
+      }
+    ]
+  }
+}
