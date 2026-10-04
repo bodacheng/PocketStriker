@@ -14,6 +14,12 @@ public static class PocketStrikerDownloadPolicy
     public const int RequestTimeoutSeconds = 30;
     public const int BundleRetryCount = 2;
     public const int DownloadAttempts = 2;
+    // Small required updates finish during startup inspection without download UI.
+    // The normal cache/retry path still runs. Larger downloads keep consent.
+    public const long AutomaticDownloadLimitBytes = 64 * 1024;
+
+    public static bool RequiresDownloadConfirmation(long requiredBytes) =>
+        requiredBytes > AutomaticDownloadLimitBytes;
 
     static Func<IResourceLocation, string> previousTransform;
     static Action<UnityWebRequest> previousRequestOverride;

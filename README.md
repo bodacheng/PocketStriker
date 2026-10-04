@@ -115,6 +115,8 @@ python3 Tools/Validation/validate_ios_pods.py
 
 **Download Policy** 检查四个并发请求、30 秒无数据超时及自动重试；
 `python3 Tools/Validation/validate_downloads.py` 验证共享资源合并计数、失败后的缓存复用与进度回调。
+启动时剩余资源不超过 64 KiB 会在资源检查阶段自动下载，不弹下载确认或显示下载进度；
+超过此大小仍先确认。小更新同样等待实际下载完成、写入缓存后才继续启动，失败后保留可重试的错误提示。
 **Check Bundled UI Fonts** 检查包内字体、中文／日文备用字体、全部 Resources 界面的翻译字符
 和战斗准备标题；**Check Character Rendering** 用实际角色调色板和六个画质档位检查颜色、
 实时光照与阴影模型，报告与预览位于 `Logs/Fonts` 和 `Logs/Rendering`。

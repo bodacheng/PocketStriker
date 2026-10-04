@@ -42,7 +42,7 @@ public class ProgressLayer : UILayer
             percentage.color = new Color(0.62f, 0.76f, 0.81f, 1);
             float descriptionHeight = Mathf.Min(LoadingScreenLayout.TextHeight(info, width - 112), 86);
             LoadingScreenLayout.Place(info.rectTransform, root, new Rect(left, footerTop - 92, width - 112, Mathf.Max(42, descriptionHeight)));
-            LoadingScreenLayout.Place(percentage.rectTransform, root, new Rect(left + width - 104, footerTop - 92, 104, 42));
+            LoadingScreenLayout.Place(percentage.rectTransform, root, new Rect(left + width - 104, footerTop - 92, 104, Mathf.Max(42, LoadingScreenLayout.TextHeight(percentage, 104))));
             LoadingScreenLayout.Place((RectTransform)progressBar.transform, root, new Rect(left, footerTop - 128, width, 16));
             info.transform.SetAsLastSibling();
             percentage.transform.SetAsLastSibling();

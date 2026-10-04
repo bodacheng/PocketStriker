@@ -209,13 +209,20 @@ public class StartUpPresentation : MonoBehaviour
             throw new InvalidOperationException($"Failed to inspect required resources: {failedLabel}");
         }
         
-        ProgressLayer.Close();
-        if (bytes > 0)
+        if (PocketStrikerDownloadPolicy.RequiresDownloadConfirmation(bytes))
         {
+            ProgressLayer.Close();
             DownLoadConfirm(bytes, commonSetting.DownLoadLabels);
+        }
+        else if (bytes > 0)
+        {
+            // Finish small required updates within the existing startup check.
+            // They still download and cache normally, without a download screen.
+            await DownloadAndStart(commonSetting.DownLoadLabels, showDownloadUi: false);
         }
         else
         {
+            ProgressLayer.Close();
             await Go();
         }
     }
@@ -229,18 +236,23 @@ public class StartUpPresentation : MonoBehaviour
         );
     }
 
-    async UniTask DownloadAndStart(List<string> downLoadLabels)
+    async UniTask DownloadAndStart(List<string> downLoadLabels, bool showDownloadUi = true)
     {
         try
         {
-            startupStage = StartupStage.DownloadUi;
-            HighLightLayer.Close();
-            // Download UI uses only the bundled progress layer, with no character art.
-            ProgressLayer.Downloading(AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+            Action<string> updateProgress = null;
+            if (showDownloadUi)
+            {
+                startupStage = StartupStage.DownloadUi;
+                HighLightLayer.Close();
+                // Download UI uses only the bundled progress layer, with no character art.
+                ProgressLayer.Downloading(AddressablesResourcePolicy.DownloadProgressText(AppSetting.Value.Language));
+                updateProgress = progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadProgress, false);
+            }
             startupStage = StartupStage.ResourceDownload;
             await AddressablesLogic.ResourcePrepareProcess(
                 null,
-                progress => ProgressLayer.LoadingPercent(progress, AddressablesLogic.DownloadProgress, false),
+                updateProgress,
                 downLoadLabels
             );
             ProgressLayer.Close();

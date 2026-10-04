@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using DummyLayerSystem;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
@@ -165,6 +167,215 @@ internal static class DownloadTests
         try { await PocketStrikerDependencyDownloader.GetWholeDownloadSize(new[] { "missing" }, _ => failureCallback = true); }
         catch (InvalidOperationException) { failed = true; }
         Check(failed && failureCallback && Addressables.Releases == 2, "inspection failures remain failures and release their handles");
+
+        await CheckStartupRoutes();
+    }
+
+    static async UniTask PrepareStartup()
+    {
+        var startup = new StartUpPresentation();
+        typeof(StartUpPresentation).GetField("starter", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(startup, new Starter());
+        var task = (UniTask)typeof(StartUpPresentation).GetMethod("OnStart", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(startup, null);
+        await task;
+    }
+
+    static void ResetStartup(long requiredBytes, long cachedBytes = 0)
+    {
+        Addressables.Reset();
+        Addressables.TotalBytes = requiredBytes;
+        Addressables.Cached = cachedBytes;
+        StartupDoubles.Reset();
+    }
+
+    sealed class StartupFrame
+    {
+        public string text;
+        public bool loadingOpen;
+        public int downloadingCalls, loadingPercentCalls, initializations, confirmations;
+    }
+
+    static List<StartupFrame> ObserveSmallDownload()
+    {
+        var frames = new List<StartupFrame>();
+        DownloadTestClock.ObserveDownloadWait = () => frames.Add(new StartupFrame
+        {
+            text = ProgressLayer.Messages.LastOrDefault(),
+            loadingOpen = ProgressLayer.Open,
+            downloadingCalls = ProgressLayer.DownloadingCalls,
+            loadingPercentCalls = ProgressLayer.LoadingPercentCalls,
+            initializations = Starter.Initializations,
+            confirmations = PopupLayer.ConfirmCalls
+        });
+        return frames;
+    }
+
+    static bool ContainsDownloadStatus(string text) => text != null &&
+        (text.Contains("下载") || text.Contains("ダウンロード") || text.Contains("重试") || text.Contains("再試行")
+         || text.IndexOf("download", StringComparison.OrdinalIgnoreCase) >= 0
+         || text.IndexOf("retry", StringComparison.OrdinalIgnoreCase) >= 0
+         || text.Contains(" B") || text.Contains(" KB") || text.Contains(" MB") || text.Contains(" GB"));
+
+    static void CheckSilentSmallDownload(List<StartupFrame> frames, SystemLanguage language, string description)
+    {
+        var inspectingText = language switch
+        {
+            SystemLanguage.Japanese => "リソースを検査中",
+            SystemLanguage.English => "Inspecting resources",
+            _ => "检查资源中"
+        };
+        Check(frames.Count > 0, description + " observes the pending download rather than only its final state");
+        Check(frames.All(frame => frame.loadingOpen && frame.text == inspectingText),
+            description + " retains the localized resource-inspection loading text during every download/retry wait");
+        Check(frames.All(frame => frame.downloadingCalls == 0 && frame.loadingPercentCalls == 0 && frame.confirmations == 0)
+            && ProgressLayer.DownloadingCalls == 0 && ProgressLayer.LoadingPercentCalls == 0 && PopupLayer.ConfirmCalls == 0,
+            description + " never opens download UI or sends a download-percent update");
+        Check(!ProgressLayer.Messages.Any(ContainsDownloadStatus),
+            description + " never exposes download, byte-count or retry status text");
+        Check(frames.All(frame => frame.initializations == 0) && Starter.PrematureInitializations == 0,
+            description + " cannot initialize the game before required resources complete");
+        Check(!ProgressLayer.Open, description + " closes ordinary loading after completion or recoverable failure");
+    }
+
+    static async UniTask CheckStartupRoutes()
+    {
+        foreach (var bytes in new[] { 0L, 1L, 20700L, 65535L, 65536L })
+            Check(!PocketStrikerDownloadPolicy.RequiresDownloadConfirmation(bytes),
+                $"{bytes} bytes do not require startup download consent");
+        foreach (var bytes in new[] { 65537L, 1048576L, 1073741824L })
+            Check(PocketStrikerDownloadPolicy.RequiresDownloadConfirmation(bytes),
+                $"{bytes} bytes preserve startup download consent");
+
+        // Fresh startup instances exercise actual routing, while the doubles
+        // retain the completed cache. This does not simulate a device cache file.
+        for (var restart = 0; restart < 3; restart++)
+        {
+            ResetStartup(20700, 20700);
+            await PrepareStartup();
+            Check(Addressables.DownloadCalls == 0 && PopupLayer.ConfirmCalls == 0 && Starter.Initializations == 1,
+                $"fully cached cold-start routing {restart + 1} skips download and confirmation");
+        }
+
+        foreach (var language in new[] { SystemLanguage.Chinese, SystemLanguage.Japanese, SystemLanguage.English })
+        {
+            for (var restart = 0; restart < 3; restart++)
+            {
+                ResetStartup(20700);
+                AppSetting.Value.Language = language;
+                var frames = ObserveSmallDownload();
+                Addressables.Downloads.Enqueue(new DownloadOperation(true, 20700, 3));
+                await PrepareStartup();
+                var description = $"{language} recurring 20.2 KB startup {restart + 1}";
+                Check(Addressables.DownloadCalls == 1 && Starter.Initializations == 1 && Addressables.Cached == 20700
+                    && PocketStrikerDependencyDownloader.DownloadedBytes == 20700 && PopupLayer.WarningCalls == 0,
+                    description + " actually completes the required download and then initializes once");
+                CheckSilentSmallDownload(frames, language, description);
+            }
+            var persistedCache = Addressables.Cached;
+            ResetStartup(20700, persistedCache);
+            AppSetting.Value.Language = language;
+            await PrepareStartup();
+            Check(Addressables.DownloadCalls == 0 && ProgressLayer.DownloadingCalls == 0 && ProgressLayer.LoadingPercentCalls == 0
+                && PopupLayer.ConfirmCalls == 0 && Starter.Initializations == 1,
+                $"{language} next startup checks completed cache and needs no second download");
+
+            foreach (var bytes in new[] { 1L, 65535L, 65536L })
+            {
+                ResetStartup(bytes);
+                AppSetting.Value.Language = language;
+                var frames = ObserveSmallDownload();
+                Addressables.Downloads.Enqueue(new DownloadOperation(true, bytes, 3));
+                await PrepareStartup();
+                var description = $"{language} {bytes}-byte automatic boundary download";
+                Check(Addressables.DownloadCalls == 1 && Addressables.Cached == bytes && Starter.Initializations == 1
+                    && PopupLayer.WarningCalls == 0, description + " downloads the positive remainder without bypassing initialization");
+                CheckSilentSmallDownload(frames, language, description);
+            }
+        }
+
+        foreach (var bytes in new[] { 65537L, 1048576L, 1073741824L })
+        {
+            ResetStartup(bytes);
+            await PrepareStartup();
+            Check(PopupLayer.ConfirmCalls == 1 && Addressables.DownloadCalls == 0 && Starter.Initializations == 0,
+                $"{bytes} byte fresh or larger update waits for original confirmation");
+            Check(PopupLayer.ConfirmationText == PocketStrikerDownloadText.Confirmation(bytes, AppSetting.Value.Language),
+                "large download confirmation retains actual size and localized text");
+            PopupLayer.CancelAction();
+            Check(Application.QuitCalls == 1 && Addressables.DownloadCalls == 0,
+                "large download cancellation retains native quit and performs no download");
+            ResetStartup(bytes);
+            await PrepareStartup();
+            Addressables.Downloads.Enqueue(new DownloadOperation(true, bytes, 3));
+            PopupLayer.ConfirmAction();
+            Check(Addressables.DownloadCalls == 1 && Addressables.Cached == bytes && Starter.Initializations == 1
+                && Starter.PrematureInitializations == 0,
+                "large download confirmation still enters the real downloader and initialization");
+            Check(ProgressLayer.DownloadingCalls == 1 && ProgressLayer.LoadingPercentCalls > 1
+                && ProgressLayer.Percentages.Any(value => value > 0 && value < 1) && ProgressLayer.Percentages.Last() == 1,
+                "confirmed large downloads preserve visible byte progress through completion");
+            Check(ProgressLayer.Messages.Any(message => message.Contains(PocketStrikerDownloadText.FormatSize(bytes)
+                + " / " + PocketStrikerDownloadText.FormatSize(bytes))) && !ProgressLayer.Open,
+                "confirmed large downloads display their actual final byte count and close progress");
+        }
+
+        ResetStartup(1048576, 1048576 - 20700);
+        var remainderFrames = ObserveSmallDownload();
+        Addressables.Downloads.Enqueue(new DownloadOperation(true, 20700, 3));
+        await PrepareStartup();
+        Check(PopupLayer.ConfirmCalls == 0 && Addressables.Cached == 1048576 && Starter.Initializations == 1,
+            "necessary 20.2 KB content change uses actual remaining size rather than the full resource set");
+        CheckSilentSmallDownload(remainderFrames, SystemLanguage.Chinese, "20.2 KB remaining in a larger resource set");
+        ResetStartup(1048576 + 65537, 1048576);
+        await PrepareStartup();
+        Check(PopupLayer.ConfirmCalls == 1 && Addressables.DownloadCalls == 0 && Starter.Initializations == 0,
+            "larger content change keeps consent even when old resources were completely downloaded");
+        Check(PopupLayer.ConfirmationText.Contains("64 KB"),
+            "larger change confirmation shows only its uncached remainder");
+
+        foreach (var language in new[] { SystemLanguage.Chinese, SystemLanguage.Japanese, SystemLanguage.English })
+        {
+            ResetStartup(20700);
+            AppSetting.Value.Language = language;
+            var retryFrames = ObserveSmallDownload();
+            Addressables.Downloads.Enqueue(new DownloadOperation(false, 7000, 2));
+            Addressables.Downloads.Enqueue(new DownloadOperation(true, 13700, 2));
+            await PrepareStartup();
+            Check(Addressables.DownloadCalls == 2 && Addressables.RetryStartingSize == 13700 && DownloadTestClock.RetryDelays == 1
+                && Addressables.Cached == 20700 && Starter.Initializations == 1 && PopupLayer.WarningCalls == 0,
+                $"{language} automatic small update silently retries the real uncached remainder then initializes");
+            CheckSilentSmallDownload(retryFrames, language, language + " transient small-download failure");
+
+            ResetStartup(20700);
+            AppSetting.Value.Language = language;
+            var failureFrames = ObserveSmallDownload();
+            Addressables.Downloads.Enqueue(new DownloadOperation(false, 0, 2));
+            Addressables.Downloads.Enqueue(new DownloadOperation(false, 0, 2));
+            await PrepareStartup();
+            Check(Addressables.DownloadCalls == 2 && DownloadTestClock.RetryDelays == 1 && PopupLayer.WarningCalls == 1
+                && PopupLayer.WarningAction != null, $"{language} offline automatic update exposes a recoverable warning after bounded retries");
+            Check(Starter.Initializations == 0 && Addressables.Cached == 0,
+                $"{language} offline failure does not fake download completion or game initialization");
+            CheckSilentSmallDownload(failureFrames, language, language + " persistent small-download failure");
+            PopupLayer.WarningAction();
+            Check(UnityEngine.SceneManagement.SceneManager.LoadedScene == 0,
+                $"{language} failure warning retries via the original startup scene reload");
+            ResetStartup(20700);
+            AppSetting.Value.Language = language;
+            var recoveryFrames = ObserveSmallDownload();
+            Addressables.Downloads.Enqueue(new DownloadOperation(true, 20700, 3));
+            await PrepareStartup();
+            Check(Addressables.Cached == 20700 && Starter.Initializations == 1 && PopupLayer.WarningCalls == 0,
+                $"{language} startup actually completes after network recovery");
+            CheckSilentSmallDownload(recoveryFrames, language, language + " network recovery");
+        }
+
+        ResetStartup(20700);
+        Addressables.SizeFailure = true;
+        await PrepareStartup();
+        Check(PopupLayer.WarningCalls == 1 && PopupLayer.ConfirmCalls == 0 && Addressables.DownloadCalls == 0 && Starter.Initializations == 0 && !ProgressLayer.Open,
+            "resource inspection failure remains recoverable and never starts a hidden download");
     }
 }
 
@@ -174,13 +385,18 @@ public static class DownloadTestClock
 {
     public static DownloadOperation Active;
     public static int RetryDelays;
+    public static Action ObserveDownloadWait;
     public static UniTask NextFrame()
     {
         Time.realtimeSinceStartup += 0.2f;
-        Active?.Tick();
+        if (Active != null && !Active.Done)
+        {
+            ObserveDownloadWait?.Invoke();
+            Active.Tick();
+        }
         return UniTask.CompletedTask;
     }
-    public static UniTask Delay() { RetryDelays++; return UniTask.CompletedTask; }
+    public static UniTask Delay() { ObserveDownloadWait?.Invoke(); RetryDelays++; return UniTask.CompletedTask; }
 }
 
 public sealed class DownloadOperation
@@ -210,7 +426,29 @@ namespace UnityEngine
     public enum RuntimeInitializeLoadType { BeforeSceneLoad }
     public sealed class RuntimeInitializeOnLoadMethodAttribute : Attribute { public RuntimeInitializeOnLoadMethodAttribute(RuntimeInitializeLoadType type) {} }
     public static class Time { public static float realtimeSinceStartup; }
-    public static class Debug { public static void LogError(object message) {} public static void LogWarning(object message) {} }
+    public static class Debug { public static void LogError(object message, object context = null) {} public static void LogWarning(object message) {} }
+    public sealed class SerializeField : Attribute {}
+    public class MonoBehaviour {}
+    public class Transform {}
+    public class RectTransform : Transform {}
+    public sealed class Canvas { public Transform transform = new Transform(); public T GetComponent<T>() where T : new() => new T(); }
+    public sealed class AudioSource { public float volume; }
+    public enum RuntimePlatform { IPhonePlayer, Android, OSXEditor }
+    public static class Application
+    {
+        public static RuntimePlatform platform = RuntimePlatform.OSXEditor;
+        public static int targetFrameRate, QuitCalls;
+        public static void Quit() { QuitCalls++; }
+        public static void OpenURL(string url) {}
+    }
+}
+namespace UnityEngine.Serialization
+{
+    public sealed class FormerlySerializedAsAttribute : Attribute { public FormerlySerializedAsAttribute(string name) {} }
+}
+namespace UnityEngine.SceneManagement
+{
+    public static class SceneManager { public static int LoadedScene = -1; public static void LoadScene(int index) { LoadedScene = index; } }
 }
 namespace UnityEngine.Networking
 {
@@ -261,7 +499,7 @@ namespace UnityEngine.AddressableAssets
         public static Action<UnityWebRequest> WebRequestOverride;
         public static Queue<DownloadOperation> Downloads = new Queue<DownloadOperation>();
         public static int Sizes, Releases, DownloadCalls, UnionCalls, SizeFailuresRemaining;
-        public static long Cached, RetryStartingSize;
+        public static long Cached, RetryStartingSize, TotalBytes = 100;
         public static bool FailedReleasedBeforeRetry, SizeFailure;
         public static string[] LastKeys;
         static DownloadOperation previous;
@@ -269,8 +507,9 @@ namespace UnityEngine.AddressableAssets
         {
             Sizes = Releases = DownloadCalls = UnionCalls = SizeFailuresRemaining = DownloadTestClock.RetryDelays = 0;
             Cached = RetryStartingSize = 0;
+            TotalBytes = 100;
             FailedReleasedBeforeRetry = SizeFailure = false;
-            Downloads.Clear(); previous = null; DownloadTestClock.Active = null;
+            Downloads.Clear(); previous = null; DownloadTestClock.Active = null; DownloadTestClock.ObserveDownloadWait = null;
         }
         public static AsyncOperationHandle<long> GetDownloadSizeAsync(IEnumerable keys)
         {
@@ -279,14 +518,14 @@ namespace UnityEngine.AddressableAssets
             UnityEngine.ResourceManagement.WebRequestQueue.MaxRequests = 500;
             var throwThisTime = SizeFailuresRemaining > 0;
             if (throwThisTime) SizeFailuresRemaining--;
-            return new AsyncOperationHandle<long> { Operation = new SizeOperation { Result = 100 - Cached, Failed = SizeFailure, Throws = throwThisTime } };
+            return new AsyncOperationHandle<long> { Operation = new SizeOperation { Result = TotalBytes - Cached, Failed = SizeFailure, Throws = throwThisTime } };
         }
         public static AsyncOperationHandle DownloadDependenciesAsync(IEnumerable keys, MergeMode mode, bool autoRelease)
         {
             if (autoRelease) throw new Exception("handle must stay valid until status is observed");
             LastKeys = keys.Cast<string>().ToArray(); DownloadCalls++;
             if (mode == MergeMode.Union) UnionCalls++;
-            if (previous != null) { FailedReleasedBeforeRetry = previous.Released; RetryStartingSize = 100 - Cached; }
+            if (previous != null) { FailedReleasedBeforeRetry = previous.Released; RetryStartingSize = TotalBytes - Cached; }
             var operation = Downloads.Dequeue(); operation.CachedAtStart = Cached;
             previous = operation; DownloadTestClock.Active = operation;
             return new AsyncOperationHandle { Operation = operation };
@@ -298,4 +537,99 @@ namespace UnityEngine.AddressableAssets
 public static class AddressablesResourcePolicy
 {
     public static string DownloadProgressText(SystemLanguage language) => language == SystemLanguage.Chinese ? "正在下载资源" : "Downloading resources";
+}
+
+// These adapters expose the actual StartUpPresentation branches without Unity,
+// PlayFab, character art, a network connection, or an operating-system cache.
+public static class StartupDoubles
+{
+    public static void Reset()
+    {
+        Starter.Initializations = Starter.PrematureInitializations = Application.QuitCalls = PopupLayer.ConfirmCalls
+            = PopupLayer.WarningCalls = ProgressLayer.DownloadingCalls = ProgressLayer.LoadingPercentCalls = 0;
+        PopupLayer.ConfirmAction = PopupLayer.CancelAction = PopupLayer.WarningAction = null;
+        PopupLayer.ConfirmationText = null;
+        ProgressLayer.Messages.Clear();
+        ProgressLayer.Percentages.Clear();
+        ProgressLayer.Open = false;
+        AppSetting.Value.Language = SystemLanguage.Chinese;
+        UnityEngine.SceneManagement.SceneManager.LoadedScene = -1;
+    }
+}
+public sealed class Starter
+{
+    public static int Initializations, PrematureInitializations;
+    public UniTask Initialise()
+    {
+        if (Addressables.Cached < Addressables.TotalBytes) PrematureInitializations++;
+        Initializations++;
+        return UniTask.CompletedTask;
+    }
+    public void EnterFrontScene() {}
+}
+public sealed class CommonSetting
+{
+    public List<string> DownLoadLabels = new List<string> { "unit", "effect" };
+    public static string StartThemeAddressKey = "start";
+    public void Initialise() {}
+}
+public static class AddressablesLogic
+{
+    public static UniTask<bool> VersionConfirm() => UniTask.FromResult(false);
+    public static UniTask DownLoadConfig() => UniTask.CompletedTask;
+    public static UniTask<CommonSetting> GetCommonSetting() => UniTask.FromResult(new CommonSetting());
+    public static UniTask<long> GetWholeDownLoadSize(Action<string> onFailure, List<string> labels) =>
+        PocketStrikerDependencyDownloader.GetWholeDownloadSize(labels, onFailure);
+    public static float DownloadProgress => PocketStrikerDependencyDownloader.Progress;
+    public static async UniTask ResourcePrepareProcess(Action complete, Action<string> onProgress, List<string> labels)
+    {
+        if (!await PocketStrikerDependencyDownloader.DownloadRequiredDependencies(labels, onProgress, AppSetting.Value.Language))
+            throw new InvalidOperationException("Failed to download required game resources.");
+        complete?.Invoke();
+    }
+}
+public static class AppSetting
+{
+    public sealed class Settings { public SystemLanguage Language = SystemLanguage.Chinese; public float BgmVolume = 1, EffectsVolume = 1; }
+    public static Settings Value = new Settings();
+    public static AudioSource BGMSource, UiAudioSource;
+    public static UniTask PlayBGM(string address) => UniTask.CompletedTask;
+}
+public static class PocketStrikerAppSettings { public static void Load() {} }
+public static class PosCal { public static Canvas Canvas; public static RectTransform SafeAreaRect; public static void TestIni() {} }
+public static class FightGlobalSetting { public static int SceneStep; }
+public static class PlayFabReadClient { public static string DontShowFrontFight = "False"; }
+public sealed class TitleBgLayer { public UniTask SetupLogin() => UniTask.CompletedTask; }
+public sealed class TitleScreenLayer { public void Initialise(bool enabled) {} }
+namespace DummyLayerSystem
+{
+    public static class UILayerLoader
+    {
+        public static void SetHanger(Transform safeArea, Transform canvas) {}
+        public static T Load<T>(bool first, object parent, bool persistent) where T : new() => new T();
+    }
+    public static class HighLightLayer { public static void Close() {} }
+    public static class ProgressLayer
+    {
+        public static int DownloadingCalls, LoadingPercentCalls;
+        public static bool Open;
+        public static List<string> Messages = new List<string>();
+        public static List<float> Percentages = new List<float>();
+        public static void Loading(string text) { Messages.Add(text); Open = true; }
+        public static void Downloading(string text) { DownloadingCalls++; Loading(text); }
+        public static void LoadingPercent(string text, float percent, bool animate = true)
+        { LoadingPercentCalls++; Percentages.Add(percent); Loading(text); }
+        public static void Close() { Open = false; }
+    }
+    public static class PopupLayer
+    {
+        public static int ConfirmCalls, WarningCalls;
+        public static Action ConfirmAction, CancelAction, WarningAction;
+        public static string ConfirmationText;
+        public static void ArrangeConfirmWindow(Action yes, Action no, string text)
+        {
+            ConfirmCalls++; ConfirmAction = yes; CancelAction = no; ConfirmationText = text;
+        }
+        public static void ArrangeWarnWindow(Action action, string text) { WarningCalls++; WarningAction = action; }
+    }
 }

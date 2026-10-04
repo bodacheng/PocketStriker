@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise startup download policy with controlled frames and Addressables operations.
+"""Exercise the actual startup routing and downloader with offline doubles.
 
 Uses Unity's bundled compiler; never starts Unity or makes network requests.
 Only NextFrame/Delay waits are substituted in a temporary source copy because
@@ -36,14 +36,20 @@ def main():
     for original, replacement in substitutions.items():
         assert source.count(original) == 1, f"PlayerLoop wait changed; review test seam: {original}"
         source = source.replace(original, replacement)
+    startup_source = (root / "Assets/Launcher/StartUpPresentation.cs").read_text()
+    assert startup_source.count("await UniTask.NextFrame();") == 1, "Startup wait changed; review test seam"
+    startup_source = startup_source.replace("await UniTask.NextFrame();", "await DownloadTestClock.NextFrame();")
     with tempfile.TemporaryDirectory(prefix="pocketstriker-downloads-") as directory:
         temporary_source = Path(directory) / "PocketStrikerDependencyDownloader.cs"
         temporary_source.write_text(source)
+        temporary_startup = Path(directory) / "StartUpPresentation.cs"
+        temporary_startup.write_text(startup_source)
         executable = Path(directory) / "DownloadTests.exe"
         subprocess.run([
             str(mono), str(compiler), "/nologo", "/langversion:9.0", f"/out:{executable}",
             f"/reference:{unitask}", f"/reference:{netstandard}",
             str(temporary_source), str(root / "Assets/Addressables/PocketStrikerDownloadPolicy.cs"),
+            str(temporary_startup),
             str(root / "Assets/Addressables/PocketStrikerDownloadText.cs"),
             str(root / "Tools/Validation/DownloadTests.cs"),
         ], check=True, cwd=root)
