@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UniRx;
+using UnityEngine;
 
 public class HitBoxSubEventManger : MonoBehaviour
 {
@@ -7,98 +6,52 @@ public class HitBoxSubEventManger : MonoBehaviour
     [SerializeField] EventAndTriggerTime _event;
     [SerializeField] string LandedEvent;
     [SerializeField] string fadeEvent;
-    
-    float _timeCount;
-    SingleAssignmentDisposable _clockEvent, _landEvent, _fadedEvent;
 
-    void DisposeEvents()
-    {
-        if (_clockEvent != null && !_clockEvent.IsDisposed)
-            _clockEvent.Dispose();
-        if (_landEvent != null && !_landEvent.IsDisposed)
-            _landEvent.Dispose();
-        if (_fadedEvent != null && !_fadedEvent.IsDisposed)
-            _fadedEvent.Dispose();
-    }
-    
-    void OnDestroy()
-    {
-        DisposeEvents();
-    }
-    
-    void OnDisable()
-    {
-        DisposeEvents();
-    }
+    float _timeCount;
+    bool clockEventTriggered, landEventTriggered, fadeEventTriggered;
 
     void OnEnable()
     {
-        _timeCount = 0;        
-        if (!string.IsNullOrEmpty(_event.event_name))
-        {
-            _clockEvent = new SingleAssignmentDisposable();
-            _clockEvent.Disposable = Observable.EveryUpdate().Subscribe(_ =>
-                {
-                    if (_timeCount > _event.time)
-                    {
-                        decomposition.SpecialTriggerEvent(_event.event_name, this);
-                        _clockEvent.Dispose();
-                    }
-                    if (!gameObject.activeSelf)
-                    {
-                        _clockEvent.Dispose();
-                    }
-                }
-            );
-            SingleAssignmentDisposableCleaner.Add(_clockEvent);
-        }
-        
-        if (!string.IsNullOrEmpty(LandedEvent))
-        {
-            _landEvent = new SingleAssignmentDisposable();
-            _landEvent.Disposable = Observable.EveryUpdate().Subscribe(_ =>
-                {
-                    if (decomposition.transform.position.y <= 0)
-                    {
-                        decomposition.SpecialTriggerEvent(LandedEvent, this);
-                        decomposition.Phase = -1;
-                        _landEvent.Dispose();
-                    }
-                    
-                    if (!gameObject.activeSelf)
-                    {
-                        _landEvent.Dispose();
-                    }
-                }
-            );
-            SingleAssignmentDisposableCleaner.Add(_landEvent);
-        }
-        
-        if (!string.IsNullOrEmpty(fadeEvent))
-        {
-            _fadedEvent = new SingleAssignmentDisposable();
-            _fadedEvent.Disposable = Observable.EveryUpdate().Subscribe(_ =>
-                {
-                    if (decomposition._HitBox.weaponHP > 0 && decomposition._HitBox.CurrentHP <= 0)
-                    {
-                        decomposition.SpecialTriggerEvent(fadeEvent, this);
-                        _fadedEvent.Dispose();
-                    }
-                    if (!gameObject.activeSelf)
-                    {
-                        _fadedEvent.Dispose();
-                    }
-                }
-            );
-            SingleAssignmentDisposableCleaner.Add(_fadedEvent);
-        }
+        _timeCount = 0;
+        clockEventTriggered = landEventTriggered = fadeEventTriggered = false;
     }
-    
-    void Update()
+
+    bool CanProcess => decomposition != null && !decomposition.IsBattleEffectInvalidated
+        && (decomposition.Phase == 1 || decomposition.Phase == 2)
+        && !BattleEffectLifetime.Suspended && isActiveAndEnabled;
+
+    // Decomposition.Life owns the ordering, so a split scheduled at the same
+    // instant as its parent's destruction is emitted before pool return.
+    public void ProcessEvents(float deltaTime)
     {
-        _timeCount += Time.deltaTime;
+        if (!CanProcess) return;
+        _timeCount += deltaTime;
+        if (!clockEventTriggered && _event != null && !string.IsNullOrEmpty(_event.event_name)
+            && _timeCount >= _event.time)
+        {
+            clockEventTriggered = true;
+            decomposition.SpecialTriggerEvent(_event.event_name, this);
+        }
+
+        if (!CanProcess) return;
+        if (!landEventTriggered && !string.IsNullOrEmpty(LandedEvent)
+            && decomposition.transform.position.y <= 0)
+        {
+            landEventTriggered = true;
+            decomposition.SpecialTriggerEvent(LandedEvent, this);
+            decomposition.Phase = -1;
+        }
+
+        if (!CanProcess) return;
+        if (!fadeEventTriggered && !string.IsNullOrEmpty(fadeEvent)
+            && decomposition._HitBox != null && decomposition._HitBox.weaponHP > 0
+            && decomposition._HitBox.CurrentHP <= 0)
+        {
+            fadeEventTriggered = true;
+            decomposition.SpecialTriggerEvent(fadeEvent, this);
+        }
     }
-    
+
     [System.Serializable]
     public class EventAndTriggerTime
     {

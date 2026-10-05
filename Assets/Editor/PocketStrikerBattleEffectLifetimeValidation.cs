@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
 
-/// <summary>Tests immediate retirement independently of the processor's per-frame queue.</summary>
+/// <summary>Tests damage suspension and visual retirement independently of the processor's per-frame queue.</summary>
 public static class PocketStrikerBattleEffectLifetimeValidation
 {
     [Serializable] public sealed class Report
@@ -17,7 +17,7 @@ public static class PocketStrikerBattleEffectLifetimeValidation
         public bool passed;
         public List<string> checks = new List<string>();
         public List<string> errors = new List<string>();
-        public string scope = "Production Decomposition, HitBoxManager, BO_Marker, HitBoxesProcesser and BattleEffectLifetime in a preview scene. Covers a rental absent from the current Update queue, particles on a child without a root ParticleSystem, renderers, immediate collider and cached-hit retirement, stale marker activation, generation expiry and clean new rental. Real retry/evolution and delayed async prefab completion are exercised by Evolution Heal Playmode Smoke.";
+        public string scope = "Production Decomposition, HitBoxManager, BO_Marker, HitBoxesProcesser and BattleEffectLifetime in a preview scene. Covers damage suspension that preserves particles/renderers until popup cleanup, a rental absent from the current Update queue, particles on a child without a root ParticleSystem, immediate collider and cached-hit retirement, stale marker activation, generation expiry and clean new rental. Real retry/evolution and delayed async prefab completion are exercised by Evolution Heal Playmode Smoke.";
     }
 
     [MenuItem("PocketStriker/Validation/Battle Effect Invalidation")]
@@ -55,6 +55,16 @@ public static class PocketStrikerBattleEffectLifetimeValidation
             Check(hitBox.Enabled && markerObject.GetComponent<SphereCollider>().enabled && particles.particleCount > 0,
                 "Fixture begins with a live collider and emitted particles", report);
             var generation = BattleEffectLifetime.Generation;
+            BattleEffectLifetime.SuspendDamage();
+            Check(BattleEffectLifetime.Suspended && !hitBox.Enabled
+                && !markerObject.GetComponent<SphereCollider>().enabled && marker.GetBallDetectHitPool().Count == 0,
+                "Defeat immediately suspends damage and cached collisions", report);
+            Check(!effect.IsBattleEffectInvalidated && effect.Phase == 1 && particles.particleCount > 0
+                && renderer.enabled && constraint.constraintActive && BattleEffectLifetime.ActiveCount == 1,
+                "Defeat preserves the visible rental until popup cleanup", report);
+            hitBox.EnableMarkers(); hitBox.MarkersEnablingStarts(); effect.Step1(); effect.Step2();
+            Check(!hitBox.Enabled && !BattleEffectLifetime.IsCurrent(generation),
+                "Defeat blocks late marker callbacks and expires pending spawns", report);
             // Never call Decomposition.Update: the old AllProcessingFade would
             // miss this valid rental because its per-frame queue is empty.
             processor.AllProcessingFade();
@@ -90,7 +100,7 @@ public static class PocketStrikerBattleEffectLifetimeValidation
             UnityEngine.Object.DestroyImmediate(rig); EditorSceneManager.ClosePreviewScene(scene);
             HitBoxesProcesser.Instance = originalProcessor;
             Directory.CreateDirectory("Logs/CombatEffects");
-            report.passed = report.errors.Count == 0 && report.checks.Count == 10;
+            report.passed = report.errors.Count == 0 && report.checks.Count == 13;
             File.WriteAllText("Logs/CombatEffects/report.json", JsonUtility.ToJson(report, true));
         }
         if (!report.passed) throw new InvalidOperationException(string.Join("\n", report.errors));

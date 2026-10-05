@@ -252,6 +252,8 @@ public static class PocketStrikerFightPrepareValidation
                     else
                     {
                         PopulatePreparation(layer, route == "Evolution" ? 1 : 3, modelSprite);
+                        Field<GameObject>(layer, "enemyDoubleExModeFlg").SetActive(route == "Rotation");
+                        Field<GameObject>(layer, "enemyInfiniteExModeFlg").SetActive(route == "Boss");
                         layer.RefreshPreparationLayout();
                         FitPortraits(layer);
                     }

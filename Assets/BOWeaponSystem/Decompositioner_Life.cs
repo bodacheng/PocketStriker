@@ -7,6 +7,19 @@ public partial class Decomposition : MonoBehaviour
     float _disFromCenter;
     public void Life()
     {
+        Life(Time.deltaTime);
+    }
+
+    void Life(float deltaTime)
+    {
+        // Dispatch due sub-object events before this rental can expire or be
+        // returned. Separate Update subscriptions race events at the lifetime
+        // deadline against the processor's fade/return pass.
+        if ((Phase == 1 || Phase == 2) && subEvents != null)
+            foreach (var subEvent in subEvents)
+                if (subEvent != null && subEvent.isActiveAndEnabled)
+                    subEvent.ProcessEvents(deltaTime);
+
         if (Phase == 1 && IsWeapon)
         {
             switch (_HitBox._WeaponMode)
@@ -84,7 +97,7 @@ public partial class Decomposition : MonoBehaviour
         
         if (gameObject.activeSelf)
         {
-            Counter += Time.deltaTime;
+            Counter += deltaTime;
         }
     }
 }

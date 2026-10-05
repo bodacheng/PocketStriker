@@ -26,6 +26,7 @@ public static class StoryVarietyTests
                     foreach (string prompt in new[] { text, image })
                         Require(prompt.Contains(variant.Theme) && prompt.Contains(PocketStrikerStoryVariety.CartoonStyle), "Provider prompt omitted genre or art direction.");
                     Require(text.Contains(variant.Seed) && text.Contains(variant.Twist) && text.Contains(variant.Tone), "Narrative variation was not sent to provider.");
+                    Require(image.Contains(PocketStrikerStoryVariety.PortraitComposition) && PocketStrikerStoryVariety.ImageAspectRatio == "9:16", "Portrait artwork constraints were not sent to provider.");
                 }
                 Require(subjects.Count == 18, "Not every genre was drawn once.");
             }

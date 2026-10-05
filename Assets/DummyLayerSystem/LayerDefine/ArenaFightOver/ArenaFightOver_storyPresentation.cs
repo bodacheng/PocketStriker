@@ -4,6 +4,31 @@ using UnityEngine.UI;
 public partial class ArenaFightOver
 {
     private GameObject aiStoryPresentation;
+    private GameObject aiStoryCaptionPanel;
+
+    protected override void OnRectTransformDimensionsChange()
+    {
+        base.OnRectTransformDimensionsChange();
+        if (aiStoryPlaying && aiStoryPresentation != null && aiStoryCaptionPanel != null
+            && shortStory != null && !string.IsNullOrWhiteSpace(shortStory.text)) ResizeAIStoryCaption();
+    }
+
+    private void ResizeAIStoryCaption()
+    {
+        var root = (RectTransform)aiStoryPresentation.transform;
+        var caption = shortStory.rectTransform;
+        if (root.rect.height <= 0 || caption.rect.width <= 0) return;
+        float maximumHeight = root.rect.height * .185f;
+        var settings = shortStory.GetGenerationSettings(new Vector2(caption.rect.width, maximumHeight));
+        settings.resizeTextForBestFit = false;
+        settings.fontSize = shortStory.resizeTextMaxSize;
+        settings.verticalOverflow = VerticalWrapMode.Overflow;
+        float preferredHeight = new TextGenerator().GetPreferredHeight(shortStory.text, settings) / shortStory.pixelsPerUnit;
+        float height = Mathf.Clamp(preferredHeight + 2, settings.fontSize * shortStory.lineSpacing, maximumHeight);
+        caption.anchorMax = new Vector2(caption.anchorMax.x, caption.anchorMin.y + height / root.rect.height);
+        var backdrop = (RectTransform)aiStoryCaptionPanel.transform;
+        backdrop.anchorMax = new Vector2(backdrop.anchorMax.x, caption.anchorMax.y + .02f);
+    }
 
     private void PrepareAIStoryPresentation()
     {
@@ -50,22 +75,30 @@ public partial class ArenaFightOver
             text.verticalOverflow = VerticalWrapMode.Truncate;
             return text;
         }
-        storyBgImage = Region("Generated Illustration", new Vector2(.06f, .43f), new Vector2(.94f, .85f)).gameObject.AddComponent<Image>();
+        // Let the portrait artwork use the whole game surface. Captions appear
+        // over it as the player advances, so reading never shrinks the picture.
+        storyBgImage = Region("Generated Illustration", Vector2.zero, Vector2.one).gameObject.AddComponent<Image>();
         storyBgImage.raycastTarget = false;
         storyBgImage.preserveAspect = true;
-        shortStory = Caption("Story Caption", new Vector2(.08f, .12f), new Vector2(.92f, .4f), 44,
+        var captionBackdrop = Region("Caption Backdrop", new Vector2(.025f, .085f), new Vector2(.975f, .31f)).gameObject.AddComponent<Image>();
+        captionBackdrop.color = new Color32(12, 18, 26, 224);
+        captionBackdrop.raycastTarget = false;
+        aiStoryCaptionPanel = captionBackdrop.gameObject;
+        aiStoryCaptionPanel.SetActive(false);
+        shortStory = Caption("Story Caption", new Vector2(.055f, .105f), new Vector2(.945f, .29f), 44,
             new Color32(241, 238, 227, 255), TextAnchor.UpperLeft);
         shortStory.resizeTextForBestFit = true;
-        shortStory.resizeTextMinSize = 32;
+        shortStory.resizeTextMinSize = 28;
         shortStory.resizeTextMaxSize = 44;
 
         var language = AIStoryRuntimeContext.GetLanguage();
         bool chinese = language == SystemLanguage.Chinese || language == SystemLanguage.ChineseSimplified || language == SystemLanguage.ChineseTraditional;
         bool japanese = language == SystemLanguage.Japanese;
         var gold = new Color32(237, 198, 120, 255);
-        Caption("Story Heading", new Vector2(.08f, .89f), new Vector2(.92f, .95f), 42, gold, TextAnchor.MiddleCenter)
-            .text = chinese ? "战斗余韵" : japanese ? "戦いの余韻" : "After the battle";
-        Caption("Continue Hint", new Vector2(.08f, .04f), new Vector2(.92f, .09f), 32, gold, TextAnchor.MiddleCenter)
+        var hintBackdrop = Region("Continue Backdrop", new Vector2(.025f, .02f), new Vector2(.975f, .075f)).gameObject.AddComponent<Image>();
+        hintBackdrop.color = new Color32(12, 18, 26, 200);
+        hintBackdrop.raycastTarget = false;
+        Caption("Continue Hint", new Vector2(.055f, .02f), new Vector2(.945f, .075f), 32, gold, TextAnchor.MiddleCenter)
             .text = chinese ? "轻触继续" : japanese ? "タップして続ける" : "Tap to continue";
     }
 }

@@ -23,6 +23,7 @@ public partial class Decomposition : MonoBehaviour {
     PositionConstraint positionConstraint;
     BO_Ani_E BO_Ani_E;
     ParticleSystem to_be_stop_emissions;
+    HitBoxSubEventManger[] subEvents;
     public float Counter;
     public int Phase { get; set; }
     public bool IsWeapon { get; set; }
@@ -44,6 +45,7 @@ public partial class Decomposition : MonoBehaviour {
     {
         to_be_stop_emissions = gameObject.GetComponent<ParticleSystem>();
         hasParticle = to_be_stop_emissions != null;
+        subEvents = GetComponentsInChildren<HitBoxSubEventManger>(true);
     }
     
     public void SetPool(DecompositionPool pool)
@@ -123,6 +125,11 @@ public partial class Decomposition : MonoBehaviour {
 
     void OnDisable() => BattleEffectLifetime.Unregister(this);
     void OnDestroy() => BattleEffectLifetime.Unregister(this);
+
+    public void SuspendBattleDamage()
+    {
+        CloseMarkers();
+    }
 
     public void InvalidateBattleEffect()
     {
@@ -222,7 +229,9 @@ public partial class Decomposition : MonoBehaviour {
     
     public void SpecialTriggerEvent(string defined_event_code, HitBoxSubEventManger hitBoxSubEventManger)//这个就只能在这自定义了
     {
-        if (BO_Ani_E == null || IsBattleEffectInvalidated || Phase != 1 || BattleEffectLifetime.Suspended)
+        // Authored follow-up events can occur after the parent's damage stops,
+        // while its particles are fading (Power Split fires at 0.5s, after 0.4s).
+        if (BO_Ani_E == null || IsBattleEffectInvalidated || (Phase != 1 && Phase != 2) || BattleEffectLifetime.Suspended)
             return;
         switch (defined_event_code)
         {

@@ -10,7 +10,7 @@ function normalize(request) {
   // Fixed budget: one image, bounded provider waits, no client-selected paid model.
   const input = { prompt: p.prompt.trim() };
   if (kind === 'text') { input.model = 'gemini-2.5-flash-lite'; input.timeoutMs = 20000; }
-  else { input.imageModel = 'gemini-3.1-flash-image'; input.sampleCount = 1; input.aspectRatio = '16:9'; input.timeoutMs = 60000; }
+  else { input.imageModel = 'gemini-3.1-flash-image'; input.sampleCount = 1; input.aspectRatio = '9:16'; input.timeoutMs = 60000; }
   const id = sha(JSON.stringify({ protocol: VERSION, kind, input }));
   input.cacheKey = `ps_${id}`;
   // Index each generated story independently. Fresh battle attempts must not

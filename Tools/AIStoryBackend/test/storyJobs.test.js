@@ -32,10 +32,19 @@ test('fresh image jobs use separate story indexes while preserving protocol and 
  assert.equal(generated.length,2);
  assert.notEqual(generated[0].storyId,generated[1].storyId);
  for (const input of generated) { assert.equal(input.storyId,input.cacheKey); assert.equal(input.sceneIndex,1); }
- const originalIdentityInput = {prompt:start.input.prompt,imageModel:'gemini-3.1-flash-image',sampleCount:1,aspectRatio:'16:9',timeoutMs:60000};
+ const originalIdentityInput = {prompt:start.input.prompt,imageModel:'gemini-3.1-flash-image',sampleCount:1,aspectRatio:'9:16',timeoutMs:60000};
  const originalId = crypto.createHash('sha256').update(JSON.stringify({protocol:'pocket-story-jobs-v1',kind:'image',input:originalIdentityInput})).digest('hex');
  assert.equal(a.id,originalId);
  assert.equal(a.protocol,'pocket-story-jobs-v1');
+});
+
+test('portrait image jobs cannot reuse a cached landscape image or override the phone format', () => {
+ const portrait = normalize({...start,input:{...start.input,aspectRatio:'16:9'}});
+ assert.equal(portrait.input.aspectRatio,'9:16');
+ const landscapeIdentityInput = {...portrait.input,aspectRatio:'16:9'};
+ delete landscapeIdentityInput.cacheKey; delete landscapeIdentityInput.storyId; delete landscapeIdentityInput.sceneIndex;
+ const landscapeId = crypto.createHash('sha256').update(JSON.stringify({protocol:'pocket-story-jobs-v1',kind:'image',input:landscapeIdentityInput})).digest('hex');
+ assert.notEqual(portrait.id,landscapeId);
 });
 
 test('preexisting ready jobs retain their legacy image locations without regeneration', async () => {

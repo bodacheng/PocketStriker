@@ -167,15 +167,16 @@ namespace FightScene
             var manager = RTFightManager.Target;
             var hero = manager.team1.RMode_Unit.Value;
             var fightingLayer = FightingStepLayer.Open();
-            BattleEffectLifetime.InvalidateAll(true);
+            BattleEffectLifetime.SuspendDamage();
             hero._MyBehaviorRunner.ChangeToWaitingState();
             foreach (var stick in fightingLayer.GetComponentsInChildren<UltimateJoystick>(true))
                 stick.UpdatePositioning();
             manager.team1.InputsManager.FocusUnit(null);
             fightingLayer.gameObject.SetActive(false);
 
-            // Lock controls immediately, leaving a real-time beat for the defeat
-            // before the skill choices appear. Fight exit disposes this timer.
+            // Lock controls and damage immediately, preserving the defeat's
+            // visible effects until the skill choices appear. Fight exit
+            // disposes this timer.
             Observable.Timer(TimeSpan.FromSeconds(1), Scheduler.MainThreadIgnoreTimeScale)
                 .Subscribe(_ =>
                 {
@@ -185,7 +186,6 @@ namespace FightScene
                         || FSceneProcessesRunner.Main.currentProcess is not FightingProcess)
                         return;
 
-                    BattleEffectLifetime.InvalidateAll(true);
                     manager.EvolutionManager.EvolutionCount++;
                     string bottomText = "";
                     switch (manager.EvolutionManager.EvolutionCount)
@@ -201,6 +201,8 @@ namespace FightScene
                             break;
                     }
 
+                    // Clear in the same frame the selection layer appears.
+                    BattleEffectLifetime.InvalidateAll(true);
                     var inBattleEvolution = UILayerLoader.Load<InBattleEvolution>();
                     inBattleEvolution.Setup(hero, () =>
                         {

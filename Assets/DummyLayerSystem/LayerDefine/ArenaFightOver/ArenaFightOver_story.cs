@@ -145,6 +145,7 @@ public partial class ArenaFightOver : UILayer
         storyBgImage.color = Color.white;
         shortStory.text = string.Empty;
         shortStory.gameObject.SetActive(false);
+        aiStoryCaptionPanel.SetActive(false);
     }
 
     private void DisplayAIStoryLine()
@@ -157,7 +158,10 @@ public partial class ArenaFightOver : UILayer
         }
 
         shortStory.text = displayLine;
-        shortStory.gameObject.SetActive(!string.IsNullOrWhiteSpace(displayLine));
+        bool hasCaption = !string.IsNullOrWhiteSpace(displayLine);
+        shortStory.gameObject.SetActive(hasCaption);
+        aiStoryCaptionPanel.SetActive(hasCaption);
+        if (hasCaption) ResizeAIStoryCaption();
     }
 
     private void FinishAIStory()

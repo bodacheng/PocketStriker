@@ -31,10 +31,11 @@ public sealed class PocketStrikerLegacyStoryClient
         if (string.IsNullOrWhiteSpace(prompt)) throw new ArgumentException("Missing story prompt.");
         string cacheKey;
         using (var hash = SHA256.Create())
-            cacheKey = "ps_story_v2_" + BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(kind + ":" + prompt))).Replace("-", "").ToLowerInvariant();
+            cacheKey = "ps_story_v2_" + BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(kind + ":" + prompt
+                + (kind == "image" ? ":" + PocketStrikerStoryVariety.ImageAspectRatio : "")))).Replace("-", "").ToLowerInvariant();
         object input = kind == "text"
             ? (object)new { prompt, model = "gemini-2.5-flash-lite", timeoutMs = 20000, cacheKey }
-            : new { prompt, imageModel = "gemini-3.1-flash-image", sampleCount = 1, aspectRatio = "16:9", timeoutMs = 60000, cacheKey, storyId = cacheKey, sceneIndex = 1 };
+            : new { prompt, imageModel = "gemini-3.1-flash-image", sampleCount = 1, aspectRatio = PocketStrikerStoryVariety.ImageAspectRatio, timeoutMs = 60000, cacheKey, storyId = cacheKey, sceneIndex = 1 };
         return new ExecuteFunctionRequest
         {
             FunctionName = kind == "text" ? "generateGeminiText" : "generateGeminiImages",

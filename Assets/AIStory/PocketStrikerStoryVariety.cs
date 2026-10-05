@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 /// <summary>Project-owned story choices. Its RNG never changes combat randomness.</summary>
 public static class PocketStrikerStoryVariety
 {
+    public const string ImageAspectRatio = "9:16";
+    public const string PortraitComposition = "portrait 9:16 composition for a phone screen; make the characters and key action large and central, use the full vertical frame, and keep essential details above the lower caption area";
     public const string CartoonStyle = "playful 2D storybook cartoon, oversized expressive heads and eyes, compact bodies, soft rounded silhouettes, thick clean outlines, flat cel shading, vibrant candy colors with coral, turquoise, lemon yellow and lavender accents, simple backgrounds, readable full-body action, gentle lighting; no photorealism, realistic anatomy, oil-painting texture or cinematic lighting; no text, lettering, logos or HUD";
     public static readonly string[] Themes =
     {
@@ -93,7 +95,8 @@ public static class PocketStrikerStoryVariety
 
     public static string BuildImagePrompt(Variant variant, string visualPrompt) =>
         "Art direction (required): " + CartoonStyle + ". Selected subject: " + variant.Theme
-        + " Illustrate this story's key action: " + visualPrompt + ". Keep the required cartoon art direction throughout.";
+        + " Illustrate this story's key action: " + visualPrompt + ". Composition (required): " + PortraitComposition
+        + ". Keep the required cartoon art direction throughout.";
 
     sealed class ShuffleBag
     {

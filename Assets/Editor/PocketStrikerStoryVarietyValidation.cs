@@ -63,6 +63,7 @@ public static class PocketStrikerStoryVarietyValidation
                 var config = AssetDatabase.LoadAssetAtPath<AIServiceConfig>("Assets/AIStory/AIServiceConfig.asset");
                 Require(config != null && config.StoryThemes.SequenceEqual(PocketStrikerStoryVariety.Themes), "Legacy asset subject catalog diverged.");
                 Require(config.ImageStyle == ImageStyle.Custom && config.GetImageStylePrompt().Contains(PocketStrikerStoryVariety.CartoonStyle), "Legacy art direction is missing.");
+                Require(config.ImageAspectRatio == PocketStrikerStoryVariety.ImageAspectRatio, "Legacy asset must request portrait artwork.");
                 return UniTask.CompletedTask;
             });
             await Check("legacy envelopes preserve registered endpoints and bounded cached budgets", () =>
@@ -73,7 +74,7 @@ public static class PocketStrikerStoryVarietyValidation
                 var imageInput = JsonUtility.FromJson<Parameters>(PlayFabSimpleJson.SerializeObject(image.FunctionParameter));
                 Require(text.FunctionName == "generateGeminiText" && image.FunctionName == "generateGeminiImages", "Registered function names changed.");
                 Require(textInput.model == "gemini-2.5-flash-lite" && textInput.timeoutMs == 20000 && !string.IsNullOrEmpty(textInput.cacheKey), "Text budget/cache missing.");
-                Require(imageInput.imageModel == "gemini-3.1-flash-image" && imageInput.sampleCount == 1 && imageInput.aspectRatio == "16:9"
+                Require(imageInput.imageModel == "gemini-3.1-flash-image" && imageInput.sampleCount == 1 && imageInput.aspectRatio == "9:16"
                     && imageInput.timeoutMs == 60000 && imageInput.storyId == imageInput.cacheKey && imageInput.sceneIndex == 1, "Image budget/envelope changed.");
                 var replay = JsonUtility.FromJson<Parameters>(PlayFabSimpleJson.SerializeObject(PocketStrikerLegacyStoryClient.BuildRequest("text", "selected story prompt").FunctionParameter));
                 Require(replay.cacheKey == textInput.cacheKey && text.GeneratePlayStreamEvent == false && image.GeneratePlayStreamEvent == false, "Replay cache key or event policy changed.");
@@ -116,6 +117,7 @@ public static class PocketStrikerStoryVarietyValidation
                         Require(story.HasVisualScene() && story.StoryScenes.Count == 1 && story.StoryScenes[0].Lines.Count == 2, "Complete one-page story was lost.");
                         foreach (string kind in new[] { "text", "image" })
                             Require(prompts[route + kind].Contains(variant.Theme) && prompts[route + kind].Contains(PocketStrikerStoryVariety.CartoonStyle), "Actual provider prompt missed selected subject/style.");
+                        Require(prompts[route + "image"].Contains(PocketStrikerStoryVariety.PortraitComposition), "Actual image prompt missed portrait composition.");
                         PocketStrikerQueuedStory.Release(story); Require(story == null && texture == null, "Owned story/image was retained after release.");
                     }
                     finally { PocketStrikerQueuedStory.Release(story); if (texture != null) UnityEngine.Object.DestroyImmediate(texture); }

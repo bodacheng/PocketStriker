@@ -12,6 +12,16 @@ public static class BattleEffectLifetime
     internal static void Register(Decomposition effect) => Active.Add(effect);
     internal static void Unregister(Decomposition effect) => Active.Remove(effect);
 
+    public static void SuspendDamage()
+    {
+        Generation++;
+        Suspended = true;
+        // The defeated round can no longer deal damage or finish pending
+        // spawns, but its visible effects finish naturally until the popup.
+        foreach (var effect in new List<Decomposition>(Active))
+            if (effect != null) effect.SuspendBattleDamage();
+    }
+
     public static void InvalidateAll(bool suspend = false)
     {
         Generation++;

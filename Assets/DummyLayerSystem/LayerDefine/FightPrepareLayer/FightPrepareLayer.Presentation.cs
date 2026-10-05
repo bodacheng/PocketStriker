@@ -184,7 +184,8 @@ public partial class FightPrepareLayer
             {
                 Place(exParent, width - 230, 20, 190, 56);
                 foreach (RectTransform badge in exParent) Stretch(badge);
-                foreach (var text in exParent.GetComponentsInChildren<Text>(true)) text.fontSize = 22;
+                StylePreparationEnergyFlag(enemyDoubleExModeFlg, "StageEnergyDouble", new Color(1f, .86f, .4f));
+                StylePreparationEnergyFlag(enemyInfiniteExModeFlg, "StageEnergyUnlimited", new Color(1f, .55f, .7f));
             }
             _preparationRootSize = root.rect.size;
             _preparationTopSize = TopArea.rect.size;
@@ -257,6 +258,32 @@ public partial class FightPrepareLayer
     {
         teamEditIndicatorText.enabled = editTeamButton.gameObject.activeInHierarchy
             && string.IsNullOrEmpty(team1OneWord.text);
+    }
+
+    static void StylePreparationEnergyFlag(GameObject flag, string languageCode, Color accent)
+    {
+        if (flag == null) return;
+        var image = flag.GetComponent<Image>();
+        if (image != null)
+        {
+            image.color = new Color(accent.r, accent.g, accent.b, .7f);
+            image.raycastTarget = false;
+        }
+        foreach (var converter in flag.GetComponentsInChildren<LanguageConverter>(true))
+            converter.ChangeAtOnce(languageCode);
+        foreach (var text in flag.GetComponentsInChildren<Text>(true))
+        {
+            PreparationButtonSkin.Fit(text.rectTransform, 12, 6);
+            text.color = accent;
+            text.fontSize = 22;
+            text.fontStyle = FontStyle.Normal;
+            text.resizeTextForBestFit = false;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.raycastTarget = false;
+            foreach (var shadow in text.GetComponents<Shadow>()) shadow.enabled = false;
+        }
     }
 
     void LayoutPreparationRewards(float left)
