@@ -28,7 +28,7 @@ public class AdmobAdsButton : MonoBehaviour
         MobileAdsEventExecutor.ExecuteInUpdate(action);
     }
 
-    [SerializeField] Image[] colorImages;
+    [SerializeField] Image[] colorImages = Array.Empty<Image>();
 
     public Button ShowAdButton=>_showAdButton;
 
@@ -42,8 +42,7 @@ public class AdmobAdsButton : MonoBehaviour
         this._watchedAdExtraProcess = watchedAdProcess;
     }
 
-    // The fight result prefab is a rewarded-ad button. The passive post-battle
-    // placement uses a separate, hidden instance of that prefab as an interstitial.
+    // Automatic placements can use this lifecycle without any UI components.
     public void UseInterstitialAd()
     {
         adType = AdType.Interstitial;
@@ -60,8 +59,7 @@ public class AdmobAdsButton : MonoBehaviour
         set
         {
             adIsReady = value;
-            _showAdButton.interactable = adIsReady && hasTicket;
-            SetColor();
+            RefreshButton();
         }
     }
 
@@ -73,15 +71,18 @@ public class AdmobAdsButton : MonoBehaviour
         set
         {
             hasTicket = value;
-            _showAdButton.interactable = adIsReady && hasTicket;
-            SetColor();
+            RefreshButton();
         }
     }
 
-    void SetColor()
+    void RefreshButton()
     {
+        if (_showAdButton == null) return;
+        _showAdButton.interactable = adIsReady && hasTicket;
+        if (colorImages == null) return;
         foreach (var image in colorImages)
         {
+            if (image == null) continue;
             var color = image.color;
             image.color = new Color(color.r, color.g, color.b, _showAdButton.interactable ? 1:0.5f);
         }

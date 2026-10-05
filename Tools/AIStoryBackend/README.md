@@ -1,6 +1,10 @@
 # PocketStriker AI story queue — deployed and accepted
 
-As of 2026-10-01. The user approved the shared Azure update, limited real generation tests and local client enablement. Version `pocketstriker-story-jobs-20261001T142602Z-f65200fc` is active; deployment ID `4390e9a5f371482d91e4aa209d1d3272`. The iOS client now defines `POCKETSTRIKER_QUEUED_STORIES`. No new credentials/permissions, Git push, Addressables publication or app-store publication occurred.
+As of **2026-10-05**, version `pocketstriker-portrait-20261005T052657Z` is active; deployment ID `8d2be8d40db440e58f6142b984908b53`, package `20261005053227.zip`. The user explicitly approved this minimal shared-service update and one real image verification, including the brief interruption to MCombat's shared service. The iOS client retains `POCKETSTRIKER_QUEUED_STORIES`. No new credentials/permissions, Git push, Addressables publication or app-store publication occurred.
+
+Read-only Azure inspection found that the previously active October 1 version fixed `aspectRatio = '16:9'`, overriding the client's portrait configuration/prompt. The deployed minimal patch changes only that ratio to `9:16` and updates version metadata; it retains `storyId = 'pocketstriker'`. The complete previous active package was backed up (7,941,738 bytes, 5,077 ZIP entries, SHA256 `9139d6d6865606b46dd0ef6780d0a5b28c5a2140c5a5a5e05e7abb4a41782382`). Guards verified source, metadata, package and deployment history before submission. After deployment, the active archive matched the reviewed candidate exactly (SHA256 `0273e4670d2cc0f716219fc5cd24e41c9a94eadcc096702a409fe4f5d942ea35`), and all **5,075 other entries** were individually verified equal to the backup, including legacy HTTP handlers, bindings and dependencies. The October 3 index isolation below remains excluded. New portrait job IDs include the changed aspect ratio and cannot reuse old landscape ready jobs.
+
+The approved real PlayFab verification generated **one unique image job, one generation attempt, and no text job**. Its actual image is **768×1376**; cold pipeline including download took **14.638 seconds**, while all ten image-function HTTP callbacks took at most **0.607 seconds**, below PlayFab's 10-second limit. An identical warm start retained the job ID, ready state, attempt count and image hash. MCombat's original request/response shape passed two cache-only live checks: its historical **1376×768** image with `aspectRatio = '16:9'` remained unchanged and `cached = true`, and the same new portrait was available through the legacy image path. These checks used no second paid image. The separately running MCombat app and a second cold legacy generation were not invoked; all legacy implementation bytes were verified unchanged. Deployment, accepted image and sanitized reports are in `Logs/AIStory/PortraitDeployment`; the current canonical source-hash inventory is in `deployed-source-sha256.json`.
 
 ## Accepted live behavior
 
@@ -54,7 +58,7 @@ Uses the existing Consumption plan and storage account. Additional Blob/Queue tr
 
 ## Backup and rollback
 
-1. Re-read deployed files and compare with `deployed-source-sha256.json`; pause if another task has changed them.
+1. Re-read deployed files and compare with the canonical `sourceSha256` map in `deployed-source-sha256.json`; pause if another task has changed them.
 2. Preserve the current complete deployment package/history before replacing it. `RollbackRuntimeSource.zip` additionally preserves the inspected function source, HTTP bindings, host config and original lock file; it is a reproducible runtime-source backup, not a byte-for-byte backup of the platform package. Restore its dependencies with the original lock file.
 3. Prepare the candidate with `npm ci --omit=dev --ignore-scripts`. Do not include Azurite/test data in the deployed package.
 4. On regressions restore the previous complete deployment package. Keep/remove the client opt-in define as appropriate to return to the current shared client path. Do not delete old caches or queue/job records as part of rollback. Generated requests already running cannot be undone.

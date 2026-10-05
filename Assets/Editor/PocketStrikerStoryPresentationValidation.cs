@@ -19,7 +19,7 @@ public static class PocketStrikerStoryPresentationValidation
     [Serializable] public sealed class Report
     {
         public bool passed;
-        public string scope = "Production ArenaFightOver story construction, portrait geometry, localized hints, worst-case caption fit and actual button listeners in isolated preview scenes. The inactive probe explicitly invokes the production viewport callback. Screenshots use existing portrait artwork as an offline fixture; no AI provider is called.";
+        public string scope = "Production ArenaFightOver story construction, portrait fill without distortion, viewport clipping, localized hints, worst-case caption fit and actual button listeners in isolated preview scenes. The inactive probe explicitly invokes the production viewport callback. Screenshots use existing portrait artwork as an offline fixture; no AI provider is called.";
         public List<string> checks = new List<string>();
         public List<string> previews = new List<string>();
         public List<string> failures = new List<string>();
@@ -89,17 +89,17 @@ public static class PocketStrikerStoryPresentationValidation
             var panel = Get<GameObject>(layer, "aiStoryCaptionPanel");
             var button = Get<BOButton>(layer, "storyMaskBtn");
             var hint = presentation.transform.Find("Continue Hint").GetComponent<Text>();
+            var viewport = presentation.transform.Find("Illustration Viewport").GetComponent<RectTransform>();
             Require(presentation.transform.Find("Story Heading") == null, "A story heading remains.");
             Require(picture.rectTransform.rect.size == surface.rect.size && picture.preserveAspect, "Artwork must use the whole surface without distortion.");
+            Require(picture.transform.parent == viewport && viewport.GetComponent<RectMask2D>() != null,
+                "Artwork must be clipped to the full-screen illustration viewport.");
             Require(!panel.activeSelf && picture.rectTransform.anchorMin == Vector2.zero && picture.rectTransform.anchorMax == Vector2.one,
                 "The initial illustration reserves caption space.");
             string expectedHint = language == SystemLanguage.Chinese ? "轻触继续" : language == SystemLanguage.Japanese ? "タップして続ける" : "Tap to continue";
             Require(hint.text == expectedHint, "Continue hint lost localization.");
             var artwork = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/AIStory/Art/PocketStrikerLogin.png");
             sprite = Sprite.Create(artwork, new Rect(0, 0, artwork.width, artwork.height), new Vector2(.5f, .5f));
-            float fittedScale = Mathf.Min(1080f / artwork.width, (float)height / artwork.height);
-            Require(artwork.width * artwork.height * fittedScale * fittedScale / (1080f * height) >= .74f,
-                "The portrait picture occupies too little of the game surface.");
             string firstLine = language == SystemLanguage.Chinese ? "旅人穿过云间古桥，在山谷中发现了一座被遗忘的城堡。"
                 : language == SystemLanguage.Japanese ? "旅人は雲の橋を渡り、谷の奥に忘れられた城を見つけた。"
                 : "The traveler crossed a bridge among the clouds and found a forgotten castle in the valley.";
@@ -116,9 +116,11 @@ public static class PocketStrikerStoryPresentationValidation
             button.SetListener(() => Invoke(layer, "AdvanceAIStory"));
             Invoke(layer, "DisplayAIStoryScene");
             Require(picture.sprite == sprite && !caption.gameObject.activeSelf && !panel.activeSelf, "Scene did not start with the illustration alone.");
+            RequireArtworkFill(picture, viewport, sprite);
+            Vector2 pictureSize = picture.rectTransform.rect.size;
             button.onClick.Invoke();
             Require(caption.text == firstLine && caption.gameObject.activeSelf && panel.activeSelf, "First tap did not reveal a readable caption.");
-            Require(picture.rectTransform.rect.size == surface.rect.size, "Showing captions shrank the illustration.");
+            Require(picture.rectTransform.rect.size == pictureSize, "Showing captions shrank the illustration.");
             Require(caption.rectTransform.rect.height < surface.rect.height * .185f, "A short caption obscures the full maximum caption area.");
             caption.text = new string('云', 200);
             Invoke(layer, "ResizeAIStoryCaption");
@@ -137,7 +139,8 @@ public static class PocketStrikerStoryPresentationValidation
             var layerRect = (RectTransform)layer.transform;
             layerRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height - 120);
             Invoke(layer, "OnRectTransformDimensionsChange");
-            Require(picture.rectTransform.rect.height == height - 120 && Mathf.Abs(caption.rectTransform.rect.height - beforeResizeHeight) < 1,
+            RequireArtworkFill(picture, viewport, sprite);
+            Require(viewport.rect.height == height - 120 && Mathf.Abs(caption.rectTransform.rect.height - beforeResizeHeight) < 1,
                 "Caption/artwork failed to adapt: viewport=" + layerRect.rect.size + ", illustration=" + picture.rectTransform.rect.size
                 + ", caption height before=" + beforeResizeHeight + ", after=" + caption.rectTransform.rect.height + ".");
             layerRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
@@ -220,6 +223,15 @@ public static class PocketStrikerStoryPresentationValidation
         return rect;
     }
     static T Get<T>(ArenaFightOver layer, string name) => (T)typeof(ArenaFightOver).GetField(name, Members).GetValue(layer);
+    static void RequireArtworkFill(Image picture, RectTransform viewport, Sprite sprite)
+    {
+        Vector2 size = picture.rectTransform.rect.size;
+        Vector2 surface = viewport.rect.size;
+        Require(size.x + .1f >= surface.x && size.y + .1f >= surface.y, "Portrait artwork leaves empty space on the screen.");
+        Require(Mathf.Abs(size.x / size.y - sprite.rect.width / sprite.rect.height) < .001f,
+            "Portrait artwork was stretched instead of enlarged equally in both directions.");
+        Require(picture.rectTransform.anchoredPosition == Vector2.zero, "Portrait artwork is not centered in the viewport.");
+    }
     static void Set(ArenaFightOver layer, string name, object value) => typeof(ArenaFightOver).GetField(name, Members).SetValue(layer, value);
     static void Invoke(ArenaFightOver layer, string name) => typeof(ArenaFightOver).GetMethod(name, Members).Invoke(layer, null);
     static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }

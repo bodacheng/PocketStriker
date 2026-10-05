@@ -143,6 +143,7 @@ public partial class ArenaFightOver : UILayer
         storyBgImage.sprite = scene.Pic;
         storyBgImage.preserveAspect = true;
         storyBgImage.color = Color.white;
+        ResizeAIStoryArtwork();
         shortStory.text = string.Empty;
         shortStory.gameObject.SetActive(false);
         aiStoryCaptionPanel.SetActive(false);

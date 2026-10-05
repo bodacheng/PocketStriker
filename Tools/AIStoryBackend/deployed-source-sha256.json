@@ -1,7 +1,34 @@
 {
-  "generateGeminiImages.readonly.js": "23ec4b214eb4d85211f9fa3cf16fe52af142bb948cae8c5a488af524f21867f6",
-  "generateGeminiText-index.js": "b30a96030408c26d9ad3d7f19dac05fff99d06cfb31755b7ba643d0ab57ed56d",
-  "host.json": "f62a6d6deda55fd544fd16310554b39a57b7cefc7ddc4e58e147faf57f42f856",
-  "package.json": "5bc8abbd6c17a6e5b31486307c9f3573ecf47a09648e077226604c4d25febc49",
-  "package-lock.json": "bbf8c1ca4d72d8c160fc4651ff2459839b4668bfdfd102926eaf50f79ae05f65"
+  "verifiedAtUtc": "2026-10-05T05:41:02.071388+00:00",
+  "functionApp": "mcombatCC",
+  "version": "pocketstriker-portrait-20261005T052657Z",
+  "deploymentId": "8d2be8d40db440e58f6142b984908b53",
+  "activePackage": "20261005053227.zip",
+  "activePackageSha256": "0273e4670d2cc0f716219fc5cd24e41c9a94eadcc096702a409fe4f5d942ea35",
+  "sourceSha256": {
+    "host.json": "2b8e195bc7272fd143cb7b6f6b86e5d3291e60f4e892d966721192daebfdaf0c",
+    "package-lock.json": "fe53b6e81ce74aeccc1960f5ecb5e5d7ab6b7e7014c80a6183ef61ba5f58acaa",
+    "package.json": "df96ee20e8e308d6755a9db2b08fdbadb4e60b1a8f846328cc69bde20e31e58d",
+    "processStoryJob/function.json": "194a852d509dc726c08ec8b33b635908cb5306204d105c4487a8859b57e18f61",
+    "processStoryJob/index.js": "60f477a43bf22334e0780e6c56bfdb4d041b8c6a92a903977fa2ea64e3c0965b",
+    "storyJobs/azure.js": "eefdccba834869ba77a40007341f001f83687851cce41f096f7d89c80ac2773e",
+    "storyJobs/core.js": "2754f94b45599f6c73ab8bee826d714f33ce9173e88d8b44ac771ee99e93b45a",
+    "storyJobs/http.js": "a9af03d3a1f1afa1d20c099a56257db79848921850752b4a30efcfb9ed0a0a1e",
+    "generateGeminiText/function.json": "09b9a6bfb92c9c4d208b5725b2f3e6f9e3289087a82ae4834955e40e1eb4a320",
+    "generateGeminiText/index.js": "30a72a0bb817faf727cb9a1034265b8e8206edf8133473e7208d162f257d67c2",
+    "generateGeminiImages/function.json": "09b9a6bfb92c9c4d208b5725b2f3e6f9e3289087a82ae4834955e40e1eb4a320",
+    "generateGeminiImages/index.js": "ef135eba61c41bc1588437e0714b74aedcf9012d91ee6de4ff7678df26c25449",
+    "deployment-version.json": "dc15aff05794902a55d8106714511fc43d93c2b80344d71a4b1bf2c8dba3c4a4"
+  },
+  "legacyRuntimeEqualToBackup": true,
+  "otherArchiveEntriesVerifiedEqual": 5075,
+  "liveAcceptance": {
+    "report": "Logs/AIStory/PortraitDeployment/live-acceptance.json",
+    "passed": true,
+    "actualImageDimensions": "768x1376",
+    "newImageGenerationAttempts": 1,
+    "newTextJobs": 0,
+    "legacyHistoricalCachedLandscape": "1376x768",
+    "maximumFunctionHttpSeconds": 0.6069
+  }
 }

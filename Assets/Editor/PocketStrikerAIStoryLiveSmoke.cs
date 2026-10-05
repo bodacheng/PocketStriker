@@ -246,7 +246,10 @@ public static class PocketStrikerAIStoryLiveSmoke
                 return;
             }
             foreach (var scene in story.StoryScenes.Where(scene => scene?.Pic != null))
+            {
                 report.imageDimensions.Add(scene.Pic.texture.width + "x" + scene.Pic.texture.height);
+                Require(scene.Pic.rect.height > scene.Pic.rect.width, "The generated story image must be taller than it is wide.");
+            }
             Save();
             UnityEngine.Object.Destroy(serviceHost);
             serviceHost = null;

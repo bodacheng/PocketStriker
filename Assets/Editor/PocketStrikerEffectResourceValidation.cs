@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -19,6 +21,7 @@ public static class PocketStrikerEffectResourceValidation
     const int EffectLayer = 7;
     static readonly string[] Roots = { "Assets/ExternalAssets/HurtObjects", "Assets/ExternalAssets/Effects" };
     static readonly string[] RegressionEffects = { "ground_huge_green_explosion", "powergazer" };
+    static readonly string[] VisibilityEffects = { "stormspray" };
     // Obsolete material-upgrade metadata retained by Unity/vendor materials; not render dependencies.
     static readonly HashSet<string> UpgradeMetadata = new HashSet<string>
     {
@@ -36,7 +39,7 @@ public static class PocketStrikerEffectResourceValidation
         public List<string> observations = new List<string>();
         public List<string> screenshots = new List<string>();
         public List<PixelSample> frames = new List<PixelSample>();
-        public string scope = "All production HurtObjects/Effects prefabs: recursive visual GUID dependencies, imported renderer materials/meshes, enabled particle shape meshes, shader compile errors and unresolved imported references. ShaderGraphs containing SceneDepth are mapped to their dependent prefabs. Actual FightScene and DedicatedCameraConnector camera depth overrides and production renderer depth-copy timing are checked. Earth Curse at 350 ms and Spell Eruption at 150 ms are rendered with seed 42 in all six configured quality tiers, using the production world-to-UnitCamera overlay settings and an explicit depth-Off negative control. Particle shaders, textures and custom vertex streams are unchanged.";
+        public string scope = "All production HurtObjects/Effects prefabs: recursive visual GUID dependencies, imported renderer materials/meshes, enabled particle shape meshes, shader compile errors and unresolved imported references. Psychic Blast's authored animation events, weapon prefab and Addressables weapon-label entry are checked. ShaderGraphs containing SceneDepth are mapped to their dependent prefabs. Actual FightScene and DedicatedCameraConnector camera depth overrides and production renderer depth-copy timing are checked. Earth Curse at 350 ms and Spell Eruption at 150 ms are rendered with seed 42 in all six configured quality tiers, using the production world-to-UnitCamera overlay settings and an explicit depth-Off negative control. Psychic Blast is rendered at 350 ms from hand height with the production camera configuration in all six tiers; active particles and visible pixels are required. Particle shaders, textures and custom vertex streams are unchanged.";
         public string limitation = "Isolated editor URP camera-stack renders; no account, battle AI, remote bundles or physical-device GPU is exercised. Pixel comparisons measure the effect against a ground-only frame. Framing is deliberately wider than gameplay and does not assert static particle-shape bounds.";
     }
 
@@ -85,6 +88,7 @@ public static class PocketStrikerEffectResourceValidation
         var originalTarget = RenderTexture.active;
         try
         {
+            CheckPsychicBlastResource(report);
             CheckResources(report);
             ReadProductionCameras(report);
             if (QualitySettings.names.Length != 6) report.errors.Add("Expected the six production quality tiers.");
@@ -100,7 +104,7 @@ public static class PocketStrikerEffectResourceValidation
                     + " | pipelineDepth=" + pipeline.supportsCameraDepthTexture + " | UnitCamera override=" + report.unitCamera?.depthOption);
                 if (report.worldCamera == null || report.unitCamera == null) continue;
                 CheckDepthTiming(pipeline, report, quality);
-                foreach (string effect in RegressionEffects)
+                foreach (string effect in RegressionEffects.Concat(VisibilityEffects))
                     try { RenderEffect(effect, quality, pipeline, report); }
                     catch (Exception error) { report.errors.Add(QualitySettings.names[quality] + "/" + effect + ": " + error); }
             }
@@ -119,10 +123,43 @@ public static class PocketStrikerEffectResourceValidation
                 && scenes.Select((scene, index) => scene.IsValid() && scene.isLoaded && scene.isDirty == dirty[index]).All(value => value);
             if (!report.qualityRestored) report.errors.Add("Quality, graphics pipeline or render target was not restored.");
             if (!report.currentScenesUnchanged) report.errors.Add("The open scene state changed during validation.");
-            report.passed = report.errors.Count == 0 && report.prefabs > 0 && report.frames.Count == 24 && report.screenshots.Count == 24;
+            int expectedFrames = QualitySettings.names.Length * (RegressionEffects.Length * 2 + VisibilityEffects.Length);
+            report.passed = report.errors.Count == 0 && report.prefabs > 0
+                && report.frames.Count == expectedFrames && report.screenshots.Count == expectedFrames;
             File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
+    }
+
+    static void CheckPsychicBlastResource(Report report)
+    {
+        const string animationPath = "Assets/ExternalAssets/Animations/human/skill/handfiref.anim";
+        const string effectName = "stormspray";
+        var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(animationPath);
+        if (clip == null || !clip.events.Any(e => e.functionName == "PrepareOneMagic" && e.stringParameter == effectName)
+            || !clip.events.Any(e => e.functionName == "ReleasePreparedMagicToAir" && e.stringParameter == "left_hand"))
+            report.errors.Add("Psychic Blast (164): missing authored prepare/release animation events.");
+
+        string path = EffectPath(effectName);
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        if (prefab == null || prefab.GetComponent<Decomposition>()?._HitBox == null)
+            report.errors.Add("Psychic Blast (164): missing stormspray weapon prefab or hitbox.");
+
+        var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null)
+        {
+            report.errors.Add("Psychic Blast (164): Addressables settings are missing.");
+            return;
+        }
+        var entries = new List<AddressableAssetEntry>();
+        foreach (var group in settings.groups.Where(group => group != null))
+            group.GatherAllAssets(entries, true, true, false);
+        string address = EffectResourceKeyUtility.PrefabAddress("defaultmagic", effectName);
+        if (!entries.Any(entry => entry.AssetPath == path && entry.address == address
+            && entry.labels.Contains(EffectResourceKeyUtility.WeaponLabel)))
+            report.errors.Add("Psychic Blast (164): stormspray is not reachable through the weapon Addressables label at " + address);
+        else
+            report.observations.Add("Psychic Blast (164): handfiref prepare/release events resolve to " + address + "; defaultmagic provides the fallback for all elements.");
     }
 
     static void CheckResources(Report report)
@@ -302,11 +339,12 @@ public static class PocketStrikerEffectResourceValidation
 
     static void RenderEffect(string name, int quality, UniversalRenderPipelineAsset pipeline, Report report)
     {
+        bool compareDepth = RegressionEffects.Contains(name);
         // Eruption's authored bright column lasts only 170 ms; sample it while
         // it is alive rather than testing the later black-smoke aftermath.
         float sampleTime = name == "powergazer" ? .15f : .35f;
         var scene = EditorSceneManager.NewPreviewScene();
-        var rig = new GameObject("Skill effect depth regression");
+        var rig = new GameObject("Skill effect rendering validation");
         rig.SetActive(false);
         SceneManager.MoveGameObjectToScene(rig, scene);
         var texture = new RenderTexture(720, 720, 24, RenderTextureFormat.ARGB32);
@@ -316,6 +354,13 @@ public static class PocketStrikerEffectResourceValidation
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(EffectPath(name));
             if (prefab == null) throw new InvalidOperationException("Missing production effect prefab.");
             var effect = UnityEngine.Object.Instantiate(prefab, rig.transform, false);
+            if (name == "stormspray")
+            {
+                // Gameplay sets the prepared weapon's world position/rotation
+                // from the left hand, replacing its source-editor placement.
+                effect.transform.localPosition = new Vector3(0, 1, 0);
+                effect.transform.localRotation = Quaternion.identity;
+            }
             foreach (var script in effect.GetComponentsInChildren<MonoBehaviour>(true)) script.enabled = false;
             foreach (var animator in effect.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
             foreach (var light in effect.GetComponentsInChildren<Light>(true)) light.enabled = false;
@@ -363,12 +408,12 @@ public static class PocketStrikerEffectResourceValidation
             effect.SetActive(true);
             foreach (var particles in systems) particles.Simulate(sampleTime, false, true, true);
             int activeParticles = systems.Sum(particles => particles.particleCount);
-            if (activeParticles == 0) report.errors.Add(name + ": the regression fixture emitted no particles.");
+            if (activeParticles == 0) report.errors.Add(QualitySettings.names[quality] + "/" + name + ": the rendering fixture emitted no particles.");
 
             var overlayData = overlay.GetUniversalAdditionalCameraData();
             var worldData = world.GetUniversalAdditionalCameraData();
             PixelSample beforeOff = null, production = null;
-            foreach (string variant in new[] { "beforeOff", "productionOn" })
+            foreach (string variant in compareDepth ? new[] { "beforeOff", "productionOn" } : new[] { "productionOn" })
             {
                 worldData.requiresDepthOption = variant == "beforeOff" ? CameraOverrideOption.Off : report.worldCamera.depthOption;
                 overlayData.requiresDepthOption = variant == "beforeOff" ? CameraOverrideOption.Off : report.unitCamera.depthOption;
@@ -394,7 +439,7 @@ public static class PocketStrikerEffectResourceValidation
             }
             if (production.visiblePixels < 500 || production.brightPixels < 25)
                 report.errors.Add(QualitySettings.names[quality] + "/" + name + ": the production camera did not render the visible, illuminated effect.");
-            if (production.brightPixels <= beforeOff.brightPixels)
+            if (compareDepth && production.brightPixels <= beforeOff.brightPixels)
                 report.errors.Add(QualitySettings.names[quality] + "/" + name + ": depth-On did not restore more bright effect pixels than the depth-Off negative control.");
         }
         finally

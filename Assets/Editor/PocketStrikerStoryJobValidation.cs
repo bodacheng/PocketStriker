@@ -27,6 +27,12 @@ public static class PocketStrikerStoryJobValidation
             int calls=0;var client=new PocketStrikerStoryJobClient((r,ct)=>{calls++;return UniTask.FromResult(Reply("ready"));},Delay);
             await client.Generate("image","warm input",default);Require(calls==1,"Warm request sent more than once.");
         });
+        await Check("image-start-explicitly-requests-portrait-format", async () => {
+            PocketStrikerStoryJobClient.Request sent = null;
+            var client = new PocketStrikerStoryJobClient((r, ct) => { sent = r; return UniTask.FromResult(Reply("ready")); }, Delay);
+            await client.Generate("image", "phone artwork", default);
+            Require(sent.input.aspectRatio == "9:16", "The image request lost its portrait format.");
+        });
         foreach(var status in new[]{"failed","missing","unavailable"}) await Check(status+"-does-not-regenerate",async()=>{
             int calls=0;var client=new PocketStrikerStoryJobClient((r,ct)=>{calls++;return UniTask.FromResult(Reply(status));},Delay);
             await Reject(()=>client.Generate("text","input",default));Require(calls==1,"Failed request regenerated automatically.");

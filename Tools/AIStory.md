@@ -35,12 +35,30 @@ wait for generation, and use an authored story or ordinary result if not ready.
 Late/abandoned owned sprites and textures are released. Existing same-attempt
 request reuse and explicit-next-attempt recovery are preserved.
 
-The focused single-page prompt uses recognizable fighters and magic stones, the
-current language, and a daily variation scoped by fight ID/event type/mode. A new
-date can generate new content; repeated requests within that scope share server
+The single-page prompt selects from 18 story subjects with shuffled twists and
+tones, uses the current language, and keeps one variation seed per battle attempt.
+A retry starts a new variation; repeated requests within an attempt share server
 jobs. Ordinary Gemini Markdown JSON fences are handled, malformed output falls
 back safely. Captions are capped at 200 characters; AI art is a static UI Image,
 isolated from the authored background animation and per-letter text component.
+
+Portrait illustrations now enlarge equally in both directions to fill the game
+screen, with centered clipping at its edges on taller phones. Captions overlay
+the image without reducing its size. Existing landscape illustrations stay fully
+visible. The client configuration, prompt and image-job request specify `9:16`.
+Read-only Azure inspection on 2026-10-05 found that the October 1 queue worker
+still fixed image jobs to `16:9`, overriding the client request. The user approved
+and we deployed the minimal shared-service update to `9:16`, preserving all legacy
+function code and deployed indexing. Real PlayFab verification generated exactly
+one image at **768×1376**, with one generation attempt; a warm replay reused its
+job and image. All ten image-function HTTP responses completed in at most
+**0.607 seconds**. The MCombat legacy request shape returned the unchanged cached
+**1376×768** historical image when given `16:9`, and also returned the same new
+portrait from its cache. No additional image or text was generated for these
+compatibility checks. The live smoke now verifies actual sprite height exceeds
+width. Sanitized deployment and acceptance records are under
+`Logs/AIStory/PortraitDeployment`; the exact active source hashes are saved in
+`Tools/AIStoryBackend/deployed-source-sha256.json`.
 
 ## Evidence and limits
 

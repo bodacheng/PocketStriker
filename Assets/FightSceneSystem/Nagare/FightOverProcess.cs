@@ -55,7 +55,7 @@ namespace FightScene
                                 var a = UILayerLoader.Load<ArenaFightOver>();
                                 a.Setup();
                                 a.Step2Anim();
-                                a.ShowAward(z,0, 0);
+                                a.ShowAward(z,0);
                                 a.ShowArenaPoint(x,y);
                             }
                         );
@@ -92,9 +92,7 @@ namespace FightScene
                                         PlayerAccountInfo.Me.arcadeProcess = levelInt;
                                         var rewardGdInt = Convert.ToInt32(rewardGd);
                                         var rewardDmInt = Convert.ToInt32(rewardDm);
-                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt, 
-                                            levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
-                                            levelInt);
+                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt);
                                     }
 
                                     arenaFightOver.LoadNextArcadeStage();
@@ -164,10 +162,7 @@ namespace FightScene
                                         PlayerAccountInfo.Me.gangbangProcess = levelInt;
                                         var rewardGdInt = Convert.ToInt32(rewardGd);
                                         var rewardDmInt = Convert.ToInt32(rewardDm);
-                                        arenaFightOver.ShowAward(
-                                            rewardDmInt, rewardGdInt, 
-                                            levelInt % 5 == 0 ? PlayFabSetting._adBossFightRewardDM : PlayFabSetting._adNormalFightRewardDM,
-                                            levelInt);
+                                        arenaFightOver.ShowAward(rewardDmInt, rewardGdInt);
                                     }
                                     Int32.TryParse(FightLoad.Fight.ID, out var nowStageNo);
                                     var nextStageNo = nowStageNo + 1;

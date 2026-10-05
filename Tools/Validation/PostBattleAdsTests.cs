@@ -99,8 +99,10 @@ internal static class PostBattleAdsTests
     static AdmobAdsButton Button(bool reward = false)
     {
         var button = new AdmobAdsButton();
-        typeof(AdmobAdsButton).GetField("_showAdButton", Fields).SetValue(button, new UnityEngine.UI.Button());
-        typeof(AdmobAdsButton).GetField("colorImages", Fields).SetValue(button, Array.Empty<UnityEngine.UI.Image>());
+        // Automatic battle placements have no button or graphics. Retain the
+        // rewarded view here to cover shop placements using the same lifecycle.
+        if (reward)
+            typeof(AdmobAdsButton).GetField("_showAdButton", Fields).SetValue(button, new UnityEngine.UI.Button());
         var type = typeof(AdmobAdsButton).GetField("adType", Fields);
         type.SetValue(button, Enum.Parse(type.FieldType, reward ? "Reward" : "Interstitial"));
         if (!reward) button.UseInterstitialAd();

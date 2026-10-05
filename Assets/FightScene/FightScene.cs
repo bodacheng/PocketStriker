@@ -20,7 +20,6 @@ namespace FightScene
         [Header("FX")]
         public Camera fxCamera;
         
-        [SerializeField] AdmobAdsButton watchAdBtnPrefab;
         [SerializeField] private AIServiceManager aiServiceManager;
 
         public AIServiceManager AIServiceManager => aiServiceManager;
@@ -39,34 +38,9 @@ namespace FightScene
         
         public static List<GangbangInfo.SoldierGroupSet> team1GroupSet;
         
-        private AdmobAdsButton watchBtn;
         private AdmobAdsButton postBattleInterstitial;
         private readonly PostBattleAdSession postBattleAds = new PostBattleAdSession();
         private FightInfo postBattleAdFight;
-        public void ShowAds(int extraAdReward, RectTransform btnTarget, Action afterWatched, int finishedStage = -1)
-        {
-            if (extraAdReward > 0 && watchBtn != null)
-            {
-                watchBtn.transform.SetParent(btnTarget, false);
-                watchBtn.transform.localPosition = Vector3.zero;
-                
-                string awardText = "x2"; // 简化处理 
-                watchBtn.Text = awardText;
-                watchBtn.SetWatchedAdExtraProcess(
-                    () =>
-                    {
-                        watchBtn.ShowAdButton.gameObject.SetActive(false);
-                        CloudScript.RequestAdReward(
-                            "DM",
-                            extraAdReward, 
-                            afterWatched,
-                            finishedStage
-                        );
-                    }
-                );
-                watchBtn.gameObject.SetActive(true);
-            }
-        }
 
         public void JustShowAds()
         {
@@ -83,13 +57,6 @@ namespace FightScene
                 return;
             }
             postBattleAds.BeginBattle(postBattleAdFight.EventType, postBattleAdFight.ID, postBattleAdFight.RunTutorial);
-            // Preserve the reusable rewarded placement before the previous
-            // result layer (its current parent) is removed during preparation.
-            if (watchBtn != null)
-            {
-                watchBtn.transform.SetParent(transform, false);
-                watchBtn.gameObject.SetActive(false);
-            }
             LoadAds();
         }
 
@@ -297,32 +264,19 @@ namespace FightScene
 
         public void LoadAds()
         {
-            if (!AdsInitializer.ShouldEnableAds() || watchAdBtnPrefab == null || FightLoad.Fight == null ||
+            if (!AdsInitializer.ShouldEnableAds() || FightLoad.Fight == null ||
                 (PlayerAccountInfo.Me != null && PlayerAccountInfo.Me.noAdsState))
                 return;
-
-            switch (FightLoad.Fight.EventType)
-            {
-                case FightEventType.Quest:
-                case FightEventType.Gangbang:
-                    if (watchBtn == null)
-                    {
-                        watchBtn = Instantiate(watchAdBtnPrefab, transform, false);
-                        watchBtn.HasTicket = true;
-                        watchBtn.gameObject.SetActive(false);
-                    }
-                    watchBtn.LoadAd();
-                    break;
-            }
 
             if (!PostBattleAdSession.IsEligible(FightLoad.Fight.EventType, FightLoad.Fight.ID, FightLoad.Fight.RunTutorial))
                 return;
             if (postBattleInterstitial == null)
             {
-                postBattleInterstitial = Instantiate(watchAdBtnPrefab, transform, false);
+                // Automatic placement has no button, reward, or purchase UI.
+                var adHost = new GameObject("Post Battle Interstitial");
+                adHost.transform.SetParent(transform, false);
+                postBattleInterstitial = adHost.AddComponent<AdmobAdsButton>();
                 postBattleInterstitial.UseInterstitialAd();
-                postBattleInterstitial.HasTicket = true;
-                postBattleInterstitial.gameObject.SetActive(false);
             }
             postBattleInterstitial.LoadAd();
         }

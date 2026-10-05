@@ -55,7 +55,7 @@ public sealed class PocketStrikerStoryJobClient
         public int retryAfterMs, generationAttempts;
         public Result result;
     }
-    [Serializable] public sealed class Input { public string prompt; }
+    [Serializable] public sealed class Input { public string prompt, aspectRatio; }
     [Serializable] public sealed class Request { public string operation, kind, id; public Input input; }
     readonly Func<Request, CancellationToken, UniTask<Reply>> execute;
     readonly Func<int, CancellationToken, UniTask> delay;
@@ -92,7 +92,9 @@ public sealed class PocketStrikerStoryJobClient
         try
         {
             token.ThrowIfCancellationRequested();
-            var response = await Send(new Request { operation = "start", kind = kind, input = new Input { prompt = prompt } });
+            var response = await Send(new Request { operation = "start", kind = kind, input = new Input {
+                prompt = prompt, aspectRatio = kind == "image" ? PocketStrikerStoryVariety.ImageAspectRatio : null
+            } });
             // Only a new, explicitly requested battle attempt may retry a previously failed job.
             // Failures observed after polling begins are returned without automatic regeneration.
             if (retryFailed && response?.protocol == Protocol && response.status == "failed" && !string.IsNullOrEmpty(response.id))

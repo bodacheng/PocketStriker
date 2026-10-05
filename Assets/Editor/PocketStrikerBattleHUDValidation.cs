@@ -98,12 +98,14 @@ public static partial class PocketStrikerTutorialValidation
         public int labelsChecked;
         public int localizedLabelCases;
         public int autoPresentationChecks;
+        public int groupCountCases;
         public bool sourcePrefabsUnchanged;
         public string scope = "Actual FightingStepLayer, SideUnitIcon and stoneModel prefab UI copies; production BattleHUDPresentation and SideUnitIcon.ApplyBattleHUDStyle. Phone, compact phone, notched phone, tablet and notched tablet safe areas. EventSystem raycasts verify pause, AUTO, six skill controls, expanded action edges, player portraits, movement pad and full-screen camera touch points. Camera input checks cover a rejected second finger, simultaneous movement and action input, and captured gestures crossing controls. Authored action down/up callbacks verify countdown locking and recovery. This static fixture has no bound fighter focus and explicitly restores its manually displayed controls after verifying production no-focus hiding; live focus/energy behavior is covered separately. Screenshots contain local posed haruka models, actual portrait and skill sprites.";
         public string limitation = "Stopped-editor fixture: battle simulation, accounts, Addressables downloads, pause scene navigation and live camera-follow bars are omitted. The pause's native Button press is observed with a local callback. Skill EventTriggers are reconstructed from their authored persistent method names because RuntimeOnly persistent callbacks do not run in Edit mode. Joystick pointer state is tested with transitions/gravity disabled; axis magnitude assumes a screen-space canvas and is left to Play-mode smoke. Static ground and boundary are fixture context, not a simulation of the runtime arena.";
         public List<string> errors = new List<string>();
         public List<string> screenshots = new List<string>();
         public List<string> autoStateScreenshots = new List<string>();
+        public List<string> groupCountScreenshots = new List<string>();
         public List<HUDCase> cases = new List<HUDCase>();
     }
 
@@ -313,6 +315,7 @@ public static partial class PocketStrikerTutorialValidation
                     layer.RefreshPresentation(); Rebuild(root, camera, target);
                     var path = Path.Combine(HUDOutput, viewport.Name + ".png");
                     SaveLayoutRender(target, path); report.screenshots.Add(path);
+                    HUDCheckGroupCounts(root, layer, camera, target, caseReport.safeBounds, viewport.Name, report);
                     report.viewportsChecked++;
                 }
                 catch (Exception exception) { report.errors.Add(viewport.Name + ": " + exception.GetBaseException().ToString()); }
@@ -338,7 +341,8 @@ public static partial class PocketStrikerTutorialValidation
             report.passed = report.errors.Count == 0 && report.sourcePrefabsUnchanged && report.viewportsChecked == 5
                 && report.stableLayoutsChecked == 5 && report.screenshots.Count == 5 && report.localizedLabelCases == 15
                 && report.cameraTouchPointsChecked == 45 && report.cameraPointerOwnershipChecks == 180
-                && report.autoPresentationChecks >= 35 && report.autoStateScreenshots.Count == 10;
+                && report.autoPresentationChecks >= 35 && report.autoStateScreenshots.Count == 10
+                && report.groupCountCases == 30 && report.groupCountScreenshots.Count == 5;
             File.WriteAllText(Path.Combine(HUDOutput, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
@@ -580,6 +584,51 @@ public static partial class PocketStrikerTutorialValidation
             foreach (char character in text.text.Where(character => !char.IsWhiteSpace(character)).Distinct())
                 Require(text.font != null && text.font.HasCharacter(character), "HUD font misses U+" + ((int)character).ToString("X4"));
             report.labelsChecked++;
+        }
+    }
+
+    static void HUDCheckGroupCounts(RectTransform root, FightingStepLayer layer, Camera camera,
+        RenderTexture target, Rect safeBounds, string viewport, HUDReport report)
+    {
+        var counts = new[] { layer.Team1UI.LiveUnitCount, layer.Team2UI.LiveUnitCount };
+        var enemyAuto = layer.Team2UI.AutoSwitch.gameObject;
+        bool enemyAutoVisible = enemyAuto.activeSelf;
+        try
+        {
+            enemyAuto.SetActive(true);
+            foreach (var count in counts) count.gameObject.SetActive(true);
+            layer.RefreshPresentation();
+            foreach (int remaining in new[] { 0, 9, 48 })
+            {
+                counts[0].text = "Player:" + remaining + "/48";
+                counts[1].text = "Enemy:" + remaining + "/48";
+                Rebuild(root, camera, target);
+                foreach (var count in counts)
+                {
+                    var bounds = LayoutBounds(root, count.rectTransform);
+                    Require(LayoutContains(safeBounds, bounds, 1), "Group count escapes safe area: " + count.name);
+                    Require(LayoutContains(bounds, LayoutGlyphBounds(root, count), 1), "Group count clips: " + count.text);
+                    Require(count.fontSize >= 30 && count.fontStyle == FontStyle.Bold && count.color.a == 1,
+                        "Group count lost readable emphasis.");
+                    var outline = count.GetComponent<Outline>();
+                    Require(outline != null && outline.enabled && outline.effectColor.a == 1 && !count.raycastTarget,
+                        "Group count lost contrast or blocks touch input.");
+                    foreach (var control in new[] { layer.PauseButton.transform, layer.Team1UI.AutoSwitch.transform, layer.Team2UI.AutoSwitch.transform })
+                        Require(!bounds.Overlaps(LayoutBounds(root, (RectTransform)control)), "Group count covers a top control.");
+                    report.groupCountCases++;
+                }
+                Require(!LayoutBounds(root, counts[0].rectTransform).Overlaps(LayoutBounds(root, counts[1].rectTransform)),
+                    "Group team counts overlap.");
+            }
+            var path = Path.Combine(HUDOutput, viewport + "-group-counts.png");
+            SaveLayoutRender(target, path);
+            report.groupCountScreenshots.Add(path);
+        }
+        finally
+        {
+            foreach (var count in counts) count.gameObject.SetActive(false);
+            enemyAuto.SetActive(enemyAutoVisible);
+            layer.RefreshPresentation();
         }
     }
 

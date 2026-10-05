@@ -449,6 +449,8 @@ public readonly struct FakePreload
 }
 public sealed class Decomposition
 {
+    public void SuspendBattleDamage() { }
+    public void InvalidateBattleEffect() { }
     public string[] Attachments;
     public Transform transform = new Transform();
     public UnityEngine.Animations.PositionConstraint GetPositionConstraint() => new UnityEngine.Animations.PositionConstraint();

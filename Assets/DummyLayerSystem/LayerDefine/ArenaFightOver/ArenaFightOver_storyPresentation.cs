@@ -9,8 +9,29 @@ public partial class ArenaFightOver
     protected override void OnRectTransformDimensionsChange()
     {
         base.OnRectTransformDimensionsChange();
+        if (aiStoryPlaying && aiStoryPresentation != null) ResizeAIStoryArtwork();
         if (aiStoryPlaying && aiStoryPresentation != null && aiStoryCaptionPanel != null
             && shortStory != null && !string.IsNullOrWhiteSpace(shortStory.text)) ResizeAIStoryCaption();
+    }
+
+    private void ResizeAIStoryArtwork()
+    {
+        if (aiStoryPresentation == null || storyBgImage == null || storyBgImage.sprite == null) return;
+        var surface = ((RectTransform)aiStoryPresentation.transform).rect.size;
+        var artwork = storyBgImage.sprite.rect.size;
+        if (surface.x <= 0 || surface.y <= 0 || artwork.x <= 0 || artwork.y <= 0) return;
+        // Portrait artwork fills tall phone screens without stretching. The
+        // central composition keeps the subject inside the small side crop.
+        // Old landscape cache entries remain fully visible until the server
+        // switches new image jobs to the portrait format.
+        float scale = artwork.y > artwork.x
+            ? Mathf.Max(surface.x / artwork.x, surface.y / artwork.y)
+            : Mathf.Min(surface.x / artwork.x, surface.y / artwork.y);
+        var picture = storyBgImage.rectTransform;
+        picture.anchorMin = picture.anchorMax = new Vector2(.5f, .5f);
+        picture.pivot = new Vector2(.5f, .5f);
+        picture.sizeDelta = artwork * scale;
+        picture.anchoredPosition = Vector2.zero;
     }
 
     private void ResizeAIStoryCaption()
@@ -77,7 +98,10 @@ public partial class ArenaFightOver
         }
         // Let the portrait artwork use the whole game surface. Captions appear
         // over it as the player advances, so reading never shrinks the picture.
+        var illustrationViewport = Region("Illustration Viewport", Vector2.zero, Vector2.one);
+        illustrationViewport.gameObject.AddComponent<RectMask2D>();
         storyBgImage = Region("Generated Illustration", Vector2.zero, Vector2.one).gameObject.AddComponent<Image>();
+        storyBgImage.rectTransform.SetParent(illustrationViewport, false);
         storyBgImage.raycastTarget = false;
         storyBgImage.preserveAspect = true;
         var captionBackdrop = Region("Caption Backdrop", new Vector2(.025f, .085f), new Vector2(.975f, .31f)).gameObject.AddComponent<Image>();

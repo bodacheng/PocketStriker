@@ -318,10 +318,6 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener {
                         if (buyNoAdsLayer != null)
                             UILayerLoader.Remove<BuyNoAds>();
 
-                        var arenaFightOver = UILayerLoader.Get<ArenaFightOver>();
-                        if (arenaFightOver != null)
-                            arenaFightOver.AdBtnParent.gameObject.SetActive(false);
-                        
                         PlayerAccountInfo.Me.noAdsState = true;
                         var shopTopLayer = UILayerLoader.Get<ShopTopLayer>();
                         if (shopTopLayer != null)

@@ -36,6 +36,7 @@ def main():
         "Assets/AnimControl/AnimationManger_ResourceLoad.cs",
         "Assets/ResourceLoading/AudioResourceLoading.cs",
         "Assets/ResourceLoading/EffectsLoad/EffectsManager.cs",
+        "Assets/BOWeaponSystem/BattleEffectLifetime.cs",
         "Assets/ResourceLoading/HurtObjectLoad/HurtObjectManager.cs",
         "Tools/Validation/RuntimeLoadingTests.cs",
     ]

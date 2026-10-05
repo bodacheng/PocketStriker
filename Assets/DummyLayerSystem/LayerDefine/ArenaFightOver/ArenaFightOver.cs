@@ -40,10 +40,8 @@ public partial class ArenaFightOver : UILayer
     [SerializeField] private NextOrAgainBtn againTab;
     [SerializeField] private NextOrAgainBtn nextTab;
     [SerializeField] private BOButton gotchaBtn;
-    [SerializeField] private RectTransform adBtnParent;
     public NextOrAgainBtn AgainBtn => againTab;
     public NextOrAgainBtn NextBtn => nextTab;
-    public RectTransform AdBtnParent => adBtnParent;
     #endregion
     
     private int arenaPointValue;
@@ -339,27 +337,6 @@ public partial class ArenaFightOver : UILayer
             _tweenTextScaleManager.AddNew(awardGdCurrency.transform, Vector3.one * 1.2f, Vector3.one, rewardTextChangeHalfDuration);
         }
         vipSymbol.gameObject.SetActive(PlayerAccountInfo.Me.noAdsState);
-    }
-    
-    public void ShowAward(int awardDm, int awardGd, int extraAdReward, int finishedStage = -1)
-    {
-        ShowAward(awardDm, awardGd);
-
-        if (PlayerAccountInfo.Me.tutorialProgress == "Finished"
-            &&
-            !PlayerAccountInfo.Me.noAdsState)
-        {
-            FightScene.FightScene.target.ShowAds(
-                extraAdReward, 
-                adBtnParent, 
-                () =>
-                {
-                    awardDmCurrency.text = "+" + (extraAdReward + awardDm);
-                    _tweenTextScaleManager.AddNew(awardDmCurrency.transform, Vector3.one * 1.2f, Vector3.one, rewardTextChangeHalfDuration);
-                },
-                finishedStage
-            );
-        }
     }
     
     public void ShowArenaPoint(int oldPoint, int currentPoint)

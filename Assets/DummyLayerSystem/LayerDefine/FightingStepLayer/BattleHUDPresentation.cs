@@ -86,8 +86,8 @@ public sealed class BattleHUDPresentation : MonoBehaviour
             }
             StyleSelectedFrame(_layer.Team1UI?.SelectedFrame);
             StyleSelectedFrame(_layer.Team2UI?.SelectedFrame);
-            Count(_layer.Team1UI?.LiveUnitCount, new Vector2(safe.center.x - 125 * u, safe.yMax - 66 * u), u, true);
-            Count(_layer.Team2UI?.LiveUnitCount, new Vector2(safe.center.x + 125 * u, safe.yMax - 66 * u), u, false);
+            Count(_layer.Team1UI?.LiveUnitCount, new Vector2(safe.center.x - 170 * u, safe.yMax - 58 * u), u, true);
+            Count(_layer.Team2UI?.LiveUnitCount, new Vector2(safe.center.x + 90 * u, safe.yMax - 58 * u), u, false);
 
             var inputs = _layer.InputsManager;
             if (inputs != null)
@@ -426,12 +426,22 @@ public sealed class BattleHUDPresentation : MonoBehaviour
     void Count(Text text, Vector2 center, float u, bool player)
     {
         if (text == null) return;
-        Place(text.transform, center, new Vector2(228, 38) * u);
-        text.fontSize = 24;
+        Place(text.transform, center, new Vector2(240, 56) * u);
+        text.fontSize = Mathf.RoundToInt(34 * u);
+        text.fontStyle = FontStyle.Bold;
+        text.resizeTextForBestFit = false;
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
         text.alignment = TextAnchor.MiddleCenter;
-        text.color = player ? new Color(0.62f, 0.85f, 0.77f) : new Color(0.91f, 0.67f, 0.60f);
+        text.color = player ? new Color(0.76f, 1f, 0.9f) : new Color(1f, 0.8f, 0.72f);
         text.raycastTarget = false;
         foreach (var shadow in text.GetComponents<Shadow>()) shadow.enabled = false;
+        var outline = text.GetComponent<Outline>();
+        if (outline == null) outline = text.gameObject.AddComponent<Outline>();
+        outline.enabled = true;
+        outline.effectColor = new Color(0.025f, 0.04f, 0.055f, 1f);
+        outline.effectDistance = new Vector2(1.5f, -1.5f) * u;
+        outline.useGraphicAlpha = true;
     }
 
     Rect SafeRect()
