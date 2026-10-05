@@ -1,0 +1,26 @@
+Hello App Review Team,
+
+I am preparing Pocket Striker / ポケットストライカー (Apple ID 6478905824, bundle ID com.PocketStriker.BO), iOS version 3.0.2, with the latest build 43 selected in App Store Connect.
+
+We cannot add this version for review because validation reports: “There are still screenshots in the process of being uploaded.” The screenshot records have remained stuck since October 4, 2026. They appear as red/pink empty tiles with a full progress indicator. Reloading the version page and opening Media Manager does not resolve them. The affected tiles offer no Delete, Retry, or Cancel control, and Delete All is disabled.
+
+Affected screenshot sets:
+• iPad 13-inch: Japanese, English (U.S.), and Simplified Chinese. Each has 3 stuck battle screenshots (duel, team, group), for 9 stuck records total. Each set also has 2 healthy screenshots (skills and adventure).
+• iPhone 6.9-inch, Simplified Chinese: 3 old stuck battle screenshots remain after 5 healthy screenshots, with a counter of 8/10.
+
+The affected filenames are:
+PocketStriker_3.0.2_local_{ja,en,zh}_iPad13_01-duel.png
+PocketStriker_3.0.2_local_{ja,en,zh}_iPad13_02-team.png
+PocketStriker_3.0.2_local_{ja,en,zh}_iPad13_03-group.png
+PocketStriker_3.0.2_local_zh_iPhone69_01-duel.png
+PocketStriker_3.0.2_local_zh_iPhone69_02-team.png
+PocketStriker_3.0.2_local_zh_iPhone69_03-group.png
+(The braces above represent the three separate locale filenames.)
+
+The original screenshot files and previously recorded app preview are already available. Corrected RGB PNG exports without alpha are also ready (iPad 2048×2732, iPhone 1290×2796). The Japanese iPhone preview has already finished processing, and healthy screenshots display normally.
+
+Could you please advise how we can remove or reset these 12 stuck screenshot records and proceed with review of build 43? If this needs a server-side cleanup, please clear only the stuck records while preserving healthy screenshots, the processed app preview, and the selected build. If another App Store Connect support team handles this, please route this request appropriately.
+
+Version page: https://appstoreconnect.apple.com/apps/6478905824/distribution/ios/version/inflight
+
+Thank you.

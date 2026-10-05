@@ -24,8 +24,8 @@ Unity 竖屏战斗游戏，通过 Git 子模块和 UPM 导入 MCombatShared。�
 可运行 `python3 Tools/Validation/validate_battle_modes.py` 检查模式、队伍与奖励请求规则；
 Unity 停止播放时，使用 **PocketStriker → Validation → Battle Modes** 验证全部冒险资源和随机 Boss 技能生成。
 `python3 Tools/Validation/validate_post_battle_ads.py` 离线验证战后广告范围、重开、延迟加载和奖励广告互斥；
-`python3 Tools/Validation/validate_story_variety.py` 验证 18 类故事的洗牌与每场选择稳定性。
-AI 故事采用二维卡通、大头短身、粗描边和平涂；题材不再局限于竞技场。
+`python3 Tools/Validation/validate_story_variety.py` 验证每场选择稳定性及远程资源配置。
+AI 故事使用 S3 上的提示词模板和主题配置，故事内容对齐 MCombat，画面采用二维卡通风格。
 `PocketStrikerStoryVarietyValidation.ValidateBatch` 在 Unity 中验证排队和旧同步协议的实际提示词、图片释放及取消，
 报告位于 `Logs/AIStory/Variety/report.json`，不请求真实生成服务。
 

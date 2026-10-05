@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-/// <summary>Single-page PocketStriker adapter; shared MCombat package remains unchanged.</summary>
+/// <summary>Remote-configured PocketStriker adapter; shared MCombat package remains unchanged.</summary>
 public static class PocketStrikerQueuedStory
 {
     // Enable only after the companion Azure deployment passes cold/warm validation.
@@ -22,31 +22,33 @@ public static class PocketStrikerQueuedStory
         }
     }
     static readonly HashSet<StoryInfo> Owned = new HashSet<StoryInfo>();
-    [Serializable] sealed class Page { public string title; public string[] lines; public string visualPrompt; }
 
     public static UniTask<StoryInfo> Load(CancellationToken cancellationToken, string seed = null)
     {
         var client = new PocketStrikerStoryJobClient();
         return LoadStory(cancellationToken, seed,
             (kind, prompt, token) => client.Generate(kind, prompt, token, kind == "text" ? 30000 : 90000, retryFailed: true),
-            DownloadImage, 100000);
+            DownloadImage, 100000, PocketStrikerRemoteStoryPrompts.Load);
     }
 
     public static UniTask<StoryInfo> LoadLegacy(CancellationToken cancellationToken, string seed = null)
     {
         var client = new PocketStrikerLegacyStoryClient();
-        return LoadStory(cancellationToken, seed, client.Generate, DownloadImage, 55000);
+        return LoadStory(cancellationToken, seed, client.Generate, DownloadImage, 55000, PocketStrikerRemoteStoryPrompts.Load);
     }
 
 #if UNITY_EDITOR
     public static UniTask<StoryInfo> LoadForValidation(CancellationToken token, string seed,
         Func<string, string, CancellationToken, UniTask<PocketStrikerStoryJobClient.Result>> generate,
-        Func<string, CancellationToken, UniTask<Texture2D>> download) => LoadStory(token, seed, generate, download, 100000);
+        Func<string, CancellationToken, UniTask<Texture2D>> download,
+        Func<CancellationToken, UniTask<PocketStrikerRemoteStoryPrompts>> loadPrompts = null) =>
+        LoadStory(token, seed, generate, download, 100000, loadPrompts ?? PocketStrikerRemoteStoryPrompts.Load);
 #endif
 
     static async UniTask<StoryInfo> LoadStory(CancellationToken cancellationToken, string seed,
         Func<string, string, CancellationToken, UniTask<PocketStrikerStoryJobClient.Result>> generate,
-        Func<string, CancellationToken, UniTask<Texture2D>> download, int deadlineMs)
+        Func<string, CancellationToken, UniTask<Texture2D>> download, int deadlineMs,
+        Func<CancellationToken, UniTask<PocketStrikerRemoteStoryPrompts>> loadPrompts)
     {
         // Cancel the owned pipeline before BattleStoryRequest's 110-second consumer deadline,
         // so a timed-out text/image chain cannot create an unobserved owned texture later.
@@ -54,39 +56,44 @@ public static class PocketStrikerQueuedStory
         lifetime.CancelAfter(deadlineMs);
         cancellationToken = lifetime.Token;
         cancellationToken.ThrowIfCancellationRequested();
-        string language = AIStoryRuntimeContext.GetLanguage().ToString();
+        var prompts = await loadPrompts(cancellationToken).AttachExternalCancellation(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (prompts == null) throw new InvalidOperationException("Story prompt resources are unavailable.");
+        var language = AIStoryRuntimeContext.GetLanguage();
         var variation = seed == null ? PocketStrikerStoryVariety.ForFight(FightLoad.Fight) : PocketStrikerStoryVariety.ForSeed(seed);
-        string prompt = PocketStrikerStoryVariety.BuildTextPrompt(variation, language);
+        string prompt = prompts.BuildTextPrompt(variation.Seed, language);
         var text = await generate("text", prompt, cancellationToken);
-        Page page;
-        try { page = JsonUtility.FromJson<Page>(NormalizeJson(text?.text)); }
-        catch { throw new InvalidOperationException("Invalid story text JSON."); }
-        if (page?.lines == null || page.lines.Length < 2 || page.lines.Length > 3 || string.IsNullOrWhiteSpace(page.visualPrompt))
-            throw new InvalidOperationException("Story text is incomplete.");
-        var lines = new List<string>();
-        foreach (string line in page.lines)
-            if (!string.IsNullOrWhiteSpace(line)) lines.Add(line.Trim());
-        if (lines.Count < 2 || string.Join("", lines).Length > 200) throw new InvalidOperationException("Story caption is invalid.");
-        string imagePrompt = PocketStrikerStoryVariety.BuildImagePrompt(variation, page.visualPrompt);
-        var generated = await generate("image", imagePrompt, cancellationToken);
-        string imageUrl = ValidateImageUrl(generated);
-        Texture2D texture = null;
-        Sprite sprite = null;
+        cancellationToken.ThrowIfCancellationRequested();
+        var story = prompts.ParseStory(NormalizeJson(text?.text));
+        Owned.Add(story);
         try
         {
-            texture = await download(imageUrl, cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-            if (texture == null) throw new InvalidOperationException("Story image is empty.");
-            sprite = Sprite.Create(texture, new Rect(0,0,texture.width,texture.height), new Vector2(.5f,.5f));
-            var story = ScriptableObject.CreateInstance<StoryInfo>();
-            story.StoryScenes = new List<StoryInfo.StoryScene> { new StoryInfo.StoryScene { Pic = sprite, Title = page.title, Lines = lines } };
-            Owned.Add(story);
+            for (int i = 0; i < story.StoryScenes.Count; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string imagePrompt = prompts.BuildImagePrompt(story, i);
+                var generated = await generate("image", imagePrompt, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                string imageUrl = ValidateImageUrl(generated);
+                Texture2D texture = null;
+                try
+                {
+                    texture = await download(imageUrl, cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (texture == null) throw new InvalidOperationException("Story image is empty.");
+                    story.StoryScenes[i].Pic = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(.5f, .5f));
+                }
+                catch
+                {
+                    DestroyOwned(texture);
+                    throw;
+                }
+            }
             return story;
         }
         catch
         {
-            DestroyOwned(sprite);
-            DestroyOwned(texture);
+            Release(story);
             throw;
         }
     }
@@ -101,6 +108,7 @@ public static class PocketStrikerQueuedStory
 
     static async UniTask<Texture2D> DownloadImage(string url, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         using (var request = UnityWebRequestTexture.GetTexture(url))
         {
             request.timeout = 15;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-// No Unity/player/account state is required to exercise the production selector.
+// Compile the production attempt selector directly: no Unity/player/account state.
 public sealed class FightInfo { }
 
 public static class StoryVarietyTests
@@ -10,38 +10,39 @@ public static class StoryVarietyTests
     {
         try
         {
-            Require(PocketStrikerStoryVariety.Themes.Length == 18, "Expected 18 subjects.");
-            var seeds = new HashSet<string>(); int previous = -1;
-            for (int cycle = 0; cycle < 12; cycle++)
+            var seeds = new HashSet<string>(StringComparer.Ordinal);
+            for (int attempt = 0; attempt < 256; attempt++)
             {
-                var subjects = new HashSet<int>();
-                for (int i = 0; i < 18; i++)
-                {
-                    var fight = new FightInfo(); var variant = PocketStrikerStoryVariety.ForFight(fight);
-                    Require(variant.ThemeIndex != previous && subjects.Add(variant.ThemeIndex), "Genre repeated before exhaustion or across a bag boundary.");
-                    Require(seeds.Add(variant.Seed), "Separate attempts reused a seed."); previous = variant.ThemeIndex;
-                    Require(ReferenceEquals(variant, PocketStrikerStoryVariety.ForFight(fight)), "Ordinary read selected another story.");
-                    string text = PocketStrikerStoryVariety.BuildTextPrompt(variant, "Chinese");
-                    string image = PocketStrikerStoryVariety.BuildImagePrompt(variant, "A character takes the story's key action.");
-                    foreach (string prompt in new[] { text, image })
-                        Require(prompt.Contains(variant.Theme) && prompt.Contains(PocketStrikerStoryVariety.CartoonStyle), "Provider prompt omitted genre or art direction.");
-                    Require(text.Contains(variant.Seed) && text.Contains(variant.Twist) && text.Contains(variant.Tone), "Narrative variation was not sent to provider.");
-                    Require(image.Contains(PocketStrikerStoryVariety.PortraitComposition) && PocketStrikerStoryVariety.ImageAspectRatio == "9:16", "Portrait artwork constraints were not sent to provider.");
-                }
-                Require(subjects.Count == 18, "Not every genre was drawn once.");
+                var fight = new FightInfo();
+                var first = PocketStrikerStoryVariety.ForFight(fight);
+                Require(!string.IsNullOrWhiteSpace(first.Seed) && seeds.Add(first.Seed), "Different battle attempts reused a seed.");
+                Require(ReferenceEquals(first, PocketStrikerStoryVariety.ForFight(fight)), "An ordinary read started a new attempt.");
+                PocketStrikerStoryVariety.BeginBattleAttempt(fight);
+                var retry = PocketStrikerStoryVariety.ForFight(fight);
+                Require(!ReferenceEquals(first, retry) && seeds.Add(retry.Seed), "A real retry retained the previous seed.");
+                Require(ReferenceEquals(retry, PocketStrikerStoryVariety.ForFight(fight)), "Retry seed was not stable.");
             }
-            var sameFight = new FightInfo(); var old = PocketStrikerStoryVariety.ForFight(sameFight);
-            PocketStrikerStoryVariety.BeginBattleAttempt(sameFight); var next = PocketStrikerStoryVariety.ForFight(sameFight);
-            Require(next.Seed != old.Seed && next.ThemeIndex != old.ThemeIndex, "Retry retained old subject/provider cache identity.");
+            var preview = PocketStrikerStoryVariety.ForFight(null);
+            Require(ReferenceEquals(preview, PocketStrikerStoryVariety.ForFight(null)), "Preview reads changed the attempt.");
+            var active = new FightInfo();
+            var battle = PocketStrikerStoryVariety.ForFight(active);
+            PocketStrikerStoryVariety.BeginBattleAttempt(null);
+            Require(preview.Seed != PocketStrikerStoryVariety.ForFight(null).Seed, "Preview retry retained its seed.");
+            Require(ReferenceEquals(battle, PocketStrikerStoryVariety.ForFight(active)), "Preview retry changed an active battle.");
             foreach (string seed in new[] { "acceptance", "故事验证", "stable-request-1" })
             {
-                var first = PocketStrikerStoryVariety.ForSeed(seed); var second = PocketStrikerStoryVariety.ForSeed(seed);
-                Require(first.Seed == second.Seed && first.Theme == second.Theme && first.Twist == second.Twist && first.Tone == second.Tone,
-                    "Explicit cache replay seed produced a different selection.");
+                Require(PocketStrikerStoryVariety.ForSeed(seed).Seed == seed, "Explicit seed was modified.");
+                Require(PocketStrikerStoryVariety.ForSeed(seed).Seed == PocketStrikerStoryVariety.ForSeed(seed).Seed, "Explicit seed replay changed.");
             }
-            foreach (string token in new[] { "2D", "thick clean outlines", "flat cel shading", "no photorealism", "oil-painting texture", "no text" })
-                Require(PocketStrikerStoryVariety.CartoonStyle.Contains(token), "Cartoon art direction missing: " + token);
-            Console.WriteLine("Story variety: PASS (216 draws, 12 complete genre bags, stable attempts/seeds, same-fight retry, actual text/image prompts).");
+            foreach (string invalid in new[] { null, "", "  " })
+            {
+                bool rejected = false;
+                try { PocketStrikerStoryVariety.ForSeed(invalid); }
+                catch (ArgumentException) { rejected = true; }
+                Require(rejected, "A missing explicit seed was accepted.");
+            }
+            Require(PocketStrikerStoryVariety.ImageAspectRatio == "9:16", "PocketStriker portrait transport ratio changed.");
+            Console.WriteLine("Story attempt seeds: PASS (512 unique battle/retry seeds, stable reads, independent preview, explicit replay, invalid input).");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }

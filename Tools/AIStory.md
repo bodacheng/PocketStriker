@@ -35,17 +35,49 @@ wait for generation, and use an authored story or ordinary result if not ready.
 Late/abandoned owned sprites and textures are released. Existing same-attempt
 request reuse and explicit-next-attempt recovery are preserved.
 
-The single-page prompt selects from 18 story subjects with shuffled twists and
-tones, uses the current language, and keeps one variation seed per battle attempt.
-A retry starts a new variation; repeated requests within an attempt share server
-jobs. Ordinary Gemini Markdown JSON fences are handled, malformed output falls
-back safely. Captions are capped at 200 characters; AI art is a static UI Image,
-isolated from the authored background animation and per-letter text component.
+The story adapters now load `Config/AIServiceConfig` and
+`Config/PocketStrikerStoryPrompts` through Addressables. Both belong to the remote
+Config group. The JSON resource contains the full Chinese/Japanese/English MCombat
+story templates, language instructions, narrative/image style mappings and image
+prompt formats. The project config matches the effective MCombat reference at
+`/Users/daisei/MComat/Assets/AIStory`: an empty explicit theme list, one page,
+FairyTale narrative style, the copied FairyTale setting/character/plot pools and
+its effective style guidance. Only the illustration style becomes 2D cartoon;
+PocketStriker retains its existing portrait ratio and presentation. The old 18
+subjects, twist/tone pools and standalone vignette instructions are removed.
+
+Each pipeline takes a managed snapshot of these remote resources before paid
+requests and releases its Addressables handles. A battle attempt retains one
+selection seed; a real retry starts a new selection, while repeated requests reuse
+its pending/ready result. The MCombat characters/locations/style/scenes JSON is
+parsed into the existing presentation model. Narrative lines are split at the
+same 200-character limit as MCombat. Missing/invalid resources or malformed story
+output fall back safely before image work. Existing owned image cleanup,
+cancellation and pipeline deadlines remain in force. There is no hardcoded prompt
+fallback and no edit to the shared package or Azure functions.
+
+The initial adapter change needs a rebuilt client. Later compatible changes to
+these templates, themes or art settings need only a new Addressables resource
+build and catalog publication for that client's environment/version/platform.
+Use PocketStriker's `/{dev|release}/v/{version}/{platform}/` prefix, never the shared
+Default profile root. Publish bundles, then catalog, then hash; keep old bundles.
+The existing native MCombat checkout and its catalogs are independent.
+
+Local acceptance on 2026-10-05 passed: iOS player-script compilation, project
+validation (497 Addressables), 19 remote prompt/schema/payload/cancellation cases,
+22 queued protocol cases and 10 battle lifecycle cases. The Dev iOS resource
+build contains 424 files (232,371,145 bytes). A separate smoke cleared the editor
+asset locator, loaded its built binary catalog and read the actual Config bundles
+with the production snapshot loader, confirming the cartoon MCombat content after
+handles were released. No live AI generation or S3 upload was performed. These
+checks do not substitute for installation of the rebuilt client on a device.
+Evidence is under `Logs/AIStory/RemotePrompts`; `isolation.json` confirms the shared
+gitlink/worktree, MCombat AI reference and Azure runtime source remain unchanged.
 
 Portrait illustrations now enlarge equally in both directions to fill the game
 screen, with centered clipping at its edges on taller phones. Captions overlay
 the image without reducing its size. Existing landscape illustrations stay fully
-visible. The client configuration, prompt and image-job request specify `9:16`.
+visible. The client configuration and image-job request specify `9:16`.
 Read-only Azure inspection on 2026-10-05 found that the October 1 queue worker
 still fixed image jobs to `16:9`, overriding the client request. The user approved
 and we deployed the minimal shared-service update to `9:16`, preserving all legacy
@@ -90,10 +122,18 @@ Use Unity 6000.5.1f1. Do not open a second editor on this checkout. Rendered
 playmode checks require omitting `-quit` and `-nographics`.
 
 ```sh
-# 21 local protocol/parser/recovery cases; no account/provider request.
+# 19 remote-template/payload/parser/ownership cases; no account/provider request.
+Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
+  -executeMethod PocketStrikerStoryVarietyValidation.ValidateBatch -logFile "$LOG_DIR/prompts.log"
+# Build Dev assets, then load the actual built remote catalog/bundles locally.
+Unity -batchmode -quit -projectPath "$PROJECT" -buildTarget iOS \
+  -executeMethod Cocone.ProjectP3.BuildAddressableAssets.BatchBuild -assetProfile dev -logFile "$LOG_DIR/assets.log"
+Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
+  -executeMethod PocketStrikerRemotePromptBundleValidation.ValidateBatch -assetProfile dev -logFile "$LOG_DIR/bundles.log"
+# 22 local protocol/parser/recovery cases; no account/provider request.
 Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
   -executeMethod PocketStrikerStoryJobValidation.ValidateBatch -logFile "$LOG_DIR/queued.log"
-# 8 local lifecycle cases.
+# 10 local lifecycle cases.
 Unity -batchmode -projectPath "$PROJECT" -buildTarget iOS \
   -executeMethod PocketStrikerAIStoryLifecycleValidation.ValidateBatch -logFile "$LOG_DIR/lifecycle.log"
 # Real account, queued warm story, natural battle and native UI navigation.

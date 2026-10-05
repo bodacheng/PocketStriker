@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "locales": [
+    {
+      "language": "Chinese",
+      "languageInstruction": "请使用中文编写所有标题、描述、对话和故事文本。",
+      "template": "你是一名专业的多页连环画编剧与美术总监。\n围绕主题“{storyTheme}”创作一个由 {pageCount} 个连续场景组成的故事。\n请输出严格的 JSON 数据，禁止添加注释、额外说明或 markdown。\n{languageInstruction}\n\n请确保：\n- 场景数量必须正好为 {pageCount}，index 从 1 开始，按顺序排列。\n- 对所有会重复出现的角色提供一致的角色卡片，在文中和 scenes.characters 列表中复用相同的 id。\n- 对关键场景地点提供地点卡片，在每个场景中引用 locations 的 id 以保持背景一致。\n- 角色描述需包含发型、五官、体态、肤色、服装和可辨识的随身物品。\n- 地点描述需包含时间、氛围、色调、重要道具。\n- 为整部作品给出统一的 style（artDirection、palette、camera、lighting、keywords、negativeKeywords）以保证画风统一。\n- 每个场景给出 title、description（描述画面）、setting（引用地点并解释时间/情境）、locationId（引用 locations.id）、characters（角色 id 列表）、mood、importantObjects、camera、lighting、visualPrompt、negativePrompt。\n- dialogues 是数组，包含 speaker 与 text，用于剧情对话。若无对话可返回空数组。\n- visualPrompt 用简洁英文或中英文混合描述画面要素，便于直接用于图像生成。\n- 场景的 description、setting 与 dialogues 必须以角色行动、互动、情绪与剧情推进为核心，可以适度融入感官细节，禁止描述或暗示角色外形与服饰（相关信息仅能保留在角色卡片中）。\n- description 与 dialogues 需表现为连贯的叙事句，交代时间推移和因果关系，避免使用“画面包含…”“主要元素：”等提示词式片段。\n- negativePrompt 描述应避免的视觉内容和错误。\n- 全文除 JSON 以外不输出任何内容。\n\n请按照以下 JSON 模板返回：\n{\n  \"characters\": [\n    {\n      \"id\": \"hero\",\n      \"name\": \"角色姓名\",\n      \"appearance\": \"身材、发型、肤色等\",\n      \"outfit\": \"服装、配饰\",\n      \"personality\": \"性格或当前情绪\",\n      \"visualTags\": \"关键视觉要素\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"warehouse\",\n      \"name\": \"地点名称\",\n      \"description\": \"背景细节\",\n      \"palette\": \"主色调\",\n      \"timeOfDay\": \"时间\",\n      \"atmosphere\": \"氛围\"\n    }\n  ],\n  \"style\": {\n    \"artDirection\": \"整体绘画风格\",\n    \"palette\": \"整体配色\",\n    \"camera\": \"常用镜头语言\",\n    \"lighting\": \"整体光影\",\n    \"keywords\": \"需要强化的视觉关键词\",\n    \"negativeKeywords\": \"需要避免的元素\"\n  },\n  \"scenes\": [\n    {\n      \"index\": 1,\n      \"title\": \"场景标题\",\n      \"description\": \"画面描述\",\n      \"setting\": \"引用地点 id 并补充细节\",\n      \"locationId\": \"warehouse\",\n      \"characters\": [\"hero\"],\n      \"mood\": \"情绪\",\n      \"importantObjects\": \"关键物件\",\n      \"camera\": \"镜头语言\",\n      \"lighting\": \"光影\",\n      \"visualPrompt\": \"图像生成提示\",\n      \"negativePrompt\": \"需避免的元素\",\n      \"dialogues\": [\n        { \"speaker\": \"角色姓名\", \"text\": \"具体台词\" }\n      ]\n    }\n  ]\n}\n\n故事叙事风格需要贴合：{storyStyle}。\n插图视觉风格需要贴合：{imageStyle}。\n请注意保持角色造型、服饰、背景在所有场景中的一致性，并确保 JSON 可被解析。整体叙事需自然连贯，故事文本中严禁描述角色外貌与服饰细节，也不要出现提示词式语句。\n"
+    },
+    {
+      "language": "Japanese",
+      "languageInstruction": "すべてのタイトル・説明・セリフ・本文は日本語で出力してください。",
+      "template": "あなたはプロの連続挿絵物語の脚本家兼アートディレクターです。\nテーマ「{storyTheme}」をもとに、{pageCount} 個の連続したシーンで構成される物語を作成してください。\nコメントや追加説明、markdown を入れず、厳密な JSON 形式で出力してください。\n{languageInstruction}\n\n必ず次の点を守ってください:\n- シーン数は必ず {pageCount} 個、index は 1 から連番で並べてください。\n- 登場を繰り返すキャラクターには一貫したキャラクターシートを用意し、本文と scenes.characters で同じ id を再利用してください。\n- 重要な舞台にはロケーションシートを作成し、各シーンで locationId として id を参照して背景を揃えてください。\n- キャラクター説明には髪型・顔立ち・体格・肌の色・衣装・識別できる小物を含めてください。\n- ロケーション説明には時間帯・雰囲気・色調・重要なオブジェクトを含めてください。\n- 作品全体のスタイル（artDirection, palette, camera, lighting, keywords, negativeKeywords）を統一してください。\n- 各シーンには title, description（画面描写）, setting（ロケーション id と状況説明）, locationId, characters（id リスト）, mood, importantObjects, camera, lighting, visualPrompt, negativePrompt を含めてください。\n- dialogues は speaker と text を持つ要素の配列です。会話がない場合は空配列を返してください。\n- visualPrompt は画像生成のための要素を簡潔な英語またはバイリンガルで記述してください。\n- description と setting、dialogues はキャラクターの行動・感情・物語の進行に専念し、外見・衣装・身体的特徴を描写したり暗示したりしないでください（それらはキャラクターシートのみで扱います）。\n- description と dialogues は流れるような叙述文で構成し、時間の流れや因果を示しつつ、\"〜を描写せよ\" \"要素:\" のようなプロンプト的表現を避けてください。\n- negativePrompt は避けたい要素や誤りを示してください。\n- JSON 本文以外は何も出力しないでください。\n\n次の JSON テンプレートに従って出力してください:\n{\n  \"characters\": [\n    {\n      \"id\": \"hero\",\n      \"name\": \"キャラクター名\",\n      \"appearance\": \"体格・髪型・肌の色など\",\n      \"outfit\": \"衣装とアクセサリー\",\n      \"personality\": \"性格または現在の感情\",\n      \"visualTags\": \"重要なビジュアルタグ\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"warehouse\",\n      \"name\": \"ロケーション名\",\n      \"description\": \"背景の詳細\",\n      \"palette\": \"主要な配色\",\n      \"timeOfDay\": \"時間帯\",\n      \"atmosphere\": \"雰囲気\"\n    }\n  ],\n  \"style\": {\n    \"artDirection\": \"全体のアートディレクション\",\n    \"palette\": \"全体の配色\",\n    \"camera\": \"よく使うカメラ表現\",\n    \"lighting\": \"全体のライティング\",\n    \"keywords\": \"強調したいビジュアルキーワード\",\n    \"negativeKeywords\": \"避けるべき要素\"\n  },\n  \"scenes\": [\n    {\n      \"index\": 1,\n      \"title\": \"シーンタイトル\",\n      \"description\": \"画面描写\",\n      \"setting\": \"ロケーション id と状況説明\",\n      \"locationId\": \"warehouse\",\n      \"characters\": [\"hero\"],\n      \"mood\": \"感情\",\n      \"importantObjects\": \"重要なオブジェクト\",\n      \"camera\": \"カメラ表現\",\n      \"lighting\": \"ライティング\",\n      \"visualPrompt\": \"画像生成プロンプト\",\n      \"negativePrompt\": \"避けるべき要素\",\n      \"dialogues\": [\n        { \"speaker\": \"キャラクター名\", \"text\": \"台詞\" }\n      ]\n    }\n  ]\n}\n\n物語の語り口は {storyStyle} に合わせてください。\n挿絵のビジュアルスタイルは {imageStyle} に合わせてください。\n全シーンでキャラクターデザイン・衣装・背景の整合性を保ち、JSON が正しく解析できるようにしてください。ストーリーは自然な叙述で統一し、本文には外見・衣装の描写やプロンプト的な言い回しを入れないこと。\n"
+    },
+    {
+      "language": "English",
+      "languageInstruction": "Please write all titles, descriptions, dialogue, and narrative text in English.",
+      "template": "You are a professional multi-page picture book writer and art director.\nCreate a story composed of {pageCount} consecutive scenes around the theme \"{storyTheme}\".\nReturn strictly formatted JSON with no comments, extra explanations, or markdown.\n{languageInstruction}\n\nMake sure that:\n- The number of scenes must be exactly {pageCount}, with indexes starting at 1 in sequential order.\n- Provide consistent character sheets for any recurring characters, and reuse the same ids in the narrative and scenes.characters list.\n- Provide location sheets for key settings and reference their ids in each scene's locationId to keep backgrounds consistent.\n- Character descriptions must cover hairstyle, facial features, body type, skin tone, wardrobe, and recognizable props.\n- Location descriptions must cover time of day, atmosphere, color palette, and important props.\n- Supply a unified style block (artDirection, palette, camera, lighting, keywords, negativeKeywords) to keep the art coherent.\n- Each scene must include title, description (visual composition), setting (reference location id and context), locationId, characters (id list), mood, importantObjects, camera, lighting, visualPrompt, negativePrompt.\n- dialogues is an array of entries with speaker and text. Return an empty array if the scene has no dialogue.\n- visualPrompt should use concise English or bilingual hints describing the imagery for text-to-image generation.\n- Use scene description, setting, and dialogue to highlight character actions, interactions, emotions, and plot progression; do not describe or hint at character appearances, outfits, or physical attributes (those belong exclusively in the character sheets).\n- Write descriptions and dialogue as flowing narrative prose that conveys pacing and causality; avoid prompt-like phrases such as \"show...\", \"elements:\" or keyword lists.\n- negativePrompt should specify visual mistakes or elements to avoid.\n- Output nothing outside of the JSON body.\n\nReturn JSON following this template:\n{\n  \"characters\": [\n    {\n      \"id\": \"hero\",\n      \"name\": \"Character name\",\n      \"appearance\": \"Body type, hairstyle, skin tone, etc.\",\n      \"outfit\": \"Wardrobe and accessories\",\n      \"personality\": \"Personality or current emotion\",\n      \"visualTags\": \"Key visual tags\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"warehouse\",\n      \"name\": \"Location name\",\n      \"description\": \"Background details\",\n      \"palette\": \"Primary colors\",\n      \"timeOfDay\": \"Time of day\",\n      \"atmosphere\": \"Mood\"\n    }\n  ],\n  \"style\": {\n    \"artDirection\": \"Overall art direction\",\n    \"palette\": \"Overall palette\",\n    \"camera\": \"Common camera language\",\n    \"lighting\": \"Overall lighting\",\n    \"keywords\": \"Visual keywords to reinforce\",\n    \"negativeKeywords\": \"Elements to avoid\"\n  },\n  \"scenes\": [\n    {\n      \"index\": 1,\n      \"title\": \"Scene title\",\n      \"description\": \"Visual description\",\n      \"setting\": \"Reference location id and context\",\n      \"locationId\": \"warehouse\",\n      \"characters\": [\"hero\"],\n      \"mood\": \"Emotion\",\n      \"importantObjects\": \"Important props\",\n      \"camera\": \"Camera language\",\n      \"lighting\": \"Lighting\",\n      \"visualPrompt\": \"Image generation prompt\",\n      \"negativePrompt\": \"Elements to avoid\",\n      \"dialogues\": [\n        { \"speaker\": \"Character name\", \"text\": \"Dialogue line\" }\n      ]\n    }\n  ]\n}\n\nMatch the narrative style: {storyStyle}.\nMatch the illustration style: {imageStyle}.\nMaintain consistent character designs, outfits, and backgrounds across all scenes, ensure the JSON is valid, and keep the story text natural and flowing without appearance descriptions or prompt-like phrasing.\n"
+    }
+  ],
+  "otherLanguageInstruction": "Please write all titles, descriptions, dialogue, and narrative text in {language}.",
+  "fallbackThemeTemplate": "在{setting}背景中，{worldDetail}。故事讲述{hero}{companion}，他们需要{goal}，途中{conflict}，最终{resolution}。{styleGuidance}",
+  "storyStyles": [
+    {
+      "style": "FairyTale",
+      "prompt": "warm fairy-tale picture-book storytelling, clear emotional beats, hopeful tone"
+    },
+    {
+      "style": "Adventure",
+      "prompt": "energetic adventure serial storytelling, escalating stakes, teamwork and discovery"
+    },
+    {
+      "style": "SportsDrama",
+      "prompt": "fast-paced sports drama storytelling, rivalry, training tension, comeback moments"
+    },
+    {
+      "style": "Comedy",
+      "prompt": "light comedic storytelling, playful reversals, expressive character reactions"
+    },
+    {
+      "style": "DarkFantasy",
+      "prompt": "dark fantasy storytelling, mysterious atmosphere, high stakes and bittersweet choices"
+    }
+  ],
+  "imageStyles": [
+    {
+      "style": "Photorealistic",
+      "prompt": "photorealistic style, high quality, natural colors"
+    },
+    {
+      "style": "Anime",
+      "prompt": "anime style, cel-shaded, vibrant colors"
+    },
+    {
+      "style": "Watercolor",
+      "prompt": "watercolor painting style, soft brushstrokes, artistic"
+    },
+    {
+      "style": "OilPainting",
+      "prompt": "oil painting style, rich textures, classical art"
+    },
+    {
+      "style": "PencilSketch",
+      "prompt": "pencil sketch style, detailed linework, monochrome"
+    },
+    {
+      "style": "DigitalArt",
+      "prompt": "digital art style, clean lines, modern illustration"
+    },
+    {
+      "style": "Cinematic",
+      "prompt": "cinematic style, dramatic lighting, movie quality"
+    }
+  ],
+  "customStoryStyleFallback": "coherent illustrated story storytelling",
+  "customImageStyleFallback": "high quality illustration style",
+  "requirementsSeparator": ", ",
+  "image": {
+    "sceneFormat": "Scene {sceneNumber}/{sceneCount}. ",
+    "titleFormat": "{value}. ",
+    "charactersFormat": "Characters: {value}.",
+    "characterFormat": "{name}: {value}",
+    "personalityFormat": "personality {value}",
+    "environmentFormat": "Environment: {value}.",
+    "locationPaletteFormat": "palette {value}",
+    "keyPropsFormat": "Key props: {value}. ",
+    "visualPromptFormat": "{value}. ",
+    "stylePaletteFormat": "Palette {value}",
+    "shotFormat": "Shot: {value}",
+    "cameraFormat": "Camera: {value}",
+    "lightingFormat": "Lighting: {value}",
+    "moodFormat": "Mood: {value}",
+    "avoidFormat": " Avoid: {value}.",
+    "overviewMaxCharacters": 500,
+    "defaultNegativeTokens": [
+      "speech bubble",
+      "speech bubbles",
+      "dialogue bubble",
+      "text bubble",
+      "text bubbles",
+      "onscreen text",
+      "text overlay",
+      "text overlays",
+      "caption text",
+      "subtitles",
+      "comic lettering",
+      "watermark"
+    ]
+  }
+}
