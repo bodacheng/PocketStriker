@@ -1,0 +1,6 @@
+/bin/zsh -lc "python3 - <<'PY'
+from pathlib import Path
+p=Path('/tmp/pocketstriker-iphone-preview-20261004/combined_preview_export.swift');s=p.read_text().replace('effectsVolume.setVolume(1, at: .zero)','effectsVolume.setVolume(0.5, at: .zero)').replace('\"loops\": 0,','\"loops\": 0, \"recordedEffectsGain\": 0.5,')
+p.write_text(s)
+PY
+xcrun swiftc -parse-as-library /tmp/pocketstriker-iphone-preview-20261004/combined_preview_export.swift -o /tmp/pocketstriker-iphone-preview-20261004/combined_preview_export -module-cache-path /tmp/pocketstriker-iphone-preview-20261004/swift-module-cache 2>/tmp/pocketstriker-iphone-preview-20261004/combined-export-compiler.log"

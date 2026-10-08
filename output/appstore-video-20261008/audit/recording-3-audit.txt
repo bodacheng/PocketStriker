@@ -1,0 +1,9 @@
+录制 3 独立 QA 通过：三种真实技能特效、两次库存装备、一次占用槽交换均有原片画面和真实模型校验。装备只改 A3、B2；交换精确互换这两槽，其余七槽保持一致，身份与 SP 校验通过。没有 fixture、隐藏 combo、合成战斗或加载条。
+
+原片动作画面：库存装备拖拽 1.100 秒、5.100 秒；落槽 1.700 秒、5.700 秒；交换拖拽 8.800 秒、互换完成 9.767 秒；三种特效分别清楚可见于 3.800 秒、7.200 秒、10.600 秒。画面见 skill-action-frames/，JSON 使用 AVFoundation 实际解码时间。
+
+技能视频实测 886×1920、30 fps、H.264 High、465 帧、15.5 秒；450 帧技能 timeline 与 465 帧 recorder buffer 是明确设计。其他三个片段分别为 150/150/180 帧、5/5/6 秒。全部视频 SHA 与录制 manifest 相符，48 kHz 双声道 AAC 均非静音。
+
+恢复证据：skill-sequence-report.json 的 resetVerified=true，仅在 native Reset 后九个原装备实例 SequenceEqual 断言通过时设置。capture-manifest.json 的 preferencesRestored/appSettingsFileRestored/scenesRestored 全 true；实际源码对设置文件逐字节比较，对受保护 prefs 的值及存在状态逐一比较。四个片段的 capture timing、targetFrameRate、runInBackground 恢复标记均 true。五份 harness 源 SHA 全与 source-manifest 一致，且 source-manifest SHA 与 capture-manifest 记录一致。恢复发生在视频停止后，因此视频不显示恢复动作。关键源码原文已保存 restoration-source-evidence.json。
+
+0.1–12.1 秒的技能裁切保留全部上述操作与特效，配合 13.6 秒战斗总长 25.6 秒。无阻断问题。需在最终音轨 QA 看峰值：原 battle AAC 解码峰值约 1.02/1.04/1.15，技能约 0.408；单凭峰值不能证明可闻削波。VFX 遥测按 actor 归属而非每次 animation ID，所以不能将 firstVisibleFrame 当成精确发射时刻；画面已证实三种不同效果。

@@ -1,0 +1,91 @@
+{
+  "generatedUtc": "2026-10-08T05:22:55.064213+00:00",
+  "finalFile": "/Users/daisei/PocketStriker/output/appstore-video-20261008/PocketStriker_3.0.2_Editor_ja_iPhone69_combined_skills_vfx_equip_swap_20261008.mp4",
+  "reviewFile": "/Users/daisei/PocketStriker/output/appstore-video-20261008/PocketStriker_Combined_Skills_ChatReview_20261008.mp4",
+  "finalSha256": "4533ba167ec9d20f8b98927b57f260a74ed8e71ab9d28467e5a20a19144df09c",
+  "reviewSha256": "a3d1c9da408bd63f511a68a852012890c971eabe4a367c48dee92e4bc06da7b7",
+  "finalBytes": 33299420,
+  "reviewBytes": 12075640,
+  "durationSeconds": 25.6,
+  "checks": {
+    "actualDuration25_6": true,
+    "portrait886x1920": true,
+    "nominal30FPS": true,
+    "encoded768Frames": true,
+    "h264HighLevel4_0": true,
+    "AACStereo48kHz": true,
+    "decodeCompleted": true,
+    "nonSilentAudio": true,
+    "noNearFullScaleSamples": true,
+    "noExactSilenceGaps": true,
+    "frameExtractionWithinOneFrame": true,
+    "under500MB": true,
+    "consistentDurationAcrossReview": true,
+    "consistentSourceTrimDurations": true
+  },
+  "scope": "Measured media metadata, compressed samples, audio PCM and requested frame extraction. Root owns encoded visual review and App Store Connect upload. SPS progressive syntax is not parsed by this probe.",
+  "measuredVideoBitrateBps": 10151453.75,
+  "measuredAACBitrateBps": 251317.8125,
+  "audioPeak": 0.724518358707428,
+  "audioRMS": 0.11158307541680117,
+  "finalManifest": "final-edit.json",
+  "actionTimeline": "final-action-timeline.json",
+  "technicalProbe": "qa-final/media-probe.json",
+  "keyFrames": [
+    {
+      "requestedSeconds": 13.7,
+      "actualSeconds": 13.7,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-007-0013.700.png"
+    },
+    {
+      "requestedSeconds": 14.25,
+      "actualSeconds": 14.233333333333333,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-008-0014.250.png"
+    },
+    {
+      "requestedSeconds": 15.4,
+      "actualSeconds": 15.4,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-009-0015.400.png"
+    },
+    {
+      "requestedSeconds": 16.7,
+      "actualSeconds": 16.7,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-010-0016.700.png"
+    },
+    {
+      "requestedSeconds": 19.4,
+      "actualSeconds": 19.4,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-011-0019.400.png"
+    },
+    {
+      "requestedSeconds": 20.7,
+      "actualSeconds": 20.7,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-012-0020.700.png"
+    },
+    {
+      "requestedSeconds": 22.1,
+      "actualSeconds": 22.1,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-013-0022.100.png"
+    },
+    {
+      "requestedSeconds": 23.1,
+      "actualSeconds": 23.1,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-014-0023.100.png"
+    },
+    {
+      "requestedSeconds": 24.1,
+      "actualSeconds": 24.1,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-015-0024.100.png"
+    },
+    {
+      "requestedSeconds": 24.6,
+      "actualSeconds": 24.6,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-016-0024.600.png"
+    },
+    {
+      "requestedSeconds": 25.4,
+      "actualSeconds": 25.4,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/qa-final/frame-017-0025.400.png"
+    }
+  ]
+}

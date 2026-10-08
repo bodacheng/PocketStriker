@@ -1,0 +1,37 @@
+--- /tmp/pocketstriker-iphone-preview-20261004/audio-recapture-backup/PocketStrikerUILiveReview.StoreCapture.cs	2026-10-04 17:39:17
++++ /tmp/pocketstriker-iphone-preview-20261004/project/Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs	2026-10-04 19:09:55
+@@ -76,6 +76,10 @@
+         SessionState.SetString(StoreKey + ".Output", output);
+         SessionState.SetInt(StoreKey + ".Width", width); SessionState.SetInt(StoreKey + ".Height", height);
+         StoreSnapshotState();
++        // Capture-only unmute; original Editor state is restored on exit.
++        EditorUtility.audioMasterMute = false;
++        AudioListener.pause = false;
++        AudioListener.volume = 1f;
+         var viewType = typeof(Editor).Assembly.GetType("UnityEditor.GameView", true);
+         var view = EditorWindow.GetWindow(viewType);
+         var selectedSize = viewType.GetProperty("selectedSizeIndex", Fields);
+@@ -88,6 +92,11 @@
+ 
+     static void StoreSnapshotState()
+     {
++        SessionState.SetBool(StoreKey + ".EditorAudioMute", EditorUtility.audioMasterMute);
++        SessionState.SetBool(StoreKey + ".ListenerPause", AudioListener.pause);
++        SessionState.SetFloat(StoreKey + ".ListenerVolume", AudioListener.volume);
++        SessionState.SetFloat(StoreKey + ".MemoryBgmVolume", AppSetting.Value.BgmVolume);
++        SessionState.SetFloat(StoreKey + ".MemoryEffectsVolume", AppSetting.Value.EffectsVolume);
+         foreach (var key in StoreIntKeys.Concat(new[] { PlayFabSetting._arenaPointCode }).Where(x => !string.IsNullOrEmpty(x)).Distinct())
+         {
+             SessionState.SetBool(StoreKey + ".Int." + key + ".Had", PlayerPrefs.HasKey(key));
+@@ -111,6 +120,11 @@
+     static void StoreRestoreState()
+     {
+         if (!SessionState.GetBool(StoreKey + ".Saved", false)) return;
++        EditorUtility.audioMasterMute = SessionState.GetBool(StoreKey + ".EditorAudioMute", false);
++        AudioListener.pause = SessionState.GetBool(StoreKey + ".ListenerPause", false);
++        AudioListener.volume = SessionState.GetFloat(StoreKey + ".ListenerVolume", 1f);
++        AppSetting.Value.BgmVolume = SessionState.GetFloat(StoreKey + ".MemoryBgmVolume", .5f);
++        AppSetting.Value.EffectsVolume = SessionState.GetFloat(StoreKey + ".MemoryEffectsVolume", .5f);
+         foreach (var key in StoreIntKeys.Concat(new[] { PlayFabSetting._arenaPointCode }).Where(x => !string.IsNullOrEmpty(x)).Distinct())
+         {
+             if (SessionState.GetBool(StoreKey + ".Int." + key + ".Had", false)) PlayerPrefs.SetInt(key, SessionState.GetInt(StoreKey + ".Int." + key + ".Value", 0));

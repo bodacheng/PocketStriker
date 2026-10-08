@@ -1,0 +1,69 @@
+{
+  "sourceThread": {
+    "id": "01a101c0-1820-74d6-96fe-7323a8d89091",
+    "title": "完善 PocketStriker 商店页面",
+    "hostId": "durable"
+  },
+  "sourceGitCommit": "49ddccbc99cd84ed1948918d16f381316c645691",
+  "sourceGitScope": "Historical manifest includes dirty local source; source commit alone does not reproduce full captured game.",
+  "originalCaptureProjects": [
+    "/tmp/pocketstriker-store-capture-20261003",
+    "/tmp/pocketstriker-iphone-preview-20261004/project"
+  ],
+  "originalVideo": "/tmp/pocketstriker-iphone-preview-20261004/CombinedPreview/PocketStriker_3.0.2_Editor_ja_iPhone69_combined_bgm_sfx.mp4",
+  "originalPathsCurrentlyExist": false,
+  "recoveredFiles": [
+    {
+      "file": "PocketStrikerUILiveReview.StoreVideoRecorder.cs",
+      "sourceItems": [
+        "exec-b4c0f0a6-4834-478a-883f-b3b5054779cb",
+        "exec-3aa9a0df-7e95-4a12-ae73-dac8052b0516",
+        "exec-43077aa4-3baf-45e6-a1c5-70b27784c5b8"
+      ],
+      "recovery": "Exact sed1–260 plus260–440 overlap removed, three exact historical audio diff hunks applied",
+      "complete": true
+    },
+    {
+      "file": "PocketStrikerUILiveReview.StoreVideoFlow.cs",
+      "sourceItems": [
+        "exec-43077aa4-3baf-45e6-a1c5-70b27784c5b8"
+      ],
+      "recovery": "Exact full sed1–240 after recorder diff",
+      "complete": true
+    },
+    {
+      "file": "PocketStrikerUILiveReview.StoreCapture.cs",
+      "sourceItems": [
+        "exec-d22d94a3-1e29-482f-b1d5-aeea57c56995",
+        "exec-f258a2c7-9ccc-4859-8034-71e0e1a21580"
+      ],
+      "recovery": "Exact full sed1–260 plus260–620, overlap removed",
+      "complete": true,
+      "versionLimitation": "Screenshot capture before later audio additions and restoration audit diffs; those exact diffs saved separately"
+    },
+    {
+      "file": "PocketStrikerUILiveReview.BattleCapture.cs",
+      "recovery": "Original complete FileChange add plus latest exact StorePrepareTrainingDuel function from item exec-1a574565-b6a1-464b-ad01-8f6554ab8d33",
+      "complete": true,
+      "versionLimitation": "Original battle screenshot route retained; video route calls recovered helper directly"
+    },
+    {
+      "file": "install_runner.py",
+      "sourceItems": [
+        "exec-0554c570-80a7-49ed-8b20-f5dfaf9bc5c8"
+      ],
+      "recovery": "Exact first145 output lines",
+      "complete": true,
+      "versionLimitation": "Original screenshot installer routes StoreRun, requires adaptation for current video use; never executed during recovery"
+    }
+  ],
+  "rawHistoricalTimelineSeconds": {
+    "duel": 4.9,
+    "team": 4.9,
+    "group": 5.9,
+    "skills": 12.9,
+    "total": 28.6
+  },
+  "recoveryOnly": true,
+  "mainAssetsChanged": false
+}

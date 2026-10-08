@@ -1,0 +1,13 @@
+/bin/zsh -lc "python3 - <<'PY'
+from pathlib import Path
+import json,hashlib
+base=Path('/tmp/pocketstriker-iphone-preview-20261004');out=base/'CombinedPreview';out.mkdir(exist_ok=True)
+battle=json.loads((base/'combined-audio-attempt1/video-manifest.json').read_text());old=json.loads((base/'battle-export.json').read_text());clips=[]
+for c,prior,duration in zip(battle['clips'][:3],old['clips'],[4.9,4.9,5.9]):
+ path=Path(c['outputPath']); digest=hashlib.sha256(path.read_bytes()).hexdigest();assert digest==c['sha256']
+ clips.append({'path':str(path),'sourceSha256':digest,'startSeconds':0,'durationSeconds':duration,'purpose':prior['purpose']+'; recaptured genuine native sound effects, original runtime BGM disabled for continuous music mix.','audioTrackIndex':0,'sourceIdentity':{'sourceKind':'unity-gameview-candidate','captureUtc':c['startUtc'],'appVersion':'3.0.2','build':None,'sourceCommit':None,'provenance':'Unity6000.5.1f1 existing Recorder5.1.7, actual native game navigation in isolated clone, genuine visuals and SFX; not build39 physical-device footage. No account save/reward actions.','continuousRealRecording':True}})
+bgm=Path('/Users/daisei/PocketStriker/Assets/ExternalAssets/Audio/BGM/MIDI☆MUSIQ/BGM1_fin.wav')
+manifest={'schema':'PocketStrikerRealClipEdit-v1','appId':'6478905824','locale':'ja','settings':{'scaleMode':'fit'},'clips':clips,'backgroundMusic':{'path':str(bgm),'sourceSha256':hashlib.sha256(bgm.read_bytes()).hexdigest(),'startSeconds':0,'gain':0.28,'fadeInSeconds':0.15,'fadeOutSeconds':0.6}}
+(out/'combined-edit-battle-prepared.json').write_text(json.dumps(manifest,indent=2))
+print('Three battle ranges prepared; total15.7s; music continuous, genuine effects gain0.5.')
+PY"

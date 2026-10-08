@@ -1,0 +1,14 @@
+Recovered original screenshot install_runner.py from archived thread 01a101c0-1820-74d6-96fe-7323a8d89091, command exec-0554c570-80a7-49ed-8b20-f5dfaf9bc5c8 (full original Python lines 1–145; not executed).
+
+Exact historical core integration:
+- Replace original static async UniTask Run() body with static UniTask Run() => StoreRun();
+- Add StoreReattach(); at end of static PocketStrikerUILiveReview() constructor (both Play exit/entry domain reloads).
+- Begin(): replace SessionState.SetString(Key + ".Output", "Logs/UIArt/Live/" + label) with SessionState.SetString(Key + ".Output", StoreOutput).
+- Finish(): replace early Application.isBatchMode EditorApplication.Exit(...) branch with EditorApplication.isPlaying = false; exit is deferred to StoreOnPlayModeChanged after restoration.
+- Screenshot(): only Inventory whitelist, no BannerSimulation; add StoreRecordScreenshot(path,width,height) after dimensions validation.
+- Home(): use actual playTab + DismissStartupModals to return home.
+- Source manifest created as StoreCaptureSourceManifest.json and original core backup preserved.
+
+Video-route adaptation needed by current integration: static UniTask Run() => StoreVideoRun(); set Inventory to battle-duel,battle-team,battle-group,skill-editor (recovered latest StoreVideoRun checks these exact case names). Original screenshot installer uses home,skill-editor,adventure-preparation,random-boss,battle-hud, so do not run it unchanged as video installer. A separate historical unavailable/unreached-case patch has not yet been located; do not assume recovered installer includes it.
+
+Audio memory/state restoration patch saved separately in StoreCapture-historical-audio.diff. The recovered StoreCapture.cs is before that audio patch. Apply it or explicitly restore EditorUtility.audioMasterMute, AudioListener.pause/volume and runtime BgmVolume/EffectsVolume after capture.

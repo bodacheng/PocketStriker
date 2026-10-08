@@ -1,0 +1,412 @@
+{
+  "audioTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 142571,
+        "firstPresentationSeconds" : 0,
+        "lastPresentationSeconds" : 15.488,
+        "measuredPayloadBitrateBps" : 73642.045454545456,
+        "positiveSampleDeltaMaxSeconds" : 2.0266666666666668,
+        "positiveSampleDeltaMinSeconds" : 0.46933333333333316,
+        "readerCompleted" : true,
+        "sampleCount" : 729,
+        "trackDurationSeconds" : 15.488
+      },
+      "decodedSignal" : {
+        "channels" : 2,
+        "entirelySilent" : false,
+        "longestExactlyZeroRunSeconds" : 4.46,
+        "nearFullScaleSampleValues" : 0,
+        "nonzeroValues" : 533248,
+        "peak" : 0.40822073817253113,
+        "perSecond" : [
+          {
+            "peak" : 0.34917622804641724,
+            "rms" : 0.037940401608824538,
+            "sampleValues" : 96000,
+            "second" : 0
+          },
+          {
+            "peak" : 0.18969270586967468,
+            "rms" : 0.015103654141586993,
+            "sampleValues" : 96000,
+            "second" : 1
+          },
+          {
+            "peak" : 0.30309811234474182,
+            "rms" : 0.026736315387312599,
+            "sampleValues" : 96000,
+            "second" : 2
+          },
+          {
+            "peak" : 0.30309811234474182,
+            "rms" : 0.025648747374493672,
+            "sampleValues" : 96000,
+            "second" : 3
+          },
+          {
+            "peak" : 0.34128594398498535,
+            "rms" : 0.038245607272863164,
+            "sampleValues" : 96000,
+            "second" : 4
+          },
+          {
+            "peak" : 0.18969270586967468,
+            "rms" : 0.015103886849690733,
+            "sampleValues" : 96000,
+            "second" : 5
+          },
+          {
+            "peak" : 0.20796912908554077,
+            "rms" : 0.016328480763744574,
+            "sampleValues" : 96000,
+            "second" : 6
+          },
+          {
+            "peak" : 0.21524117887020111,
+            "rms" : 0.036580383942278354,
+            "sampleValues" : 96000,
+            "second" : 7
+          },
+          {
+            "peak" : 0.0024752174504101276,
+            "rms" : 0.00018303037443065867,
+            "sampleValues" : 96000,
+            "second" : 8
+          },
+          {
+            "peak" : 0.18982328474521637,
+            "rms" : 0.016882231728602308,
+            "sampleValues" : 96000,
+            "second" : 9
+          },
+          {
+            "peak" : 0.40822073817253113,
+            "rms" : 0.046965138506047534,
+            "sampleValues" : 96000,
+            "second" : 10
+          },
+          {
+            "peak" : 0.00017721745825838298,
+            "rms" : 3.4561376774210271e-06,
+            "sampleValues" : 96000,
+            "second" : 11
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 12
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 13
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 14
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 46848,
+            "second" : 15
+          }
+        ],
+        "readerCompleted" : true,
+        "rms" : 0.023872628699667157,
+        "sampleRateHz" : 48000,
+        "sampleValues" : 1486848,
+        "trackDurationSeconds" : 15.488
+      },
+      "formats" : [
+        {
+          "channels" : 2,
+          "codec" : "aac ",
+          "sampleRateHz" : 48000
+        }
+      ],
+      "index" : 0
+    }
+  ],
+  "durationSeconds" : 15.5,
+  "fileBytes" : 19010170,
+  "frames" : [
+    {
+      "actualSeconds" : 0.29999999999999999,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-000-0000.300.png",
+      "requestedSeconds" : 0.29999999999999999,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "05f52a050787d66f974b0ae2af1ba174752685fae51c8937d792565104dd251f",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 1.2,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-001-0001.200.png",
+      "requestedSeconds" : 1.2,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "2ffd8a62462934d12465fc8900cb252eae37c17f95500ab9852a4cd5fb8eb528",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 1.6000000000000001,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-002-0001.600.png",
+      "requestedSeconds" : 1.6000000000000001,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "d6b61af3d14710e688e0c6c16a3566ea198922588a74a3926dea9b85400edd95",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 2,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-003-0002.000.png",
+      "requestedSeconds" : 2,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "fedf584006740c1a6af116af47aa67fddf75428c44eab159c5ff63858e4e4cc5",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 2.7999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-004-0002.800.png",
+      "requestedSeconds" : 2.7999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "2d6459cacd32e0889d976dd97c9b850c439694be52970253284e0347bc660043",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 3.3999999999999999,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-005-0003.400.png",
+      "requestedSeconds" : 3.3999999999999999,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "e949d155611a74fa56c80266537faaff321a65259537b51e5dff399e2897baa8",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 4,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-006-0004.000.png",
+      "requestedSeconds" : 4,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "b4ce9c296686a72b8caa2166f27f1bcb432d47b2b519257bd5554567ddefc639",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 5.2999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-007-0005.300.png",
+      "requestedSeconds" : 5.2999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "d560533f1312492e5398d3dbb28ffffa15e155a35c403e976ddccae9d771f1fb",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 5.7999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-008-0005.800.png",
+      "requestedSeconds" : 5.7999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "8adb8a893bcefed72276a7bbc1b34f61ed61b47789b8eabf1f928a0a89e82c14",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 6.2999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-009-0006.300.png",
+      "requestedSeconds" : 6.2999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "edbcce1cfa1e33fb4a7dd301bd259353331a162efb41f5a429bbffdc6c560f45",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 6.7999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-010-0006.800.png",
+      "requestedSeconds" : 6.7999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "394c61ed663622f48e70b3b2d72aec5042122fc183e90c0dad568afa889fb815",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 7.2999999999999998,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-011-0007.300.png",
+      "requestedSeconds" : 7.2999999999999998,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "00b1b5a8e6a8e8245082689083ad337faa625c16a77df59d9baf5df261ad5b2a",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 8.8000000000000007,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-012-0008.800.png",
+      "requestedSeconds" : 8.8000000000000007,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "b3bbd0a0a262bbb002bc910e512ba8abbe8fb2cac62585c38edcb23b1467d382",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 9.1999999999999993,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-013-0009.200.png",
+      "requestedSeconds" : 9.1999999999999993,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "b6455781adf1f159735e99ed5745acd2fda0bc7f9a0c591dbcd60376aa7ceb00",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 9.5999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-014-0009.600.png",
+      "requestedSeconds" : 9.5999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "02f076e1002f4e3d348f07f518add1e1a97d9e30f54dc463b8ecf52301a3b9a4",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 10.4,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-015-0010.400.png",
+      "requestedSeconds" : 10.4,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "00a6e695d39c288551380747b5f19c4aee8e697f4e526b0cb2513c856074c9b4",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 10.800000000000001,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-016-0010.800.png",
+      "requestedSeconds" : 10.800000000000001,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "c019555e1996beabe1793d42c399f7344367df180af4c6acf273533eaf9485ca",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 11.199999999999999,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-017-0011.200.png",
+      "requestedSeconds" : 11.199999999999999,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "c7e465b0fc2e4cd3c055f9016371801821be1f933a3f96afc8d06ca0aa6913b6",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 12,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-018-0012.000.png",
+      "requestedSeconds" : 12,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "c2465c213078f072c3e7a11fa6f25a13486a1f9b2828f59ece606798778593c8",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 14.9,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/root-skill-qa\/frame-019-0014.900.png",
+      "requestedSeconds" : 14.9,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "4beb76c8f049a4086425f3dea5bc5e0565c33712bdb1a712b9a07e1c05d6be9f",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    }
+  ],
+  "limitations" : [
+    "Technical inspection does not confirm gameplay authenticity or store acceptance.",
+    "H.264 profile\/level are read from avcC; SPS progressive syntax is not parsed.",
+    "Near-full-scale PCM values are reported as observations, not proof of audible clipping."
+  ],
+  "schema" : "PocketStrikerMediaProbe-v1",
+  "sha256" : "12d6ae89c19cd2541e35e40923c5e77017bf184fff04a854be988ef090d40c82",
+  "source" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/recording-3\/skill-editor-20261008T051656673-4648e267.mp4",
+  "sourceModified" : false,
+  "videoEncoded" : false,
+  "videoTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 18856587,
+        "firstPresentationSeconds" : 0.066666666666666666,
+        "lastPresentationSeconds" : 15.5,
+        "measuredPayloadBitrateBps" : 9732432,
+        "positiveSampleDeltaMaxSeconds" : 0.16666666666666785,
+        "positiveSampleDeltaMinSeconds" : 0.06666666666666643,
+        "readerCompleted" : true,
+        "sampleCount" : 465,
+        "trackDurationSeconds" : 15.5
+      },
+      "displayHeight" : 1920,
+      "displayWidth" : 886,
+      "formats" : [
+        {
+          "avcConfigurationVersion" : 1,
+          "codec" : "avc1",
+          "encodedHeight" : 1920,
+          "encodedWidth" : 886,
+          "h264Level" : 4,
+          "h264LevelIDC" : 40,
+          "h264ProfileIDC" : 100
+        }
+      ],
+      "index" : 0,
+      "naturalHeight" : 1920,
+      "naturalWidth" : 886,
+      "nominalFrameRate" : 30,
+      "transform" : [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

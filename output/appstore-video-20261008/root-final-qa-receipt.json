@@ -1,0 +1,30 @@
+{
+  "checkedUtc": "2026-10-08T05:22:51.430303+00:00",
+  "userRequest": "Dynamic actual skill VFX, inventory equipment, and occupied skill-slot swap in store preview",
+  "finalVideo": "/Users/daisei/PocketStriker/output/appstore-video-20261008/PocketStriker_3.0.2_Editor_ja_iPhone69_combined_skills_vfx_equip_swap_20261008.mp4",
+  "sha256": "4533ba167ec9d20f8b98927b57f260a74ed8e71ab9d28467e5a20a19144df09c",
+  "durationSeconds": 25.6,
+  "visualReviewedFiles": [
+    "qa-final/root-final-contact-sheet.jpg",
+    "root-skill-qa/contact-sheet.jpg"
+  ],
+  "visualResult": "Battle scenes, 3 native skill effects, both inventory drags and the occupied-slot swap are visible. Removed the long idle tail. No loading overlay or editor chrome.",
+  "inventoryEquips": 2,
+  "occupiedSlotSwaps": 1,
+  "actualVfxPreviews": 3,
+  "resetVerified": true,
+  "noCloudConfirmation": true,
+  "audio": {
+    "entirelySilent": false,
+    "longestExactlyZeroRunSeconds": 0,
+    "nearFullScaleSampleValues": 0,
+    "peak": 0.724518358707428,
+    "rms": 0.11158307541680117
+  },
+  "captureRestoration": {
+    "preferencesRestored": true,
+    "appSettingsFileRestored": true,
+    "scenesRestored": true
+  },
+  "candidateProvenance": "Real Unity Editor Game-view recording from actual account; no native-device capture claimed."
+}

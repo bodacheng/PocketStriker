@@ -1,0 +1,58 @@
+from pathlib import Path
+src=Path('/Users/daisei/PocketStriker/output/appstore-video-20261008/recovered/edit_real_clips.swift').read_text()
+src=src.replace('// Edits only declared continuous recordings. No still images, generated audio,\n// overlays, speed changes, frame interpolation, or game/project operations.', '// User-authorized combined preview: genuine recordings and one existing in-game music track.\n// No still images, overlays, speed changes, frame interpolation, or game/project operations.')
+src=src.replace('struct EditList: Decodable {','struct BackgroundMusic: Decodable {\n    let path: String\n    let sourceSha256: String\n    let startSeconds: Double\n    let gain: Float\n    let fadeInSeconds: Double\n    let fadeOutSeconds: Double\n}\nstruct EditList: Decodable {')
+src=src.replace('    let clips: [Clip]\n}', '    let clips: [Clip]\n    let backgroundMusic: BackgroundMusic?\n}')
+src=src.replace('    let audioTrack: AVMutableCompositionTrack?\n', '    let audioTracks: [AVMutableCompositionTrack]\n    let audioMix: AVMutableAudioMix?\n')
+needle='    let videoComposition = AVMutableVideoComposition()'
+insert='''    var outputAudioTracks: [AVMutableCompositionTrack] = audioTrack.map { [$0] } ?? []
+    var audioMix: AVMutableAudioMix?
+    var bgmReport: [String: Any] = [:]
+    if let bgm = list.backgroundMusic {
+        try need(bgm.gain >= 0 && bgm.gain <= 1 && bgm.startSeconds >= 0, "Invalid music gain/range.")
+        let bgmURL = URL(fileURLWithPath: bgm.path).resolvingSymlinksInPath()
+        try need(try hash(bgmURL) == bgm.sourceSha256, "Background music source hash mismatch.")
+        let bgmAsset = AVURLAsset(url: bgmURL)
+        let bgmTracks = try await bgmAsset.loadTracks(withMediaType: .audio)
+        try need(bgmTracks.count == 1, "Background music needs exactly one real source audio track.")
+        let bgmStart = CMTime(seconds: bgm.startSeconds, preferredTimescale: 60_000)
+        let bgmRange = CMTimeRange(start: bgmStart, duration: cursor)
+        let sourceRange = try await bgmTracks[0].load(.timeRange)
+        try need(CMTimeCompare(bgmRange.start, sourceRange.start) >= 0 && CMTimeCompare(bgmRange.end, sourceRange.end) <= 0,
+                 "Music must cover entire preview without looping or padding.")
+        guard let musicTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else { throw Failure.message("Cannot add music track.") }
+        try musicTrack.insertTimeRange(bgmRange, of: bgmTracks[0], at: .zero)
+        outputAudioTracks.append(musicTrack)
+        let mix = AVMutableAudioMix()
+        let musicVolume = AVMutableAudioMixInputParameters(track: musicTrack)
+        musicVolume.setVolume(bgm.gain, at: .zero)
+        let fi = min(max(0, bgm.fadeInSeconds), cursor.seconds / 4)
+        let fo = min(max(0, bgm.fadeOutSeconds), cursor.seconds / 4)
+        if fi > 0 { musicVolume.setVolumeRamp(fromStartVolume: 0, toEndVolume: bgm.gain,
+            timeRange: CMTimeRange(start: .zero, duration: CMTime(seconds: fi, preferredTimescale: 60_000))) }
+        if fo > 0 { musicVolume.setVolumeRamp(fromStartVolume: bgm.gain, toEndVolume: 0,
+            timeRange: CMTimeRange(start: CMTime(seconds: cursor.seconds - fo, preferredTimescale: 60_000), duration: CMTime(seconds: fo, preferredTimescale: 60_000))) }
+        var params: [AVAudioMixInputParameters] = [musicVolume]
+        if let effectsTrack = audioTrack {
+            let effectsVolume = AVMutableAudioMixInputParameters(track: effectsTrack)
+            effectsVolume.setVolume(1, at: .zero)
+            params.append(effectsVolume)
+        }
+        mix.inputParameters = params
+        audioMix = mix
+        bgmReport = ["path": bgmURL.path, "sourceSha256": bgm.sourceSha256, "sourceStartSeconds": bgm.startSeconds,
+                     "durationSeconds": cursor.seconds, "gain": bgm.gain, "fadeInSeconds": fi, "fadeOutSeconds": fo,
+                     "continuousSingleRangeAcrossEveryVisualCut": true, "loops": 0,
+                     "provenance": "Existing bundled game music, user authorized calm continuous background music"]
+    }
+'''
+src=src.replace(needle,insert+needle)
+src=src.replace('"audioIncluded": audioTrack != nil, "audioPolicy": "only original recorded track; no generated audio",','"audioIncluded": !outputAudioTracks.isEmpty, "audioPolicy": "genuine recorded effects plus one existing game music range continuous across cuts",\n        "backgroundMusic": bgmReport,')
+src=src.replace('"requestedAudio": audioTrack == nil ? "none" : "AAC stereo 256000bps 48000Hz",','"requestedAudio": outputAudioTracks.isEmpty ? "none" : "AAC stereo 256000bps 48000Hz",')
+src=src.replace('audioTrack: audioTrack, duration: cursor, report: report)', 'audioTracks: outputAudioTracks, audioMix: audioMix, duration: cursor, report: report)')
+src=src.replace('if let track = prepared.audioTrack {\n        let decoded = AVAssetReaderAudioMixOutput(audioTracks: [track]', 'if !prepared.audioTracks.isEmpty {\n        let decoded = AVAssetReaderAudioMixOutput(audioTracks: prepared.audioTracks')
+src=src.replace('        decoded.alwaysCopiesSampleData = false\n', '        decoded.audioMix = prepared.audioMix\n        decoded.alwaysCopiesSampleData = false\n')
+src=src.replace('try need(try hash(bgmURL) == bgm.sourceSha256,', 'let bgmHash = try hash(bgmURL)\n        try need(bgmHash == bgm.sourceSha256,')
+path=Path('/Users/daisei/PocketStriker/output/appstore-video-20261008/recovered/combined_preview_export.swift')
+path.write_text(src)
+print(path)

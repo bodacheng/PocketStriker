@@ -1,0 +1,40 @@
+--- /tmp/pocketstriker-iphone-preview-20261004/audio-recapture-backup/PocketStrikerUILiveReview.StoreVideoRecorder.cs	2026-10-04 17:50:37
++++ /tmp/pocketstriker-iphone-preview-20261004/project/Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs	2026-10-04 19:08:15
+@@ -46,6 +46,10 @@
+         public string label, outputPath, filename, startUtc, endUtc, startScene, endScene;
+         public string startProcess, endProcess, stopReason, errorCode, sha256;
+         public string actualAudioSpeakerMode;
++        public bool editorAudioMuteBeforeCapture, listenerPausedBeforeCapture;
++        public float listenerVolumeBeforeCapture, runtimeBgmVolume, runtimeEffectsVolume;
++        public int activeAudioListeners, audioOutputProbeFrames, nonzeroAudioProbeFrames;
++        public float audioOutputProbePeak;
+         public string requestedEncoder = "Unity Media Encoder H.264 MP4; Custom quality; High profile; target 11 Mbps; no alpha; capture native game audio.";
+         public bool battle, recorderStarted, requestedIntervalCompleted, fileExists;
+         public bool captureTimingRestored, targetFrameRateRestored, runInBackgroundRestored;
+@@ -284,6 +288,13 @@
+             startTimeScale = Time.timeScale, originalCaptureFramerate = Time.captureFramerate,
+             originalCaptureDeltaTime = Time.captureDeltaTime, originalTargetFrameRate = Application.targetFrameRate
+         };
++        clip.editorAudioMuteBeforeCapture = EditorUtility.audioMasterMute;
++        clip.listenerPausedBeforeCapture = AudioListener.pause;
++        clip.listenerVolumeBeforeCapture = AudioListener.volume;
++        clip.runtimeBgmVolume = AppSetting.Value.BgmVolume;
++        clip.runtimeEffectsVolume = AppSetting.Value.EffectsVolume;
++        clip.activeAudioListeners = UnityEngine.Object.FindObjectsByType<AudioListener>(FindObjectsInactive.Exclude).Count(x => x.enabled);
++        Require(!EditorUtility.audioMasterMute && !AudioListener.pause && AudioListener.volume > 0 && clip.activeAudioListeners == 1, "Actual capture audio is muted or lacks exactly one listener.");
+         var audioConfiguration = AudioSettings.GetConfiguration();
+         clip.actualAudioSpeakerMode = audioConfiguration.speakerMode.ToString();
+         clip.actualAudioSampleRate = audioConfiguration.sampleRate;
+@@ -351,6 +362,12 @@
+                 if (Time.frameCount != lastSampledFrame)
+                 {
+                     clip.frames.Add(StoreVideoObserveFrame(battle));
++                    var pcmProbe = new float[1024];
++                    AudioListener.GetOutputData(pcmProbe, 0);
++                    float probePeak = pcmProbe.Max(x => Mathf.Abs(x));
++                    clip.audioOutputProbeFrames++;
++                    if (probePeak > .000001f) clip.nonzeroAudioProbeFrames++;
++                    clip.audioOutputProbePeak = Mathf.Max(clip.audioOutputProbePeak, probePeak);
+                     lastSampledFrame = Time.frameCount;
+                 }
+                 if (Time.realtimeSinceStartupAsDouble > deadline)

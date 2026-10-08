@@ -1,0 +1,44 @@
+{
+  "createdOn": "2026-10-08",
+  "operation": "Delivery format conversion and center crop; no new generation",
+  "source": {
+    "path": "creative-landscape-source.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2374021
+  },
+  "originalUniversal": {
+    "path": "pocket-striker-appstore-creative-5244x2950.png",
+    "width": 5244,
+    "height": 2950,
+    "bytes": 14253938
+  },
+  "exports": [
+    {
+      "path": "pocket-striker-appstore-creative-5244x2950-q92.jpg",
+      "width": 5244,
+      "height": 2950,
+      "bytes": 3254943,
+      "format": "JPEG",
+      "quality": 92,
+      "colorSpace": "RGB",
+      "alpha": false,
+      "operation": "Plain JPEG conversion of original universal PNG",
+      "preview": "creative-jpeg-preview-1440x810.jpg"
+    },
+    {
+      "path": "pocket-striker-appstore-search-1920x1280-q92.jpg",
+      "width": 1920,
+      "height": 1280,
+      "bytes": 869942,
+      "format": "JPEG",
+      "quality": 92,
+      "colorSpace": "RGB",
+      "alpha": false,
+      "operation": "Centered source crop 1412×941, then resample to 1920×1280",
+      "preview": "search-jpeg-preview-960x640.jpg"
+    }
+  ],
+  "tool": "macOS sips",
+  "visualVerification": "Both final previews inspected; central golden gem and blue/purple secondary gems retained; no added text, logo or UI."
+}

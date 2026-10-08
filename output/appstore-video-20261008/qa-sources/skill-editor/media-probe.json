@@ -1,0 +1,357 @@
+{
+  "audioTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 142571,
+        "firstPresentationSeconds" : 0,
+        "lastPresentationSeconds" : 15.488,
+        "measuredPayloadBitrateBps" : 73642.045454545456,
+        "positiveSampleDeltaMaxSeconds" : 2.0266666666666668,
+        "positiveSampleDeltaMinSeconds" : 0.46933333333333316,
+        "readerCompleted" : true,
+        "sampleCount" : 729,
+        "trackDurationSeconds" : 15.488
+      },
+      "decodedSignal" : {
+        "channels" : 2,
+        "entirelySilent" : false,
+        "longestExactlyZeroRunSeconds" : 4.46,
+        "nearFullScaleSampleValues" : 0,
+        "nonzeroValues" : 533248,
+        "peak" : 0.40822073817253113,
+        "perSecond" : [
+          {
+            "peak" : 0.34917622804641724,
+            "rms" : 0.037940401608824538,
+            "sampleValues" : 96000,
+            "second" : 0
+          },
+          {
+            "peak" : 0.18969270586967468,
+            "rms" : 0.015103654141586993,
+            "sampleValues" : 96000,
+            "second" : 1
+          },
+          {
+            "peak" : 0.30309811234474182,
+            "rms" : 0.026736315387963745,
+            "sampleValues" : 96000,
+            "second" : 2
+          },
+          {
+            "peak" : 0.30309811234474182,
+            "rms" : 0.025648747374493672,
+            "sampleValues" : 96000,
+            "second" : 3
+          },
+          {
+            "peak" : 0.34128594398498535,
+            "rms" : 0.03824560684095709,
+            "sampleValues" : 96000,
+            "second" : 4
+          },
+          {
+            "peak" : 0.18969270586967468,
+            "rms" : 0.015103886849690733,
+            "sampleValues" : 96000,
+            "second" : 5
+          },
+          {
+            "peak" : 0.20796912908554077,
+            "rms" : 0.016328480931833436,
+            "sampleValues" : 96000,
+            "second" : 6
+          },
+          {
+            "peak" : 0.21524117887020111,
+            "rms" : 0.036580383942278354,
+            "sampleValues" : 96000,
+            "second" : 7
+          },
+          {
+            "peak" : 0.0024752174504101276,
+            "rms" : 0.00018303037443065867,
+            "sampleValues" : 96000,
+            "second" : 8
+          },
+          {
+            "peak" : 0.18982328474521637,
+            "rms" : 0.016882231746493406,
+            "sampleValues" : 96000,
+            "second" : 9
+          },
+          {
+            "peak" : 0.40822073817253113,
+            "rms" : 0.046965138900147717,
+            "sampleValues" : 96000,
+            "second" : 10
+          },
+          {
+            "peak" : 0.00017721744370646775,
+            "rms" : 3.456137567999868e-06,
+            "sampleValues" : 96000,
+            "second" : 11
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 12
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 13
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 96000,
+            "second" : 14
+          },
+          {
+            "peak" : 0,
+            "rms" : 0,
+            "sampleValues" : 46848,
+            "second" : 15
+          }
+        ],
+        "readerCompleted" : true,
+        "rms" : 0.023872628713337656,
+        "sampleRateHz" : 48000,
+        "sampleValues" : 1486848,
+        "trackDurationSeconds" : 15.488
+      },
+      "formats" : [
+        {
+          "channels" : 2,
+          "codec" : "aac ",
+          "sampleRateHz" : 48000
+        }
+      ],
+      "index" : 0
+    }
+  ],
+  "durationSeconds" : 15.5,
+  "fileBytes" : 19010170,
+  "frames" : [
+    {
+      "actualSeconds" : 0.10000000000000001,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-000-0000.100.png",
+      "requestedSeconds" : 0.10000000000000001,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "ccec182d4deb9058be25e8baafaa66d24fd7ec4cb89604b3719c9796b9a7b21b",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 0.69999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-001-0000.700.png",
+      "requestedSeconds" : 0.69999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "2cefe2dd9fbf5d7a9bb6d933a090b1e4ae15834a32647e73dafb28ee1d8ff63d",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 1.8999999999999999,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-002-0001.900.png",
+      "requestedSeconds" : 1.8999999999999999,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "ac3d6d9e24e1bd6ca98e504188b9d5053b040d0d77fcaf14f67c1c1a01ea2df4",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 2.7000000000000002,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-003-0002.700.png",
+      "requestedSeconds" : 2.7000000000000002,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "a1427e7beba66c5354b742915c1e2eaf75824415d5806d87d8ab8b35b6d00b10",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 3.2000000000000002,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-004-0003.200.png",
+      "requestedSeconds" : 3.2000000000000002,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "26f42673f7349921814f195368aca8c7b312060d22eeda544525e02165b97d0b",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 4.5999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-005-0004.600.png",
+      "requestedSeconds" : 4.5999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "f0160ec8fdfb9a25ce3218e9e7a20526662982612eaff1d099b8e027c25795ad",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 5.9000000000000004,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-006-0005.900.png",
+      "requestedSeconds" : 5.9000000000000004,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "fe4351b75e53b27e484b7e7d4b69025879d78ae68ba12270caaeb85f81290a48",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 6.5999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-007-0006.600.png",
+      "requestedSeconds" : 6.5999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "50a98358b8ce1c2675090908710c0b27e710ff6a93e32041fc8436af89520ab8",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 7.2000000000000002,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-008-0007.200.png",
+      "requestedSeconds" : 7.2000000000000002,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "225643c0a025be1165aee1524199dffd9d79a186afc909c6d74fe24e0e9de451",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 8.5999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-009-0008.600.png",
+      "requestedSeconds" : 8.5999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "fe076cb9a7a6318dfbd4e61585b7349f034b937339ad6ebab3d9fbd896e2ca20",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 9.5999999999999996,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-010-0009.600.png",
+      "requestedSeconds" : 9.5999999999999996,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "02f076e1002f4e3d348f07f518add1e1a97d9e30f54dc463b8ecf52301a3b9a4",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 10.6,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-011-0010.600.png",
+      "requestedSeconds" : 10.6,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "978a74b4188adf93f0ba121eacba1c675efdc22a2eae55e4619fbbb8ad960d43",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 11.1,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-012-0011.100.png",
+      "requestedSeconds" : 11.1,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "b200e74846c7fc6f22e4196376ad4ad95d1362cdb503d9d0d010c93bb1b7bf13",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 14.9,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-013-0014.900.png",
+      "requestedSeconds" : 14.9,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "4beb76c8f049a4086425f3dea5bc5e0565c33712bdb1a712b9a07e1c05d6be9f",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 15.300000000000001,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/skill-editor\/frame-014-0015.300.png",
+      "requestedSeconds" : 15.300000000000001,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "7a3755df4d12a57d675ad64ef95e226c77eab89212e65b227e230890fb6fc073",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    }
+  ],
+  "limitations" : [
+    "Technical inspection does not confirm gameplay authenticity or store acceptance.",
+    "H.264 profile\/level are read from avcC; SPS progressive syntax is not parsed.",
+    "Near-full-scale PCM values are reported as observations, not proof of audible clipping."
+  ],
+  "schema" : "PocketStrikerMediaProbe-v1",
+  "sha256" : "12d6ae89c19cd2541e35e40923c5e77017bf184fff04a854be988ef090d40c82",
+  "source" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/recording-3\/skill-editor-20261008T051656673-4648e267.mp4",
+  "sourceModified" : false,
+  "videoEncoded" : false,
+  "videoTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 18856587,
+        "firstPresentationSeconds" : 0.066666666666666666,
+        "lastPresentationSeconds" : 15.5,
+        "measuredPayloadBitrateBps" : 9732432,
+        "positiveSampleDeltaMaxSeconds" : 0.16666666666666785,
+        "positiveSampleDeltaMinSeconds" : 0.06666666666666643,
+        "readerCompleted" : true,
+        "sampleCount" : 465,
+        "trackDurationSeconds" : 15.5
+      },
+      "displayHeight" : 1920,
+      "displayWidth" : 886,
+      "formats" : [
+        {
+          "avcConfigurationVersion" : 1,
+          "codec" : "avc1",
+          "encodedHeight" : 1920,
+          "encodedWidth" : 886,
+          "h264Level" : 4,
+          "h264LevelIDC" : 40,
+          "h264ProfileIDC" : 100
+        }
+      ],
+      "index" : 0,
+      "naturalHeight" : 1920,
+      "naturalWidth" : 886,
+      "nominalFrameRate" : 30,
+      "transform" : [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

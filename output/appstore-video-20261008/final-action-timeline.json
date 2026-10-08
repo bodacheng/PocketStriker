@@ -1,0 +1,112 @@
+{
+  "schema": "PocketStrikerFinalActionTimeline-v1",
+  "durationSeconds": 25.6,
+  "skillSegmentOutputStartSeconds": 13.6,
+  "skillSourceTrimStartSeconds": 0.1,
+  "skillSourceDurationSeconds": 12,
+  "framesPerSecond": 30,
+  "sequenceOriginUnityFrame": 5007,
+  "recorderStartUnityFrame": 5012,
+  "timingBasis": "Native operation Unity frame markers on the constant 30fps Recorder grid. VFX samples occur in the frame following the current completed WaitFrames count. Final positions subtract source trim0.1 and add output skill start13.6. These are nominal frame-derived action boundaries; inspect media PNG requested/actual times for the encoded visual frames.",
+  "actions": [
+    {
+      "action": "category-first-owned-skill",
+      "nativeSequenceFrame": 18,
+      "skillRelativeStartSeconds": 0.333333333,
+      "finalStartSeconds": 13.933333333
+    },
+    {
+      "action": "inventory-equip",
+      "nativeSequenceFrame": 28,
+      "skillRelativeStartSeconds": 0.666666667,
+      "finalStartSeconds": 14.266666667,
+      "skillId": "37",
+      "realName": "slidekick",
+      "fromCell": "CellPrefab(Clone)",
+      "toCell": "A3",
+      "skillRelativeDropSeconds": 1.566666667,
+      "finalDropSeconds": 15.166666667,
+      "productionDropVerified": true,
+      "identityVerified": true
+    },
+    {
+      "action": "preview-176",
+      "nativeSequenceFrame": 68,
+      "skillRelativeStartSeconds": 2.0,
+      "finalStartSeconds": 15.6
+    },
+    {
+      "action": "category-second-owned-skill",
+      "nativeSequenceFrame": 138,
+      "skillRelativeStartSeconds": 4.333333333,
+      "finalStartSeconds": 17.933333333
+    },
+    {
+      "action": "inventory-equip",
+      "nativeSequenceFrame": 148,
+      "skillRelativeStartSeconds": 4.666666667,
+      "finalStartSeconds": 18.266666667,
+      "skillId": "9",
+      "realName": "downrotatekick",
+      "fromCell": "CellPrefab(Clone)",
+      "toCell": "B2",
+      "skillRelativeDropSeconds": 5.566666667,
+      "finalDropSeconds": 19.166666667,
+      "productionDropVerified": true,
+      "identityVerified": true
+    },
+    {
+      "action": "preview-77",
+      "nativeSequenceFrame": 188,
+      "skillRelativeStartSeconds": 6.0,
+      "finalStartSeconds": 19.6
+    },
+    {
+      "action": "occupied-slot-swap",
+      "nativeSequenceFrame": 258,
+      "skillRelativeStartSeconds": 8.333333333,
+      "finalStartSeconds": 21.933333333,
+      "skillId": "37",
+      "realName": "slidekick",
+      "fromCell": "A3",
+      "toCell": "B2",
+      "skillRelativeDropSeconds": 9.233333333,
+      "finalDropSeconds": 22.833333333,
+      "productionDropVerified": true,
+      "identityVerified": true
+    },
+    {
+      "action": "preview-162",
+      "nativeSequenceFrame": 298,
+      "skillRelativeStartSeconds": 9.666666667,
+      "finalStartSeconds": 23.266666667
+    },
+    {
+      "action": "VFX-visible",
+      "skillId": "176",
+      "realName": "adam_spin",
+      "skillRelativeFirstSeconds": 2.5,
+      "skillRelativeLastSeconds": 4.333333333,
+      "finalFirstSeconds": 16.1,
+      "finalLastSeconds": 17.933333333
+    },
+    {
+      "action": "VFX-visible",
+      "skillId": "77",
+      "realName": "fo_huge",
+      "skillRelativeFirstSeconds": 6.033333333,
+      "skillRelativeLastSeconds": 8.233333333,
+      "finalFirstSeconds": 19.633333333,
+      "finalLastSeconds": 21.833333333
+    },
+    {
+      "action": "VFX-visible",
+      "skillId": "162",
+      "realName": "mirrorcannon",
+      "skillRelativeFirstSeconds": 10.266666667,
+      "skillRelativeLastSeconds": 10.9,
+      "finalFirstSeconds": 23.866666667,
+      "finalLastSeconds": 24.5
+    }
+  ]
+}

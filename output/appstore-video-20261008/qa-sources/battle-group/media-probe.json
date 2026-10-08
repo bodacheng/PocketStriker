@@ -1,0 +1,154 @@
+{
+  "audioTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 148016,
+        "firstPresentationSeconds" : 0,
+        "lastPresentationSeconds" : 5.9946666666666664,
+        "measuredPayloadBitrateBps" : 197530.24911032029,
+        "positiveSampleDeltaMaxSeconds" : 2.0266666666666668,
+        "positiveSampleDeltaMinSeconds" : 0.46933333333333316,
+        "readerCompleted" : true,
+        "sampleCount" : 284,
+        "trackDurationSeconds" : 5.9946666666666664
+      },
+      "decodedSignal" : {
+        "channels" : 2,
+        "entirelySilent" : false,
+        "longestExactlyZeroRunSeconds" : 0,
+        "nearFullScaleSampleValues" : 5381,
+        "nonzeroValues" : 575488,
+        "peak" : 1.1543076038360596,
+        "perSecond" : [
+          {
+            "peak" : 1.1543076038360596,
+            "rms" : 0.45767070212749011,
+            "sampleValues" : 96000,
+            "second" : 0
+          },
+          {
+            "peak" : 1.0370234251022339,
+            "rms" : 0.26400503380547724,
+            "sampleValues" : 96000,
+            "second" : 1
+          },
+          {
+            "peak" : 1.0478099584579468,
+            "rms" : 0.24117448401752153,
+            "sampleValues" : 96000,
+            "second" : 2
+          },
+          {
+            "peak" : 1.0794646739959717,
+            "rms" : 0.41687580759719134,
+            "sampleValues" : 96000,
+            "second" : 3
+          },
+          {
+            "peak" : 1.0544067621231079,
+            "rms" : 0.38789854568061671,
+            "sampleValues" : 96000,
+            "second" : 4
+          },
+          {
+            "peak" : 1.0462241172790527,
+            "rms" : 0.373745048876094,
+            "sampleValues" : 95488,
+            "second" : 5
+          }
+        ],
+        "readerCompleted" : true,
+        "rms" : 0.36542887108150868,
+        "sampleRateHz" : 48000,
+        "sampleValues" : 575488,
+        "trackDurationSeconds" : 5.9946666666666664
+      },
+      "formats" : [
+        {
+          "channels" : 2,
+          "codec" : "aac ",
+          "sampleRateHz" : 48000
+        }
+      ],
+      "index" : 0
+    }
+  ],
+  "durationSeconds" : 6,
+  "fileBytes" : 8577839,
+  "frames" : [
+    {
+      "actualSeconds" : 0.10000000000000001,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/battle-group\/frame-000-0000.100.png",
+      "requestedSeconds" : 0.10000000000000001,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "a30461aea3ca099fcb8ff2a0a313ee9bc09dd888cb34ab902e220b2f8c19ea15",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    },
+    {
+      "actualSeconds" : 5.7000000000000002,
+      "height" : 1920,
+      "path" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/qa-sources\/battle-group\/frame-001-0005.700.png",
+      "requestedSeconds" : 5.7000000000000002,
+      "requestedTimeToleranceAfterSeconds" : 0,
+      "requestedTimeToleranceBeforeSeconds" : 0,
+      "sha256" : "227dab15837902206b336bf840242c6be9b8ab203eba107f53671a210e5a45b2",
+      "timeDifferenceSeconds" : 0,
+      "width" : 886
+    }
+  ],
+  "limitations" : [
+    "Technical inspection does not confirm gameplay authenticity or store acceptance.",
+    "H.264 profile\/level are read from avcC; SPS progressive syntax is not parsed.",
+    "Near-full-scale PCM values are reported as observations, not proof of audible clipping."
+  ],
+  "schema" : "PocketStrikerMediaProbe-v1",
+  "sha256" : "77e958fe416846ab038ee3b1c93a8324ba0c55c9a00e422c1352abb592d4a6db",
+  "source" : "\/Users\/daisei\/PocketStriker\/output\/appstore-video-20261008\/recording-3\/battle-group-20261008T051636084-57a84847.mp4",
+  "sourceModified" : false,
+  "videoEncoded" : false,
+  "videoTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 8424772,
+        "firstPresentationSeconds" : 0.066666666666666666,
+        "lastPresentationSeconds" : 6,
+        "measuredPayloadBitrateBps" : 11233029.333333334,
+        "positiveSampleDeltaMaxSeconds" : 0.13333333333333336,
+        "positiveSampleDeltaMinSeconds" : 0.06666666666666643,
+        "readerCompleted" : true,
+        "sampleCount" : 180,
+        "trackDurationSeconds" : 6
+      },
+      "displayHeight" : 1920,
+      "displayWidth" : 886,
+      "formats" : [
+        {
+          "avcConfigurationVersion" : 1,
+          "codec" : "avc1",
+          "encodedHeight" : 1920,
+          "encodedWidth" : 886,
+          "h264Level" : 4,
+          "h264LevelIDC" : 40,
+          "h264ProfileIDC" : 100
+        }
+      ],
+      "index" : 0,
+      "naturalHeight" : 1920,
+      "naturalWidth" : 886,
+      "nominalFrameRate" : 30,
+      "transform" : [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

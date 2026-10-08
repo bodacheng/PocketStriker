@@ -1,0 +1,102 @@
+{
+    "passed": false,
+    "complete": false,
+    "realAccountLogin": true,
+    "fixtureAccountUsed": false,
+    "unityVersion": "6000.5.1f1",
+    "utcTime": "2026-10-08T05:09:37.5631240Z",
+    "loginMode": "Existing production device login",
+    "scope": "Four genuine Unity Recorder GameView recordings with native sound effects: strict 1v1, completed team/group quests and unsaved skill editor. In-game BGM is temporarily set to zero only for recording; continuous native lobby music will be mixed afterward. Current Editor source, not physical build39 footage.",
+    "limitation": "No account skill confirmation, reward/result click, progress changes, fixture, banner simulation, hidden combo or synthetic battle. Editor Fast Mode uses local assets.",
+    "startupSideEffects": "Ordinary existing production device login and startup behavior. Temporary preferences are restored.",
+    "width": 886,
+    "height": 1920,
+    "sceneRecoveries": 0,
+    "cases": [
+        {
+            "name": "battle-duel",
+            "status": "failed",
+            "observedScene": "FightScene",
+            "observedProcess": "SelfFightPage",
+            "finalProcess": "SelfFightPage",
+            "catalogState": "",
+            "captures": [
+                {
+                    "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/recording-1/battle-duel-failure.png",
+                    "scene": "FightScene",
+                    "process": "SelfFightPage",
+                    "width": 886,
+                    "height": 1920,
+                    "activeModelPreviews": 0,
+                    "loadedModelPreviews": 0,
+                    "portraitCount": 1,
+                    "loadedPortraits": 1,
+                    "simulatedBannerPixels": 0.0,
+                    "contentPixels": {
+                        "serializedVersion": "2",
+                        "x": -0.0000030994415283203127,
+                        "y": 0.00002221856266260147,
+                        "width": 886.0,
+                        "height": 1920.0
+                    }
+                }
+            ],
+            "note": "Video stopped before its requested frame interval: render-size-changed. Stop navigation before any result/reward action.",
+            "pointerClicks": 7,
+            "duplicateLayerChecks": 3,
+            "seconds": 12.2,
+            "screenshots": [
+                "/Users/daisei/PocketStriker/output/appstore-video-20261008/recording-1/battle-duel-failure.png"
+            ],
+            "programmaticScrollEndpoints": 0
+        },
+        {
+            "name": "battle-team",
+            "status": "unavailable",
+            "observedScene": "",
+            "observedProcess": "",
+            "finalProcess": "",
+            "catalogState": "",
+            "captures": [],
+            "note": "Not reached in this capture.",
+            "pointerClicks": 0,
+            "duplicateLayerChecks": 0,
+            "seconds": 0.0,
+            "screenshots": [],
+            "programmaticScrollEndpoints": 0
+        },
+        {
+            "name": "battle-group",
+            "status": "unavailable",
+            "observedScene": "",
+            "observedProcess": "",
+            "finalProcess": "",
+            "catalogState": "",
+            "captures": [],
+            "note": "Not reached in this capture.",
+            "pointerClicks": 0,
+            "duplicateLayerChecks": 0,
+            "seconds": 0.0,
+            "screenshots": [],
+            "programmaticScrollEndpoints": 0
+        },
+        {
+            "name": "skill-editor",
+            "status": "unavailable",
+            "observedScene": "",
+            "observedProcess": "",
+            "finalProcess": "",
+            "catalogState": "",
+            "captures": [],
+            "note": "Not reached in this capture.",
+            "pointerClicks": 0,
+            "duplicateLayerChecks": 0,
+            "seconds": 0.0,
+            "screenshots": [],
+            "programmaticScrollEndpoints": 0
+        }
+    ],
+    "errors": [
+        "Duel capture failed; no next encounter. | FightScene / SelfFightPage / ready=True"
+    ]
+}

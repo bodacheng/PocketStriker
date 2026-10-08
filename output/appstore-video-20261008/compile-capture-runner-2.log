@@ -1,0 +1,1074 @@
+Unity Editor version:    6000.5.1f1 (0d9463e84828)
+Branch:                  6000.5/staging
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 26.6.2 (Build 25G83)
+Darwin version:          25.6.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        32768 MB
+Date:                    2026-10-08T05:08:28Z
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-daisei" at "2026-10-08T05:08:28.582128Z"
+Launching external process: /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Helpers/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/MacOS/Unity
+-batchmode
+-projectPath
+/tmp/pocketstriker-video-20261008/project
+-buildTarget
+iOS
+-quit
+-logFile
+/Users/daisei/PocketStriker/output/appstore-video-20261008/compile-capture-runner-2.log
+Successfully changed project path to: /tmp/pocketstriker-video-20261008/project
+/private/tmp/pocketstriker-video-20261008/project
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-main-allocator-mimalloc-enabled=0"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Logging is directed to a specific file, skipping project log.Player connection [8312807808]  Target information:
+
+Player connection [8312807808]  * "[IP] 192.168.1.209 [Port] 55504 [Flags] 2 [Guid] 3284587573 [EditorId] 3284587573 [Version] 1048832 [Id] OSXEditor(0,Daiseis-MacBook-Air.local) [Debug] 1 [PackageName] OSXEditor [ProjectName] Editor" 
+
+Player connection [8312807808]  * "[IP] 169.254.47.141 [Port] 55504 [Flags] 2 [Guid] 3284587573 [EditorId] 3284587573 [Version] 1048832 [Id] OSXEditor(0,Daiseis-MacBook-Air.local) [Debug] 1 [PackageName] OSXEditor [ProjectName] Editor" 
+
+Player connection [8312807808] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [8312807808] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-87766" after 0.1 seconds.
+[Licensing::Module] Licensing is not yet initialized.
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              f0ee37d4fb144bbaa5531501e7a02ec9
+  Correlation Id:          d37d87a4ed43d634ef8cd825141fbeda
+  External correlation Id: 8529518611982146931
+  Machine Id:              BXCzmk3ymjXmBf9UUvrWPnYDRY0=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-daisei" (connect: 0.00s, validation: 0.00s, handshake: 0.23s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-daisei-notifications" at "2026-10-08T05:08:28.80884Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 2300757-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.23s
+[Licensing::Module] Licensing is initialized (took 0.06s).
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+[Licensing::Client] Successfully resolved entitlement details
+Targeting platform: iOS
+Refreshing native plugins compatible for Editor in 2.34 ms, found 1 plugins.
+Initialize engine version: 6000.5.1f1 (0d9463e84828)
+[Subsystems] Discovering subsystems at path /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /private/tmp/pocketstriker-video-20261008/project/Assets
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+ preferred device: Apple M5 (high power)
+Metal devices available: 1
+0: Apple M5 (high power)
+Using device Apple M5 (high power)
+Initializing Metal device caps: Apple M5
+Mac GPU Family: 2
+Apple GPU Family: 9
+MSL Version: 3.0
+Has Float MSAA: 1
+Has Float Filtering: 1
+ReadWrite Texture Tier: 2
+Shader 'SyntyStudios/SkyboxUnlit': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/TriplanarBasic': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/Basic_LOD_Shader': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/CloudShader': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/CloudShaderNoFog': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/SkyboxUnlitNoFog': fallback shader 'wiiu' not found
+Initialize mono
+Mono path[0] = '/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/Managed'
+Mono path[1] = '/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/BCLExtensions/runtime/netstandard2.1'
+Mono path[2] = '/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/MonoBleedingEdge/lib/mono/unityjit-macos'
+Mono config path = '/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56766
+CodeReloadManager initialized
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: /Applications/Unity/Hub/Editor/6000.5.1f1/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: /Applications/Unity/Hub/Editor/6000.5.1f1/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Register platform support module: /Applications/Unity/Hub/Editor/6000.5.1f1/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.dll
+Registered in 0.001809 seconds.
+[usbmuxd] Start listen thread
+[usbmuxd] Listen thread started
+[usbmuxd] Send listen message
+Native extension for iOS target not found
+[usbmuxd] Attached: 4 00008160-000905E801E00036
+Native extension for Android target not found
+Native extension for OSXStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.188 seconds
+Domain Reload Profiling: 380ms
+	BeginReloadAssembly (36ms)
+		CreateAndSetChildDomain (3ms)
+	RebuildNativeTypeToScriptingClass (7ms)
+	initialDomainReloadingComplete (23ms)
+	LoadAllAssembliesAndSetupDomain (124ms)
+		LoadAssemblies (33ms)
+		AnalyzeDomain (92ms)
+			TypeCache.Refresh (91ms)
+				TypeCache.ScanAssembly (84ms)
+	FinalizeReload (188ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (31ms)
+			BeforeProcessingInitializeOnLoad (36ms)
+			ProcessInitializeOnLoadAttributes (42ms)
+			ProcessInitializeOnLoadMethodAttributes (48ms)
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 72 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.addressables@2.9.1 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.addressables@8460f1c9c927)
+    com.unity.burst@1.8.30 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.burst@2f3d916873ea)
+    com.unity.collab-proxy@2.12.4 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.collab-proxy@0b1559bcd34e)
+    com.unity.ide.rider@3.0.40 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.ide.rider@e4950c6d131b)
+    com.unity.inputsystem@1.20.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.inputsystem@7a4e1a2a8194)
+    com.unity.localization@1.5.13 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.localization@ef5a0677859d)
+    com.unity.mobile.android-logcat@1.4.7 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.mobile.android-logcat@a8a404f035b3)
+    com.unity.project-auditor-rules@1.0.3 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.project-auditor-rules@1fa74fdf90ed)
+    com.unity.purchasing@5.4.3 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.purchasing@c771cfd27c96)
+    com.unity.recorder@5.1.7 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.recorder@0b23bb7a1fb4)
+    com.unity.timeline@1.8.12 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.timeline@8cd8509afae5)
+    com.unity.bindings.openimageio@1.0.2 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.bindings.openimageio@94e2abc0bc65)
+    com.unity.services.core@1.18.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.services.core@3464cb68d709)
+    com.unity.nuget.newtonsoft-json@3.2.2 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.nuget.newtonsoft-json@4dfd81071c64)
+    com.unity.nuget.mono-cecil@1.11.6 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.test-framework.performance@8b56083ec0f0)
+    com.unity.profiling.core@1.0.3 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.profiling.core@8a49f7027d06)
+    com.unity.scriptablebuildpipeline@2.6.1 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.scriptablebuildpipeline@36e3b5898ee2)
+    com.unity.searcher@4.9.4 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.searcher@d45a78918735)
+  Built-in packages:
+    com.unity.adaptiveperformance@6.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.adaptiveperformance@4516fc1e899a)
+    com.unity.collections@6.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.collections@a43cabe808ca)
+    com.unity.mathematics@1.4.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.mathematics@981956d94fb6)
+    com.unity.multiplayer.center@1.0.1 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.multiplayer.center@b860850997d0)
+    com.unity.render-pipelines.universal@17.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.render-pipelines.universal@be00b5bbd9a1)
+    com.unity.test-framework@1.7.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.test-framework@f3e6c9a02477)
+    com.unity.ugui@2.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.ugui@4f9b15fd1386)
+    com.unity.modules.accessibility@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.physics2d)
+    com.unity.modules.physicscore2d@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.physicscore2d)
+    com.unity.modules.screencapture@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.video)
+    com.unity.modules.wind@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.1.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.ext.nunit@44f7d31723bd)
+    com.unity.render-pipelines.core@17.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.render-pipelines.core@d7ce3ed2cd80)
+    com.unity.shadergraph@17.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.shadergraph@2df19e8719bc)
+    com.unity.render-pipelines.universal-config@17.5.0 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.unity.render-pipelines.universal-config@fdda01c80fe3)
+  Embedded packages:
+    com.mcombat.shared@file:/private/tmp/pocketstriker-video-20261008/project/Packages/com.mcombat.shared (location: /private/tmp/pocketstriker-video-20261008/project/Packages/com.mcombat.shared)
+    com.heurekagames.utils@file:/private/tmp/pocketstriker-video-20261008/project/Packages/com.heurekagames.utils (location: /private/tmp/pocketstriker-video-20261008/project/Packages/com.heurekagames.utils)
+  Git packages:
+    com.cysharp.unitask@https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#ceac8d6946b1125fe782cd171fbcb245b567dbf9 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.cysharp.unitask@dc216dc4183d)
+    com.google.external-dependency-manager@https://github.com/googlesamples/unity-jar-resolver.git?path=upm#1a9384872d6b8b954a8c0115fdcdf146c995062a (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.google.external-dependency-manager@eb15acb9d1f0)
+    com.neuecc.unirx@https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts#6baeccf6c544c155497164327cca72f28163a578 (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.neuecc.unirx@31ee62cbf28c)
+    com.yasirkula.ingamedebugconsole@https://github.com/yasirkula/UnityIngameDebugConsole.git#73c1d9c582e0b49d63ddcd6efb48b0059f33d43c (location: /private/tmp/pocketstriker-video-20261008/project/Library/PackageCache/com.yasirkula.ingamedebugconsole@73c1d9c582e0)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.00 seconds
+[ScriptCompilation] Requested script compilation because: AssetDatabase observed changes in script compilation related files
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://unix:/tmp/ilpp.sock-9bd1decb8d3abf9e3b465f7b8dd43b3a
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /private/tmp/pocketstriker-video-20261008/project
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping - 200 - application/grpc 11.7067ms
+Starting: /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/BuildPipeline/bee_backend --ipc --defer-dag-verification --dagfile="Library/Bee/900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: /private/tmp/pocketstriker-video-20261008/project
+DisplayProgressbar: Compiling Scripts
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly unityeditor.ios.extensions.xcode has duplicate hint path. Ignoring "/Applications/Unity/Hub/Editor/6000.5.1f1/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll" in favor of "/Applications/Unity/Hub/Editor/6000.5.1f1/PlaybackEngines/MacStandaloneSupport/UnityEditor.iOS.Extensions.Xcode.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.runtime.interopservices.windowsruntime has duplicate hint path. Ignoring "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/UnityReferenceAssemblies/unity-4.8-api/Facades/System.Runtime.InteropServices.WindowsRuntime.dll" in favor of "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/NetStandard/Extensions/2.0.0/System.Runtime.InteropServices.WindowsRuntime.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.componentmodel.composition has duplicate hint path. Ignoring "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/UnityReferenceAssemblies/unity-4.8-api/System.ComponentModel.Composition.dll" in favor of "/Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/NetStandard/compat/2.1.0/shims/netfx/System.ComponentModel.Composition.dll"
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library/PackageCache/com.unity.burst@2f3d916873ea/Unity.Burst.CodeGen/Unity.Burst.Cecil.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library/PackageCache/com.unity.nuget.mono-cecil@ecb9724e46ff/Mono.Cecil.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors - 200 - application/grpc 11.8441ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly - application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      Processing assembly Library/Bee/artifacts/900b0aE.dag/Assembly-CSharp-Editor.dll, with 149 defines and 431 references
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running Unity.Jobs.CodeGen.JobsILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null with Library/Bee/artifacts/900b0aE.dag/Unity.Collections.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null with /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEditor.CoreModule.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null with /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEngine.CoreModule.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Scripting, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null with /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/Unity.Scripting.dll
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil.Rocks, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library/PackageCache/com.unity.burst@2f3d916873ea/Unity.Burst.CodeGen/Unity.Burst.Cecil.Rocks.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly - 200 - application/grpc 282.1840ms
+ExitCode: 0 Duration: 2s900ms
+[1106/1510  0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[1506/1510  2s] Csc Library/Bee/artifacts/900b0aE.dag/Assembly-CSharp-Editor.dll (+2 others)
+Assets/AppCenter/Editor/AppCenterBehaviorEditorAdvanced.cs(31,24): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Assets/AppCenter/Editor/AppCenterPostBuild.cs(42,17): warning CS0618: 'PlayerSettings.GetScriptingBackend(BuildTargetGroup)' is obsolete: 'Use GetScriptingBackend(NamedBuildTarget buildTarget) instead'
+Assets/App/Editor/Build/BuildClient.cs(412,6): warning CS0618: 'PlayerSettings.SetApplicationIdentifier(BuildTargetGroup, string)' is obsolete: 'Use SetApplicationIdentifier(NamedBuildTarget buildTarget, string identifier) instead'
+Assets/App/Editor/Build/BuildClient.cs(1027,28): warning CS0618: 'PlayerSettings.GetApplicationIdentifier(BuildTargetGroup)' is obsolete: 'Use GetApplicationIdentifier(NamedBuildTarget buildTarget) instead'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(191,77): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(191,22): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(182,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(182,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(183,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(183,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(184,107): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(184,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(186,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(186,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(187,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(187,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(179,96): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(179,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(498,34): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(548,59): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(549,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(645,20): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(669,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(681,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(930,76): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(929,56): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(170,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(170,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(171,105): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(171,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(172,107): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(172,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(178,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(178,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(185,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(185,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(955,30): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(271,105): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(271,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(272,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(272,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(273,108): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(273,30): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(279,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(279,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(284,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(284,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(288,119): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(288,36): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(179,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(179,43): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(167,76): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(167,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(610,125): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(610,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(611,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(611,39): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(612,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(612,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(613,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(613,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(355,99): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(355,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(638,126): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(638,39): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(639,88): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(639,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(640,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(640,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(641,94): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(641,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(59,74): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(59,24): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(116,27): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(703,42): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerReturnValidation.cs(327,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerReturnValidation.cs(327,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerReturnValidation.cs(328,110): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerReturnValidation.cs(328,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(106,77): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(106,22): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(148,20): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(150,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(813,95): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(813,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(300,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(300,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerValidation.cs(188,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerValidation.cs(202,69): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerValidation.cs(202,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(97,106): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(97,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(134,87): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(134,18): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerValidation.cs(360,31): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerValidation.cs(457,46): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerValidation.cs(456,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(118,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(118,34): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(338,86): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(338,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(344,96): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(344,27): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(1787,17): warning CS0618: 'Object.FindObjectOfType<T>()' is obsolete: 'Object.FindObjectOfType has been deprecated. Use Object.FindAnyObjectByType instead.'
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(1799,24): warning CS0618: 'Object.FindObjectsOfType(Type)' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID, but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1447,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1447,46): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1449,121): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1449,52): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/App/Editor/Build/BuildClient.cs(88,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/App/Editor/Build/BuildClient.cs(108,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/App/Editor/Build/BuildClient.cs(113,37): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/AssetPostImportProcess_TitleFX.cs(10,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(21,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(22,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(38,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(40,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(62,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(83,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/Title_fx_GUI.cs(19,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/Title_fx_GUI_V2.cs(19,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/AppCenter/Editor/AppCenterSettingsContext.cs(11,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(26,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialValidation.cs(24,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerSettingsInteractionValidation.cs(19,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(27,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(27,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(28,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(29,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(43,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(44,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(23,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(24,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(25,22): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(26,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(28,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(28,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(29,32): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleModeValidation.cs(19,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(42,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(43,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(44,20): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(45,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(46,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(30,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(31,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(32,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(25,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(26,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(66,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.Impact.cs(87,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.Opening.cs(36,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattlePauseValidation.cs(26,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(21,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(33,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(8,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(9,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(10,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(24,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(25,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(26,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(27,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerSlotEffectValidation.cs(18,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/RPG and MMO UI 11/Scripts/UI/Serializables/Editor/ColorBlockExtendedDrawer.cs(10,39): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/RPG and MMO UI 11/Scripts/UI/Serializables/Editor/ColorBlockExtendedDrawer.cs(11,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadme.cs(25,26): warning UAC1001: Field 'versionHistory' type 'UltimateJoystickReadme.VersionHistory' is skipped by serialization (missing the [Serializable] attribute). Refer to the Serialization rules analyzer reference. (https://docs.unity3d.com/6000.5/Documentation/Manual/script-serialization-analyzer.html#uac1001)
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadme.cs(19,20): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(33,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(34,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(35,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(36,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILayoutValidation.cs(33,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(12,32): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(37,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(38,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(41,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(42,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(42,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(44,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(45,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(46,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(47,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(47,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(28,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(29,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(30,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(31,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(32,22): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(55,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(22,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(23,39): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(24,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(25,24): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(26,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(27,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(29,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(30,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(31,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(31,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(32,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(33,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(34,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/DynamicStarrySky/Editor/EditorCoroutine.cs(25,5): warning UDR0004: Non-static method subscribed to static event in start is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(77,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(58,47): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(66,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(127,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(129,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(89,44): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleHUDValidation.cs(151,9): warning UDR0004: Non-static method subscribed to static event in RunBattleHUDFixture is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattlePauseValidation.cs(106,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattleModeValidation.cs(112,9): warning UDR0004: Non-static method subscribed to static event in Validate is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattleModeValidation.cs(116,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(165,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(167,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(169,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(44,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(45,9): warning UDR0004: Non-static method subscribed to static event in Unknown is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(109,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerEditorDefaults.cs(20,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(175,50): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(176,46): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(177,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(184,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(99,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(100,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(119,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(58,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(162,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialLayoutValidation.cs(117,9): warning UDR0004: Non-static method subscribed to static event in ValidateTutorialLayout is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(163,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(164,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(181,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(263,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(115,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(117,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(264,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(265,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(137,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(139,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(141,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialValidation.cs(76,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerReturnValidation.cs(73,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(75,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerPreBattleTutorialValidation.cs(62,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerSkillUIValidation.cs(58,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(78,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(79,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,9): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,46): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,83): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(80,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(143,47): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(152,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(82,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(255,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(83,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(257,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(293,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(295,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(157,3): warning UDR0004: Non-static method subscribed to static event in OnEnable is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(176,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(539,9): warning UDR0004: Non-static method subscribed to static event in BuildLocalPlayer is not deregistered. Deregister it in OnDisable.
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(504,3): warning UDR0004: Non-static method subscribed to static event in OnEnable is not deregistered. Deregister it in OnDisable.
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(426,3): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(13,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(14,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(83,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(387,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(89,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(91,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(93,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(340,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(101,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(155,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(157,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+[1507/1510  0s] ILPostProcess Library/Bee/artifacts/900b0aE.dag/post-processed/Assembly-CSharp-Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/900b0aE.dag/Assembly-CSharp-Editor.dll, with 149 defines and 431 references
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[1508/1510  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.pdb
+[1509/1510  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+*** Tundra build success (2.89 seconds), 5 items updated, 1510 evaluated
+Assets/AppCenter/Editor/AppCenterBehaviorEditorAdvanced.cs(31,24): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Assets/AppCenter/Editor/AppCenterPostBuild.cs(42,17): warning CS0618: 'PlayerSettings.GetScriptingBackend(BuildTargetGroup)' is obsolete: 'Use GetScriptingBackend(NamedBuildTarget buildTarget) instead'
+Assets/App/Editor/Build/BuildClient.cs(412,6): warning CS0618: 'PlayerSettings.SetApplicationIdentifier(BuildTargetGroup, string)' is obsolete: 'Use SetApplicationIdentifier(NamedBuildTarget buildTarget, string identifier) instead'
+Assets/App/Editor/Build/BuildClient.cs(1027,28): warning CS0618: 'PlayerSettings.GetApplicationIdentifier(BuildTargetGroup)' is obsolete: 'Use GetApplicationIdentifier(NamedBuildTarget buildTarget) instead'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(191,77): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(191,22): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(182,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(182,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(183,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(183,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(184,107): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(184,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(186,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(186,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(187,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(187,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(179,96): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(179,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(498,34): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(548,59): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(549,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(645,20): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(669,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(681,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(930,76): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(929,56): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(170,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(170,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(171,105): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(171,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(172,107): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(172,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(178,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(178,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(185,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(185,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(955,30): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(271,105): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(271,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(272,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(272,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(273,108): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(273,30): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(279,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(279,29): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(284,114): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(284,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(288,119): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(288,36): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(179,120): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(179,43): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(167,76): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(167,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(610,125): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(610,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(611,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(611,39): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(612,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(612,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(613,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(613,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(355,99): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(355,21): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(638,126): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(638,39): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(639,88): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(639,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(640,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(640,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(641,94): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(641,12): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(59,74): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(59,24): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerRenderingValidation.cs(116,27): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(703,42): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerReturnValidation.cs(327,111): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerReturnValidation.cs(327,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerReturnValidation.cs(328,110): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerReturnValidation.cs(328,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(106,77): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(106,22): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(148,20): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(150,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(813,95): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(813,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(300,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(300,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerValidation.cs(188,25): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerValidation.cs(202,69): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerValidation.cs(202,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(97,106): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(97,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(134,87): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(134,18): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerValidation.cs(360,31): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets/Editor/PocketStrikerValidation.cs(457,46): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerValidation.cs(456,50): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(118,90): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(118,34): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(338,86): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(338,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(344,96): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerUILiveReview.DynamicSkills.cs(344,27): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(1787,17): warning CS0618: 'Object.FindObjectOfType<T>()' is obsolete: 'Object.FindObjectOfType has been deprecated. Use Object.FindAnyObjectByType instead.'
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(1799,24): warning CS0618: 'Object.FindObjectsOfType(Type)' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID, but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1447,115): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1447,46): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1449,121): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(1449,52): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets/App/Editor/Build/BuildClient.cs(88,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/App/Editor/Build/BuildClient.cs(108,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/App/Editor/Build/BuildClient.cs(113,37): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/AssetPostImportProcess_TitleFX.cs(10,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(21,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(22,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(38,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(40,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(62,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/TitleFX_Welcome.cs(83,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/Title_fx_GUI.cs(19,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/OrangedKeys/TitleFX/Editor/Title_fx_GUI_V2.cs(19,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/AppCenter/Editor/AppCenterSettingsContext.cs(11,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(26,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialValidation.cs(24,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerSettingsInteractionValidation.cs(19,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(27,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(27,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(28,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(29,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(43,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(44,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(23,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(24,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(25,22): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(26,23): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(28,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(28,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(29,32): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleModeValidation.cs(19,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(42,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(43,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(44,20): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(45,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerQueuedLiveValidation.cs(46,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(30,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(31,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(32,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(25,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(26,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(66,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.Impact.cs(87,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.Opening.cs(36,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(29,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattlePauseValidation.cs(26,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(21,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(33,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(8,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(9,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(10,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(24,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(25,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(26,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(27,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerSlotEffectValidation.cs(18,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/RPG and MMO UI 11/Scripts/UI/Serializables/Editor/ColorBlockExtendedDrawer.cs(10,39): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/D_Asset/RPG and MMO UI 11/Scripts/UI/Serializables/Editor/ColorBlockExtendedDrawer.cs(11,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadme.cs(25,26): warning UAC1001: Field 'versionHistory' type 'UltimateJoystickReadme.VersionHistory' is skipped by serialization (missing the [Serializable] attribute). Refer to the Serialization rules analyzer reference. (https://docs.unity3d.com/6000.5/Documentation/Manual/script-serialization-analyzer.html#uac1001)
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadme.cs(19,20): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(33,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(34,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(35,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(36,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILayoutValidation.cs(33,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(12,32): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(37,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(38,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(41,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(42,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(42,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(44,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(45,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(46,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(47,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(47,28): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(28,25): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(29,26): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(30,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(31,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.Banners.cs(32,22): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(55,33): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(22,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(23,39): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(24,34): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(25,24): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(26,27): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(27,31): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(28,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(29,16): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(30,18): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(31,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(31,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(32,19): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(33,36): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(34,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/DynamicStarrySky/Editor/EditorCoroutine.cs(25,5): warning UDR0004: Non-static method subscribed to static event in start is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(77,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(58,47): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(66,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(127,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAIStoryLiveSmoke.cs(129,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerAsyncIconValidation.cs(89,44): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleHUDValidation.cs(151,9): warning UDR0004: Non-static method subscribed to static event in RunBattleHUDFixture is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattlePauseValidation.cs(106,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattleModeValidation.cs(112,9): warning UDR0004: Non-static method subscribed to static event in Validate is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerBattleModeValidation.cs(116,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(165,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(167,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerCombatFlowSmoke.cs(169,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(44,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(45,9): warning UDR0004: Non-static method subscribed to static event in Unknown is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(109,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerEditorDefaults.cs(20,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(175,50): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(176,46): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDownloadCacheValidation.cs(177,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerDebugConsoleValidation.cs(184,17): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(99,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerGachaRecoveryValidation.cs(100,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(119,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(58,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(162,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialLayoutValidation.cs(117,9): warning UDR0004: Non-static method subscribed to static event in ValidateTutorialLayout is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(163,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoadingReviewValidation.cs(164,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(181,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(263,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(115,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerLoginArtSmoke.cs(117,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(264,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerMenuBackgroundValidation.cs(265,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(137,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(139,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerBattleCameraSmoke.cs(141,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialValidation.cs(76,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerReturnValidation.cs(73,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerReturnValidation.cs(75,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerPreBattleTutorialValidation.cs(62,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerSkillUIValidation.cs(58,9): warning UDR0004: Non-static method subscribed to static event in Run is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(78,57): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(79,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,9): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,46): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIArtValidation.cs(115,83): warning UDR0004: Non-static method subscribed to static event in QueueSnapshot is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerTutorialPlaymodeSmoke.cs(80,54): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(143,47): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(152,43): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(82,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(255,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(83,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(257,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(293,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUIArtValidation.cs(295,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickEditor.cs(157,3): warning UDR0004: Non-static method subscribed to static event in OnEnable is not deregistered. Deregister it in OnDisable.
+Assets/Editor/PocketStrikerUIInterruptionValidation.cs(176,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerValidation.cs(539,9): warning UDR0004: Non-static method subscribed to static event in BuildLocalPlayer is not deregistered. Deregister it in OnDisable.
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(504,3): warning UDR0004: Non-static method subscribed to static event in OnEnable is not deregistered. Deregister it in OnDisable.
+Assets/Tank & Healer Studio/Ultimate Joystick/Editor/UltimateJoystickReadmeEditor.cs(426,3): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(13,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/UltimateCircularHealthBar/Editor/HelpEditorWindow.cs(14,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(83,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreCapture.cs(387,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(89,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(91,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(93,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.StoreVideoRecorder.cs(340,13): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(101,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(155,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+Assets/Editor/PocketStrikerUILiveReview.cs(157,9): warning UDR0001: No method with RuntimeInitializeOnLoadMethod attribute
+AssetDatabase: script compilation time: 3.178435s
+Total cache size 265853712
+Total cache size after purge 265853712, took 00:00:00.1582794
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory is not a mono symbol file
+Refreshing native plugins compatible for Editor in 20.32 ms, found 6 plugins.
+Native extension for iOS target not found
+Native extension for Android target not found
+Native extension for OSXStandalone target not found
+Refreshing native plugins compatible for Editor in 3.73 ms, found 6 plugins.
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.465 seconds
+Domain Reload Profiling: 2964ms
+	BeginReloadAssembly (84ms)
+		DisableScriptedObjects (14ms)
+		CreateAndSetChildDomain (23ms)
+	RebuildCommonClasses (4ms)
+	RebuildNativeTypeToScriptingClass (7ms)
+	initialDomainReloadingComplete (21ms)
+	LoadAllAssembliesAndSetupDomain (384ms)
+		LoadAssemblies (174ms)
+		AnalyzeDomain (183ms)
+			TypeCache.Refresh (141ms)
+				TypeCache.ScanAssembly (129ms)
+			BuildScriptInfoCaches (37ms)
+			ResolveRequiredComponents (3ms)
+	FinalizeReload (2465ms)
+		SetupLoadedEditorAssemblies (0ms)
+			InitializePlatformSupportModulesInManaged (6ms)
+			BeforeProcessingInitializeOnLoad (39ms)
+			ProcessInitializeOnLoadAttributes (2173ms)
+			ProcessInitializeOnLoadMethodAttributes (68ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+Starting new worker id: 0 with log in /private/tmp/pocketstriker-video-20261008/project/Logs/AssetImportWorkerHW0.log
+Refreshing native plugins compatible for Editor in 3.84 ms, found 6 plugins.
+
+Asset Pipeline Refresh (id=25971c1cd3bcb41fbbd2843837ea979e): Total: 7.699 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=3660 ms
+		Asset DB Callback time: managed=294 ms, native=14 ms
+		Scripting: domain reloads=1, domain reload time=517 ms, compile time=3179 ms, other=31 ms
+		Project Asset Count: scripts=3683, non-scripts=11789
+		Asset File Changes: new=0, changed=4, moved=0, deleted=0
+		Scan Filter Count: 1
+	InvokePackagesCallback: 6.552ms
+	ApplyChangesToAssetFolders: 0.192ms
+	Scan: 720.007ms
+	Collect global state as custom dependencies: 1.294ms
+	OnSourceAssetsModified: 0.329ms
+	CategorizeScriptCompilationAssets: 28.614ms
+	ProcessAssetsWithTransientArtifactChanges: 50.035ms
+	CategorizeAssets: 201.129ms
+	CompileScripts: 3179.029ms
+	ImportOutOfDateAssets: 2594.399ms (2511.610ms without children)
+		ReloadNativeAssets: 0.101ms
+		UnloadImportedAssets: 1.052ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 1.184ms
+		ImportSchedulerStart: 80.450ms
+	PostProcessAllAssets: 296.794ms
+		VCAutoAddAssetPostprocess 1.128ms
+		XRBuildSystem.XRAssetImported 0.521ms
+		PostProcessCallbackCreateDeferredMaterials 0.211ms
+		MonoPostProcessAllAssets: 294.602ms
+			AssetPostprocessor.OnPostprocessAllAssets 171.379ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 23.847ms
+			UniversalRenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 7.907ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 6.609ms
+			AddressablesAssetPostProcessor.OnPostprocessAllAssets 1.999ms
+			SyncVS.PostprocessSyncProject 1.325ms
+			PackageManagerResolver.OnPostprocessAllAssets 1.317ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.928ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 0.842ms
+			ShaderGraphAssetPostProcessor.OnPostprocessAllAssets 0.814ms
+			VersionHandlerImpl.OnPostprocessAllAssets 0.719ms
+			AssetChangedListener.OnPostprocessAllAssets 0.696ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 0.595ms
+			IOSResolver.OnPostprocessAllAssets 0.593ms
+			ClothAssetPostprocessor.OnPostprocessAllAssets 0.567ms
+			LocalizationAssetPostProcessor.OnPostprocessAllAssets 0.492ms
+			MaterialPostprocessor.OnPostprocessAllAssets 0.426ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.349ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 0.332ms
+			UtilityWindowPostProcessor.OnPostprocessAllAssets 0.277ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.243ms
+			PlayServicesResolver.OnPostprocessAllAssets 0.192ms
+			Launch.OnPostprocessAllAssets 0.170ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.162ms
+			SampleDependencyImporterPostProcessor.OnPostprocessAllAssets 0.161ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 0.153ms
+			UVCSAssetPostprocessor.OnPostprocessAllAssets 0.153ms
+			AssetPathToTypes.OnPostprocessAllAssets 0.148ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 0.147ms
+			AssetPostImportProcess_TitleFX.OnPostprocessAllAssets 0.143ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.138ms
+			TMPro_TexturePostProcessor.OnPostprocessAllAssets 0.128ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.127ms
+			ShaderReflectionAssetPostProcessor.OnPostprocessAllAssets 0.118ms
+			AssetEvents.OnPostprocessAllAssets 0.114ms
+			PostProcessor.OnPostprocessAllAssets 0.103ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.087ms
+			SamplePostprocessor.OnPostprocessAllAssets 0.086ms
+			AssetPostprocessorProxy.OnPostprocessAllAssets 0.076ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.074ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.067ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.063ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.062ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.057ms
+	PostAssetChangesProfiler: 6.744ms
+	UnloadStreamsBegin: 1.654ms
+	PersistCurrentRevisions: 0.288ms
+	GenerateScriptTypeHashes: 80.071ms
+	GenerateScriptTypeSerializationHashes: 81.399ms
+	Untracked: 610.278ms
+
+Application.AssetDatabase Initial Refresh End
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Launching external process: /Applications/Unity/Hub/Editor/6000.5.1f1/Unity.app/Contents/Helpers/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.05 seconds
+Shader Hidden/ChartRasterizerHardware is not supported: GPU does not support conservative rasterization
+Shader 'SyntyStudios/TriplanarBasic': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/CloudShaderNoFog': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/SkyboxUnlitNoFog': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/SkyboxUnlit': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/Basic_LOD_Shader': fallback shader 'wiiu' not found
+Shader 'SyntyStudios/CloudShader': fallback shader 'wiiu' not found
+Scanning for USB devices : 0.102ms
+Initializing Unity extensions:
+Worker ready: AssetImportWorkerHW0 0
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-PocketStriker
+2026-10-08 14:08:40.001 Unity[87766:1060712] NSEventModifierFlagFunction specified to -setKeyEquivalentModifierMask: for item <NSMenuItem: 0x7d1c875c0 Quick Recording, ke='Command-F10'>, but is only supported for system-provided menu items; will not be used
+2026-10-08 14:08:40.003 Unity[87766:1060712] NSEventModifierFlagFunction specified to -setKeyEquivalentModifierMask: for item <NSMenuItem: 0x7cdc4a080 SDF, ke='Command-F12'>, but is only supported for system-provided menu items; will not be used
+Unloading 29 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 9887 unused Assets / (7.3 MB). Loaded Objects now: 10885.
+Memory consumption went from 346.0 MB to 338.7 MB.
+Total: 9.891625 ms (FindLiveObjects: 0.342916 ms CreateObjectMapping: 1.834584 ms MarkObjects: 5.887208 ms  DeleteObjects: 1.826542 ms)
+
+2026-10-08 14:08:40.059 Unity[87766:1060712] NSEventModifierFlagFunction specified to -setKeyEquivalentModifierMask: for item <NSMenuItem: 0x7ce25d0e0 Quick Recording, ke='Command-F10'>, but is only supported for system-provided menu items; will not be used
+2026-10-08 14:08:40.061 Unity[87766:1060712] NSEventModifierFlagFunction specified to -setKeyEquivalentModifierMask: for item <NSMenuItem: 0x7cdc50960 SDF, ke='Command-F12'>, but is only supported for system-provided menu items; will not be used
+Batchmode quit successfully invoked - shutting down!
+Curl error 42: Callback aborted
+Killing ADB server in 0.337707 seconds.
+Thread 0x17fc47000 may have been prematurely finalized
+MSBuild サーバー をシャットダウンしています...
+VB/C# コンパイラ サーバー をシャットダウンしています...
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+MSBuild サーバー は正常にシャットダウンしました。
+VB/C# コンパイラ サーバー は正常にシャットダウンしました。
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+[Licensing::IpcConnector] LicenseClient-daisei-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-daisei channel disconnected successfully.
+Thread 0x16e3ab000 may have been prematurely finalized
+Thread 0x16e437000 may have been prematurely finalized
+Thread 0x16e54f000 may have been prematurely finalized
+Thread 0x16e5db000 may have been prematurely finalized
+Thread 0x16e667000 may have been prematurely finalized
+Thread 0x16e6f3000 may have been prematurely finalized
+Thread 0x16e77f000 may have been prematurely finalized
+Thread 0x16e80b000 may have been prematurely finalized
+Thread 0x16e4c3000 may have been prematurely finalized
+AcceleratorClientConnectionCallback - disconnected - :0
+Thread 0x17b84b000 may have been prematurely finalized
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      ALC ILPP context 1 is unloading
+Cleanup mono
+CodeReloadManager destroyed
+14:08:43.413 |V| RiderPlugin                    | :1                             | AppDomain.CurrentDomain.DomainUnload lifetimeDefinition.Terminate
+debugger-agent: Unable to listen on 42
+[usbmuxd] Stop listen thread
+[usbmuxd] Error: 
+[usbmuxd] Listen thread exiting
+Exiting batchmode successfully now!
+[Package Manager] Server process was shutdown

@@ -1,0 +1,10 @@
+/bin/zsh -lc "python3 - <<'PY'
+from pathlib import Path
+import json,hashlib
+base=Path('/tmp/pocketstriker-iphone-preview-20261004');out=base/'CombinedPreview'
+m=json.loads((out/'combined-edit-battle-prepared.json').read_text());skill=json.loads((base/'skill-export.json').read_text())['clips'][0]
+assert hashlib.sha256(Path(skill['path']).read_bytes()).hexdigest()==skill['sourceSha256']
+skill.update(startSeconds=1.5,durationSeconds=12.9,purpose='Genuine native slot selection, unsaved replacement, native reset, skill selection and character animation from previously verified raw recording. Original skill audio is silent; continuous calm game music supplied separately. No added/fabricated UI effects.')
+m['clips'].append(skill)
+(out/'combined-edit.json').write_text(json.dumps(m,indent=2));print('Final edit29? measured declared total:',sum(c['durationSeconds'] for c in m['clips']))
+PY"

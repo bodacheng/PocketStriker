@@ -1,0 +1,614 @@
+{
+  "schema": "PocketStrikerIndependentRecordingAudit-v1",
+  "createdUtc": "2026-10-08T05:24:08.101746+00:00",
+  "recordingAttempt": 3,
+  "auditor": "accessibility_evidence subagent",
+  "passed": true,
+  "blockingFindings": [],
+  "scope": "Read-only source/report/media audit. No UI or account operations, no video encoding, no source changes. Private equipment instance values are not reproduced in this audit.",
+  "checks": [
+    {
+      "check": "attempt_completed_without_report_errors",
+      "passed": true,
+      "evidence": [
+        "skill-sequence-report.json",
+        "report.json"
+      ]
+    },
+    {
+      "check": "three_distinct_native_owned_previews",
+      "passed": true,
+      "evidence": {
+        "ids": [
+          "176",
+          "77",
+          "162"
+        ],
+        "source": "skill-sequence-report.json.skills",
+        "visualSeconds": [
+          3.8,
+          7.2,
+          10.6
+        ]
+      }
+    },
+    {
+      "check": "two_inventory_equips",
+      "passed": true,
+      "evidence": {
+        "count": 2,
+        "targetSlots": [
+          "A3",
+          "B2"
+        ]
+      }
+    },
+    {
+      "check": "inventory_equip_1_exact_identity_and_sp",
+      "passed": true,
+      "evidence": {
+        "skillId": "37",
+        "realName": "slidekick",
+        "target": "A3",
+        "spLevel": 0,
+        "changedSlotNumbers": [
+          3
+        ],
+        "productionDrop": true,
+        "identityVerified": true,
+        "spLevelVerified": true
+      }
+    },
+    {
+      "check": "inventory_equip_2_exact_identity_and_sp",
+      "passed": true,
+      "evidence": {
+        "skillId": "9",
+        "realName": "downrotatekick",
+        "target": "B2",
+        "spLevel": 0,
+        "changedSlotNumbers": [
+          5
+        ],
+        "productionDrop": true,
+        "identityVerified": true,
+        "spLevelVerified": true
+      }
+    },
+    {
+      "check": "inventory_edit_chain_contiguous",
+      "passed": true,
+      "evidence": {
+        "source": "first slotsAfter == second slotsBefore"
+      }
+    },
+    {
+      "check": "one_exact_occupied_swap",
+      "passed": true,
+      "evidence": {
+        "from": "A3",
+        "to": "B2",
+        "changedSlotNumbers": [
+          3,
+          5
+        ],
+        "visualDragSeconds": 8.8,
+        "visualCompletedSeconds": 9.766666666666667
+      }
+    },
+    {
+      "check": "no_fixture_or_hidden_combo_or_simulated_frames",
+      "passed": true,
+      "evidence": {
+        "source": "source-manifest.json and video-manifest.json"
+      }
+    },
+    {
+      "check": "all_timeline_samples_no_loading_overlay",
+      "passed": true,
+      "evidence": {
+        "timelineFrames": 450,
+        "source": "Sequence.Sample inspects live ProgressLayer every timeline frame; selected encoded frames also reviewed"
+      }
+    },
+    {
+      "check": "original_nine_equipment_reset_after_recording",
+      "passed": true,
+      "evidence": {
+        "proofType": "runtime assertion plus independently inspected source",
+        "report": "skill-sequence-report.json.resetVerified",
+        "assertion": "SlotIds(layer).SequenceEqual(plan.originalSlotInstances)",
+        "source": "PocketStrikerUILiveReview.DynamicSkills.cs:143-152",
+        "ordering": "StopStoreVideoRecorder(); then await RestoreAsync in finally",
+        "limitation": "Restoration occurs after recording; final original IDs are asserted but not separately serialized as a second snapshot."
+      }
+    },
+    {
+      "check": "settings_file_bytes_restored",
+      "passed": true,
+      "evidence": {
+        "proofType": "runtime byte comparison plus independently inspected source",
+        "assertion": "File.ReadAllBytes(path).SequenceEqual(original)",
+        "source": "PocketStrikerUILiveReview.StoreCapture.cs:130-137",
+        "report": "capture-manifest.json.appSettingsFileRestored"
+      }
+    },
+    {
+      "check": "protected_preferences_restored",
+      "passed": true,
+      "evidence": {
+        "proofType": "runtime value/presence comparison plus independently inspected source",
+        "source": "PocketStrikerUILiveReview.StoreCapture.cs:144-149",
+        "report": "capture-manifest.json.preferencesRestored"
+      }
+    },
+    {
+      "check": "scene_state_restored",
+      "passed": true,
+      "evidence": {
+        "report": "capture-manifest.json.scenesRestored"
+      }
+    },
+    {
+      "check": "no_cloud_equipment_confirmation_path",
+      "passed": true,
+      "evidence": {
+        "proofType": "harness code inspection and reported scope",
+        "source": "DynamicSkills clicks actual categories, three skill cells, native Reset; never clicks ConfirmSkillChangeButton",
+        "productionReset": "ResetButton.onClick→ResetNineSlot→ClearTempUnitUsage+ReadANineAndTwo",
+        "limitation": "No separate network traffic log was audited."
+      }
+    },
+    {
+      "check": "source_manifest_integrity",
+      "passed": true,
+      "evidence": {
+        "sha256": "d655f790943e3f30672a009dcf1a498d44a72100d3a90d05c1fbe77b4b6b739f"
+      }
+    },
+    {
+      "check": "all_five_recorded_harness_sources_unchanged",
+      "passed": true,
+      "evidence": [
+        {
+          "name": "PocketStrikerUILiveReview.StoreCapture.cs",
+          "sha256": "4db2b4a79d562ead2a40d76d946176fe7fe63e87cd827842b47a8847d9706e32",
+          "matchesRecordedManifest": true
+        },
+        {
+          "name": "PocketStrikerUILiveReview.BattleCapture.cs",
+          "sha256": "d75f388156e8bfde892f7bf4b1f44df35e595cbe0d23936dbb44d8a7d7651309",
+          "matchesRecordedManifest": true
+        },
+        {
+          "name": "PocketStrikerUILiveReview.StoreVideoFlow.cs",
+          "sha256": "96b4ccf32543a13ffa4bd6bf3977a35b37dbbd14086872a9f753fdc13d6b29de",
+          "matchesRecordedManifest": true
+        },
+        {
+          "name": "PocketStrikerUILiveReview.StoreVideoRecorder.cs",
+          "sha256": "f6080e3d0fe25241ca3108190747b7d7224d71411e3da473f0327fbb1f864a00",
+          "matchesRecordedManifest": true
+        },
+        {
+          "name": "PocketStrikerUILiveReview.DynamicSkills.cs",
+          "sha256": "044cede9754f395d5aa2cf74d64f9ca487172ca495c38126ca4e5f1b45b42e36",
+          "matchesRecordedManifest": true
+        }
+      ]
+    },
+    {
+      "check": "battle-duel_encoded_metadata_and_hash",
+      "passed": true,
+      "evidence": {
+        "label": "battle-duel",
+        "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/duel-media/media-probe.json",
+        "sha256": "5a3ec313e9df31a3fed10070d324bb72f65ae8ff6d5d05f057354a76fca62b84",
+        "durationSeconds": 5,
+        "encodedVideoSamples": 150,
+        "width": 886,
+        "height": 1920,
+        "nominalFps": 29.999998092651367,
+        "h264ProfileIDC": 100,
+        "audioCodec": "aac ",
+        "audioSampleRateHz": 48000,
+        "audioChannels": 2,
+        "entirelySilent": false,
+        "audioDecodedPeak": 1.0188372135162354,
+        "nearFullScaleValues": 22
+      }
+    },
+    {
+      "check": "battle-duel_recorder_runtime_state_restored",
+      "passed": true,
+      "evidence": {
+        "source": "video-manifest.json.clips",
+        "originalCaptureFramerate": 0,
+        "originalTargetFrameRate": 60,
+        "originalCaptureDeltaTime": 0.0
+      }
+    },
+    {
+      "check": "battle-team_encoded_metadata_and_hash",
+      "passed": true,
+      "evidence": {
+        "label": "battle-team",
+        "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/team-media/media-probe.json",
+        "sha256": "b3f475922706e041e08391dbe4cc7b44410754ec6102ab4b79bd04ef6fae501f",
+        "durationSeconds": 5,
+        "encodedVideoSamples": 150,
+        "width": 886,
+        "height": 1920,
+        "nominalFps": 29.999998092651367,
+        "h264ProfileIDC": 100,
+        "audioCodec": "aac ",
+        "audioSampleRateHz": 48000,
+        "audioChannels": 2,
+        "entirelySilent": false,
+        "audioDecodedPeak": 1.0415165424346924,
+        "nearFullScaleValues": 871
+      }
+    },
+    {
+      "check": "battle-team_recorder_runtime_state_restored",
+      "passed": true,
+      "evidence": {
+        "source": "video-manifest.json.clips",
+        "originalCaptureFramerate": 0,
+        "originalTargetFrameRate": 60,
+        "originalCaptureDeltaTime": 0.0
+      }
+    },
+    {
+      "check": "battle-group_encoded_metadata_and_hash",
+      "passed": true,
+      "evidence": {
+        "label": "battle-group",
+        "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/group-media/media-probe.json",
+        "sha256": "77e958fe416846ab038ee3b1c93a8324ba0c55c9a00e422c1352abb592d4a6db",
+        "durationSeconds": 6,
+        "encodedVideoSamples": 180,
+        "width": 886,
+        "height": 1920,
+        "nominalFps": 30,
+        "h264ProfileIDC": 100,
+        "audioCodec": "aac ",
+        "audioSampleRateHz": 48000,
+        "audioChannels": 2,
+        "entirelySilent": false,
+        "audioDecodedPeak": 1.1543076038360596,
+        "nearFullScaleValues": 5381
+      }
+    },
+    {
+      "check": "battle-group_recorder_runtime_state_restored",
+      "passed": true,
+      "evidence": {
+        "source": "video-manifest.json.clips",
+        "originalCaptureFramerate": 0,
+        "originalTargetFrameRate": 60,
+        "originalCaptureDeltaTime": 0.0
+      }
+    },
+    {
+      "check": "skill-editor_encoded_metadata_and_hash",
+      "passed": true,
+      "evidence": {
+        "label": "skill-editor",
+        "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/media-probe.json",
+        "sha256": "12d6ae89c19cd2541e35e40923c5e77017bf184fff04a854be988ef090d40c82",
+        "durationSeconds": 15.5,
+        "encodedVideoSamples": 465,
+        "width": 886,
+        "height": 1920,
+        "nominalFps": 30,
+        "h264ProfileIDC": 100,
+        "audioCodec": "aac ",
+        "audioSampleRateHz": 48000,
+        "audioChannels": 2,
+        "entirelySilent": false,
+        "audioDecodedPeak": 0.40822073817253113,
+        "nearFullScaleValues": 0
+      }
+    },
+    {
+      "check": "skill-editor_recorder_runtime_state_restored",
+      "passed": true,
+      "evidence": {
+        "source": "video-manifest.json.clips",
+        "originalCaptureFramerate": 0,
+        "originalTargetFrameRate": 60,
+        "originalCaptureDeltaTime": 0.0
+      }
+    }
+  ],
+  "media": [
+    {
+      "label": "battle-duel",
+      "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/duel-media/media-probe.json",
+      "sha256": "5a3ec313e9df31a3fed10070d324bb72f65ae8ff6d5d05f057354a76fca62b84",
+      "durationSeconds": 5,
+      "encodedVideoSamples": 150,
+      "width": 886,
+      "height": 1920,
+      "nominalFps": 29.999998092651367,
+      "h264ProfileIDC": 100,
+      "audioCodec": "aac ",
+      "audioSampleRateHz": 48000,
+      "audioChannels": 2,
+      "entirelySilent": false,
+      "audioDecodedPeak": 1.0188372135162354,
+      "nearFullScaleValues": 22
+    },
+    {
+      "label": "battle-team",
+      "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/team-media/media-probe.json",
+      "sha256": "b3f475922706e041e08391dbe4cc7b44410754ec6102ab4b79bd04ef6fae501f",
+      "durationSeconds": 5,
+      "encodedVideoSamples": 150,
+      "width": 886,
+      "height": 1920,
+      "nominalFps": 29.999998092651367,
+      "h264ProfileIDC": 100,
+      "audioCodec": "aac ",
+      "audioSampleRateHz": 48000,
+      "audioChannels": 2,
+      "entirelySilent": false,
+      "audioDecodedPeak": 1.0415165424346924,
+      "nearFullScaleValues": 871
+    },
+    {
+      "label": "battle-group",
+      "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/group-media/media-probe.json",
+      "sha256": "77e958fe416846ab038ee3b1c93a8324ba0c55c9a00e422c1352abb592d4a6db",
+      "durationSeconds": 6,
+      "encodedVideoSamples": 180,
+      "width": 886,
+      "height": 1920,
+      "nominalFps": 30,
+      "h264ProfileIDC": 100,
+      "audioCodec": "aac ",
+      "audioSampleRateHz": 48000,
+      "audioChannels": 2,
+      "entirelySilent": false,
+      "audioDecodedPeak": 1.1543076038360596,
+      "nearFullScaleValues": 5381
+    },
+    {
+      "label": "skill-editor",
+      "probePath": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/media-probe.json",
+      "sha256": "12d6ae89c19cd2541e35e40923c5e77017bf184fff04a854be988ef090d40c82",
+      "durationSeconds": 15.5,
+      "encodedVideoSamples": 465,
+      "width": 886,
+      "height": 1920,
+      "nominalFps": 30,
+      "h264ProfileIDC": 100,
+      "audioCodec": "aac ",
+      "audioSampleRateHz": 48000,
+      "audioChannels": 2,
+      "entirelySilent": false,
+      "audioDecodedPeak": 0.40822073817253113,
+      "nearFullScaleValues": 0
+    }
+  ],
+  "visualEvidence": [
+    {
+      "evidence": "equip 1 source empty plus moving clone",
+      "frameIndex": 1,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-001-0001.133.png",
+      "actualSeconds": 1.1,
+      "requestedSeconds": 1.133333,
+      "sha256": "58874e3c8579f2d161d6b8bce21f7e7de99eb013b7425fc199e0c0869c44f02b"
+    },
+    {
+      "evidence": "equip 1 occupied A3 and landing glow",
+      "frameIndex": 3,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-003-0001.700.png",
+      "actualSeconds": 1.7,
+      "requestedSeconds": 1.7,
+      "sha256": "4d0be3b84fa17ec2b03d0b18ece100c3642817fdcfbe45363daf03fadef252a5"
+    },
+    {
+      "evidence": "preview 176 red rotating streaks",
+      "frameIndex": 7,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-007-0003.800.png",
+      "actualSeconds": 3.8,
+      "requestedSeconds": 3.8,
+      "sha256": "5236a5c9ddb92bf4dd77ed474e778e6bfb64fdc28c92d5e7900cdf94bdd9422b"
+    },
+    {
+      "evidence": "equip 2 source empty plus moving clone",
+      "frameIndex": 10,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-010-0005.133.png",
+      "actualSeconds": 5.1,
+      "requestedSeconds": 5.133333,
+      "sha256": "5b38e084663e68b5ed47fa66e3e31f827776c93d881cb16517bdfd4b22f2fba2"
+    },
+    {
+      "evidence": "equip 2 occupied B2 and landing glow",
+      "frameIndex": 12,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-012-0005.700.png",
+      "actualSeconds": 5.7,
+      "requestedSeconds": 5.7,
+      "sha256": "72f0c7288c8805402af01c0b4c21d5ef2ecc295974d827dd0b7847ac0887a13b"
+    },
+    {
+      "evidence": "preview 77 blue/purple particles",
+      "frameIndex": 15,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-015-0007.200.png",
+      "actualSeconds": 7.2,
+      "requestedSeconds": 7.2,
+      "sha256": "225643c0a025be1165aee1524199dffd9d79a186afc909c6d74fe24e0e9de451"
+    },
+    {
+      "evidence": "occupied A3 to B2 drag clone and source temporarily blank",
+      "frameIndex": 18,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-018-0008.800.png",
+      "actualSeconds": 8.8,
+      "requestedSeconds": 8.8,
+      "sha256": "b3bbd0a0a262bbb002bc910e512ba8abbe8fb2cac62585c38edcb23b1467d382"
+    },
+    {
+      "evidence": "swap complete; A3/B2 icons exchanged",
+      "frameIndex": 21,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-021-0009.767.png",
+      "actualSeconds": 9.766666666666667,
+      "requestedSeconds": 9.766667,
+      "sha256": "4f0f909b36284a874b45308064862dd1b7aaaacd371fa9674e1acbde26db3d36"
+    },
+    {
+      "evidence": "preview 162 purple lightning",
+      "frameIndex": 23,
+      "path": "/Users/daisei/PocketStriker/output/appstore-video-20261008/audit/skill-action-frames/frame-023-0010.600.png",
+      "actualSeconds": 10.6,
+      "requestedSeconds": 10.6,
+      "sha256": "978a74b4188adf93f0ba121eacba1c675efdc22a2eae55e4619fbbb8ad960d43"
+    }
+  ],
+  "skillTelemetry": [
+    {
+      "skillId": "176",
+      "realName": "adam_spin",
+      "spLevel": 1,
+      "clickFrame": 68,
+      "maximumOwnedEffects": 2,
+      "maximumVisibleOwnedEffects": 2,
+      "maximumVisibleParticles": 252,
+      "firstVisibleFrame": 82,
+      "lastVisibleFrame": 137,
+      "animatorStateChanges": 2,
+      "maximumAnimatorNormalizedTime": 4.797186374664307
+    },
+    {
+      "skillId": "77",
+      "realName": "fo_huge",
+      "spLevel": 3,
+      "clickFrame": 188,
+      "maximumOwnedEffects": 1,
+      "maximumVisibleOwnedEffects": 1,
+      "maximumVisibleParticles": 174,
+      "firstVisibleFrame": 188,
+      "lastVisibleFrame": 254,
+      "animatorStateChanges": 2,
+      "maximumAnimatorNormalizedTime": 2.7333321571350098
+    },
+    {
+      "skillId": "162",
+      "realName": "mirrorcannon",
+      "spLevel": 2,
+      "clickFrame": 298,
+      "maximumOwnedEffects": 2,
+      "maximumVisibleOwnedEffects": 1,
+      "maximumVisibleParticles": 139,
+      "firstVisibleFrame": 315,
+      "lastVisibleFrame": 334,
+      "animatorStateChanges": 2,
+      "maximumAnimatorNormalizedTime": 2.2666659355163574
+    }
+  ],
+  "timing": {
+    "timelineBaseUnityFrame": 5007,
+    "recorderStartUnityFrame": 5012,
+    "startOffsetFrames": 5,
+    "fps": 30,
+    "estimatedActionTimingBasis": "(operation unityFrame - recorder startUnityFrame)/30; encoded frame actualSeconds governs selected visual evidence",
+    "operations": [
+      {
+        "name": "prewarmed-three-real-owned-vfx-skills",
+        "utc": "2026-10-08T05:16:56.5898800Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5007,
+        "realtime": 109.95868475160093,
+        "estimatedEncodedSeconds": -0.16666666666666666
+      },
+      {
+        "name": "category-first-owned-skill-frame-18",
+        "utc": "2026-10-08T05:16:57.1673810Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5025,
+        "realtime": 110.53616854360092,
+        "estimatedEncodedSeconds": 0.43333333333333335
+      },
+      {
+        "name": "inventory-equip-frame-55",
+        "utc": "2026-10-08T05:16:58.4103420Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5062,
+        "realtime": 111.77912596060092,
+        "estimatedEncodedSeconds": 1.6666666666666667
+      },
+      {
+        "name": "preview-176-frame-68",
+        "utc": "2026-10-08T05:16:58.8372510Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5075,
+        "realtime": 112.20603358560092,
+        "estimatedEncodedSeconds": 2.1
+      },
+      {
+        "name": "category-second-owned-skill-frame-138",
+        "utc": "2026-10-08T05:17:01.1767000Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5145,
+        "realtime": 114.54547333560093,
+        "estimatedEncodedSeconds": 4.433333333333334
+      },
+      {
+        "name": "inventory-equip-frame-175",
+        "utc": "2026-10-08T05:17:02.4280910Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5182,
+        "realtime": 115.79685900160092,
+        "estimatedEncodedSeconds": 5.666666666666667
+      },
+      {
+        "name": "preview-77-frame-188",
+        "utc": "2026-10-08T05:17:02.8564860Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5195,
+        "realtime": 116.22525296060093,
+        "estimatedEncodedSeconds": 6.1
+      },
+      {
+        "name": "occupied-slot-swap-frame-285",
+        "utc": "2026-10-08T05:17:06.0987220Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5292,
+        "realtime": 119.4674772106009,
+        "estimatedEncodedSeconds": 9.333333333333334
+      },
+      {
+        "name": "preview-162-frame-298",
+        "utc": "2026-10-08T05:17:06.5517140Z",
+        "scene": "MainMenuScene",
+        "unityFrame": 5305,
+        "realtime": 119.92046666860092,
+        "estimatedEncodedSeconds": 9.766666666666667
+      }
+    ]
+  },
+  "restorationEvidenceLimits": "Runtime restore flags are backed by source assertions whose SHA matches the recorded manifest. The audit did not replay restoration or inspect a separate pre/post persistent snapshot.",
+  "findings": [
+    {
+      "level": "information",
+      "text": "Source timeline is 450 frames / 15 seconds. Recorder deliberately captures 465 frames / 15.5 seconds, including preparation/trailing buffer. This is not an unexplained count mismatch."
+    },
+    {
+      "level": "information",
+      "text": "0.1–12.1 seconds skill trim retains both inventory equips, the complete occupied swap and all three visible VFX. Final requested duration with 13.6 seconds of battles is 25.6 seconds."
+    },
+    {
+      "level": "review-note",
+      "text": "VFX telemetry assigns effects to the preview actor, not to individual animation event IDs. Exact firstVisibleFrame should not be read as a guaranteed skill-specific emission onset. Encoded visual frames establish three different visible effects."
+    },
+    {
+      "level": "audio-review",
+      "text": "Raw battle AAC decode has peaks above 1 (approximately 1.02, 1.04 and 1.15); this observation does not alone establish audible clipping. Inspect final mix after music/ducking/limiting. Skill raw peak is 0.408."
+    },
+    {
+      "level": "scope",
+      "text": "Footage is current Unity Editor rendering with production account and UI, not physical-device TestFlight build 39 footage."
+    }
+  ]
+}

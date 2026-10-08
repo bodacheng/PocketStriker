@@ -1,0 +1,593 @@
+{
+  "audioTracks" : [
+    {
+      "compressedSamples" : {
+        "bitrateBasis" : "compressed payload bytes \/ track duration, excludes container overhead",
+        "compressedPayloadBytes" : 23447634,
+        "firstPresentationSeconds" : 0,
+        "lastPresentationSeconds" : 88.000997732426299,
+        "measuredPayloadBitrateBps" : 2116800,
+        "positiveSampleDeltaMaxSeconds" : 2.0000226757369717,
+        "positiveSampleDeltaMinSeconds" : 2.0000226757369575,
+        "readerCompleted" : true,
+        "sampleCount" : 3907939,
+        "trackDurationSeconds" : 88.615396825396829
+      },
+      "decodedSignal" : {
+        "channels" : 2,
+        "entirelySilent" : false,
+        "longestExactlyZeroRunSeconds" : 0,
+        "nearFullScaleSampleValues" : 291,
+        "nonzeroValues" : 7815875,
+        "peak" : 1,
+        "perSecond" : [
+          {
+            "peak" : 0.94733035564422607,
+            "rms" : 0.22521464947312031,
+            "sampleValues" : 88200,
+            "second" : 0
+          },
+          {
+            "peak" : 0.81963884830474854,
+            "rms" : 0.19646158897759408,
+            "sampleValues" : 88200,
+            "second" : 1
+          },
+          {
+            "peak" : 0.76349568367004395,
+            "rms" : 0.17419703450684162,
+            "sampleValues" : 88200,
+            "second" : 2
+          },
+          {
+            "peak" : 0.77341735363006592,
+            "rms" : 0.1822949813209544,
+            "sampleValues" : 88200,
+            "second" : 3
+          },
+          {
+            "peak" : 0.8839346170425415,
+            "rms" : 0.19604013397685166,
+            "sampleValues" : 88200,
+            "second" : 4
+          },
+          {
+            "peak" : 0.75408446788787842,
+            "rms" : 0.18137141899702577,
+            "sampleValues" : 88200,
+            "second" : 5
+          },
+          {
+            "peak" : 0.73848652839660645,
+            "rms" : 0.19928207728784836,
+            "sampleValues" : 88200,
+            "second" : 6
+          },
+          {
+            "peak" : 0.8256843090057373,
+            "rms" : 0.20836415482827386,
+            "sampleValues" : 88200,
+            "second" : 7
+          },
+          {
+            "peak" : 0.79126596450805664,
+            "rms" : 0.19360679904478514,
+            "sampleValues" : 88200,
+            "second" : 8
+          },
+          {
+            "peak" : 0.72796630859375,
+            "rms" : 0.17901099390705855,
+            "sampleValues" : 88200,
+            "second" : 9
+          },
+          {
+            "peak" : 0.72962343692779541,
+            "rms" : 0.17264942753269896,
+            "sampleValues" : 88200,
+            "second" : 10
+          },
+          {
+            "peak" : 0.92890119552612305,
+            "rms" : 0.2066590546395832,
+            "sampleValues" : 88200,
+            "second" : 11
+          },
+          {
+            "peak" : 0.92536866664886475,
+            "rms" : 0.21155230036061423,
+            "sampleValues" : 88200,
+            "second" : 12
+          },
+          {
+            "peak" : 0.76017534732818604,
+            "rms" : 0.18072960577038771,
+            "sampleValues" : 88200,
+            "second" : 13
+          },
+          {
+            "peak" : 0.91377627849578857,
+            "rms" : 0.18411738178841203,
+            "sampleValues" : 88200,
+            "second" : 14
+          },
+          {
+            "peak" : 0.91863954067230225,
+            "rms" : 0.19768498178361077,
+            "sampleValues" : 88200,
+            "second" : 15
+          },
+          {
+            "peak" : 0.89939379692077637,
+            "rms" : 0.18413449220082159,
+            "sampleValues" : 88200,
+            "second" : 16
+          },
+          {
+            "peak" : 0.6947866678237915,
+            "rms" : 0.17256280651549627,
+            "sampleValues" : 88200,
+            "second" : 17
+          },
+          {
+            "peak" : 0.93560111522674561,
+            "rms" : 0.21604032306588727,
+            "sampleValues" : 88200,
+            "second" : 18
+          },
+          {
+            "peak" : 0.78681647777557373,
+            "rms" : 0.196074372617977,
+            "sampleValues" : 88200,
+            "second" : 19
+          },
+          {
+            "peak" : 0.70239925384521484,
+            "rms" : 0.1776977370187183,
+            "sampleValues" : 88200,
+            "second" : 20
+          },
+          {
+            "peak" : 0.80644786357879639,
+            "rms" : 0.17231264991954803,
+            "sampleValues" : 88200,
+            "second" : 21
+          },
+          {
+            "peak" : 0.99729609489440918,
+            "rms" : 0.21355848644879669,
+            "sampleValues" : 88200,
+            "second" : 22
+          },
+          {
+            "peak" : 0.93731987476348877,
+            "rms" : 0.19307871280312708,
+            "sampleValues" : 88200,
+            "second" : 23
+          },
+          {
+            "peak" : 0.85496950149536133,
+            "rms" : 0.20958674347420822,
+            "sampleValues" : 88200,
+            "second" : 24
+          },
+          {
+            "peak" : 0.91898417472839355,
+            "rms" : 0.20048991286522516,
+            "sampleValues" : 88200,
+            "second" : 25
+          },
+          {
+            "peak" : 0.86748290061950684,
+            "rms" : 0.21426081567947894,
+            "sampleValues" : 88200,
+            "second" : 26
+          },
+          {
+            "peak" : 0.85243690013885498,
+            "rms" : 0.19745184553207956,
+            "sampleValues" : 88200,
+            "second" : 27
+          },
+          {
+            "peak" : 0.77289235591888428,
+            "rms" : 0.18648016858768746,
+            "sampleValues" : 88200,
+            "second" : 28
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.22197540882249939,
+            "sampleValues" : 88200,
+            "second" : 29
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.37272383966767475,
+            "sampleValues" : 88200,
+            "second" : 30
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31504524357516644,
+            "sampleValues" : 88200,
+            "second" : 31
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.27070426499875294,
+            "sampleValues" : 88200,
+            "second" : 32
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31766065519096487,
+            "sampleValues" : 88200,
+            "second" : 33
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29291088879825661,
+            "sampleValues" : 88200,
+            "second" : 34
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.32689166510379458,
+            "sampleValues" : 88200,
+            "second" : 35
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31265455616058296,
+            "sampleValues" : 88200,
+            "second" : 36
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.30705024173911477,
+            "sampleValues" : 88200,
+            "second" : 37
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31607180258100237,
+            "sampleValues" : 88200,
+            "second" : 38
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.28155698596954459,
+            "sampleValues" : 88200,
+            "second" : 39
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29207172448554497,
+            "sampleValues" : 88200,
+            "second" : 40
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.28908305358775488,
+            "sampleValues" : 88200,
+            "second" : 41
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.32033612129229116,
+            "sampleValues" : 88200,
+            "second" : 42
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.30303097201312557,
+            "sampleValues" : 88200,
+            "second" : 43
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.30670311127479022,
+            "sampleValues" : 88200,
+            "second" : 44
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.35388237001615314,
+            "sampleValues" : 88200,
+            "second" : 45
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29815524287461798,
+            "sampleValues" : 88200,
+            "second" : 46
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29438810513627645,
+            "sampleValues" : 88200,
+            "second" : 47
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.3234442931059805,
+            "sampleValues" : 88200,
+            "second" : 48
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29704907615252979,
+            "sampleValues" : 88200,
+            "second" : 49
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31627725832560083,
+            "sampleValues" : 88200,
+            "second" : 50
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.29038764150235974,
+            "sampleValues" : 88200,
+            "second" : 51
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.319328039102456,
+            "sampleValues" : 88200,
+            "second" : 52
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.32079984479086726,
+            "sampleValues" : 88200,
+            "second" : 53
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.28074781798173182,
+            "sampleValues" : 88200,
+            "second" : 54
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.31349053586002384,
+            "sampleValues" : 88200,
+            "second" : 55
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.28928625490519755,
+            "sampleValues" : 88200,
+            "second" : 56
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.32105795155447581,
+            "sampleValues" : 88200,
+            "second" : 57
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.28977965181598914,
+            "sampleValues" : 88200,
+            "second" : 58
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.2578555981901976,
+            "sampleValues" : 88200,
+            "second" : 59
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.24514094225000277,
+            "sampleValues" : 88200,
+            "second" : 60
+          },
+          {
+            "peak" : 0.99312984943389893,
+            "rms" : 0.2593506737170872,
+            "sampleValues" : 88200,
+            "second" : 61
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.23066007137294972,
+            "sampleValues" : 88200,
+            "second" : 62
+          },
+          {
+            "peak" : 0.99937200546264648,
+            "rms" : 0.23863087761299098,
+            "sampleValues" : 88200,
+            "second" : 63
+          },
+          {
+            "peak" : 0.99921858310699463,
+            "rms" : 0.28229964839706079,
+            "sampleValues" : 88200,
+            "second" : 64
+          },
+          {
+            "peak" : 0.99839878082275391,
+            "rms" : 0.23405437601477941,
+            "sampleValues" : 88200,
+            "second" : 65
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.27318601619766364,
+            "sampleValues" : 88200,
+            "second" : 66
+          },
+          {
+            "peak" : 0.99952971935272217,
+            "rms" : 0.22525873274013219,
+            "sampleValues" : 88200,
+            "second" : 67
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.26665025093459327,
+            "sampleValues" : 88200,
+            "second" : 68
+          },
+          {
+            "peak" : 0.90175426006317139,
+            "rms" : 0.20149222327453434,
+            "sampleValues" : 88200,
+            "second" : 69
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.25541304830746325,
+            "sampleValues" : 88200,
+            "second" : 70
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.21335423771965131,
+            "sampleValues" : 88200,
+            "second" : 71
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.32065212084932554,
+            "sampleValues" : 88200,
+            "second" : 72
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.22131837345018204,
+            "sampleValues" : 88200,
+            "second" : 73
+          },
+          {
+            "peak" : 1,
+            "rms" : 0.25225122209336703,
+            "sampleValues" : 88200,
+            "second" : 74
+          },
+          {
+            "peak" : 0.99885547161102295,
+            "rms" : 0.24981801812925436,
+            "sampleValues" : 88200,
+            "second" : 75
+          },
+          {
+            "peak" : 0.90586090087890625,
+            "rms" : 0.22010921977075792,
+            "sampleValues" : 88200,
+            "second" : 76
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.2644153462962292,
+            "sampleValues" : 88200,
+            "second" : 77
+          },
+          {
+            "peak" : 0.99950492382049561,
+            "rms" : 0.23849081053707819,
+            "sampleValues" : 88200,
+            "second" : 78
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.30860634630956824,
+            "sampleValues" : 88200,
+            "second" : 79
+          },
+          {
+            "peak" : 0.89966535568237305,
+            "rms" : 0.20144960720140531,
+            "sampleValues" : 88200,
+            "second" : 80
+          },
+          {
+            "peak" : 0.99934613704681396,
+            "rms" : 0.26198758078692169,
+            "sampleValues" : 88200,
+            "second" : 81
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.21249047410295185,
+            "sampleValues" : 88200,
+            "second" : 82
+          },
+          {
+            "peak" : 0.9991220235824585,
+            "rms" : 0.26757713282966405,
+            "sampleValues" : 88200,
+            "second" : 83
+          },
+          {
+            "peak" : 0.99876177310943604,
+            "rms" : 0.23415293747214944,
+            "sampleValues" : 88200,
+            "second" : 84
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.26620087499165446,
+            "sampleValues" : 88200,
+            "second" : 85
+          },
+          {
+            "peak" : 0.99999988079071045,
+            "rms" : 0.24801479799186524,
+            "sampleValues" : 88200,
+            "second" : 86
+          },
+          {
+            "peak" : 0.9992600679397583,
+            "rms" : 0.26471323058491614,
+            "sampleValues" : 88200,
+            "second" : 87
+          },
+          {
+            "peak" : 0.99717235565185547,
+            "rms" : 0.17256214405122863,
+            "sampleValues" : 54278,
+            "second" : 88
+          }
+        ],
+        "readerCompleted" : true,
+        "rms" : 0.25464834665519015,
+        "sampleRateHz" : 44100,
+        "sampleValues" : 7815878,
+        "trackDurationSeconds" : 88.615396825396829
+      },
+      "formats" : [
+        {
+          "channels" : 2,
+          "codec" : "lpcm",
+          "sampleRateHz" : 44100
+        }
+      ],
+      "index" : 0
+    }
+  ],
+  "durationSeconds" : 88.615396825396829,
+  "fileBytes" : 23447678,
+  "frames" : [
+
+  ],
+  "limitations" : [
+    "Technical inspection does not confirm gameplay authenticity or store acceptance.",
+    "H.264 profile\/level are read from avcC; SPS progressive syntax is not parsed.",
+    "Near-full-scale PCM values are reported as observations, not proof of audible clipping."
+  ],
+  "schema" : "PocketStrikerMediaProbe-v1",
+  "sha256" : "f4f6ecff5d001dfcc2242fd40b406d4ab2e82779aa00e2df27022b0f9a6a9cb0",
+  "source" : "\/Users\/daisei\/PocketStriker\/Assets\/ExternalAssets\/Audio\/BGM\/MIDI☆MUSIQ\/BGM1_fin.wav",
+  "sourceModified" : false,
+  "videoEncoded" : false,
+  "videoTracks" : [
+
+  ]
+}
