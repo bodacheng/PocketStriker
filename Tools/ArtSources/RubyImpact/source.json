@@ -1,0 +1,211 @@
+{
+  "sourceRepository": "MCombat",
+  "sourceCheckoutHead": "0db99ba60e0cb0cf76f4a128ab0177f86c88b25e",
+  "sourceReadDate": "2026-10-13",
+  "skill": {
+    "id": 16,
+    "realName": "rollfoward",
+    "enName": "Ruby Impact",
+    "cnName": "红宝石撞击"
+  },
+  "notes": "Read-only source import. Authored prefab, hitbox, particle systems, audio, timing, layer, transform, material and GUIDs are preserved byte-for-byte. Existing destination materials, scripts, arcane_glow texture, dark_boom and energy_resolve effect prefabs are reused. No dragon assets or shared package are modified.",
+  "assets": [
+    {
+      "source": "Assets/ExternalAssets/Prefabs/HurtObjects/defaultmagic/rollfoward.prefab",
+      "target": "Assets/ExternalAssets/HurtObjects/defaultmagic/rollfoward.prefab",
+      "sourceSha256": "5686bfc885ba629da260bd757f322fdfebd980a5f77f847150aacd6ca13643cf",
+      "targetSha256": "5686bfc885ba629da260bd757f322fdfebd980a5f77f847150aacd6ca13643cf"
+    },
+    {
+      "source": "Assets/ExternalAssets/Prefabs/HurtObjects/defaultmagic/rollfoward.prefab.meta",
+      "target": "Assets/ExternalAssets/HurtObjects/defaultmagic/rollfoward.prefab.meta",
+      "sourceSha256": "3d0e3aeb8f5b0247322c70ff8b6936aa56156b9e65bbfbb72c56584cf709c823",
+      "targetSha256": "3d0e3aeb8f5b0247322c70ff8b6936aa56156b9e65bbfbb72c56584cf709c823"
+    },
+    {
+      "source": "Assets/EffectsResource/materials/Projectiles/Arcane/ArcaneGlowDoubleSide.mat",
+      "target": "Assets/OrganizedResources/InUse/MCombatRecovered/EffectsResource/materials/Projectiles/Arcane/ArcaneGlowDoubleSide__d68a837b.mat",
+      "sourceSha256": "d66d222bc7f79bd4b0eb49b9d6a64e68de9ef6a6e6b46db25fb326690659c686",
+      "targetSha256": "d66d222bc7f79bd4b0eb49b9d6a64e68de9ef6a6e6b46db25fb326690659c686"
+    },
+    {
+      "source": "Assets/EffectsResource/materials/Projectiles/Arcane/ArcaneGlowDoubleSide.mat.meta",
+      "target": "Assets/OrganizedResources/InUse/MCombatRecovered/EffectsResource/materials/Projectiles/Arcane/ArcaneGlowDoubleSide__d68a837b.mat.meta",
+      "sourceSha256": "21a66f7ce653bde765988efa5c0d84e23046bcf05cf490ac821822ac647aa803",
+      "targetSha256": "21a66f7ce653bde765988efa5c0d84e23046bcf05cf490ac821822ac647aa803"
+    }
+  ],
+  "dependencyAudit": {
+    "roots": [
+      "Assets/ExternalAssets/HurtObjects/defaultmagic/rollfoward.prefab",
+      "Assets/ExternalAssets/Effects/defaultmagic/dark_boom.prefab",
+      "Assets/ExternalAssets/Effects/defaultmagic/energy_resolve.prefab"
+    ],
+    "method": "Recursive serialized GUID audit against importable Assets and Packages .meta files; Unity built-in GUIDs are excluded. Texture/binary data are terminal dependencies. Runtime string effects are included as roots.",
+    "reachableAssetCount": 43,
+    "missingGuids": {},
+    "duplicateGuids": {},
+    "existingDependencies": [
+      {
+        "guid": "4eb9f9ab3fbc9415f9514539f68c47e2",
+        "path": "Assets/BOWeaponSystem/Decomposition.cs"
+      },
+      {
+        "guid": "6c94714ac130c5740af6933936e15c47",
+        "path": "Assets/BOWeaponSystem/Weapon Marker Systems/BO_Marker.cs"
+      },
+      {
+        "guid": "99a48db1ed15426469ef2ac2ae741ea3",
+        "path": "Assets/BOWeaponSystem/Weapon Marker Systems/HitBoxManager.cs"
+      },
+      {
+        "guid": "9b409b2e65af3cf44b3fc61491dce714",
+        "path": "Assets/EffectsResource/Sounds/Lightning/Lightning Spell 03.wav"
+      },
+      {
+        "guid": "d07a3f05da0e19d4f8ab335a3afc0bfd",
+        "path": "Assets/EffectsResource/Sounds/Punch and Fighting Sounds/Punch 7.wav"
+      },
+      {
+        "guid": "b42cd23566332db4cbe437cad94fbe2f",
+        "path": "Assets/EffectsResource/Sounds/Shadow/Shadow Attack 1.wav"
+      },
+      {
+        "guid": "c9b3eaae0aa575c4db6feb3ae6fea5a7",
+        "path": "Assets/EffectsResource/model/QuadToCircle.fbx"
+      },
+      {
+        "guid": "b68b99c2e57cef4419465c63c527201b",
+        "path": "Assets/EffectsResource/shaders/Blend_CenterGlow.shader"
+      },
+      {
+        "guid": "707c7399dea3873468f73f9fd0dcc3a0",
+        "path": "Assets/OrganizedResources/InUse/D_Asset/Game_Portal/Textures/Glow_Main.png"
+      },
+      {
+        "guid": "2e554b9a8a972ba4fb64c5ce512230f7",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Circle/Circle8cg.mat"
+      },
+      {
+        "guid": "ac39884ca65698c46ab28cb5f1445d69",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Flare21cg.mat"
+      },
+      {
+        "guid": "5632893a0e345054998ef42f1e5748ed",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Glow/Glow_Main.mat"
+      },
+      {
+        "guid": "9d5b0897c7b3e5241878478c672f09e4",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Glow/GroundLight03.mat"
+      },
+      {
+        "guid": "64c774a016e044548b7752ac7e5d088c",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Glow/LightParticle.mat"
+      },
+      {
+        "guid": "f7ddbe0c37e16c548b18108c9ef59e96",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Glow/Noise50cg.mat"
+      },
+      {
+        "guid": "7a70e430f6cccf642816a3994983a529",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Glow/glowsmooth.mat"
+      },
+      {
+        "guid": "0abe55a3158bb5f41925e4fddbfe9de2",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Gradient17cg2.mat"
+      },
+      {
+        "guid": "910457dc152f8c341b02cf22c406c5c6",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Materials/m_fx_lightning4x2_blue.mat"
+      },
+      {
+        "guid": "1d2e6d5641ac99b46847794322c608b6",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Materials/m_fx_lightning4x2_red.mat"
+      },
+      {
+        "guid": "6ce04723dedf8af4fa258fa76caace12",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Noise69bcg2.mat"
+      },
+      {
+        "guid": "fe3fbcea8e93fec468be670c547e0aa1",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Smoke/Smoke3cg.mat"
+      },
+      {
+        "guid": "1a8eb290d9ffa53489d076ac4c51e73b",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/materials/Trails/trailblue.mat"
+      },
+      {
+        "guid": "7dcb8a9c3f171064387b66c3e553ab24",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Circle8.png"
+      },
+      {
+        "guid": "947fe6f544d82394db98003a81460397",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Flare21.png"
+      },
+      {
+        "guid": "61e68320eb0a34646ae9e7855bba9d92",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Gradient17.png"
+      },
+      {
+        "guid": "ed3a5efebe958ba429d350e04f14d1ab",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Gradient3r.png"
+      },
+      {
+        "guid": "6b3ade2740748114b93a7c0310e7c324",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Modular/glowsmooth.png"
+      },
+      {
+        "guid": "dd93ece84d407cd44931653f592c0cb4",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Noise29.png"
+      },
+      {
+        "guid": "4e3951c538fc8a647a4a10a99b480987",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Noise50.png"
+      },
+      {
+        "guid": "3584f2bf4afb5284d91edb6a29126e62",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Noise69.png"
+      },
+      {
+        "guid": "52b767eecc2845a429e0e9e2155a8ea5",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Smoke3.png"
+      },
+      {
+        "guid": "dbec9039c70e09e47b8ff15d508f39ac",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Trail58.png"
+      },
+      {
+        "guid": "5c03bc4b80b50384a9904843f3769487",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Trail6.png"
+      },
+      {
+        "guid": "cb434ac087fcf8d44b7bb74405a330c0",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/Trails/trail_scifi_blue.png"
+      },
+      {
+        "guid": "63f4792c6c50b4e49bec66a8bad914c5",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/arcane_glow.png"
+      },
+      {
+        "guid": "6a8d78cb95270dd45b35a1cf85ada012",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/ground_light03.png"
+      },
+      {
+        "guid": "4000721759898ed438063ff5c2cfc889",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/light_particle.png"
+      },
+      {
+        "guid": "4458e46d26210ab4aaf1928a2d1a0f8c",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/lightning2x4_blue.png"
+      },
+      {
+        "guid": "cdf65b85feb3e454c8ea4cf55e4ec3ce",
+        "path": "Assets/OrganizedResources/InUse/EffectsResource/textures/lightning2x4_red.png"
+      },
+      {
+        "guid": "d68a837b40e3fdc47a88e95210a431a8",
+        "path": "Assets/OrganizedResources/InUse/MCombatRecovered/EffectsResource/materials/Projectiles/Arcane/ArcaneGlowDoubleSide__d68a837b.mat"
+      }
+    ]
+  }
+}

@@ -1,0 +1,265 @@
+{
+  "sourceRepository": "MCombat",
+  "sourceCheckoutHead": "0db99ba60e0cb0cf76f4a128ab0177f86c88b25e",
+  "sourceReadDate": "2026-10-13",
+  "notes": "Read-only import from local checkout; hashes include working-tree state. Shared package unchanged. Native body/eye material GUIDs preserved with PocketStriker authored materials.",
+  "assets": [
+    {
+      "source": "Assets/Malbers Animations/Dragons/6 - Elemental Dragon/Models/Elemental Dragon Toon.FBX",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Models/Elemental Dragon Toon.FBX",
+      "targetSha256": "79106f614f0dba12482aa4b697943e8bfbb78d3a442d20d19aa1ed6f095c6b7d",
+      "sourceSha256": "79106f614f0dba12482aa4b697943e8bfbb78d3a442d20d19aa1ed6f095c6b7d"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/6 - Elemental Dragon/Models/Elemental Dragon PA.FBX",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Models/Elemental Dragon PA.FBX",
+      "targetSha256": "7a0a31f24436320acefc57c1d7aecb50d77e5cf09a597dad4182e3499f97ec7e",
+      "sourceSha256": "7a0a31f24436320acefc57c1d7aecb50d77e5cf09a597dad4182e3499f97ec7e"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/El_Fly_Forward.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/El_Fly_Forward.anim",
+      "targetSha256": "7440e92e04fe711a00e4c3fc324aedb5bda8e5fc5cb3f1a921c3e6e3df557117",
+      "sourceSha256": "7440e92e04fe711a00e4c3fc324aedb5bda8e5fc5cb3f1a921c3e6e3df557117"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/e_dragon.controller",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/e_dragon.controller",
+      "targetSha256": "003c834ffd9cc4970382df37b04593a4d4a3399e5d79636c6cab5b8a1bad2658",
+      "sourceSha256": "c6bf3f92e9083c7f3b009e6d53d80e240b60c273d546457a437b88701958fe16"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Tail_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Tail_Left.anim",
+      "targetSha256": "a6cb455d5cfd5fdca71bda5bf76355507bb0902710195f609e7e2fc4214f2c8a",
+      "sourceSha256": "a6cb455d5cfd5fdca71bda5bf76355507bb0902710195f609e7e2fc4214f2c8a"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_FireBall.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_FireBall.anim",
+      "targetSha256": "14444688bcf1e50c5a099fd40ae315fcd029b9d981257b3447726ad3c3c345d9",
+      "sourceSha256": "14444688bcf1e50c5a099fd40ae315fcd029b9d981257b3447726ad3c3c345d9"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Paw_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Paw_Left.anim",
+      "targetSha256": "fdfeee0750e7ef32cfb4181cf9de842d5dd1a66201e568867558a588b199b328",
+      "sourceSha256": "fdfeee0750e7ef32cfb4181cf9de842d5dd1a66201e568867558a588b199b328"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Tail_Right.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Tail_Right.anim",
+      "targetSha256": "657f01e9369cc9609b866ef5a6473be9e3886de0e99441324efbbfd519a686d6",
+      "sourceSha256": "657f01e9369cc9609b866ef5a6473be9e3886de0e99441324efbbfd519a686d6"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_FireBreath_Swipe.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_FireBreath_Swipe.anim",
+      "targetSha256": "c218a2dc754e5b8cc3b5150f3cd0ea946678e81b95965f64b77c9fcbb9467f4f",
+      "sourceSha256": "c218a2dc754e5b8cc3b5150f3cd0ea946678e81b95965f64b77c9fcbb9467f4f"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Bite_Front.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Bite_Front.anim",
+      "targetSha256": "cc0bde959374bf787207dafa85e9f0cc4ebac4f6e3510a65f607ea450cef3055",
+      "sourceSha256": "cc0bde959374bf787207dafa85e9f0cc4ebac4f6e3510a65f607ea450cef3055"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Bite_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Bite_Left.anim",
+      "targetSha256": "ce698d7bac30319b457a529527b51485ab5776d0b47117075fb88e3ce4e0467b",
+      "sourceSha256": "ce698d7bac30319b457a529527b51485ab5776d0b47117075fb88e3ce4e0467b"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_FireBreath.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_FireBreath.anim",
+      "targetSha256": "7bf9f31b2cc85844362c9d0741df73e6b725e700c546953f7d62fd8a15cc7695",
+      "sourceSha256": "7bf9f31b2cc85844362c9d0741df73e6b725e700c546953f7d62fd8a15cc7695"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Bite_Right.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Bite_Right.anim",
+      "targetSha256": "950884360e4e2e5a91893d93de4df95334d1a86e66ff5371013fa30bd8d6d392",
+      "sourceSha256": "950884360e4e2e5a91893d93de4df95334d1a86e66ff5371013fa30bd8d6d392"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Stump.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Stump.anim",
+      "targetSha256": "1b6c990c5044ac3735d2bfd6c9fd558055ca67a35bebf506623e57e906b19928",
+      "sourceSha256": "1b6c990c5044ac3735d2bfd6c9fd558055ca67a35bebf506623e57e906b19928"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Attack_Wing_Right.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Attack_Wing_Right.anim",
+      "targetSha256": "90589053abc9757a1ccf04289e96014e5748dee378fe5c29ade7f1134af74edb",
+      "sourceSha256": "90589053abc9757a1ccf04289e96014e5748dee378fe5c29ade7f1134af74edb"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/skill/El_Fly_Backwards.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/skill/El_Fly_Backwards.anim",
+      "targetSha256": "2865130d99b77a09d2f9272e52142e002579efd19a5aadfc3051b45ed556b6c6",
+      "sourceSha256": "2865130d99b77a09d2f9272e52142e002579efd19a5aadfc3051b45ed556b6c6"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_hurts/high/El_Death_02 1.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_hurts/high/El_Death_02 1.anim",
+      "targetSha256": "a5a5a018210bb7e31c3f8153360f22c8e621b491df25777e9100f4e7ea792003",
+      "sourceSha256": "a5a5a018210bb7e31c3f8153360f22c8e621b491df25777e9100f4e7ea792003"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_hurts/low/El_Damage_Front_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_hurts/low/El_Damage_Front_Left.anim",
+      "targetSha256": "b4732c6e4e4405000bc8337d6a510b32db67a5aa00a300ffd2e800ab70d885d5",
+      "sourceSha256": "b4732c6e4e4405000bc8337d6a510b32db67a5aa00a300ffd2e800ab70d885d5"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_hurts/lay/El_Damage_Front_Right.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_hurts/lay/El_Damage_Front_Right.anim",
+      "targetSha256": "b34b96b2583b0ece3a4878e7818098092447f3fe4c226522142392968bf6d54a",
+      "sourceSha256": "b34b96b2583b0ece3a4878e7818098092447f3fe4c226522142392968bf6d54a"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_hurts/press/p.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_hurts/press/p.anim",
+      "targetSha256": "2b24e3b85b2fc5013b27c3478990289db444cbb026c5ac09f364806f18434220",
+      "sourceSha256": "2b24e3b85b2fc5013b27c3478990289db444cbb026c5ac09f364806f18434220"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_knockoffs/El_Fly_Fall_Death_Opp.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_knockoffs/El_Fly_Fall_Death_Opp.anim",
+      "targetSha256": "8745205cf1afd60eed842db194b7b71f2db5de5f2bf1ba5996a7c2784e954ee9",
+      "sourceSha256": "8745205cf1afd60eed842db194b7b71f2db5de5f2bf1ba5996a7c2784e954ee9"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/basic_knockoffs/El_Fly_Fall_Death.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_knockoffs/El_Fly_Fall_Death.anim",
+      "targetSha256": "799b8a93617335d5638979394711dd633753d887a7a8ae84c7ea25d7f0ec78f5",
+      "sourceSha256": "799b8a93617335d5638979394711dd633753d887a7a8ae84c7ea25d7f0ec78f5"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/victory.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/victory.anim",
+      "targetSha256": "d69fba9e6e7725eebef403998ca37d37fb273d0a01d693dd372123655e5e8995",
+      "sourceSha256": "d69fba9e6e7725eebef403998ca37d37fb273d0a01d693dd372123655e5e8995"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/run.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/run.anim",
+      "targetSha256": "bf2d7e4e50b4d6dc8c0bc7af3ca5d8a49efb60a370e3a91901dd79dda542162b",
+      "sourceSha256": "bf2d7e4e50b4d6dc8c0bc7af3ca5d8a49efb60a370e3a91901dd79dda542162b"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/rush.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/rush.anim",
+      "targetSha256": "cbe3f18ea468fac2e56a93f249190fb5c3a16cdf4d178485328418493aa9d5c8",
+      "sourceSha256": "cbe3f18ea468fac2e56a93f249190fb5c3a16cdf4d178485328418493aa9d5c8"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/getup.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/getup.anim",
+      "targetSha256": "e066e9d88f87492903394351cf749e3ae5b1882ec610359737ac808abd25153f",
+      "sourceSha256": "e066e9d88f87492903394351cf749e3ae5b1882ec610359737ac808abd25153f"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/walk.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/walk.anim",
+      "targetSha256": "04690eb0901ede17177a9b3dc5f59669c295e3da22b62db50d3fa9e2ffafe3e1",
+      "sourceSha256": "04690eb0901ede17177a9b3dc5f59669c295e3da22b62db50d3fa9e2ffafe3e1"
+    },
+    {
+      "source": "Assets/ExternalAssets/Animations/e_dragon/BasicPack/e_dragon/idle.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/idle.anim",
+      "targetSha256": "2730eeb859cc30be758d123fc99709d49b3a68bc2f3876c3143819541688e6d0",
+      "sourceSha256": "2730eeb859cc30be758d123fc99709d49b3a68bc2f3876c3143819541688e6d0"
+    },
+    {
+      "source": "Assets/AnimControl/e_dragon_empty/fullbody_empty1.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Controller/fullbody_empty1.anim",
+      "targetSha256": "728ecb4fd641e425a17a369a09e852b9ed42c215aed4a96ea6345a3a73ad189a",
+      "sourceSha256": "728ecb4fd641e425a17a369a09e852b9ed42c215aed4a96ea6345a3a73ad189a"
+    },
+    {
+      "source": "Assets/AnimControl/e_dragon_empty/fullbody_empty2.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Controller/fullbody_empty2.anim",
+      "targetSha256": "0215e8f7cfcab1d0f2879ff2445e8923844a64f08e18a17f4a4e89e53b77d395",
+      "sourceSha256": "0215e8f7cfcab1d0f2879ff2445e8923844a64f08e18a17f4a4e89e53b77d395"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/Common/Animators/Blink Eyes/Eye BlendShapes Animator.controller",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Eyes/Eye BlendShapes Animator.controller",
+      "targetSha256": "4cef7fcf11314fd510a4e3fec2104f0ba4d1b2d91b150b07607d29d6b670d475",
+      "sourceSha256": "4cef7fcf11314fd510a4e3fec2104f0ba4d1b2d91b150b07607d29d6b670d475"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/Common/Animators/Blink Eyes/Eye BlendShapes Close.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Eyes/Eye BlendShapes Close.anim",
+      "targetSha256": "031595fd2c9d937beb11d71bad00acc1385e2eedd69deb283e6478d34768dbdd",
+      "sourceSha256": "031595fd2c9d937beb11d71bad00acc1385e2eedd69deb283e6478d34768dbdd"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/Common/Animators/Blink Eyes/Eye BlendShapes Blink.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Eyes/Eye BlendShapes Blink.anim",
+      "targetSha256": "40ab125daf666540029000be8cb5977f1a74000f1253ebfbd3760935f165d87e",
+      "sourceSha256": "40ab125daf666540029000be8cb5977f1a74000f1253ebfbd3760935f165d87e"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/Common/Animators/Blink Eyes/Eye BlendShapes Semi Open.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/Eyes/Eye BlendShapes Semi Open.anim",
+      "targetSha256": "31dc3fcfd68e456d50eb93add649508628ce013230ae595392b218a1efd768ab",
+      "sourceSha256": "31dc3fcfd68e456d50eb93add649508628ce013230ae595392b218a1efd768ab"
+    },
+    {
+      "source": "Assets/Malbers Animations/Dragons/6 - Elemental Dragon/Textures/Realistic/Nature/Elemental_Dragon_Nature_Eyes_AlbedoTransparency.png",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Textures/Elemental_Dragon_Nature_Eyes_AlbedoTransparency.png",
+      "targetSha256": "424fe099cf270304eed070ba4bf4ff6d2109798344fd765d215dd592f01fae12",
+      "sourceSha256": "424fe099cf270304eed070ba4bf4ff6d2109798344fd765d215dd592f01fae12"
+    },
+    {
+      "source": "Assets/ExternalAssets/Prefabs/Units/e_dragon/g_e_dragon.prefab",
+      "target": "Assets/ExternalAssets/Unit/e_dragon/g_e_dragon.prefab",
+      "targetSha256": "dd67c17e57f429404e3edd45f27732bd52b27303049468357318853d9f848d4d",
+      "sourceSha256": "79ceffcccfc8512829335fe20bcbae494b8529cf025a4c7cbb5b16bf432baf66"
+    },
+    {
+      "source": "Assets/ExternalAssets/Prefabs/HurtObjects/defaultmagic/El_Attack_Paw_Left.prefab",
+      "target": "Assets/ExternalAssets/HurtObjects/defaultmagic/El_Attack_Paw_Left.prefab",
+      "targetSha256": "ae3593def78d7c6ed9af64d2291b4db4053e1602e88c1ef723ee406a0141fccd",
+      "sourceSha256": "1bbca500d43113e5d85e1bf745afe6a8272a888c0c4c5aa13741b5b49e916fd8"
+    },
+    {
+      "source": "Adapted from basic_hurts/high/El_Death_02 1.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/death.anim",
+      "targetSha256": "a368d236224aecee2a06d9b65c16786fc51bb924ec7b5b0f9d92dc9a2ba052e3"
+    },
+    {
+      "source": "Adapted from BasicPack/e_dragon/idle.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/block.anim",
+      "targetSha256": "39a9798caea9b81d26eb96116996f588a82602efa4130cccbcc610e4805d5cc0"
+    },
+    {
+      "source": "Adapted from basic_hurts/low/El_Damage_Front_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/block_break.anim",
+      "targetSha256": "934608e97fec38cb7e92c27a55083e9270d5d24f48ecf204c725e989549dc9e1"
+    },
+    {
+      "source": "Adapted from basic_hurts/low/El_Damage_Front_Left.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/basic_hurts/back/El_Damage_Back.anim",
+      "targetSha256": "689da043ecaed5c398003e900a125d55813e765a1a9e1a2a06de2879e2fdd315"
+    },
+    {
+      "source": "Adapted loop, events removed from El_Fly_Forward.anim",
+      "target": "Assets/OrganizedResources/InUse/MCombatDragon/Animations/e_dragon/BasicPack/e_dragon/air.anim",
+      "targetSha256": "79260a7a4e2c3e815c729d4c80311b698a4176c3baa4a0d2933657773aeb3c86"
+    }
+  ],
+  "appearance": {
+    "tool": "built-in image_gen",
+    "texture": "Assets/OrganizedResources/InUse/MCombatDragon/Textures/PocketDragon_Terracotta.png",
+    "textureSha256": "13cefd310713306ad3991089dc60f2b7772b9e32055fc927610190477128427c",
+    "editTarget": "Assets/Malbers Animations/Dragons/6 - Elemental Dragon/Textures/Toon/El_Toon_Basic.png",
+    "editTargetSha256": "c469af4b86259651d4e87f3696107f4c3b5951246bc705c29d79aad654413e9c",
+    "styleReference": "Assets/OrganizedResources/InUse/D_Resources/PolygonFantasyHeroCharacters/Textures/Textures/PolygonFantasyHero_Texture_01_A.png",
+    "icon": "Assets/OrganizedResources/InUse/ExternalAssets/Unit_Icon/17.png",
+    "iconMethod": "Unity render of the imported dragon with its authored PocketStriker material (512x512)"
+  }
+}

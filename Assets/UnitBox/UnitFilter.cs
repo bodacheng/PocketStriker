@@ -18,6 +18,7 @@ public class UnitFilter : MonoBehaviour
     readonly List<HeroIcon> _green = new List<HeroIcon>();
     readonly List<HeroIcon> _light = new List<HeroIcon>();
     readonly List<HeroIcon> _dark = new List<HeroIcon>();
+    readonly List<string> _types = new List<string>();
     
     public List<HeroIcon> OrderIcons(List<HeroIcon> origin_mainMenuIcons)
     {
@@ -33,12 +34,14 @@ public class UnitFilter : MonoBehaviour
 
     public void RefreshTypeDropDown(List<string> types)
     {
+        _types.Clear();
+        _types.AddRange(types);
         typeDropDown.options.Clear();
         for (int i = 0; i < types.Count; i++)
         {
             Dropdown.OptionData m_NewData = new Dropdown.OptionData
             {
-                text = types[i]
+                text = Translate.Get(types[i])
             };
             typeDropDown.options.Add(m_NewData);
             if (types[i] == "human")
@@ -51,13 +54,13 @@ public class UnitFilter : MonoBehaviour
     List<HeroIcon> TypeFilter(List<HeroIcon> originMainMenuIcons)
     {
         var new_mainMenuIcons = new List<HeroIcon>();
-        if (typeDropDown.options.Count > 0 && typeDropDown.options[typeDropDown.value] != null)
+        if (typeDropDown.value >= 0 && typeDropDown.value < _types.Count)
         {
             for (var i = 0; i < originMainMenuIcons.Count; i++)
             {
                 if (originMainMenuIcons[i] != null)
                 {
-                    if (originMainMenuIcons[i].unitConfig.TYPE == typeDropDown.options[typeDropDown.value].text)
+                    if (originMainMenuIcons[i].unitConfig.TYPE == _types[typeDropDown.value])
                     {
                         new_mainMenuIcons.Add(originMainMenuIcons[i]);
                     }

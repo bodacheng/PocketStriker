@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ namespace mainMenu
     public partial class SkillStonesBox : MonoBehaviour
     {
         public event Action ExTabPressed;
+        readonly List<string> _typeIds = new List<string>();
 
         [Header("画面主模块parent")]
         [SerializeField] RectTransform BoxT;
@@ -86,18 +88,21 @@ namespace mainMenu
         {
             if (viewingMode)
             {
+                _typeIds.Clear();
                 types.ClearOptions();
                 foreach (var s in Units.GetTypeList())
                 {
                     // Legacy unit types with no configured skills are not selectable categories.
                     if (SkillConfigTable.GetSkillConfigsOfType(s).Count == 0) continue;
+                    _typeIds.Add(s);
                     var m_NewData = new Dropdown.OptionData
                     {
-                        text = s
+                        text = Translate.Get(s)
                     };
                     types.options.Add(m_NewData);
                 }
-                var selectedType = types.options.FindIndex(option => option.text == FocusingType);
+                var selectedType = _typeIds.IndexOf(FocusingType);
+                if (selectedType < 0 && _typeIds.Count > 0) FocusingType = _typeIds[0];
                 types.SetValueWithoutNotify(Mathf.Max(0, selectedType));
                 types.RefreshShownValue();
                 types.gameObject.SetActive(types.options.Count > 1);
@@ -119,8 +124,8 @@ namespace mainMenu
         // 直接放在type下拉按钮上的功能
         public void TypeDropDownBehaviour()
         {
-            if (types.options.Count == 0) return;
-            FocusingType = types.options[types.value].text;
+            if (types.value < 0 || types.value >= _typeIds.Count) return;
+            FocusingType = _typeIds[types.value];
             RestFilter();
         }
 

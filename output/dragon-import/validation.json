@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-13",
+  "unityVersion": "6000.5.1f1",
+  "target": "iOS (Editor validation)",
+  "reports": {
+    "import": {
+      "path": "Logs/Dragon/report.json",
+      "sha256": "41d4510892d8019e8734b84c29de169ecd7e9dc87514b188eaf68e85107ea99c",
+      "passed": true
+    },
+    "animationLoading": {
+      "path": "Logs/Dragon/loading-report.json",
+      "sha256": "5c71f5d5a8d2ad0bd173b66a2702f381100d2d50db0a4ff545b59aa5fc035945",
+      "passed": true
+    },
+    "playmode": {
+      "path": "Logs/Dragon/Playmode/report.json",
+      "sha256": "a7c156b62ada09ac30527a94ee463b58ff58a5db5fe7f2a378afb032d14d7365",
+      "passed": true
+    },
+    "battleModes": {
+      "path": "Logs/Revival/battle-modes-report.json",
+      "sha256": "0ef5e7e2af30bf2e745a33bae6a932ab9e778ca99cede054332bc7ad3eab6dae",
+      "passed": true
+    },
+    "project": {
+      "path": "Logs/Revival/project-iOS-report.json",
+      "sha256": "681d32ff19e87f983b441b266276069076555e2fd460af6d0eaebe4168bc22a8",
+      "passed": true
+    }
+  },
+  "animationAddresses": 29,
+  "dragonSkills": 12,
+  "naturalBattleCases": 2,
+  "dragonRuntimeChecks": [
+    "dragon-enemy: actual unit17, colored OmniShade materials, diffuse atlas and shadows loaded",
+    "dragon-player: actual unit17, colored OmniShade materials, diffuse atlas and shadows loaded",
+    "evolution-1: 1 valid options; native UI selection resumes with dragon-only skills",
+    "evolution-2: 1 valid options; native UI selection resumes with dragon-only skills",
+    "evolution-3: 2 valid options; native UI selection resumes with dragon-only skills"
+  ],
+  "dragonBossSkillSets": 90,
+  "publishedStages": 120,
+  "limitations": "Editor Play mode and local Addressables. No remote resource publication, player inventory changes, signing or device installation."
+}

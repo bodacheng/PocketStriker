@@ -487,14 +487,11 @@ public static class Units
 		return rowList.FindAll(x => x.RARITY_LEVEL == find);
 	}
     
-    // 20200322 新追加。角色type的追加按说不应该那么麻烦，事前定义好就可以
     public static List<string> GetTypeList()
     {
-        List<string> typeList = new List<string>
-        {
-            "human",
-            "dog"
-        };
-        return typeList;
+        return rowList.Select(row => row.MONSTER_TYPE)
+            .Where(type => !string.IsNullOrEmpty(type)).Distinct()
+            .Where(type => GetMonsterIDsAndNamesDic(type).Count > 0)
+            .OrderBy(type => type == "human" ? 0 : 1).ToList();
     }
 }

@@ -36,10 +36,14 @@ public class EvolutionManager
             Near = false,
             Far = false
         };
-        var skill1 =  SkillSet.RandomSkillIDOfStone(filterForm);
-        var skill2 = SkillSet.RandomSkillIDOfStone(filterForm, new List<string>(){ skill1 });
-        var skill3 = SkillSet.RandomSkillIDOfStone(filterForm, new List<string>(){ skill1, skill2 });
-        return new[] { skill1, skill2, skill3 };
+        var choices = new List<string>();
+        for (var index = 0; index < 3; index++)
+        {
+            var skill = SkillSet.RandomSkillIDOfStone(filterForm, choices);
+            if (string.IsNullOrEmpty(skill)) break;
+            choices.Add(skill);
+        }
+        return choices.ToArray();
     }
     
     public async UniTask ChangeSkill(Data_Center focusUnit, int targetSlotIndex, string skillId)

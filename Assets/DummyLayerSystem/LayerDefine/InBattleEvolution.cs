@@ -59,9 +59,11 @@ public class InBattleEvolution : UILayer
     {
         nineForShow.EvolutionModeSlotInteractiveRefresh(focusUnit.UnitInfo.set, RTFightManager.Target.EvolutionManager.EvolutionCount >= 3);
         await nineForShow.RefreshEffects(FightScene.FightScene.target.fxCamera);
-        var skills = RTFightManager.Target.EvolutionManager.RandomSkillList("human", focusUnit.UnitInfo.set);
+        var skills = RTFightManager.Target.EvolutionManager.RandomSkillList(focusUnit.UnitConfig().TYPE, focusUnit.UnitInfo.set);
         for (var i = 0; i < skillOptions.Length; i++)
         {
+            skillOptions[i].gameObject.SetActive(i < skills.Length);
+            if (i >= skills.Length) continue;
             var index = i;
             skillOptions[i].Btn.SetListener(
                 async () =>
@@ -72,7 +74,7 @@ public class InBattleEvolution : UILayer
                     t.transform.DOMove( clickedSlot.transform.position, animEndInSeconds).SetEase(Ease.InBack);
                     for (var a = 0; a < skillOptions.Length; a++)
                     {
-                        if (a != index)
+                        if (a != index && skillOptions[a].gameObject.activeInHierarchy)
                         {
                             skillOptions[a].Animator.SetTrigger("fade");
                         }

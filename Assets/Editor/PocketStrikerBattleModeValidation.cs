@@ -34,6 +34,8 @@ public static class PocketStrikerBattleModeValidation
         public int skillConfigs;
         public int bossBattlesChecked;
         public int bossSkillSetsChecked;
+        public int dragonBossSkillSetsChecked;
+        public int evolutionSpeciesChecks;
         public int modePolicyChecks;
         public int multiStages;
         public int rotationStages;
@@ -125,6 +127,8 @@ public static class PocketStrikerBattleModeValidation
             await LoadLocalTables(entries, report);
             CheckModePolicy(report);
             CheckRandomBosses(entries, report);
+            CheckDragonBosses(report);
+            CheckEvolutionSpecies(report);
             CheckPrefabEntries(report);
 
             var questEntries = entries.Where(entry => entry.labels.Contains("quest")).ToList();
@@ -298,7 +302,9 @@ public static class PocketStrikerBattleModeValidation
             UnityEngine.Random.state = randomState;
             running = false;
             report.passed = report.errors.Count == 0 && report.expectedStages > 0 && report.stagesChecked == report.expectedStages
-                && report.bossBattlesChecked == SamplesPerDifficulty * 3 && report.prefabEntriesPassed;
+                && report.bossBattlesChecked == SamplesPerDifficulty * 3
+                && report.dragonBossSkillSetsChecked == SamplesPerDifficulty * 3
+                && report.evolutionSpeciesChecks == 6 && report.prefabEntriesPassed;
             Directory.CreateDirectory(Path.GetDirectoryName(ReportPath));
             File.WriteAllText(ReportPath, JsonUtility.ToJson(report, true));
             var summary = $"[BattleModes] {(report.passed ? "PASS" : "FAIL")}: adventure {report.stagesChecked}/{report.expectedStages} published "
@@ -330,6 +336,9 @@ public static class PocketStrikerBattleModeValidation
         report.unitConfigs = Units.Dic.Count;
         report.skillConfigs = SkillConfigTable.SkillConfigRefDic.Count;
         Require(report.unitConfigs >= 3 && report.skillConfigs >= 9, "Local battle tables are incomplete.");
+        foreach (var type in Units.Dic.Values.Select(config => config.TYPE).Distinct())
+            Require(CommonSetting.CharacterAnimDuration.TryGetValue(type, out var duration) && duration > 0,
+                "Missing animation blend duration for unit type: " + type);
     }
 
     static void CheckRandomBosses(List<AddressableAssetEntry> entries, Report report)
@@ -367,13 +376,15 @@ public static class PocketStrikerBattleModeValidation
                     Require(stage.UnitsData.Select(unit => unit.id).Distinct().Count() == stage.UnitsData.Count, "Repeated Boss identity.");
                     foreach (var unit in stage.UnitsData)
                     {
+                        var config = Units.GetUnitConfig(unit.r_id);
                         Require(!string.IsNullOrEmpty(unit.id) && !SubUnitUtility.IsSubUnitId(unit.id)
-                            && Units.GetUnitConfig(unit.r_id)?.TYPE == "human", "Invalid Boss enemy.");
+                            && config != null && entries.Any(item => item.address == config.TYPE + "/" + config.REAL_NAME),
+                            "Invalid or unregistered Boss enemy.");
                         Require(Mathf.Approximately(unit.level, template.stageRefLevel), "Boss level was not applied.");
                         Require(unit.set != null, "Boss skill set is missing.");
                         var skills = new[] { unit.set.a1, unit.set.a2, unit.set.a3, unit.set.b1, unit.set.b2,
                             unit.set.b3, unit.set.c1, unit.set.c2, unit.set.c3 };
-                        Require(skills.All(id => SkillConfigTable.GetSkillConfigByRecordId(id) != null)
+                        Require(skills.All(id => SkillConfigTable.GetSkillConfigByRecordId(id)?.TYPE == config.TYPE)
                             && skills.Distinct().Count() == 9, "Boss skill set has missing or repeated skills.");
                         var passive = UnitPassiveTable.GetUnitPassiveRecordId(unit.r_id);
                         if (SkillConfigTable.GetSkillConfigByRecordId(passive) != null)
@@ -450,6 +461,71 @@ public static class PocketStrikerBattleModeValidation
                 report.modePolicyChecks++;
             }
             finally { UnityEngine.Object.DestroyImmediate(stage); }
+        }
+    }
+
+    static void CheckDragonBosses(Report report)
+    {
+        var originalRows = Units.rowList.ToArray();
+        var dragon = originalRows.FirstOrDefault(row => row.RECORD_ID == "17" && row.MONSTER_TYPE == "e_dragon");
+        Require(dragon != null, "Imported dragon unit is missing from the local table.");
+        try
+        {
+            // A single candidate proves dragon generation for every difficulty,
+            // independent of whether the general random samples happened to pick it.
+            Units.rowList.Clear();
+            Units.rowList.Add(dragon);
+            foreach (var gauge in new[] { CriticalGaugeMode.Normal, CriticalGaugeMode.DoubleGain, CriticalGaugeMode.Unlimited })
+            {
+                for (var sample = 0; sample < SamplesPerDifficulty; sample++)
+                {
+                    FightInfo stage = null;
+                    try
+                    {
+                        stage = RandomBossStageFactory.Create("dragon-validation", gauge, 1, 10);
+                        Require(stage.UnitsData.Count == 1 && stage.UnitsData[0].r_id == "17", "Dragon was excluded from Boss selection.");
+                        var unit = stage.UnitsData[0];
+                        var skills = unit.set.SkillIDList();
+                        Require(skills.Count == 9 && skills.Distinct().Count() == 9
+                            && skills.All(id => SkillConfigTable.GetSkillConfigByRecordId(id)?.TYPE == "e_dragon"),
+                            "Dragon Boss has missing, repeated, or humanoid skills.");
+                        if (gauge != CriticalGaugeMode.Unlimited)
+                            Require(unit.set.CheckEdit() == SkillSet.SkillEditError.Perfect,
+                                $"Dragon {gauge} sample {sample}: {unit.set.CheckEdit()}.");
+                        report.dragonBossSkillSetsChecked++;
+                    }
+                    finally
+                    {
+                        if (stage != null) UnityEngine.Object.DestroyImmediate(stage);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            Units.rowList.Clear();
+            Units.rowList.AddRange(originalRows);
+        }
+    }
+
+    static void CheckEvolutionSpecies(Report report)
+    {
+        var types = Units.GetTypeList();
+        Require(types.Count > 1 && types[0] == "human" && types.Contains("e_dragon") && !types.Contains("dog"),
+            "Skill inventory categories do not reflect registered unit species.");
+        foreach (var type in new[] { "human", "e_dragon" })
+        {
+            for (var phase = 1; phase <= 3; phase++)
+            {
+                var evolution = new EvolutionManager { EvolutionCount = phase };
+                var choices = evolution.RandomSkillList(type, new SkillSet());
+                int expected = type == "human" ? 3 : phase == 3 ? 2 : 1;
+                Require(choices.Length == expected && choices.Distinct().Count() == expected,
+                    $"{type} evolution {phase} did not return its available unique options.");
+                Require(choices.All(id => SkillConfigTable.GetSkillConfigByRecordId(id)?.TYPE == type),
+                    $"{type} evolution {phase} contains missing or incompatible skills.");
+                report.evolutionSpeciesChecks++;
+            }
         }
     }
 

@@ -20,7 +20,9 @@ using UnityEngine.SceneManagement;
 public static partial class PocketStrikerCombatFlowSmoke
 {
     const string Key = "PocketStriker.CombatFlowSmoke";
-    static string Output => SessionState.GetBool(Key + ".TutorialBalance", false) ? "Logs/Tutorial/Balance"
+    static string Output => SessionState.GetBool(Key + ".RubyImpact", false) ? "Logs/RubyImpact/Playmode"
+        : SessionState.GetBool(Key + ".Dragon", false) ? "Logs/Dragon/Playmode"
+        : SessionState.GetBool(Key + ".TutorialBalance", false) ? "Logs/Tutorial/Balance"
         : SessionState.GetBool(Key + ".EvolutionHeal", false) ? "Logs/Evolution/Playmode"
         : SessionState.GetBool(Key + ".StoryFailures", false) ? "Logs/AIStory/Playmode" : "Logs/CombatFlow/Playmode";
     const string Account = "local-combat-flow-smoke";
@@ -55,6 +57,9 @@ public static partial class PocketStrikerCombatFlowSmoke
         public int evolutionHealthBarChecks;
         public int evolutionEnemyHpChecks;
         public List<string> effectInvalidationChecks = new List<string>();
+        public List<string> dragonChecks = new List<string>();
+        public List<string> dragonAttackStates = new List<string>();
+        public List<string> rubyImpactChecks = new List<string>();
         public bool evolutionFinalDefeatHeal;
         public bool normalRotationHealthUnchanged;
         public bool deadPlayerNotRevived;
@@ -125,8 +130,10 @@ public static partial class PocketStrikerCombatFlowSmoke
         Begin();
     }
 
-    static void Begin()
+    static void Begin(bool dragon = false, bool rubyImpact = false)
     {
+        SessionState.SetBool(Key + ".Dragon", dragon);
+        SessionState.SetBool(Key + ".RubyImpact", rubyImpact);
         finishing = false;
         report = null;
         if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -214,6 +221,18 @@ public static partial class PocketStrikerCombatFlowSmoke
             // Validation must not rewrite the user's persistent skill-analysis data.
             FightGlobalSetting.HitBoxLogger = false;
             Directory.CreateDirectory(Output);
+            if (SessionState.GetBool(Key + ".RubyImpact", false))
+            {
+                await ValidateRubyImpact();
+                report.passed = true;
+                return;
+            }
+            if (SessionState.GetBool(Key + ".Dragon", false))
+            {
+                await ValidateDragonCombat();
+                report.passed = true;
+                return;
+            }
             if (!SessionState.GetBool(Key + ".EvolutionHeal", false) && !SessionState.GetBool(Key + ".TutorialBalance", false)) ValidateSaturatedQuery();
             var manager = new ArcadeModeManager();
             await manager.Initialize().Timeout(TimeSpan.FromSeconds(30));
@@ -459,6 +478,7 @@ public static partial class PocketStrikerCombatFlowSmoke
                     Require(units.All(unit => !unit.FightDataRef.Invincible), name + " contains an invincible fighter.");
                 }
                 item.fightingFrames++;
+                if (SessionState.GetBool(Key + ".Dragon", false)) SampleDragonCombat(units, name, item.fightingFrames);
                 item.playerMaxHp = manager.team1.teamMembers.mDict.Values.First().FightDataRef.MaxHp;
                 foreach (var unit in units)
                 {

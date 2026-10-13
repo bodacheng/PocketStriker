@@ -92,6 +92,17 @@ Dash 使用原 `rush` 人物纹理的逐字节副本，由独立 UI glyph 显示
 MCombat 的软粒子材质依赖这一纹理，资源文件齐全也可能因相机缺少深度、或生成过晚而
 隐藏光柱、光环。特效验证使用全部六档画质，以及世界和角色相机均关闭深度的负对照。
 
+技能 16 **红宝石撞击（Ruby Impact）** 的 `rollfoward` 动画原有释放事件，但缺少
+被引用的武器特效。已从 MCombat 补入 `defaultmagic/rollfoward.prefab` 和
+`ArcaneGlowDoubleSide` 材质，保留源 GUID、粒子、命中及音效参数，复用现有贴图与
+其余材质；原有 `defaultmagic` 文件夹 Addressables 注册直接覆盖新资源。
+来源、文件哈希及依赖清单见 `Tools/ArtSources/RubyImpact/source.json`。
+**Skill Effect Resources** 检查准备／身体中心释放／关闭事件、`weapon` 标签与六档画质。
+**Ruby Impact Playmode Smoke**（`PocketStrikerCombatFlowSmoke.StartRubyImpactBatch`，
+不带 `-quit`）在实际 FightScene 检查无接触施放的及时回收，以及两次近距离施放的
+粒子、身体中心约束、真实伤害与对象池复用；AI 关闭并固定测试站位。
+报告和截图位于 `Logs/RubyImpact/Playmode`，画质渲染位于 `Logs/EffectResources`。
+
 大乱斗全战场相机（2026-10-03）替代按角色动态取景的 Group 相机。**Group Battle Camera**
 专项检查完整圆形地面边界贴近屏幕侧边、站立体积和纵向技能高度余量、720 种屏幕／半径／旋角组合、手指捕获与 UI 控件隔离，
 报告位于 `Logs/CameraFraming/Group/report.json`。**Battle Camera Playmode Smoke** 的默认大乱斗

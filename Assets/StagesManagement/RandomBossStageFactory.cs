@@ -12,10 +12,12 @@ public static class RandomBossStageFactory
         if (string.IsNullOrEmpty(stageId))
             throw new ArgumentException("A random Boss stage needs a reward ID.", nameof(stageId));
 
-        // PocketStriker's unit table contains main characters only. Also exclude the
-        // shared runtime's sub-unit ID convention if such entries are introduced.
-        var recordIds = Units.GetMonsterIDsAndNamesDic("human").Keys
+        // Each registered species has its own compatible skill pool, including
+        // the dragon. Keep the shared runtime's summoned sub-units out of Bosses.
+        var recordIds = Units.rowList.Select(row => row.MONSTER_TYPE).Distinct()
+            .SelectMany(type => Units.GetMonsterIDsAndNamesDic(type).Keys)
             .Where(id => !SubUnitUtility.IsSubUnitId(id) && Units.GetUnitConfig(id) != null)
+            .Distinct()
             .ToList();
         if (recordIds.Count == 0)
             throw new InvalidOperationException("No main characters are available for random Boss battles.");

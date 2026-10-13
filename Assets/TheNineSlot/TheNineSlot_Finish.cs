@@ -73,7 +73,8 @@ public partial class SkillSet
             goto A;
         }
         
-        var remainSpLevelList = RemainSlotSPLevelCal(_skillSet, focusingUnitInstanceId, _skillSet.GetAllInstanceIdsThatRelatesToCurrentSet());
+        var remainSpLevelList = RemainSlotSPLevelCal(_skillSet, focusingUnitInstanceId,
+            _skillSet.GetAllInstanceIdsThatRelatesToCurrentSet(), type);
         if (remainSpLevelList.Count > 1 && remainSpLevelList.Contains(0))
         {
             remainSpLevelList.Remove(0); // 必杀技优先

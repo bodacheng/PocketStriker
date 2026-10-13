@@ -21,7 +21,7 @@ public static class PocketStrikerEffectResourceValidation
     const int EffectLayer = 7;
     static readonly string[] Roots = { "Assets/ExternalAssets/HurtObjects", "Assets/ExternalAssets/Effects" };
     static readonly string[] RegressionEffects = { "ground_huge_green_explosion", "powergazer" };
-    static readonly string[] VisibilityEffects = { "stormspray" };
+    static readonly string[] VisibilityEffects = { "stormspray", "rollfoward" };
     // Obsolete material-upgrade metadata retained by Unity/vendor materials; not render dependencies.
     static readonly HashSet<string> UpgradeMetadata = new HashSet<string>
     {
@@ -39,7 +39,7 @@ public static class PocketStrikerEffectResourceValidation
         public List<string> observations = new List<string>();
         public List<string> screenshots = new List<string>();
         public List<PixelSample> frames = new List<PixelSample>();
-        public string scope = "All production HurtObjects/Effects prefabs: recursive visual GUID dependencies, imported renderer materials/meshes, enabled particle shape meshes, shader compile errors and unresolved imported references. Psychic Blast's authored animation events, weapon prefab and Addressables weapon-label entry are checked. ShaderGraphs containing SceneDepth are mapped to their dependent prefabs. Actual FightScene and DedicatedCameraConnector camera depth overrides and production renderer depth-copy timing are checked. Earth Curse at 350 ms and Spell Eruption at 150 ms are rendered with seed 42 in all six configured quality tiers, using the production world-to-UnitCamera overlay settings and an explicit depth-Off negative control. Psychic Blast is rendered at 350 ms from hand height with the production camera configuration in all six tiers; active particles and visible pixels are required. Particle shaders, textures and custom vertex streams are unchanged.";
+        public string scope = "All production HurtObjects/Effects prefabs: recursive visual GUID dependencies, imported renderer materials/meshes, enabled particle shape meshes, shader compile errors and unresolved imported references. Psychic Blast's and Ruby Impact's authored animation events, weapon prefabs and Addressables weapon-label entries are checked. ShaderGraphs containing SceneDepth are mapped to their dependent prefabs. Actual FightScene and DedicatedCameraConnector camera depth overrides and production renderer depth-copy timing are checked. Earth Curse at 350 ms and Spell Eruption at 150 ms are rendered with seed 42 in all six configured quality tiers, using the production world-to-UnitCamera overlay settings and an explicit depth-Off negative control. Psychic Blast and Ruby Impact are rendered at 350 ms from hand and body-center height respectively with the production camera configuration in all six tiers; active particles and visible pixels are required. Particle shaders, textures and custom vertex streams are unchanged.";
         public string limitation = "Isolated editor URP camera-stack renders; no account, battle AI, remote bundles or physical-device GPU is exercised. Pixel comparisons measure the effect against a ground-only frame. Framing is deliberately wider than gameplay and does not assert static particle-shape bounds.";
     }
 
@@ -89,6 +89,7 @@ public static class PocketStrikerEffectResourceValidation
         try
         {
             CheckPsychicBlastResource(report);
+            CheckRubyImpactResource(report);
             CheckResources(report);
             ReadProductionCameras(report);
             if (QualitySettings.names.Length != 6) report.errors.Add("Expected the six production quality tiers.");
@@ -160,6 +161,41 @@ public static class PocketStrikerEffectResourceValidation
             report.errors.Add("Psychic Blast (164): stormspray is not reachable through the weapon Addressables label at " + address);
         else
             report.observations.Add("Psychic Blast (164): handfiref prepare/release events resolve to " + address + "; defaultmagic provides the fallback for all elements.");
+    }
+
+    static void CheckRubyImpactResource(Report report)
+    {
+        const string animationPath = "Assets/ExternalAssets/Animations/human/skill/rollfoward.anim";
+        const string effectName = "rollfoward";
+        var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(animationPath);
+        var events = clip == null ? Array.Empty<AnimationEvent>() : clip.events;
+        var prepare = events.FirstOrDefault(e => e.functionName == "PrepareOneMagic" && e.stringParameter == effectName);
+        var release = events.FirstOrDefault(e => e.functionName == "ReleasePreparedMagic" && e.stringParameter == "center");
+        var close = events.FirstOrDefault(e => e.functionName == "CloseOnProcessEnergyFromBodyWeapons");
+        if (prepare == null || release == null || close == null || prepare.time >= release.time || release.time + .35f >= close.time)
+            report.errors.Add("Ruby Impact (16): missing or invalid authored prepare/body-center release/close animation events.");
+
+        string path = EffectPath(effectName);
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        if (prefab == null || prefab.GetComponent<Decomposition>()?._HitBox == null)
+            report.errors.Add("Ruby Impact (16): missing rollfoward weapon prefab or hitbox.");
+
+        var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null)
+        {
+            report.errors.Add("Ruby Impact (16): Addressables settings are missing.");
+            return;
+        }
+        var entries = new List<AddressableAssetEntry>();
+        foreach (var group in settings.groups.Where(group => group != null))
+            group.GatherAllAssets(entries, true, true, false);
+        string address = EffectResourceKeyUtility.PrefabAddress("defaultmagic", effectName);
+        if (!entries.Any(entry => entry.AssetPath == path && entry.address == address
+            && entry.labels.Contains(EffectResourceKeyUtility.WeaponLabel)))
+            report.errors.Add("Ruby Impact (16): rollfoward is not reachable through the weapon Addressables label at " + address);
+        else
+            report.observations.Add("Ruby Impact (16): rollfoward prepare/body-center release/close events resolve to " + address
+                + "; the 350 ms render samples its active window before the 767 ms close event.");
     }
 
     static void CheckResources(Report report)
@@ -354,10 +390,10 @@ public static class PocketStrikerEffectResourceValidation
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(EffectPath(name));
             if (prefab == null) throw new InvalidOperationException("Missing production effect prefab.");
             var effect = UnityEngine.Object.Instantiate(prefab, rig.transform, false);
-            if (name == "stormspray")
+            if (name == "stormspray" || name == "rollfoward")
             {
                 // Gameplay sets the prepared weapon's world position/rotation
-                // from the left hand, replacing its source-editor placement.
+                // from the left hand or body center, replacing its source-editor placement.
                 effect.transform.localPosition = new Vector3(0, 1, 0);
                 effect.transform.localRotation = Quaternion.identity;
             }

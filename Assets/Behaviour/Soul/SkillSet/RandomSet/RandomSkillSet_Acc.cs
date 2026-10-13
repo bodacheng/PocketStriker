@@ -48,7 +48,8 @@ public partial class SkillSet
     /// <param name="focusingUnitInstanceId"></param>
     /// <param name="usingStoneInstanceIds"></param>
     /// <returns></returns>
-    public static List<int> RemainSlotSPLevelCal(SkillSet current, string focusingUnitInstanceId, List<string> usingStoneInstanceIds)
+    public static List<int> RemainSlotSPLevelCal(SkillSet current, string focusingUnitInstanceId, List<string> usingStoneInstanceIds,
+        string type = "human")
     {
         var currentPoint = SkillBalancePoint(current.a1, current.a2, current.a3, current.b1, current.b2, current.b3, current.c1, current.c2, current.c3);
 
@@ -59,7 +60,7 @@ public partial class SkillSet
                     focusingUnitInstanceId,
                     new SkillStonesBox.StoneFilterForm
                     {
-                        Type = "human",
+                        Type = type,
                         ExType = new int[1] { spLevel },
                         Close = false,
                         Near = false,
