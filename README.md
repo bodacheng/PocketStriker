@@ -127,7 +127,8 @@ python3 Tools/Validation/validate_ios_pods.py
 大乱斗使用固定全战场视野，圆形边缘贴近屏幕两侧，左右拖动绕战场中心旋转；**Group Battle Camera** 验证各屏幕比例、边界和触控规则。
 战斗 Auto 明确显示 ON/OFF、亮暗底色和左右滑块；**Battle HUD** 保存五种屏幕的状态对照。
 **Skill Icon MCombat Reference** 验证按 MCombat 同步的七张图标与全部 96 个 Sprite 地址；
-**Battle Effect Invalidation** 和 **Evolution Heal Playmode Smoke** 检查重开、进化选技时旧特效立即失效及延迟生成隔离。
+**Battle Effect Invalidation** 和 **Evolution Heal Playmode Smoke** 检查重开、进化选技时旧特效失效及延迟生成隔离，
+并确认终结一击特效保留到慢动作结束、结算界面出现时才清理。
 战斗相机按实际角色及地面范围调整 URP 阴影距离，保留各画质的图集预算；渲染检查另覆盖
 六档画质的每队 12／24／48 人与最远镜头，开关对比图位于 `Logs/Rendering/ShadowCoverage`。
 iOS 默认画质显式设为支持阴影的 Ultra；Startup Smoke 还检查真实战斗的材质、光源和阴影，

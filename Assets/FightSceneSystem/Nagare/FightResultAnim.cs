@@ -33,9 +33,20 @@ namespace FightScene
 
         async UniTask FinalMomentAnim()
         {
+            var fight = FightLoad.Fight;
+            var manager = RTFightManager.Target;
+            var generation = BattleEffectLifetime.Generation;
             animEnd = false;
             Time.timeScale = 0.4f;
             await UniTask.Delay(TimeSpan.FromSeconds(1));
+            if (FSceneProcessesRunner.Main.currentProcess != this
+                || !ReferenceEquals(FightLoad.Fight, fight) || manager == null
+                || manager != RTFightManager.Target || generation != BattleEffectLifetime.Generation)
+                return;
+
+            // Preserve the finishing effects through slow motion; retire them
+            // when the victory presentation and result UI take over.
+            BattleEffectLifetime.InvalidateAll(true);
             var winners = new List<Data_Center>();
             switch (FightLogger.value.GetWinnerTeam())
             {

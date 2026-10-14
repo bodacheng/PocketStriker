@@ -57,6 +57,9 @@ namespace FightScene
 
         public override void ProcessEnd()
         {
+            // Stop damage and pending spawns, but let the finishing hit's
+            // visuals play through the result animation before UI cleanup.
+            BattleEffectLifetime.SuspendDamage();
             if (FightLoad.Fight.EventType == FightEventType.Screensaver)
             {
                 UILayerLoader.Remove<TitleScreenLayer>();
@@ -73,7 +76,6 @@ namespace FightScene
             RTFightManager.Target.Disposables.Dispose();
             RTFightManager.Target.RefreshTimeDic.Clear();
             RTFightManager.Target.ClearUnitData();
-            HitBoxesProcesser.Instance.AllProcessingFade();
             RTFightManager.Target.EvolutionManager.EvolutionCount = 0;
             // FightOver consumes the winner for the result and rewards. Reset it
             // when the next battle is prepared, rather than on leaving Fighting.

@@ -61,6 +61,8 @@ public static partial class PocketStrikerCombatFlowSmoke
         public List<string> dragonAttackStates = new List<string>();
         public List<string> rubyImpactChecks = new List<string>();
         public bool evolutionFinalDefeatHeal;
+        public bool finalDefeatEffectsPreserved;
+        public bool finalDefeatEffectsRetired;
         public bool normalRotationHealthUnchanged;
         public bool deadPlayerNotRevived;
         public List<Case> cases = new List<Case>();
@@ -250,8 +252,8 @@ public static partial class PocketStrikerCombatFlowSmoke
             UnityEngine.Object.Destroy(authored);
             if (SessionState.GetBool(Key + ".EvolutionHeal", false))
             {
-                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three one-second real-time skill-choice delays with locked input, real UI callbacks/stat recalculations and live HP sliders. Each nonterminal defeat immediately suspends damage and pending spawns while preserving a real pooled hitbox/effect's visuals through the delay; the skill-selection popup clears them. Retry retires a seeded previous-battle hitbox before loading. Fight exit cancels a pending choice. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
-                report.limitation = "Local Self battles isolate account/reward services. Invulnerability prevents incidental AI damage; fixture HP reductions and death notifications make boundary conditions deterministic. This checks production defeat handling and evolution transitions, not natural damage or device performance.";
+                report.scope = "Actual FightLoad.Go, production rotation units/death subscriptions, four Evolution opponent defeats including the terminal defeat, three one-second real-time skill-choice delays with locked input, real UI callbacks/stat recalculations and live HP sliders. Each nonterminal defeat immediately suspends damage and pending spawns while preserving a real pooled hitbox/effect's visuals through the delay; the skill-selection popup clears them. The native Quest terminal defeat preserves another visual and weapon through FightResultAnim slow motion, retires them as ArenaFightOver appears, and keeps result damage/spawning suspended. Retry retires a seeded previous-battle hitbox before loading. Fight exit cancels a pending choice. A non-Evolution rotation defeat and already-dead player are negative controls. HP includes the configured team multiplier.";
+                report.limitation = "Local fixture account already completed Quest 4, with an editor-only empty story loader, so the native result transition calls no remote reward/story service; other fixtures use Self. Invulnerability prevents incidental AI damage; fixture HP reductions and death notifications make boundary conditions deterministic. Authored effect lifetimes are extended to distinguish forced cleanup from natural expiry. This checks production defeat handling and evolution transitions, not natural damage or device performance.";
                 await ValidateEvolutionHeal(leader);
                 report.passed = true;
                 return;
@@ -648,11 +650,11 @@ public static partial class PocketStrikerCombatFlowSmoke
                 .ToDictionary(renderer => renderer, renderer => renderer.enabled);
         }
 
-        void RequireVisibleBeforeChoice(Decomposition effect, string boundary)
+        void RequireVisibleBeforePresentation(Decomposition effect, string boundary)
         {
             Require(effect != null && !effect.IsBattleEffectInvalidated && effect.gameObject.activeSelf
                 && visibleStates[effect].All(entry => entry.Key != null && entry.Key.enabled == entry.Value),
-                boundary + " cleared a visible effect before skill selection appeared.");
+                boundary + " cleared a visible effect before the next presentation appeared.");
             report.effectInvalidationChecks.Add(boundary);
         }
 
@@ -692,7 +694,9 @@ public static partial class PocketStrikerCombatFlowSmoke
             report.evolutionHealthBarChecks++;
         }
 
-        var evolutionFight = CreateFixture("evolution-heal", true, 4);
+        var evolutionFight = CreateFixture("4", true, 4);
+        evolutionFight.EventType = FightEventType.Quest;
+        evolutionFight.ArcadeFightMode = AdventureModeRules.EvolutionMode;
         var hero = await StartFixture(evolutionFight, false);
         await ValidateBodyPartEffectRace(hero);
         for (int index = 0; index < 4; index++)
@@ -714,22 +718,19 @@ public static partial class PocketStrikerCombatFlowSmoke
                 typeof(UltimateJoystick).GetProperty("VerticalAxis").SetValue(stick, -.5f);
             }
             if (index == 0) Time.timeScale = .25f;
-            Decomposition oldEffect = null, oldWeapon = null;
+            var oldEffect = await EffectsManager.GenerateEffect("super_hit", null, hero.geometryCenter.position, Quaternion.identity, null);
+            Require(oldEffect != null && oldEffect.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.enabled),
+                "Evolution effect fixture did not rent its preloaded visible visual.");
+            var oldWeapon = SeedWeapon(enemy);
+            KeepEffectThroughDefeatDelay(oldEffect);
+            KeepEffectThroughDefeatDelay(oldWeapon);
             UniTask<Decomposition> delayedEffect = default;
             UniTaskCompletionSource<GameObject> delayedPrefab = null;
-            if (index < 3)
+            if (index == 0)
             {
-                oldEffect = await EffectsManager.GenerateEffect("super_hit", null, hero.geometryCenter.position, Quaternion.identity, null);
-                Require(oldEffect != null, "Evolution effect fixture did not rent its preloaded visual.");
-                oldWeapon = SeedWeapon(enemy);
-                KeepEffectThroughDefeatDelay(oldEffect);
-                KeepEffectThroughDefeatDelay(oldWeapon);
-                if (index == 0)
-                {
-                    delayedPrefab = new UniTaskCompletionSource<GameObject>();
-                    EffectsManager.PrefabLoaderForValidation = _ => delayedPrefab.Task;
-                    delayedEffect = EffectsManager.GenerateEffect("effect-lifetime-pending-fixture", null, Vector3.zero, Quaternion.identity, null);
-                }
+                delayedPrefab = new UniTaskCompletionSource<GameObject>();
+                EffectsManager.PrefabLoaderForValidation = _ => delayedPrefab.Task;
+                delayedEffect = EffectsManager.GenerateEffect("effect-lifetime-pending-fixture", null, Vector3.zero, Quaternion.identity, null);
             }
             float defeatedAt = Time.realtimeSinceStartup;
             if (index == 0)
@@ -768,8 +769,8 @@ public static partial class PocketStrikerCombatFlowSmoke
                 Require(BattleEffectLifetime.Suspended && !oldWeapon._HitBox.Enabled
                     && oldWeapon.GetComponentsInChildren<Collider>(true).All(collider => !collider.enabled),
                     "Evolution defeat kept damage active during its visual delay.");
-                RequireVisibleBeforeChoice(oldWeapon, "evolution-" + index + "-weapon-visible-immediate");
-                RequireVisibleBeforeChoice(oldEffect, "evolution-" + index + "-visual-visible-immediate");
+                RequireVisibleBeforePresentation(oldWeapon, "evolution-" + index + "-weapon-visible-immediate");
+                RequireVisibleBeforePresentation(oldEffect, "evolution-" + index + "-visual-visible-immediate");
                 if (delayedPrefab != null)
                 {
                     try
@@ -787,6 +788,39 @@ public static partial class PocketStrikerCombatFlowSmoke
                 Require(FightLogger.value.GameOver.Value && FightLogger.value.GetWinnerTeam() == Team.player1
                     && ActiveEvolutionLayer() == null, "Final defeat did not skip evolution and complete the battle.");
                 report.evolutionFinalDefeatHeal = true;
+                RequireVisibleBeforePresentation(oldWeapon, "final-weapon-visible-immediate");
+                RequireVisibleBeforePresentation(oldEffect, "final-visual-visible-immediate");
+                await UniTask.WaitUntil(() => FSceneProcessesRunner.Main.currentProcess is FightResultAnim)
+                    .Timeout(TimeSpan.FromSeconds(10));
+                void RequireFinalDelay()
+                {
+                    Require(FSceneProcessesRunner.Main.currentProcess is FightResultAnim
+                        && UnityEngine.Object.FindFirstObjectByType<ArenaFightOver>() == null
+                        && BattleEffectLifetime.Suspended && !oldWeapon._HitBox.Enabled
+                        && oldWeapon.GetComponentsInChildren<Collider>(true).All(collider => !collider.enabled),
+                        "The terminal defeat skipped native slow motion or retained damage during it.");
+                }
+                RequireFinalDelay();
+                RequireVisibleBeforePresentation(oldWeapon, "final-weapon-visible-animation-entry");
+                RequireVisibleBeforePresentation(oldEffect, "final-visual-visible-animation-entry");
+                await UniTask.Delay(600, DelayType.Realtime);
+                RequireFinalDelay();
+                RequireVisibleBeforePresentation(oldWeapon, "final-weapon-visible-animation-delay");
+                RequireVisibleBeforePresentation(oldEffect, "final-visual-visible-animation-delay");
+                report.finalDefeatEffectsPreserved = true;
+                await UniTask.WaitUntil(() => UnityEngine.Object.FindFirstObjectByType<ArenaFightOver>() != null)
+                    .Timeout(TimeSpan.FromSeconds(15));
+                RequireRetired(oldWeapon, "final-weapon-result-presentation");
+                RequireRetired(oldEffect, "final-visual-result-presentation");
+                Require(BattleEffectLifetime.Suspended && BattleEffectLifetime.ActiveCount == 0
+                    && await EffectsManager.GenerateEffect("super_hit", null, Vector3.zero, Quaternion.identity, null) == null,
+                    "The terminal result presentation retained or generated a battle effect.");
+                report.effectInvalidationChecks.Add("final-result-presentation-suspended");
+                report.finalDefeatEffectsRetired = true;
+                var result = UnityEngine.Object.FindFirstObjectByType<ArenaFightOver>();
+                var storyText = (UnityEngine.UI.Text)typeof(ArenaFightOver).GetField("shortStory", PrivateInstance).GetValue(result);
+                if (storyText.gameObject.activeInHierarchy && !string.IsNullOrWhiteSpace(storyText.text))
+                    ((BOButton)typeof(ArenaFightOver).GetField("storyMaskBtn", PrivateInstance).GetValue(result)).onClick.Invoke();
                 break;
             }
 
@@ -811,8 +845,8 @@ public static partial class PocketStrikerCombatFlowSmoke
             RequireLockedInput();
             await UniTask.Delay(600, DelayType.Realtime);
             RequireLockedInput();
-            RequireVisibleBeforeChoice(oldWeapon, "evolution-" + index + "-weapon-visible-delay");
-            RequireVisibleBeforeChoice(oldEffect, "evolution-" + index + "-visual-visible-delay");
+            RequireVisibleBeforePresentation(oldWeapon, "evolution-" + index + "-weapon-visible-delay");
+            RequireVisibleBeforePresentation(oldEffect, "evolution-" + index + "-visual-visible-delay");
             report.evolutionInputLockChecks++;
             await UniTask.WaitUntil(() => ActiveEvolutionLayer() != null).Timeout(TimeSpan.FromSeconds(10));
             float choiceDelay = Time.realtimeSinceStartup - defeatedAt;
@@ -862,6 +896,9 @@ public static partial class PocketStrikerCombatFlowSmoke
             .Timeout(TimeSpan.FromSeconds(15));
 
         var rotationFight = CreateFixture("rotation-no-heal", false, 1);
+        // Seed a live previous-generation rental to exercise retry cleanup,
+        // after asserting that the real result boundary remains suspended.
+        BattleEffectLifetime.Resume();
         var previousWeapon = SeedWeapon(hero);
         hero = await StartFixture(rotationFight, true, previousWeapon);
         float damagedHp = hero.FightDataRef.MaxHp * 0.35f;
@@ -894,7 +931,14 @@ public static partial class PocketStrikerCombatFlowSmoke
             && report.evolutionHealthBarChecks == 4 && report.evolutionFinalDefeatHeal
             && report.normalRotationHealthUnchanged && report.deadPlayerNotRevived
             && report.evolutionInputLockChecks == 3 && report.evolutionChoiceDelaySeconds.Count == 3
-            && report.cancelledEvolutionChoice && report.effectInvalidationChecks.Count == 25,
+            && report.cancelledEvolutionChoice && report.finalDefeatEffectsPreserved && report.finalDefeatEffectsRetired
+            && new[] { "final-weapon-visible-immediate", "final-visual-visible-immediate",
+                "final-weapon-visible-animation-entry", "final-visual-visible-animation-entry",
+                "final-weapon-visible-animation-delay", "final-visual-visible-animation-delay",
+                "final-weapon-result-presentation", "final-visual-result-presentation",
+                "final-result-presentation-suspended", "retry-immediate",
+                "killing-hit-stats-retained-next-hit-cancelled", "evolution-pending-prefab-expired",
+                "body-effect-old-new-generation-shared-pool-race" }.All(report.effectInvalidationChecks.Contains),
             "Evolution transition, damage suspension and popup effect cleanup checks were incomplete.");
         UnityEngine.Object.Destroy(evolutionFight); UnityEngine.Object.Destroy(rotationFight);
         UnityEngine.Object.Destroy(cancelledFight); UnityEngine.Object.Destroy(simultaneousFight);
@@ -970,12 +1014,14 @@ public static partial class PocketStrikerCombatFlowSmoke
     {
         if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying) return;
         RemoveShopStartupObjects();
-        if (SessionState.GetBool(Key + ".StoryFailures", false))
+        if (SessionState.GetBool(Key + ".EvolutionHeal", false) || SessionState.GetBool(Key + ".StoryFailures", false))
         {
             var controller = UnityEngine.Object.FindFirstObjectByType<global::FightScene.FightScene>();
             if (controller != null)
                 typeof(global::FightScene.FightScene).GetField("StoryLoaderForValidation", PrivateInstance).SetValue(controller,
-                    (Func<UniTask<StoryInfo>>)(() => SessionState.GetString(Key + ".StoryFault", "") switch
+                    (Func<UniTask<StoryInfo>>)(() => SessionState.GetBool(Key + ".EvolutionHeal", false)
+                        ? UniTask.FromResult<StoryInfo>(null)
+                        : SessionState.GetString(Key + ".StoryFault", "") switch
                     {
                         "exception" => UniTask.FromException<StoryInfo>(new InvalidOperationException("fixture story generation failed")),
                         "pending" => new UniTaskCompletionSource<StoryInfo>().Task,

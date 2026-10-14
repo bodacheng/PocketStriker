@@ -257,6 +257,8 @@ namespace FightScene
 
         public override void ProcessEnter()
         {
+            // Self battles reach the result UI without a FightResultAnim.
+            BattleEffectLifetime.InvalidateAll(true);
             EnterProcess();
         }
         
