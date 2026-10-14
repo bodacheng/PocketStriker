@@ -67,9 +67,44 @@ namespace DummyLayerSystem
         }
 
         private static RectTransform effectBg;
+        static readonly Vector3[] effectBgCorners = new Vector3[4];
         public static void SetEffectBg(RectTransform _effectBg)
         {
+            Canvas.willRenderCanvases -= RefreshEffectBgLayout;
             effectBg = _effectBg;
+            if (effectBg != null)
+            {
+                Canvas.willRenderCanvases += RefreshEffectBgLayout;
+                RefreshEffectBgLayout();
+            }
+        }
+
+        public static void RefreshEffectBgLayout()
+        {
+            if (effectBg == null || !(effectBg.parent is RectTransform parent)) return;
+            var canvas = effectBg.GetComponentInParent<Canvas>(true)?.rootCanvas;
+            if (canvas == null || !(canvas.transform is RectTransform canvasRect)) return;
+
+            // This RawImage presents full-screen camera pixels. Its sibling order
+            // follows the active UI layer, but safe-area/banner insets must never
+            // shrink the texture or its gems away from their screen-space hit targets.
+            canvasRect.GetWorldCorners(effectBgCorners);
+            var lower = (Vector2)parent.InverseTransformPoint(effectBgCorners[0]);
+            var upper = (Vector2)parent.InverseTransformPoint(effectBgCorners[2]);
+            effectBg.localRotation = Quaternion.identity;
+            effectBg.localScale = Vector3.one;
+            effectBg.anchorMin = Vector2.zero;
+            effectBg.anchorMax = Vector2.one;
+            effectBg.offsetMin = lower - parent.rect.min;
+            effectBg.offsetMax = upper - parent.rect.max;
+        }
+
+        static void MoveEffectBgToHanger(Transform targetHanger)
+        {
+            if (effectBg == null) return;
+            effectBg.SetParent(targetHanger, false);
+            effectBg.SetAsLastSibling();
+            RefreshEffectBgLayout();
         }
 
         private static readonly List<UILayer> Queues = new List<UILayer>();
@@ -175,6 +210,7 @@ namespace DummyLayerSystem
                 }
                 existed.ResizeAreas();
                 ApplySiblingOrder(existed.transform, insertToTop, loadToFullScreen);
+                MoveEffectBgToHanger(targetHanger);
                 EnsureMosakAtBottom(targetHanger);
                 return existed;
             }
@@ -192,11 +228,7 @@ namespace DummyLayerSystem
             Queues.Add(t);
             var returnValue = t as T;
 
-            if (effectBg != null)
-            {
-                effectBg.transform.SetParent(targetHanger);
-                effectBg.transform.SetAsLastSibling();
-            }
+            MoveEffectBgToHanger(targetHanger);
 
             EnsureMosakAtBottom(targetHanger);
 

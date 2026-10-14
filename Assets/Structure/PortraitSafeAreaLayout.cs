@@ -86,5 +86,6 @@ public sealed class PortraitSafeAreaLayout : MonoBehaviour
         UnityEngine.Canvas.ForceUpdateCanvases();
         foreach (var layer in _canvas.GetComponentsInChildren<UILayer>(true))
             layer.ResizeAreas();
+        DummyLayerSystem.UILayerLoader.RefreshEffectBgLayout();
     }
 }

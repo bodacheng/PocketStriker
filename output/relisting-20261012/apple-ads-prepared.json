@@ -1,0 +1,38 @@
+{
+  "appId": "6478905824",
+  "appName": "ポケットストライカー",
+  "accountWriteCompleted": false,
+  "blockingState": "App is not returned by the Apple Ads app selector while Japan availability is Processing to Available.",
+  "country": "JP",
+  "placement": "SEARCH_RESULTS",
+  "bidding": "MANAGE_BIDS",
+  "currency": "JPY",
+  "dailyBudget": 1500,
+  "plannedDays": 10,
+  "plannedAdSpend": 15000,
+  "startAfterAppEligible": true,
+  "endDateRequired": true,
+  "searchMatch": false,
+  "defaultMaxCPT": 40,
+  "bidBasis": "Conservative experimental starting bids, not a measured CPI or market rate.",
+  "keywords": [
+    {"text": "格闘ゲーム", "match": "EXACT", "maxCPT": 50},
+    {"text": "3D格闘ゲーム", "match": "EXACT", "maxCPT": 50},
+    {"text": "格闘アクション", "match": "EXACT", "maxCPT": 50},
+    {"text": "格闘アクションゲーム", "match": "EXACT", "maxCPT": 50},
+    {"text": "コンボアクション", "match": "EXACT", "maxCPT": 40},
+    {"text": "コンボアクションゲーム", "match": "EXACT", "maxCPT": 40},
+    {"text": "スキルバトル", "match": "EXACT", "maxCPT": 40},
+    {"text": "スキルバトルゲーム", "match": "EXACT", "maxCPT": 40},
+    {"text": "スキルアクションゲーム", "match": "EXACT", "maxCPT": 40},
+    {"text": "育成格闘ゲーム", "match": "EXACT", "maxCPT": 30},
+    {"text": "育成バトルゲーム", "match": "EXACT", "maxCPT": 30},
+    {"text": "チームバトルゲーム", "match": "EXACT", "maxCPT": 30}
+  ],
+  "negativeKeywords": [
+    {"text": "ポケットストライカー", "match": "EXACT"},
+    {"text": "Pocket Striker", "match": "EXACT"},
+    {"text": "PocketStriker", "match": "EXACT"}
+  ],
+  "qualificationProof": "apple-ads-awaiting-availability.jpg"
+}

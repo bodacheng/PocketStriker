@@ -1,0 +1,15 @@
+{
+  "checked_at_utc": "2026-10-11T04:43:33.186594+00:00",
+  "source": "Fresh direct HTTP GET requests via Python urllib; no local or web-tool cached response used. Cache-Control: no-cache and Pragma: no-cache requested. Apple/CDN origin cache status not determined.",
+  "checks": [
+    {
+      "url": "https://apps.apple.com/jp/app/id6478905824",
+      "status": 404
+    },
+    {
+      "url": "https://itunes.apple.com/lookup?id=6478905824&country=jp",
+      "status": 200,
+      "resultCount": 0
+    }
+  ]
+}

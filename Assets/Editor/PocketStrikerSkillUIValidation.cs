@@ -21,6 +21,7 @@ public static class PocketStrikerSkillUIValidation
     const BindingFlags Fields = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
     const BindingFlags StaticFields = BindingFlags.Static | BindingFlags.NonPublic;
     const string Output = "Logs/UILayout/SkillUI";
+    static readonly Type Loader = typeof(UILayer).Assembly.GetType("DummyLayerSystem.UILayerLoader", true);
     static readonly string[] TabNames = { "NormalTab", "EX1Tab", "EX2Tab", "EX3Tab" };
     static readonly string[] Effects = { "normal", "EX1", "EX2", "EX3" };
     static readonly string[] Elements = { "defaultmagic", "redmagic", "bluemagic", "greenmagic", "lightmagic", "darkmagic" };
@@ -29,8 +30,10 @@ public static class PocketStrikerSkillUIValidation
     {
         public bool passed;
         public int gemBoundsChecked, raycastsChecked, filteredTabsChecked, iconInsetsChecked, particleShapesChecked;
+        public int composedCentersChecked, selectedHaloCentersChecked, effectPresentationRectsChecked, loaderReparentsChecked;
         public List<string> errors = new List<string>();
-        public string scope = "Actual SkillEditLayer/StoneListLayer layout and six element category models, rotating mesh bounds and visual-center UI raycasts before/after safe-area resize. Production IniExTabs/onClick/RestFilter with four isolated skill categories verifies visible list contents and repeated initialization. Real stoneModel/StoneCell placement verifies inventory/nine-slot insets after resize. No network, account changes or Play-mode animation.";
+        public string scope = "Actual SkillEditLayer/StoneListLayer layout and six element category models at 1080x1920 and 1206x2622. Real UILayerLoader.Load reparents a RenderTexture-backed effectBg RawImage; production PortraitSafeAreaLayout.Apply changes device-safe and banner insets. Gem centers and rotating bounds are projected through the RawImage presentation, then native UI raycasts hit the four category buttons. The layer-0 selected halo is projected directly and checked against the displayed layer-5 gems after resize. Production IniExTabs/onClick/RestFilter verifies four skill categories and repeated initialization; real stoneModel/StoneCell verifies inventory/nine-slot insets.";
+        public string limitation = "Stopped-editor world-space UI fixture. Device ratios are controlled by real RenderTextures; safe-area and banner inputs are normalized to the host Screen for production Apply. Geometry follows the actual RawImage UV presentation, without frame-pixel analysis, native phone SDKs, network, account changes, camera-stack animation or Play-mode particle timing.";
     }
 
     public static void ValidateBatch()
@@ -46,10 +49,18 @@ public static class PocketStrikerSkillUIValidation
         var report = new Report();
         var oldCanvas = PosCal.Canvas; var oldSafe = PosCal.SafeAreaRect; var oldPre = PreScene.target;
         var oldSelected = SkillStonesBox.Selected; var oldEvents = EventSystem.current;
+        var oldBanner = BannerAds.target;
+        var oldHanger = Loader.GetField("_hanger", StaticFields).GetValue(null);
+        var oldFullHanger = Loader.GetField("_fullScreenHanger", StaticFields).GetValue(null);
+        var oldEffectBg = Loader.GetField("effectBg", StaticFields).GetValue(null);
+        var loaderQueues = (List<UILayer>)Loader.GetField("Queues", StaticFields).GetValue(null);
+        var oldQueues = loaderQueues.ToArray();
         var stoneData = (IDictionary<string, dataAccess.StoneOfPlayerInfo>)typeof(dataAccess.Stones).GetField("Dic", StaticFields).GetValue(null);
         var stoneModels = (IDictionary<string, SKStoneItem>)typeof(dataAccess.Stones).GetField("RenderModelDic", StaticFields).GetValue(null);
         var savedData = stoneData.ToArray(); var savedModels = stoneModels.ToArray();
         var savedConfigs = SkillConfigTable.SkillConfigRefDic;
+        var savedUnitRows = Units.rowList.ToArray();
+        var unitLoaded = typeof(Units).GetField("isLoaded", StaticFields); var savedUnitLoaded = unitLoaded.GetValue(null);
         Application.LogCallback captureErrors = (message, stack, type) =>
         {
             if (type == LogType.Error || type == LogType.Exception || type == LogType.Assert)
@@ -59,6 +70,13 @@ public static class PocketStrikerSkillUIValidation
         try
         {
             stoneData.Clear(); stoneModels.Clear();
+            loaderQueues.Clear();
+            // The supported category list comes from unit rows. A standalone batch
+            // Editor starts without the menu's asynchronous table initialization.
+            Units.rowList.Clear();
+            Units.rowList.Add(new Units.Row { RECORD_ID = "1", REAL_NAME = "adam", MONSTER_TYPE = "human", ELEMENT = "3",
+                RARITY_LEVEL = "1", BASIC_MOVEMENT_PACK = "adam", MOVE_TYPE = "Move1", DODGE_SKILL = "Rush", DEFENDABLE_FLAG = "1" });
+            unitLoaded.SetValue(null, true);
             SkillConfigTable.SkillConfigRefDic = new Dictionary<string, SkillConfig>();
             for (int ex = 0; ex < 4; ex++)
             {
@@ -80,12 +98,20 @@ public static class PocketStrikerSkillUIValidation
             stoneData.Clear(); foreach (var entry in savedData) stoneData.Add(entry.Key, entry.Value);
             stoneModels.Clear(); foreach (var entry in savedModels) stoneModels.Add(entry.Key, entry.Value);
             SkillConfigTable.SkillConfigRefDic = savedConfigs;
+            Units.rowList.Clear(); Units.rowList.AddRange(savedUnitRows); unitLoaded.SetValue(null, savedUnitLoaded);
             PosCal.Canvas = oldCanvas; PosCal.SafeAreaRect = oldSafe; PreScene.target = oldPre; SkillStonesBox.Selected = oldSelected;
+            BannerAds.target = oldBanner;
+            Loader.GetField("_hanger", StaticFields).SetValue(null, oldHanger);
+            Loader.GetField("_fullScreenHanger", StaticFields).SetValue(null, oldFullHanger);
+            Loader.GetMethod("SetEffectBg").Invoke(null, new[] { oldEffectBg });
+            loaderQueues.Clear(); loaderQueues.AddRange(oldQueues);
             // Unity rejects assigning a null EventSystem; fixture destruction already removes it.
             if (oldEvents != null) EventSystem.current = oldEvents;
             Application.logMessageReceived -= captureErrors;
             report.passed = report.errors.Count == 0 && report.filteredTabsChecked == 16 && report.gemBoundsChecked == 1152
-                && report.raycastsChecked == 48 && report.iconInsetsChecked == 24 && report.particleShapesChecked > 0;
+                && report.raycastsChecked == 48 && report.iconInsetsChecked == 24 && report.particleShapesChecked > 0
+                && report.composedCentersChecked == 288 && report.selectedHaloCentersChecked == 48
+                && report.effectPresentationRectsChecked == 72 && report.loaderReparentsChecked == 12;
             Directory.CreateDirectory(Output);
             File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         }
@@ -97,18 +123,37 @@ public static class PocketStrikerSkillUIValidation
         var scene = EditorSceneManager.NewPreviewScene();
         var rig = new GameObject("Skill UI Fixture"); SceneManager.MoveGameObjectToScene(rig, scene);
         var texture = new RenderTexture(device.x, device.y, 16); texture.Create();
+        var effectTexture = new RenderTexture(device.x, device.y, 16); effectTexture.Create();
         EventSystem eventSystem = null;
         try
         {
             var canvasRect = NewRect("Canvas", rig.transform);
             canvasRect.sizeDelta = new Vector2(1080, device.y * 1080f / device.x); canvasRect.localScale = Vector3.one * .01f;
             var canvas = canvasRect.gameObject.AddComponent<Canvas>(); canvas.renderMode = RenderMode.WorldSpace;
+            canvas.gameObject.AddComponent<CanvasScaler>().referenceResolution = new Vector2(1080, 1920);
             var uiCamera = Camera(rig.transform, texture, canvasRect.rect.height * .005f);
-            var effectCamera = Camera(rig.transform, texture, 30); canvas.worldCamera = uiCamera;
+            var effectCamera = Camera(rig.transform, effectTexture, 30); canvas.worldCamera = uiCamera;
             canvas.gameObject.AddComponent<GraphicRaycaster>();
             var safe = NewRect("Safe Area", canvasRect); safe.anchorMin = Vector2.zero; safe.anchorMax = Vector2.one;
             safe.offsetMin = safe.offsetMax = Vector2.zero;
             PosCal.Canvas = canvas; PosCal.SafeAreaRect = safe;
+            var safeLayout = canvas.gameObject.AddComponent<PortraitSafeAreaLayout>();
+            var bannerObject = new GameObject("Simulated banner occupancy"); bannerObject.SetActive(false); bannerObject.transform.SetParent(rig.transform, false);
+            var banner = bannerObject.AddComponent<BannerAds>(); bannerObject.SetActive(true); BannerAds.target = banner;
+            ApplyDeviceInsets(safeLayout, canvas, safe, banner, device, 0);
+            var effectBgRect = NewRect("effectBg", canvasRect); effectBgRect.anchorMin = Vector2.zero; effectBgRect.anchorMax = Vector2.one;
+            effectBgRect.offsetMin = effectBgRect.offsetMax = Vector2.zero;
+            var effectBg = effectBgRect.gameObject.AddComponent<RawImage>(); effectBg.texture = effectTexture; effectBg.raycastTarget = false;
+            Loader.GetMethod("SetHanger", new[] { typeof(Transform), typeof(Transform) }).Invoke(null, new object[] { safe, canvasRect });
+            Loader.GetMethod("SetEffectBg").Invoke(null, new object[] { effectBgRect });
+            // ReturnLayer has no startup/services lifecycle. Use a real new-load path,
+            // then its existing-load path to move the effect presentation between hangers.
+            Require(Object.FindObjectsByType<ReturnLayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length == 0,
+                "Close existing ReturnLayer instances before isolated skill UI validation.");
+            var loaderLoad = Loader.GetMethod("Load").MakeGenericMethod(typeof(ReturnLayer));
+            var loadedReturn = (ReturnLayer)loaderLoad.Invoke(null, new object[] { false, null, false });
+            Require(loadedReturn != null && effectBgRect.parent == safe, "The production loader did not reparent the effect presentation to the safe hanger.");
+            loadedReturn.gameObject.SetActive(false); report.loaderReparentsChecked++;
             var preRoot = new GameObject("Inactive local PreScene"); preRoot.SetActive(false); preRoot.transform.SetParent(rig.transform, false);
             PreScene.target = preRoot.AddComponent<PreScene>(); PreScene.target.stonesTempContainer = NewRect("Stone Temp", rig.transform);
             eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule)).GetComponent<EventSystem>(); eventSystem.transform.SetParent(rig.transform, false);
@@ -198,18 +243,30 @@ public static class PocketStrikerSkillUIValidation
                     }
                     for (int state = 0; state < 3; state++)
                     {
-                        safe.offsetMin = new Vector2(0, state * 35); safe.offsetMax = new Vector2(0, -state * 140);
+                        ApplyDeviceInsets(safeLayout, canvas, safe, banner, device, state);
                         layer.ResizeAreas(); Canvas.ForceUpdateCanvases();
+                        CheckEffectPresentationRect(effectBgRect, canvasRect, uiCamera, device, state, report);
                         if (element == Elements[0]) Draw(canvas, uiCamera, texture);
                         for (int ex = 0; ex < 4; ex++)
                         {
                             var layout = effects[ex]; layout.RefreshLayout(); var rect = (RectTransform)buttons[ex].transform;
                             var allowed = ScreenRect(rect, uiCamera);
-                            var center = (Vector2)effectCamera.WorldToScreenPoint(layout.transform.position);
-                            Require(Vector2.Distance(center, allowed.center) < .1f, "Category gem no longer follows its button after layout changes.");
-                            if (element == "defaultmagic") CheckParticleShapes(layout, allowed, effectCamera, report);
+                            var center = PresentedPoint(layout.transform.position, effectCamera, effectBg, uiCamera);
+                            Require(Vector2.Distance(center, allowed.center) < .1f, "Displayed category gem no longer follows its button after RenderTexture presentation: "
+                                + page + "/" + device + "/" + element + "/" + Effects[ex] + "/inset=" + state + ", gem=" + center + ", button=" + allowed.center);
+                            report.composedCentersChecked++;
+                            if (element == "defaultmagic") CheckParticleShapes(layout, allowed, effectCamera, effectBg, uiCamera, report);
                             if (element == Elements[0])
                             {
+                                manager.SetSelectedTabPos(ex);
+                                var haloLayout = halo.GetComponent<SkillStoneTabEffectLayout>();
+                                Require(haloLayout != null && haloLayout.Target == rect, "Selecting the category did not bind its halo to the button.");
+                                haloLayout.RefreshLayout();
+                                var haloCenter = (Vector2)effectCamera.WorldToScreenPoint(halo.transform.position);
+                                Require(halo.gameObject.layer == 0 && effects[ex].gameObject.layer == 5, "Fixture does not reproduce direct halo versus RenderTexture gem layers.");
+                                Require(Vector2.Distance(center, haloCenter) < .1f && Vector2.Distance(haloCenter, allowed.center) < .1f,
+                                    "Displayed category gem and directly rendered selection halo have different centers after inset change: " + state + "/" + Effects[ex]);
+                                report.selectedHaloCentersChecked++;
                                 var results = new List<RaycastResult>(); var data = new PointerEventData(eventSystem) { position = center };
                                 canvas.GetComponent<GraphicRaycaster>().Raycast(data, results);
                                 var hit = results.Where(result => result.gameObject != null).OrderByDescending(result => result.depth).FirstOrDefault();
@@ -229,7 +286,7 @@ public static class PocketStrikerSkillUIValidation
                                 foreach (var renderer in layout.GetComponentsInChildren<MeshRenderer>())
                                 foreach (var point in BoundsCorners(renderer.bounds))
                                 {
-                                    var pixel = (Vector2)effectCamera.WorldToScreenPoint(point);
+                                    var pixel = PresentedPoint(point, effectCamera, effectBg, uiCamera);
                                     Require(allowed.Contains(pixel), "Rotating category geometry extends outside its button: " + element + "/" + Effects[ex]);
                                 }
                                 report.gemBoundsChecked++;
@@ -239,12 +296,20 @@ public static class PocketStrikerSkillUIValidation
                 }
                 finally { foreach (var effect in effects) Object.DestroyImmediate(effect.gameObject); }
             }
+            foreach (var fullScreen in new[] { true, false })
+            {
+                Require(loaderLoad.Invoke(null, new object[] { false, null, fullScreen }) == loadedReturn, "Existing loader path did not reuse its layer.");
+                Require(effectBgRect.parent == (fullScreen ? canvasRect : safe), "Existing loader path left the effect presentation in the previous hanger.");
+                Canvas.ForceUpdateCanvases(); CheckEffectPresentationRect(effectBgRect, canvasRect, uiCamera, device, 2, null);
+                report.loaderReparentsChecked++;
+            }
         }
         finally
         {
             if (eventSystem != null && RegisteredEventSystems().Contains(eventSystem))
                 typeof(EventSystem).GetMethod("OnDisable", Fields).Invoke(eventSystem, null);
-            Object.DestroyImmediate(rig); texture.Release(); Object.DestroyImmediate(texture); EditorSceneManager.ClosePreviewScene(scene);
+            Loader.GetMethod("SetEffectBg").Invoke(null, new object[] { null });
+            Object.DestroyImmediate(rig); texture.Release(); Object.DestroyImmediate(texture); effectTexture.Release(); Object.DestroyImmediate(effectTexture); EditorSceneManager.ClosePreviewScene(scene);
         }
     }
 
@@ -265,7 +330,39 @@ public static class PocketStrikerSkillUIValidation
         }
         if (grid != null) grid.enabled = true;
     }
-    static void CheckParticleShapes(SkillStoneTabEffectLayout layout, Rect allowed, Camera camera, Report report)
+    static void ApplyDeviceInsets(PortraitSafeAreaLayout layout, Canvas canvas, RectTransform safe, BannerAds banner, Vector2Int device, int state)
+    {
+        var deviceSafe = state == 0 ? new Rect(0, 0, device.x, device.y)
+            : new Rect(0, device.y * .04f, device.x, device.y * .90f);
+        float bannerPixels = state == 2 ? device.x * 90f / 390f : 0;
+        Require(Screen.width > 0 && Screen.height > 0, "The Editor Screen has no valid dimensions for safe-area validation.");
+        Set(layout, "safeAreaForValidation", (Rect?)new Rect(deviceSafe.x * Screen.width / device.x, deviceSafe.y * Screen.height / device.y,
+            deviceSafe.width * Screen.width / device.x, deviceSafe.height * Screen.height / device.y));
+        Set(banner, "_occupiedHeightPixels", bannerPixels * Screen.height / device.y);
+        layout.Initialize(canvas, safe);
+        var expected = PortraitSafeAreaLayout.ContentSafeArea(deviceSafe, device, bannerPixels);
+        Require(Vector2.Distance(safe.anchorMin, new Vector2(expected.xMin / device.x, expected.yMin / device.y)) < .0001f
+            && Vector2.Distance(safe.anchorMax, new Vector2(expected.xMax / device.x, expected.yMax / device.y)) < .0001f,
+            "Production safe-area Apply did not reserve the device and banner insets exactly once.");
+    }
+    static void CheckEffectPresentationRect(RectTransform effectBg, RectTransform canvas, Camera camera, Vector2Int device, int state, Report report)
+    {
+        var expected = ScreenRect(canvas, camera); var actual = ScreenRect(effectBg, camera);
+        Require(Vector2.Distance(actual.min, expected.min) < .1f && Vector2.Distance(actual.max, expected.max) < .1f,
+            "RenderTexture effectBg no longer covers the full canvas after loader reparent and safe/banner Apply: " + device + "/inset=" + state
+            + ", displayed=" + actual + ", canvas=" + expected + ", parent=" + effectBg.parent.name);
+        if (report != null) report.effectPresentationRectsChecked++;
+    }
+    // The effect camera pixel coordinates are texture coordinates, not final UI
+    // screen coordinates. This is the extra transform omitted by the old checks.
+    static Vector2 PresentedPoint(Vector3 world, Camera effectCamera, RawImage presentation, Camera uiCamera)
+    {
+        var viewport = effectCamera.WorldToViewportPoint(world); var uv = presentation.uvRect;
+        var normalized = new Vector2((viewport.x - uv.x) / uv.width, (viewport.y - uv.y) / uv.height);
+        var rect = presentation.rectTransform; var local = rect.rect.min + Vector2.Scale(rect.rect.size, normalized);
+        return RectTransformUtility.WorldToScreenPoint(uiCamera, rect.TransformPoint(local));
+    }
+    static void CheckParticleShapes(SkillStoneTabEffectLayout layout, Rect allowed, Camera camera, RawImage presentation, Camera uiCamera, Report report)
     {
         foreach (var system in layout.GetComponentsInChildren<ParticleSystem>(true))
         {
@@ -275,7 +372,7 @@ public static class PocketStrikerSkillUIValidation
             var scale = system.transform.lossyScale; radius *= Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
             var position = system.transform.position;
             foreach (var delta in new[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down })
-                Require(allowed.Contains((Vector2)camera.WorldToScreenPoint(position + delta * radius)), "Fallback particle emission extends outside its category button.");
+                Require(allowed.Contains(PresentedPoint(position + delta * radius, camera, presentation, uiCamera)), "Fallback particle emission extends outside its category button.");
             report.particleShapesChecked++;
         }
     }
