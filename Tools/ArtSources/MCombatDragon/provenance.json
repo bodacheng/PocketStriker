@@ -217,7 +217,7 @@
     {
       "source": "Assets/ExternalAssets/Prefabs/Units/e_dragon/g_e_dragon.prefab",
       "target": "Assets/ExternalAssets/Unit/e_dragon/g_e_dragon.prefab",
-      "targetSha256": "dd67c17e57f429404e3edd45f27732bd52b27303049468357318853d9f848d4d",
+      "targetSha256": "9b3d44deef620993bf189de655e2aa4954f4379728ea73d953a43a5845d3bb0d",
       "sourceSha256": "79ceffcccfc8512829335fe20bcbae494b8529cf025a4c7cbb5b16bf432baf66"
     },
     {
@@ -261,5 +261,34 @@
     "styleReference": "Assets/OrganizedResources/InUse/D_Resources/PolygonFantasyHeroCharacters/Textures/Textures/PolygonFantasyHero_Texture_01_A.png",
     "icon": "Assets/OrganizedResources/InUse/ExternalAssets/Unit_Icon/17.png",
     "iconMethod": "Unity render of the imported dragon with its authored PocketStriker material (512x512)"
-  }
+  },
+  "projectUpdates": [
+    {
+      "date": "2026-10-14",
+      "element": "redMagic (3)",
+      "contactProfile": {
+        "localPlanarCenter": [
+          0,
+          0.73
+        ],
+        "worldRadiusRange": [
+          1.78,
+          1.9
+        ],
+        "worldHeightRange": [
+          3.6,
+          3.8
+        ],
+        "fitTorsoCorners": true
+      },
+      "validation": [
+        "10 actual contact comparisons",
+        "4 impact-follow rotations",
+        "2 close attack damage checks",
+        "2 natural dragon battles",
+        "3 evolution selections"
+      ],
+      "sourceUnchanged": true
+    }
+  ]
 }

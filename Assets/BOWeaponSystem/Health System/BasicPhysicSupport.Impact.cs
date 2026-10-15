@@ -8,6 +8,9 @@ public partial class BasicPhysicSupport
     Vector3 impactOffset;
     Collider ignoredSourceBody, ignoredVictimBody;
     public bool FollowingImpact => impactSource != null;
+    Vector3 ImpactRootOffset => impactOffset
+        + (impactSource?._BasicPhysicSupport.GetComponent<CombatBodyProfile>()?.PlanarCenterOffset ?? Vector3.zero)
+        - (GetComponent<CombatBodyProfile>()?.PlanarCenterOffset ?? Vector3.zero);
 
     public void BeginImpactFollow(Data_Center source)
     {
@@ -18,15 +21,16 @@ public partial class BasicPhysicSupport
             if (cursor == _DATA_CENTER) return;
         impactSource = source;
         source._BasicPhysicSupport.impactFollowers.Add(this);
-        var separation = CurrentRootPosition() - source.WholeT.position;
+        var victimProfile = GetComponent<CombatBodyProfile>();
+        var sourceProfile = source._BasicPhysicSupport.GetComponent<CombatBodyProfile>();
+        var separation = CurrentRootPosition() + (victimProfile?.PlanarCenterOffset ?? Vector3.zero)
+            - source.WholeT.position - (sourceProfile?.PlanarCenterOffset ?? Vector3.zero);
         separation.y = 0;
         if (separation.sqrMagnitude < .0001f)
         {
             separation = source.WholeT.forward;
             separation.y = 0;
         }
-        var victimProfile = GetComponent<CombatBodyProfile>();
-        var sourceProfile = source._BasicPhysicSupport.GetComponent<CombatBodyProfile>();
         float minimum = (victimProfile?.Radius ?? .68f) + (sourceProfile?.Radius ?? .68f) + .08f;
         impactOffset = separation.normalized * Mathf.Max(minimum, Mathf.Min(separation.magnitude, 2.8f));
         ignoredSourceBody = sourceProfile?.Body;
@@ -50,7 +54,7 @@ public partial class BasicPhysicSupport
             EndImpactFollow();
             return false;
         }
-        var target = impactSource.WholeT.position + impactOffset;
+        var target = impactSource.WholeT.position + ImpactRootOffset;
         target.y = CurrentRootPosition().y;
         // Match the source's owned displacement rather than lagging behind a faster charge.
         // The locked planar offset keeps the victim in front without following the rotating foot.

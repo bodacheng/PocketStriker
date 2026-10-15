@@ -3,6 +3,12 @@ using UnityEngine;
 /// <summary>Stable world-sized body contact shape, separate from animated damage volumes.</summary>
 public sealed class CombatBodyProfile : MonoBehaviour
 {
+    [Header("Body contact fit (world dimensions, local planar center)")]
+    [SerializeField] Vector2 radiusRange = new Vector2(.88f, 1.08f);
+    [SerializeField] Vector2 heightRange = new Vector2(2.8f, 3.4f);
+    [SerializeField] Vector2 planarCenterOffset;
+    [SerializeField] bool fitTorsoCorners;
+
     static readonly System.Collections.Generic.Dictionary<Collider, CombatBodyProfile> Bodies = new System.Collections.Generic.Dictionary<Collider, CombatBodyProfile>();
     public static bool TryGet(Collider body, out CombatBodyProfile profile) => Bodies.TryGetValue(body, out profile);
     public CapsuleCollider Body { get; private set; }
@@ -17,6 +23,28 @@ public sealed class CombatBodyProfile : MonoBehaviour
     Collider registeredBody;
     Data_Center owner;
     PhysicsMaterial material;
+
+    public Vector3 PlanarCenterOffset
+    {
+        get
+        {
+            var root = owner != null ? owner.WholeT : transform;
+            var offset = root.TransformVector(new Vector3(planarCenterOffset.x, 0, planarCenterOffset.y));
+            offset.y = 0;
+            return offset;
+        }
+    }
+
+    // Formation tools may measure a model before its live capsule exists.
+    // Authored overrides also describe that model's maximum contact footprint.
+    public Bounds ContactBoundsForFormation(Data_Center center)
+    {
+        if (Body != null && Body.enabled && Body.gameObject.activeInHierarchy) return Body.bounds;
+        float radius = Mathf.Max(.01f, radiusRange.x, radiusRange.y);
+        float height = Mathf.Max(heightRange.x, heightRange.y, radius * 2f);
+        return new Bounds(center.WholeT.position + PlanarCenterOffset + Vector3.up * height * .5f,
+            new Vector3(radius * 2f, height, radius * 2f));
+    }
 
     public static CombatBodyProfile Apply(Data_Center center)
     {
@@ -51,7 +79,7 @@ public sealed class CombatBodyProfile : MonoBehaviour
         Body.direction = 1;
         Body.height = Height / verticalScale;
         Body.radius = Radius / horizontalScale;
-        Body.center = new Vector3(0, Height / (2 * verticalScale), 0);
+        Body.center = new Vector3(planarCenterOffset.x, Height / (2 * verticalScale), planarCenterOffset.y);
         Body.contactOffset = .015f;
         Body.enabled = true;
         SetLayer(center._TeamConfig.mylayer);
@@ -103,7 +131,7 @@ public sealed class CombatBodyProfile : MonoBehaviour
         foreach (var renderer in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
             if (renderer.enabled && renderer.sharedMesh != null)
                 ReferenceVisualHeight = Mathf.Max(ReferenceVisualHeight, renderer.bounds.max.y - root.position.y);
-        Height = Mathf.Clamp(ReferenceVisualHeight, 2.8f, 3.4f);
+        Height = Mathf.Clamp(ReferenceVisualHeight, heightRange.x, heightRange.y);
 
         var torsoTransform = center.spine_hitbox_t;
         var limb = torsoTransform != null ? torsoTransform.GetComponent<BO_Limb>() : null;
@@ -111,8 +139,12 @@ public sealed class CombatBodyProfile : MonoBehaviour
         if (TryMeasureTorso(torsoCollider, root, out var halfWidth, out var halfDepth, out var offset))
         {
             ReferenceTorsoSize = new Vector2(halfWidth * 2f, halfDepth * 2f);
-            ReferenceTorsoRadius = Mathf.Max(halfWidth + Mathf.Abs(Vector3.Dot(offset, root.right)),
-                halfDepth + Mathf.Abs(Vector3.Dot(offset, root.forward)));
+            offset -= PlanarCenterOffset;
+            float offsetX = Mathf.Abs(Vector3.Dot(offset, root.right));
+            float offsetZ = Mathf.Abs(Vector3.Dot(offset, root.forward));
+            ReferenceTorsoRadius = fitTorsoCorners
+                ? new Vector2(halfWidth + offsetX, halfDepth + offsetZ).magnitude
+                : Mathf.Max(halfWidth + offsetX, halfDepth + offsetZ);
         }
         else
         {
@@ -120,10 +152,13 @@ public sealed class CombatBodyProfile : MonoBehaviour
             ReferenceTorsoSize = Vector2.one * ReferenceTorsoRadius * 2f;
         }
         // A 1.24-wide body allowed the wider chest models to visibly interleave.
-        // Fit the torso plus clearance, while keeping the same rounded contact shape
-        // and a narrow world-size range for small and large fighters. Extended arms
-        // remain hurt volumes rather than making every idle pose a wide solid body.
-        Radius = Mathf.Clamp(ReferenceTorsoRadius + BodyClearance, .88f, 1.08f);
+        // Fit the torso plus clearance. Defaults retain the human size range;
+        // quadruped prefabs can fit their broader, offset chest independently.
+        // Extended arms/wings remain hurt volumes rather than a wide solid body.
+        Radius = Mathf.Clamp(ReferenceTorsoRadius + BodyClearance, radiusRange.x, radiusRange.y);
+        // Unity clamps a capsule shorter than its diameter internally. Keep our
+        // sweep and contact-radius calculations consistent with the actual shape.
+        Height = Mathf.Max(Height, Radius * 2f);
         dimensionsCalibrated = true; // Retrying a round must not recalibrate from a bent/attacking pose.
     }
 

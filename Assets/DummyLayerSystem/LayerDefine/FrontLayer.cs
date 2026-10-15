@@ -151,6 +151,7 @@ public class FrontLayer : UILayer
     public async UniTask ShowMyModel(string instanceID)
     {
         int requestVersion = ++_showMyModelRequestVersion;
+        StopRandomShowSkill();
         SetBusy(true);
         ProgressLayer.Loading(string.Empty);
         try
@@ -185,7 +186,7 @@ public class FrontLayer : UILayer
                         var skillConfig =  SkillConfigTable.GetSkillConfigByRecordId(x.SkillId);
                         return skillConfig.REAL_NAME;
                     }).ToList();
-                    if (this == null)
+                    if (this == null || requestVersion != _showMyModelRequestVersion)
                     {
                         return;
                     }

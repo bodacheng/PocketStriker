@@ -145,7 +145,7 @@ namespace ModelView
             wid = Mathf.Max(1, rect.rect.width);
             hei = Mathf.Max(1, rect.rect.height);
             camera.orthographicSize = Mathf.Max(0.01f,
-                Mathf.Max(_basicOrthographicSize, _targetBounds.extents.x / camera.aspect) * 1.04f);
+                Mathf.Max(_basicOrthographicSize, Mathf.Max(_targetBounds.extents.y, _targetBounds.extents.x / camera.aspect)) * 1.04f);
             var position = _targetBounds.center + Vector3.forward * (_targetBounds.extents.z + extraZDis);
             // UI relocation is immediate; easing through the large isolation offset
             // would leave the surface empty during layout and route changes.

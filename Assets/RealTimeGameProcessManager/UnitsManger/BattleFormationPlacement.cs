@@ -17,6 +17,14 @@ public static class BattleFormationPlacement
             else bounds.Encapsulate(collider.bounds);
             found = true;
         }
+        var profile = unit._BasicPhysicSupport != null ? unit._BasicPhysicSupport.GetComponent<CombatBodyProfile>() : null;
+        if (profile != null)
+        {
+            var contactBounds = profile.ContactBoundsForFormation(unit);
+            if (found) bounds.Encapsulate(contactBounds);
+            else bounds = contactBounds;
+            found = true;
+        }
         return found;
     }
 

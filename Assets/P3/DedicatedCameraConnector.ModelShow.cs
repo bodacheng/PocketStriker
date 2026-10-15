@@ -41,12 +41,24 @@ namespace ModelView
 
         private readonly SingleThreadProcessor _singleThreadProcessor = new SingleThreadProcessor();
         int _modelDisplayVersion;
+        int _skillRequestVersion;
+        bool _preparingSkill;
+
+        void StopPreviewSkill()
+        {
+            _skillRequestVersion++;
+            _preparingSkill = false;
+            IfShowingSkill = false;
+            resetModelPosTween?.Kill();
+            resetModelPosTween = null;
+        }
 
         void OnDisable()
         {
             // A queued/in-flight selection must not resume after its UI closes,
             // especially by closing the new battle-loading ProgressLayer.
             _modelDisplayVersion++;
+            StopPreviewSkill();
         }
 
         public int TaskRunningCount => _singleThreadProcessor.TaskRunningCount;
@@ -60,6 +72,7 @@ namespace ModelView
         {
             bool IsCurrent() => this != null && isActiveAndEnabled && displayVersion == _modelDisplayVersion;
             if (!IsCurrent()) return;
+            StopPreviewSkill();
 
             foreach (var save in _saves)
             {
@@ -125,6 +138,7 @@ namespace ModelView
             // 这个短暂变色是为了掩盖一些模型刚加载瞬间有些渲染没到位的尴尬。比如裙子摇晃 
             _focusingC._ShaderManager.FlatColorForAShortTime(Color.black, 0f, 1f);
             _focusingC.WholeT.gameObject.SetActive(true);
+            _focusingC.AnimationManger.AnimationTrigger(string.Empty, 0f);
             
             await UniTask.DelayFrame(5);// 否则Unity对mesh的尺寸计算有错误。算是Unity的bug
             if (!IsCurrent())
@@ -185,25 +199,36 @@ namespace ModelView
         
         public async UniTask SkillShowRunWithPrepare(string skillName, bool waitLastMotionEnd = true)
         {
-            if (IfShowingSkill && waitLastMotionEnd)
+            if (this == null || !isActiveAndEnabled || _focusingC?.AnimationManger == null
+                || _focusingC.WholeT == null || !_focusingC.WholeT.gameObject.activeInHierarchy
+                || ((_preparingSkill || IfShowingSkill) && waitLastMotionEnd))
                 return;
 
-            await HurtObjectManager.ConstructDPool();
-            
+            var model = _focusingC;
             var unitConfig = Units.GetUnitConfig(_focusRId);
-            if (unitConfig == null)
-                return;
-            
-            if (_focusingC.AnimationManger != null)
+            if (unitConfig == null) return;
+            int displayVersion = _modelDisplayVersion;
+            int skillVersion = ++_skillRequestVersion;
+            bool IsCurrent() => this != null && isActiveAndEnabled && model != null
+                && model.WholeT != null && model.WholeT.gameObject.activeInHierarchy
+                && _focusingC == model && displayVersion == _modelDisplayVersion && skillVersion == _skillRequestVersion;
+            _preparingSkill = true;
+            try
             {
-                await _focusingC.AnimationManger.PreloadPersonalAnimResourceMode(unitConfig.TYPE, skillName, unitConfig.element, 1);
-                if (_focusingC == null)
-                {
-                    return;
-                }
+                await HurtObjectManager.ConstructDPool();
+                if (!IsCurrent()) return;
+                await model.AnimationManger.PreloadPersonalAnimResourceMode(unitConfig.TYPE, skillName, unitConfig.element, 1);
+                if (!IsCurrent()) return;
+                resetModelPosTween?.Kill();
+                resetModelPosTween = null;
                 IfShowingSkill = true;
-                _focusingC.AnimationManger.AnimationTrigger(skillName, 0.25f);
-                _focusingC.AnimationManger.TriggerExpression(Facial.aggressive);
+                model.AnimationManger.AnimationTrigger(skillName, 0.25f);
+                model.AnimationManger.TriggerExpression(Facial.aggressive);
+            }
+            finally
+            {
+                if (this != null && skillVersion == _skillRequestVersion)
+                    _preparingSkill = false;
             }
         }
 

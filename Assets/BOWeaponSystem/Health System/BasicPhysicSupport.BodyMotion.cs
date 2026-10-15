@@ -16,8 +16,8 @@ public partial class BasicPhysicSupport
         var direction = delta / distance;
         // Damage limbs are triggers; sweep only the stable world-sized contact capsule.
         float radius = Mathf.Max(.01f, profile.Radius - .015f);
-        var lower = current + Vector3.up * profile.Radius;
-        var upper = current + Vector3.up * (profile.Height - profile.Radius);
+        var lower = current + profile.PlanarCenterOffset + Vector3.up * profile.Radius;
+        var upper = current + profile.PlanarCenterOffset + Vector3.up * (profile.Height - profile.Radius);
         int count;
         while (true)
         {
@@ -52,7 +52,7 @@ public partial class BasicPhysicSupport
         {
             var follower = impactFollowers[index];
             if (follower == null || !follower.FollowingImpact) continue;
-            var desired = target + follower.impactOffset;
+            var desired = target + follower.ImpactRootOffset;
             desired.y = follower.CurrentRootPosition().y;
             var reachable = follower.ClampOwnedBodyMotion(follower.ClampPositionToBattleRange(desired));
             var correction = reachable - desired;

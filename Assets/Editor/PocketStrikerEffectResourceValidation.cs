@@ -90,6 +90,7 @@ public static class PocketStrikerEffectResourceValidation
         {
             CheckPsychicBlastResource(report);
             CheckRubyImpactResource(report);
+            CheckHeadStrikeResource(report);
             CheckResources(report);
             ReadProductionCameras(report);
             if (QualitySettings.names.Length != 6) report.errors.Add("Expected the six production quality tiers.");
@@ -130,6 +131,58 @@ public static class PocketStrikerEffectResourceValidation
             File.WriteAllText(Path.Combine(Output, "report.json"), JsonUtility.ToJson(report, true));
         }
         return report;
+    }
+
+    [MenuItem("PocketStriker/Validation/Head Strike Resources")]
+    public static void ValidateHeadStrikeResources()
+    {
+        var report = new Report
+        {
+            unityVersion = Application.unityVersion,
+            scope = "Skill 27 Head Strike: imported frank_heada release event, k_hitbox positive damage/push reaction, MCombat sphere radius and whoosh audio, weapon-label Addressables reachability.",
+            limitation = "Stopped-editor resource checks; actual animation dispatch, physics damage and pooled retirement are covered by the separate Head Strike Playmode Smoke."
+        };
+        CheckHeadStrikeResource(report);
+        report.passed = report.errors.Count == 0;
+        Directory.CreateDirectory("Logs/HeadStrike");
+        File.WriteAllText("Logs/HeadStrike/resources.json", JsonUtility.ToJson(report, true));
+        if (!report.passed) throw new InvalidOperationException(string.Join("\n", report.errors));
+        Debug.Log("[HeadStrike] PASS: authored animation, attack sphere, whoosh sound and weapon Addressables fallback.");
+    }
+
+    static void CheckHeadStrikeResource(Report report)
+    {
+        var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/ExternalAssets/Animations/human/skill/frank_heada.anim");
+        var release = clip?.events.SingleOrDefault(e => e.functionName == "MagicForward" && e.stringParameter == "k_hitbox");
+        if (release == null || !Mathf.Approximately(release.time, 19f / 60f)
+            || !Mathf.Approximately(release.floatParameter, 1.5f) || release.intParameter != 0)
+            report.errors.Add("Head Strike (27): missing authored 19-frame k_hitbox release at 1.5 metres forward.");
+
+        const string path = "Assets/ExternalAssets/HurtObjects/defaultmagic/k_hitbox.prefab";
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        var hitbox = prefab?.GetComponent<Decomposition>()?._HitBox;
+        var marker = prefab?.GetComponentInChildren<HittingDetection.BO_Marker>();
+        var audio = prefab?.GetComponent<AudioSource>();
+        if (hitbox == null || hitbox.AT_weight <= 0 || hitbox.damage_type != HittingDetection.DamageType.push_to_mid
+            || marker == null || !Mathf.Approximately(marker.radius, 1.5f)
+            || !Mathf.Approximately(Mathf.Abs(marker.transform.lossyScale.x), 1f))
+            report.errors.Add("Head Strike (27): missing attack object, positive damage/push reaction or MCombat's 1.5 metre sphere.");
+        if (audio == null || audio.clip == null
+            || AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(audio.clip)) != "13fc021db11e4ce46b0854d7e461d793")
+            report.errors.Add("Head Strike (27): missing authored MCombat whoosh AudioSource/clip.");
+
+        var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null) { report.errors.Add("Head Strike (27): Addressables settings are missing."); return; }
+        var entries = new List<AddressableAssetEntry>();
+        foreach (var group in settings.groups.Where(group => group != null))
+            group.GatherAllAssets(entries, true, true, false);
+        string address = EffectResourceKeyUtility.PrefabAddress("defaultmagic", "k_hitbox");
+        if (!entries.Any(entry => entry.AssetPath == path && entry.address == address
+            && entry.labels.Contains(EffectResourceKeyUtility.WeaponLabel)))
+            report.errors.Add("Head Strike (27): attack object is unreachable through the weapon label at " + address);
+        else
+            report.observations.Add("Head Strike (27): frank_heada releases " + address
+                + "; MCombat's attack object is a 1.5 metre sphere with whoosh audio, using the defaultmagic fallback for every element.");
     }
 
     static void CheckPsychicBlastResource(Report report)

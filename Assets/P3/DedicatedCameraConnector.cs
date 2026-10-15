@@ -122,13 +122,15 @@ namespace ModelView
             CameraTreat(camera, true);
         }
 
-        void Update()
+        void LateUpdate()
         {
-            if (target != null) CameraPositionCal();
             if (IfShowingSkill)
             {
                 SkillsPrintOutLateUpdate();
             }
+            // Animator evaluates the skill pose after Update. Frame the pose that
+            // will actually render, including the first frame of a jumping skill.
+            if (target != null) CameraPositionCal();
         }
 
         private void OnDestroy()
@@ -184,13 +186,19 @@ namespace ModelView
                 return;
             }
             var viewCenter = GetCenterPosition(rect);
-            _camera.orthographicSize = _basicOrthographicSize * (PosCal.CanvasHeight / rect.rect.height);
+            var panelAspect = rect.rect.width / Mathf.Max(1f, rect.rect.height);
+            var requiredSize = Mathf.Max(_basicOrthographicSize, Mathf.Max(_targetBounds.extents.y,
+                _targetBounds.extents.x / Mathf.Max(.01f, panelAspect)) * 1.04f);
+            _camera.orthographicSize = requiredSize * (PosCal.CanvasHeight / rect.rect.height);
             var cViewWidth = _camera.orthographicSize * 2 * _camera.aspect;
             var cViewHeight = _camera.orthographicSize * 2;
             var pos = _targetBounds.center + Vector3.forward * (_targetBounds.extents.z + extraZDis)
                                            + (0.5f -　(viewCenter.x / Screen.width)) * cViewWidth * _camera.transform.right 
                                            + (0.5f - (viewCenter.y / Screen.height)) * cViewHeight * Vector3.up;
-            _camera.transform.position = resetPos ? pos : Vector3.Lerp(_camera.transform.position, pos, Time.deltaTime * followSpeed);
+            // Slow idle following cannot catch a skill's rapid pose/root movement.
+            // Keep its body centered throughout both the skill and its return.
+            bool movingPreview = IfShowingSkill || resetModelPosTween.IsActive() || _rotateTo.IsActive();
+            _camera.transform.position = resetPos || movingPreview ? pos : Vector3.Lerp(_camera.transform.position, pos, Time.deltaTime * followSpeed);
             _camera.farClipPlane = _targetBounds.extents.z * 2 + extraZDis + extraZCameraDepth;
         }
         

@@ -1673,6 +1673,7 @@ GameObject:
   - component: {fileID: 6619543536568015767}
   - component: {fileID: 8599188250676223969}
   - component: {fileID: 9157738377539255518}
+  - component: {fileID: 5714469941428314078}
   m_Layer: 3
   m_Name: g_e_dragon
   m_TagString: Untagged
@@ -3729,7 +3730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63006b054cf094544b82f91a6f4ba6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  element: 5
+  element: 3
   geometryCenter: {fileID: 8564968635368684007}
   WholeT: {fileID: 4886555132345594}
   _AudioSource: {fileID: 8111403224422046381}
@@ -3785,3 +3786,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4605031464898384}
   m_LocalEulerAnglesHint: {x: 160, y: 90, z: 0}
+--- !u!114 &5714469941428314078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1349907487765544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71db8ddd01ad4e4da0abbb2546507c64, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  radiusRange: {x: 1.78, y: 1.9}
+  heightRange: {x: 3.6, y: 3.8}
+  planarCenterOffset: {x: 0, y: 0.73}
+  fitTorsoCorners: 1

@@ -78,6 +78,7 @@ public static class PocketStrikerDragonValidation
             var unit = UnitRow();
             report.basicPack = unit[5];
             Require(unit[1] == "g_e_dragon" && unit[2] == "e_dragon", "Unit 17 does not select the imported dragon model.");
+            Require(unit[3] == ((int)Element.redMagic).ToString(), "Unit 17 must use the red element.");
             var modelEntry = UniqueEntry(entries, unit[2] + "/" + unit[1]);
             Require(modelEntry.AssetPath == PrefabPath, "Dragon model address selects a different prefab: " + modelEntry.AssetPath);
             var source = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
@@ -155,7 +156,7 @@ public static class PocketStrikerDragonValidation
                 Vector3.one * dragonBounds.size.y * .65f);
             RenderView(camera, portraitBounds, new Vector2Int(512, 512), new Vector3(6, -20, 0), 1 << 3,
                 "unit-17-icon.png", report, 1.04f);
-            report.checks.AddRange(new[] { "Unit 17 resolves the actual dragon prefab", "No missing prefab scripts; required combat and skin references resolve",
+            report.checks.AddRange(new[] { "Unit 17 resolves the actual dragon prefab and red element", "No missing prefab scripts; required combat and skin references resolve",
                 "All transitive serialized GUID references resolve", "Generic avatar and all configured animation bindings resolve",
                 "Production base movement and hurt/knock labels cover each required series", "All configured dragon skill addresses resolve",
                 "Actual dragon/human scale comparison and authored-material URP views" });

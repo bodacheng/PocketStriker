@@ -130,6 +130,9 @@ public static partial class PocketStrikerCombatFlowSmoke
         Require(dragon != null, "Actual battle did not load the dragon.");
         if (frame == 1)
         {
+            Require(Units.GetUnitConfig("17")?.element == Element.redMagic && dragon.element == Element.redMagic
+                && FightGlobalSetting.EffectPathDefine(dragon.element) == "redmagic",
+                "Runtime dragon did not inherit the red element and red effect resource path.");
             var renderers = dragon.WholeT.GetComponentsInChildren<Renderer>();
             var body = renderers.Where(renderer => renderer.gameObject.layer == 3 && renderer is SkinnedMeshRenderer).ToArray();
             Require(body.Length > 0 && body.All(renderer => renderer.sharedMaterials.All(material => material != null
@@ -137,7 +140,7 @@ public static partial class PocketStrikerCombatFlowSmoke
                 "Runtime dragon lost its project material or diffuse texture.");
             Require(renderers.Any(renderer => renderer.name.StartsWith("shadow_", StringComparison.Ordinal)
                 && renderer.shadowCastingMode == ShadowCastingMode.ShadowsOnly), "Dragon has no ground shadow proxy.");
-            report.dragonChecks.Add(name + ": actual unit17, colored OmniShade materials, diffuse atlas and shadows loaded");
+            report.dragonChecks.Add(name + ": actual red-element unit17, red effect resource path, colored OmniShade materials, diffuse atlas and shadows loaded");
         }
         var state = dragon._MyBehaviorRunner.GetNowState();
         if (state != null && state.StateKey != null && state.StateKey.StartsWith("El_Attack_", StringComparison.Ordinal)

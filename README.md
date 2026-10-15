@@ -49,6 +49,10 @@ AI 故事使用 S3 上的提示词模板和主题配置，故事内容对齐 MCo
 UI 修改后，在停止播放的编辑器中运行 **PocketStriker → Validation → UI Layout** 和
 **Check Stage Cards**：前者检查所有注册画面及常用导航组合在手机、刘海屏、iPad 下的区域边界，
 后者检查三种语言、锁定状态和四位关卡编号的卡片排版。报告和预览图位于 `Logs/UILayout`。
+首页动态技能预览使用 **Menu Skill Preview Verify**，在真实首页布局中检查首次技能、重复技能和缓存角色切换；
+相机在动画更新后跟随当前姿势，保留技能根运动。报告与逐帧记录位于 `Logs/MenuSkillPreview`。
+**Head Strike Resources** 与 **Head Strike Playmode Smoke** 检查头击的 MCombat 攻击范围、挥动音效、
+实际动画释放、命中及对象池回收，报告位于 `Logs/HeadStrike`。
 **Arena Awards** 用真实奖励行检查列表间距和滚动首尾；**Check Fight Preparation**
 用实际奖励、领取标记和多语言标题检查战斗准备页。设置页另检查六个页签内容的垂直居中。
 **Startup Smoke** 可继续检查启动、标题与演示战斗的实际运行。覆盖范围见 [UI 布局验证](Tools/UILayout.md)。

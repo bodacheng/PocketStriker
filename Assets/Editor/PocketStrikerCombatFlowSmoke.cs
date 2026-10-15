@@ -20,7 +20,9 @@ using UnityEngine.SceneManagement;
 public static partial class PocketStrikerCombatFlowSmoke
 {
     const string Key = "PocketStriker.CombatFlowSmoke";
-    static string Output => SessionState.GetBool(Key + ".RubyImpact", false) ? "Logs/RubyImpact/Playmode"
+    static string Output => SessionState.GetBool(Key + ".HeadStrike", false) ? "Logs/HeadStrike/Playmode"
+        : SessionState.GetBool(Key + ".RubyImpact", false) ? "Logs/RubyImpact/Playmode"
+        : SessionState.GetBool(Key + ".DragonBody", false) ? "Logs/Dragon/BodyContact"
         : SessionState.GetBool(Key + ".Dragon", false) ? "Logs/Dragon/Playmode"
         : SessionState.GetBool(Key + ".TutorialBalance", false) ? "Logs/Tutorial/Balance"
         : SessionState.GetBool(Key + ".EvolutionHeal", false) ? "Logs/Evolution/Playmode"
@@ -59,7 +61,11 @@ public static partial class PocketStrikerCombatFlowSmoke
         public List<string> effectInvalidationChecks = new List<string>();
         public List<string> dragonChecks = new List<string>();
         public List<string> dragonAttackStates = new List<string>();
+        public List<DragonBodySize> dragonBodySizes = new List<DragonBodySize>();
+        public List<DragonBodyContact> dragonBodyContacts = new List<DragonBodyContact>();
+        public List<DragonBodyAttack> dragonBodyAttacks = new List<DragonBodyAttack>();
         public List<string> rubyImpactChecks = new List<string>();
+        public List<string> headStrikeChecks = new List<string>();
         public bool evolutionFinalDefeatHeal;
         public bool finalDefeatEffectsPreserved;
         public bool finalDefeatEffectsRetired;
@@ -132,10 +138,12 @@ public static partial class PocketStrikerCombatFlowSmoke
         Begin();
     }
 
-    static void Begin(bool dragon = false, bool rubyImpact = false)
+    static void Begin(bool dragon = false, bool rubyImpact = false, bool headStrike = false, bool dragonBody = false)
     {
+        SessionState.SetBool(Key + ".HeadStrike", headStrike);
         SessionState.SetBool(Key + ".Dragon", dragon);
         SessionState.SetBool(Key + ".RubyImpact", rubyImpact);
+        SessionState.SetBool(Key + ".DragonBody", dragonBody);
         finishing = false;
         report = null;
         if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -191,7 +199,8 @@ public static partial class PocketStrikerCombatFlowSmoke
         var errors = SessionState.GetString(Key + ".Errors", "");
         if (!string.IsNullOrEmpty(errors)) { Finish(errors); return; }
         var started = DateTime.Parse(SessionState.GetString(Key + ".Start", DateTime.UtcNow.ToString("O"))).ToUniversalTime();
-        if ((DateTime.UtcNow - started).TotalSeconds > 600)
+        double timeoutSeconds = SessionState.GetBool(Key + ".DragonBody", false) ? 240 : 600;
+        if ((DateTime.UtcNow - started).TotalSeconds > timeoutSeconds)
         {
             Finish("Combat-flow smoke timeout. " + Diagnostic());
             return;
@@ -223,6 +232,18 @@ public static partial class PocketStrikerCombatFlowSmoke
             // Validation must not rewrite the user's persistent skill-analysis data.
             FightGlobalSetting.HitBoxLogger = false;
             Directory.CreateDirectory(Output);
+            if (SessionState.GetBool(Key + ".DragonBody", false))
+            {
+                await ValidateDragonBodyContact();
+                report.passed = true;
+                return;
+            }
+            if (SessionState.GetBool(Key + ".HeadStrike", false))
+            {
+                await ValidateHeadStrike();
+                report.passed = true;
+                return;
+            }
             if (SessionState.GetBool(Key + ".RubyImpact", false))
             {
                 await ValidateRubyImpact();
@@ -1067,6 +1088,7 @@ public static partial class PocketStrikerCombatFlowSmoke
         }
         Debug.Log("[CombatFlowSmoke] " + (report.passed ? "PASS" : "FAIL") + ": " + Path.GetFullPath(Path.Combine(Output, "report.json")));
         if (!report.passed) Debug.LogError(string.Join("\n", report.errors));
+        SessionState.SetBool(Key + ".DragonBody", false);
         if (Application.isBatchMode) EditorApplication.Exit(report.passed ? 0 : 1);
         else EditorApplication.isPlaying = false;
     }
