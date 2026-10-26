@@ -20,7 +20,8 @@ using UnityEngine.SceneManagement;
 public static partial class PocketStrikerCombatFlowSmoke
 {
     const string Key = "PocketStriker.CombatFlowSmoke";
-    static string Output => SessionState.GetBool(Key + ".HeadStrike", false) ? "Logs/HeadStrike/Playmode"
+    static string Output => SessionState.GetBool(Key + ".GroupStageLoading", false) ? "Logs/GroupBattle/StageLoading"
+        : SessionState.GetBool(Key + ".HeadStrike", false) ? "Logs/HeadStrike/Playmode"
         : SessionState.GetBool(Key + ".RubyImpact", false) ? "Logs/RubyImpact/Playmode"
         : SessionState.GetBool(Key + ".DragonBody", false) ? "Logs/Dragon/BodyContact"
         : SessionState.GetBool(Key + ".Dragon", false) ? "Logs/Dragon/Playmode"
@@ -66,6 +67,7 @@ public static partial class PocketStrikerCombatFlowSmoke
         public List<DragonBodyAttack> dragonBodyAttacks = new List<DragonBodyAttack>();
         public List<string> rubyImpactChecks = new List<string>();
         public List<string> headStrikeChecks = new List<string>();
+        public List<string> groupStageLoadingChecks = new List<string>();
         public bool evolutionFinalDefeatHeal;
         public bool finalDefeatEffectsPreserved;
         public bool finalDefeatEffectsRetired;
@@ -138,8 +140,10 @@ public static partial class PocketStrikerCombatFlowSmoke
         Begin();
     }
 
-    static void Begin(bool dragon = false, bool rubyImpact = false, bool headStrike = false, bool dragonBody = false)
+    static void Begin(bool dragon = false, bool rubyImpact = false, bool headStrike = false, bool dragonBody = false,
+        bool groupStageLoading = false)
     {
+        SessionState.SetBool(Key + ".GroupStageLoading", groupStageLoading);
         SessionState.SetBool(Key + ".HeadStrike", headStrike);
         SessionState.SetBool(Key + ".Dragon", dragon);
         SessionState.SetBool(Key + ".RubyImpact", rubyImpact);
@@ -232,6 +236,12 @@ public static partial class PocketStrikerCombatFlowSmoke
             // Validation must not rewrite the user's persistent skill-analysis data.
             FightGlobalSetting.HitBoxLogger = false;
             Directory.CreateDirectory(Output);
+            if (SessionState.GetBool(Key + ".GroupStageLoading", false))
+            {
+                await ValidateGroupStageLoading();
+                report.passed = true;
+                return;
+            }
             if (SessionState.GetBool(Key + ".DragonBody", false))
             {
                 await ValidateDragonBodyContact();
@@ -1035,12 +1045,14 @@ public static partial class PocketStrikerCombatFlowSmoke
     {
         if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying) return;
         RemoveShopStartupObjects();
-        if (SessionState.GetBool(Key + ".EvolutionHeal", false) || SessionState.GetBool(Key + ".StoryFailures", false))
+        if (SessionState.GetBool(Key + ".EvolutionHeal", false) || SessionState.GetBool(Key + ".StoryFailures", false)
+            || SessionState.GetBool(Key + ".GroupStageLoading", false))
         {
             var controller = UnityEngine.Object.FindFirstObjectByType<global::FightScene.FightScene>();
             if (controller != null)
                 typeof(global::FightScene.FightScene).GetField("StoryLoaderForValidation", PrivateInstance).SetValue(controller,
                     (Func<UniTask<StoryInfo>>)(() => SessionState.GetBool(Key + ".EvolutionHeal", false)
+                        || SessionState.GetBool(Key + ".GroupStageLoading", false)
                         ? UniTask.FromResult<StoryInfo>(null)
                         : SessionState.GetString(Key + ".StoryFault", "") switch
                     {

@@ -29,8 +29,8 @@ public static class PocketStrikerGroupBattleValidation
         public int originalDataComparisons;
         public int[] teamLimits;
         public bool sourceAssetsUnchanged;
-        public string scope = "Nine actual main-adventure Group assets and their quest Addressables entries; production ArcadeModeManager.PrepareStage, GangbangInfo count selection/expansion/retry copy, and FightLoad.ConfigureBattleControl. All three authored 12/24/48 per-team options. Legacy 75 Gangbang assets, addresses, GUIDs, labels and bundled schema. Unit/skill references are checked against local master CSV registrations.";
-        public string limitation = "Pure stopped-editor data checks: no scene, account, download or combat simulation is started. Remote bundle availability is not checked. Original MComat payload comparison runs only when that local sibling checkout exists; curated stage identity/count/routing checks always run.";
+        public string scope = "Nine actual main-adventure Group assets, their quest Addressables entries and battlefield addresses/labels/prefab components; production ArcadeModeManager.PrepareStage, GangbangInfo count selection/expansion/retry copy, and FightLoad.ConfigureBattleControl. All three authored 12/24/48 per-team options. Legacy 75 Gangbang assets, addresses, GUIDs, labels and bundled schema. Unit/skill references are checked against local master CSV registrations.";
+        public string limitation = "Pure stopped-editor data checks: no scene, account, download or combat simulation is started. Remote bundle availability is not checked. Original MComat payload comparison allows the local battlefield mapping for stages 30/36 and runs only when that local sibling checkout exists; curated stage identity/count/routing checks always run.";
         public List<string> errors = new List<string>();
         public List<string> observations = new List<string>();
     }
@@ -88,6 +88,11 @@ public static class PocketStrikerGroupBattleValidation
                 Require(entry.guid == AssetDatabase.AssetPathToGUID(path), "Main Group quest GUID is invalid: " + number);
                 Require(source.UnitsData.Count == 4 && source.Team2GroupSet.Count == 4, "Main Group stage lost its four authored troop types: " + number);
                 Require(source.Team2GroupSet.Sum(group => group.Count) == (stageIndex < 2 ? 24 : 32), "Main Group stage lost its authored troop distribution: " + number);
+                var groundAddress = "battleGround/" + source.battleGroundID;
+                var groundEntry = entries.SingleOrDefault(item => item.address == groundAddress);
+                Require(groundEntry != null && groundEntry.labels.Contains("battle_ground")
+                    && AssetDatabase.LoadAssetAtPath<GameObject>(groundEntry.AssetPath)?.GetComponent<BattleGround>() != null,
+                    "Main Group stage references a missing battlefield: " + number + " -> " + groundAddress);
                 CheckReferences(source, unitIds, skillIds, report);
                 CheckOriginalPayload(number, path, report);
                 for (int option = 1; option <= 3; option++)
@@ -233,7 +238,12 @@ public static class PocketStrikerGroupBattleValidation
             // Empty YAML scalar lines may have had whitespace removed during restoration.
             return Regex.Replace(data, "[ \\t]+$", "", RegexOptions.Multiline);
         }
-        Require(Payload(File.ReadAllText(original)) == Payload(File.ReadAllText(path)), "Restored Group payload differs from MComat at stage " + number);
+        var originalPayload = Payload(File.ReadAllText(original));
+        // MComat's fourth battlefield is not shipped by PocketStriker. These two
+        // stages use the local Graveyard; all other encounter data stays authored.
+        if (number == 30 || number == 36)
+            originalPayload = Regex.Replace(originalPayload, "^  battleGroundID: 3$", "  battleGroundID: 2", RegexOptions.Multiline);
+        Require(originalPayload == Payload(File.ReadAllText(path)), "Restored Group payload differs from MComat at stage " + number);
         report.originalDataComparisons++;
     }
 

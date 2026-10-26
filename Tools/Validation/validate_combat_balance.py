@@ -30,6 +30,59 @@ def read_table(name, key):
         return {row[key]: row for row in csv.DictReader(source)}
 
 
+def read_battle_grounds():
+    """Resolve every registered battlefield through its actual prefab GUID."""
+    entries = {}
+    groups = ROOT / "Assets/AddressableAssetsData/AssetGroups"
+    for catalog in sorted(groups.glob("*.asset")):
+        for guid, address, entry in re.findall(
+                r"  - m_GUID: (\w+)\n    m_Address: ([^\n]+)\n(.*?)(?=  - m_GUID:|\Z)",
+                catalog.read_text(), re.DOTALL):
+            if not address.startswith("battleGround/"):
+                continue
+            assert re.fullmatch(r"battleGround/(0|[1-9]\d*)", address), f"Invalid battlefield address: {address}"
+            assert address not in entries, f"Duplicate battlefield address: {address}"
+            assert "    - battle_ground\n" in entry, f"Battlefield address lacks battle_ground label: {address}"
+            entries[address] = {"guid": guid, "catalog": str(catalog.relative_to(ROOT))}
+    assert entries, "No battlefield Addressables are registered"
+
+    required_guids = {entry["guid"] for entry in entries.values()}
+    prefabs = {}
+    for metadata in (ROOT / "Assets").rglob("*.prefab.meta"):
+        match = re.search(r"^guid: (\w+)$", metadata.read_text(), re.MULTILINE)
+        if match is None or match[1] not in required_guids:
+            continue
+        guid = match[1]
+        assert guid not in prefabs, f"Duplicate battlefield prefab GUID: {guid}"
+        prefab = metadata.with_suffix("")
+        assert prefab.is_file(), f"Battlefield prefab is missing: {prefab.relative_to(ROOT)}"
+        prefabs[guid] = prefab
+    for address, entry in entries.items():
+        assert entry["guid"] in prefabs, f"Battlefield {address} GUID does not resolve to a prefab: {entry['guid']}"
+        entry["source"] = str(prefabs[entry["guid"]].relative_to(ROOT))
+    return entries
+
+
+def check_battle_ground_references(paths, battle_grounds):
+    references = []
+    errors = []
+    for path in paths:
+        number = scalar(path.read_text(), "battleGroundID")
+        source = str(path.relative_to(ROOT))
+        if not math.isfinite(number) or number < 0 or not number.is_integer():
+            errors.append(f"{source}: invalid battlefield ID {number}")
+            continue
+        address = f"battleGround/{int(number)}"
+        if address not in battle_grounds:
+            errors.append(f"{source}: unregistered battlefield address {address}")
+            continue
+        references.append({"source": source, "battleGroundId": int(number),
+                           "battleGroundAddress": address,
+                           "battleGroundSource": battle_grounds[address]["source"]})
+    assert not errors, "Invalid combat battlefield references:\n" + "\n".join(errors)
+    return references
+
+
 def level_multiplier(level, settings):
     power = scalar(settings, "levelPowerAverager")
     if level <= 1 or power <= 0:
@@ -62,6 +115,9 @@ def main():
     directories = ("Stage", "EvolutionStages", "Gangbang", "EventStage")
     paths = [path for directory in directories
              for path in sorted((ROOT / "Assets/ExternalAssets" / directory).glob("*.asset"))]
+    battle_grounds = read_battle_grounds()
+    battle_ground_references = check_battle_ground_references(paths, battle_grounds)
+    battle_ground_by_path = {row["source"]: row for row in battle_ground_references}
     by_guid = {}
     for path in paths:
         guid = re.search(r"^guid: (\w+)$", path.with_suffix(".asset.meta").read_text(), re.MULTILINE)[1]
@@ -85,7 +141,8 @@ def main():
 
     report = {"passed": False, "teamLimits": limits, "assetsChecked": 0, "unitsChecked": 0,
               "skillReferencesChecked": 0, "tutorials": [], "publishedStages": [],
-              "scope": "All 328 authored adventure, evolution, legacy Group and event assets; the 120 published quests resolved by Addressables GUID; master skill/unit references, HP/attack weights, positive levels/HP rates, valid AI/gauge values, beginner budgets and early progression.",
+              "battleGrounds": battle_grounds, "battleGroundReferences": battle_ground_references,
+              "scope": "All 328 authored adventure, evolution, legacy Group and event assets; the 120 published quests resolved by Addressables GUID; battlefield addresses, labels and prefab GUIDs; master skill/unit references, HP/attack weights, positive levels/HP rates, valid AI/gauge values, beginner budgets and early progression.",
               "limitation": "Configuration checks only. Initial server-granted inventory is not stored in the repository. A level-1 human with nine HP-weight-3 skills is the comparison budget; natural combat is tested separately."}
     opening = {}
     for directory in directories:
@@ -121,7 +178,8 @@ def main():
             report["assetsChecked"] += 1
             number = published_by_path.get(path)
             if number is not None:
-                report["publishedStages"].append({"stage": number, "source": str(path.relative_to(ROOT)),
+                report["publishedStages"].append({"stage": number,
+                    **battle_ground_by_path[str(path.relative_to(ROOT))],
                     "mode": stage_modes[number], "enemyCount": len(authored_units), "level": level,
                     "enemyHpRate": rates[1], "enemyAiMode": int(scalar(text, "team2AIMode")),
                     "enemyDreamRate": int(scalar(text, "dreamComboAIRateNum", 5))})
@@ -144,6 +202,7 @@ def main():
                                            "aiDecisionDelayFrames": int(scalar(text, "dumbAIDecisionDelay"))})
 
     assert report["assetsChecked"] == 328 and len(report["publishedStages"]) == 120
+    assert len(report["battleGroundReferences"]) == report["assetsChecked"]
     report["publishedStages"].sort(key=lambda row: row["stage"])
     report["tutorials"].sort(key=lambda row: row["stage"])
     assert report["tutorials"][0]["enemyTotalToHeroHp"] < report["tutorials"][1]["enemyTotalToHeroHp"]
@@ -158,7 +217,8 @@ def main():
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2) + "\n")
     print(f"PASS: {report['assetsChecked']} combat assets, {report['unitsChecked']} units, "
-          f"{report['skillReferencesChecked']} skill references; 12/24/48 counts and tutorial budgets")
+          f"{report['skillReferencesChecked']} skill references, {len(battle_ground_references)} battlefield references "
+          f"across {len(battle_grounds)} registered maps; 12/24/48 counts and tutorial budgets")
     for row in report["tutorials"]:
         print(f"Stage {row['stage']}: player HP {row['heroHpBudget']:g}; enemy HP {row['enemyHp']}; "
               f"total/player {row['enemyTotalToHeroHp']:.3f}")
